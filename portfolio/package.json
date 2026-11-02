@@ -11,7 +11,8 @@
     "lint": "oxlint",
     "test:emet": "node --test src/lib/palettes.test.mjs src/components/companionMotion.test.mjs src/components/createEmetBehaviorDirector.test.mjs src/components/createBB8Roaming.test.mjs src/emet/emetKnowledge.test.mjs src/bb8/motionCues.test.mjs src/bb8/reactionMath.test.mjs",
     "preview": "vite preview",
-    "check:tools": "node scripts/check-tools.mjs"
+    "check:tools": "node scripts/check-tools.mjs",
+    "count:loc": "node scripts/count-loc.mjs"
   },
   "dependencies": {
     "framer-motion": "^13.1.0",
