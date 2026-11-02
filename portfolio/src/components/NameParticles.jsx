@@ -14,8 +14,11 @@ const MORPH_DURATION = 0.56;
 const clamp01 = (v) => Math.max(0, Math.min(1, v));
 const ease = (k) => 1 - Math.pow(1 - k, 4);
 
-// Soft-black letterforms carry the name; burnt orange catches the perimeter.
-const STOPS = [[16, 16, 16], [16, 16, 16], [16, 16, 16], [213, 54, 12]];
+// Soft-black letterforms carry the name and the statement; burnt orange is
+// held back to the trailing edge so the words stay ink-dark end to end. The
+// statement is long and set in a lighter face than the name, so contrast is
+// what makes it readable — the accent only catches the last few letters.
+const STOPS = [[16, 16, 16], [16, 16, 16], [16, 16, 16], [16, 16, 16], [16, 16, 16], [116, 32, 13], [213, 54, 12]];
 function sweep(f) {
   const x = Math.min(0.999, Math.max(0, f)) * (STOPS.length - 1);
   const i = Math.floor(x), k = x - i;
@@ -42,7 +45,10 @@ function sampleText(w, h, dpr, statement = false, stepOverride = 0) {
     : narrow ? ["Mohamed", "Ansar"] : ["Mohamed Ansar"];
   g.font = statement ? "700 100px Outfit, sans-serif" : "400 100px Anton, sans-serif";
   const widest = Math.max(...lines.map((line) => g.measureText(line).width));
-  const big = Math.min((w * 0.86 * 100) / widest, (h * 0.62) / (lines.length * 0.95 + (statement ? 0 : 0.55)));
+  // The statement is two long lines: set it smaller than the name so each
+  // stroke is wide enough, relative to the sampling grid, to hold its shape.
+  const fill = statement ? 0.68 : 0.86;
+  const big = Math.min((w * fill * 100) / widest, (h * (statement ? 0.44 : 0.62)) / (lines.length * 0.95 + (statement ? 0 : 0.55)));
   const small = statement ? 0 : big * 0.42;
   const lineHeight = big * (statement ? 1.15 : 0.95);
   const total = small * 1.1 + big + (lines.length - 1) * lineHeight;
@@ -60,7 +66,10 @@ function sampleText(w, h, dpr, statement = false, stepOverride = 0) {
     g.fillText(line, w / 2, y);
     y += lineHeight;
   }
-  const step = Math.max(2, stepOverride || Math.round((narrow ? 2.5 : 3) * dpr * Math.max(0.7, big / (220 * dpr))));
+  // A finer grid for the statement: its strokes are thinner than the name's,
+  // so the same spacing would leave them ragged.
+  const spacing = statement ? (narrow ? 1.8 : 2.1) : narrow ? 2.5 : 3;
+  const step = Math.max(2, stepOverride || Math.round(spacing * dpr * Math.max(0.7, big / (220 * dpr))));
   const data = g.getImageData(0, 0, w, h).data;
   const pts = [];
   for (let py = 0; py < h; py += step) {
@@ -104,6 +113,7 @@ export default function NameParticles({ ready = true, onSettled }) {
     let lastFrame = 0;
     let lastPointerMove = -Infinity;
     let settledSent = false;
+    let sweptToStatement = false;
     let initialized = false;
     let onScreen = true;
     let alive = true;
@@ -134,7 +144,10 @@ export default function NameParticles({ ready = true, onSettled }) {
       const sampledCount = Math.max(name.pts.length, statement.pts.length);
       // The animated hero is capped for per-frame cost; the static one is drawn
       // once and is already bounded by the grid above.
-      const count = Math.min(sampledCount, staticMode ? sampledCount : rect.width < 640 ? 3200 : 7000);
+      // The statement needs far more points than the name to stay readable;
+      // the draw loop is a flat fillRect pass, so the extra cost is small and
+      // the resting frame rate already drops to 30fps.
+      const count = Math.min(sampledCount, staticMode ? sampledCount : rect.width < 640 ? 6000 : 15000);
       // Slightly larger points retain the letter density with fewer particles.
       radius = Math.min(Math.min(name.step, statement.step) * 0.36 * Math.sqrt(sampledCount / Math.max(1, count)), 2.4 * dpr);
       const scale = Math.min(w * 0.38, h * 0.62);
@@ -154,9 +167,16 @@ export default function NameParticles({ ready = true, onSettled }) {
         const morph = staticMode ? 0 : ease(clamp01((elapsed - MORPH_START - delay) / MORPH_DURATION));
         const x = preservePhase ? nx + (tx - nx) * morph : sx;
         const y = preservePhase ? ny + (ty - ny) * morph : sy;
-        const color = Math.random() < 0.18 ? 0 : Math.min(15, Math.max(0, Math.round((nx / w + (Math.random() - 0.5) * 0.08) * 15)));
-        return { nx, ny, tx, ty, x, y, sx, sy, vx: 0, vy: 0, color, delay, phase: Math.floor(Math.random() * PHASES) };
+        // Each shape gets its own sweep, keyed to where the particle rests in
+        // that shape. Carrying the name's colours into the statement scattered
+        // accent-coloured points through the middle of the words, where they
+        // read as noise; the jitter is smaller now for the same reason.
+        const ink = Math.random() < 0.18;
+        const wobble = (Math.random() - 0.5) * 0.03;
+        const quantize = (x) => (ink ? 0 : Math.min(15, Math.max(0, Math.round((x / w + wobble) * 15))));
+        return { nx, ny, tx, ty, x, y, sx, sy, vx: 0, vy: 0, color: quantize(nx), statementColor: quantize(tx), delay, phase: Math.floor(Math.random() * PHASES) };
       }).sort((a, b) => a.color - b.color);
+      sweptToStatement = false;
       canvas.dataset.particleCount = String(parts.length);
     }
 
@@ -171,6 +191,14 @@ export default function NameParticles({ ready = true, onSettled }) {
         waveX[i] = Math.sin(elapsed * 1.3 + phase) * 0.6 * dpr;
         waveY[i] = Math.cos(elapsed * 1.1 + phase) * 0.6 * dpr;
         waveIntro[i] = Math.sin(elapsed * 1.4 + phase) * 3 * dpr;
+      }
+      // Once the morph starts the sweep belongs to the statement, so adopt
+      // those colours and re-sort to keep the draw batched by fillStyle. Both
+      // happen once per build, not per frame.
+      if (!sweptToStatement && !staticMode && elapsed >= MORPH_START) {
+        for (const p of parts) p.color = p.statementColor;
+        parts.sort((a, b) => a.color - b.color);
+        sweptToStatement = true;
       }
       let allHome = true;
       let color = -1;
