@@ -3,7 +3,7 @@ import { AnimatePresence, animate, motion, useReducedMotion, useInView } from "f
 import { ArrowDown, ArrowRight, ArrowUpRight, ExternalLink, Info, Mail } from "lucide-react";
 import NameParticles from "./NameParticles";
 import ProjectMotionPreview from "./ProjectMotionPreview";
-import { ABOUT, CONTACT, HERO, RECEIPTS, ROLES } from "../data/content";
+import { ABOUT, CODE, CONTACT, HERO, RECEIPTS, ROLES } from "../data/content";
 import { EARLIER_PROJECTS, EXPERIMENTS, FEATURED, FEATURED_GRID, LISTED_PROJECTS, MORE_PROJECTS, OPEN_SOURCE_GROUPS } from "../data/projects";
 import { TOOL_INFO } from "../data/tools";
 import { EASE_REVEAL } from "../lib/motion";
@@ -166,6 +166,32 @@ function BuiltLine({ run }) {
 }
 
 
+// The receipts are counts of things; this is the one measurement, so it gets
+// its own band rather than a fifth column too narrow to hold a five-digit
+// number. The note line is not decoration: it is what makes the figure
+// checkable instead of a boast.
+function CodeBand() {
+  const widest = CODE.languages[0].lines;
+  return (
+    <Enter className="ed-code-band">
+      <div>
+        <p className="ed-code-total"><CountUp value={CODE.total.toLocaleString()} /></p>
+        <p className="ed-code-label">lines of code written</p>
+        <p className="ed-code-note">hand-written only · no dependencies, build output or notebooks · {CODE.asOf}</p>
+      </div>
+      <dl className="ed-code-langs">
+        {CODE.languages.map((language) => (
+          <div key={language.name}>
+            <dt>{language.name}</dt>
+            <dd aria-hidden="true"><span style={{ width: `${(language.lines / widest) * 100}%` }} /></dd>
+            <dd>{language.lines.toLocaleString()}</dd>
+          </div>
+        ))}
+      </dl>
+    </Enter>
+  );
+}
+
 export function Hero({ ready = true }) {
   const reduced = useReducedMotion();
   const staticHero = useStaticHero();
@@ -198,6 +224,7 @@ export function Hero({ ready = true }) {
           </div>
         </Enter>
         <dl className="ed-receipts">{RECEIPTS.map((item) => <div key={item.label}><dt><CountUp value={item.value === "PROJECTS" ? `${LISTED_PROJECTS.length}+` : item.value} /></dt><dd>{item.label}</dd></div>)}</dl>
+        <CodeBand />
       </div>
     </section>
   </>;
