@@ -68,7 +68,6 @@
 .ed-code-band { display: grid; grid-template-columns: 1fr 1.25fr; gap: 64px; align-items: end; border-bottom: 1px solid var(--ed-rule); padding-block: 34px; }
 .ed-code-total { font: 400 clamp(3.4rem,7vw,5.4rem)/.9 var(--font-serif); letter-spacing: -.045em; }
 .ed-code-label { font-size: .7rem; line-height: 1.6; margin-top: 14px; max-width: 30ch; }
-.ed-code-note { font: 400 .55rem/1.5 var(--font-mono); letter-spacing: .06em; opacity: .55; margin-top: 10px; max-width: 46ch; }
 .ed-code-langs { display: grid; gap: 9px; }
 .ed-code-langs > div { display: grid; grid-template-columns: 92px 1fr 54px; align-items: center; gap: 14px; font: 500 .6rem/1 var(--font-mono); letter-spacing: .04em; }
 .ed-code-langs dt { color: inherit; }
