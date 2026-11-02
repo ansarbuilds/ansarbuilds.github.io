@@ -19,20 +19,22 @@ export const RECEIPTS = [
   { value: "2019", label: "the year I started working with data", accent: "cyan" },
 ];
 
-// A real count, not an estimate: every repository on the account, public and
-// private, counting only hand-written source. Regenerate this block with
-// `npm run count:loc` — the script explains what it excludes and why.
+// A real count, not an estimate: lines added across the whole history of every
+// repository on the account, public and private, by commits Mohamed authored,
+// counting only hand-written source. Regenerate with `npm run count:loc` — the
+// script explains what it counts, what it leaves out, and why.
 // 39 repositories, counted 2026-11-02
 export const CODE = {
-  total: 89920,
+  total: 133785,
+  repos: 39,
   asOf: "Nov 2026",
   languages: [
-    { name: "Swift", lines: 35308 },
-    { name: "Python", lines: 18856 },
-    { name: "JavaScript", lines: 15045 },
-    { name: "HTML", lines: 6380 },
-    { name: "TypeScript", lines: 4636 },
-    { name: "C", lines: 4429 },
+    { name: "Swift", lines: 63571 },
+    { name: "HTML", lines: 25418 },
+    { name: "Python", lines: 15892 },
+    { name: "JavaScript", lines: 13801 },
+    { name: "CSS", lines: 8394 },
+    { name: "C", lines: 5170 },
   ],
 };
 

@@ -176,7 +176,7 @@ function CodeBand() {
     <Enter className="ed-code-band">
       <div>
         <p className="ed-code-total"><CountUp value={CODE.total.toLocaleString()} /></p>
-        <p className="ed-code-label">lines of code written</p>
+        <p className="ed-code-label">lines of code written across {CODE.repos} repositories</p>
       </div>
       <dl className="ed-code-langs">
         {CODE.languages.map((language) => (
