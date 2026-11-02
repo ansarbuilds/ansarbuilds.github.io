@@ -168,8 +168,8 @@ function BuiltLine({ run }) {
 
 // The receipts are counts of things; this is the one measurement, so it gets
 // its own band rather than a fifth column too narrow to hold a five-digit
-// number. The note line is not decoration: it is what makes the figure
-// checkable instead of a boast.
+// number. What the figure counts, and what it leaves out, is recorded with the
+// data in content.js and in scripts/count-loc.mjs, which reproduces it.
 function CodeBand() {
   const widest = CODE.languages[0].lines;
   return (
@@ -177,7 +177,6 @@ function CodeBand() {
       <div>
         <p className="ed-code-total"><CountUp value={CODE.total.toLocaleString()} /></p>
         <p className="ed-code-label">lines of code written</p>
-        <p className="ed-code-note">hand-written only · no dependencies, build output or notebooks · {CODE.asOf}</p>
       </div>
       <dl className="ed-code-langs">
         {CODE.languages.map((language) => (
