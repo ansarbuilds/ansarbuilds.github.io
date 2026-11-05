@@ -75,6 +75,8 @@
 .ed-code-langs dd:last-child { text-align: right; opacity: .6; font-variant-numeric: tabular-nums; }
 .ed-code-langs span { display: block; height: 6px; background: var(--ed-blue); opacity: .85; }
 .ed-code-langs > div:first-child span { background: var(--ed-coral); opacity: 1; }
+.ed-code-tools { grid-column: 1 / -1; display: flex; flex-wrap: wrap; gap: 8px; list-style: none; margin: 0; padding: 0; }
+.ed-code-tools li { font: 500 .6rem/1 var(--font-mono); letter-spacing: .04em; padding: 6px 10px; border: 1px solid var(--ed-rule); border-radius: 999px; }
 .ed-projects { padding-top: 70px; }
 .ed-feature { display: grid; grid-template-columns: 1.25fr 1fr; gap: 65px; align-items: center; margin-bottom: 110px; }
 .ed-feature-reverse { grid-template-columns: 1fr 1.25fr; }

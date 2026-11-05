@@ -23,18 +23,34 @@ export const RECEIPTS = [
 // repository on the account, public and private, by commits Mohamed authored,
 // counting only hand-written source. Regenerate with `npm run count:loc` — the
 // script explains what it counts, what it leaves out, and why.
-// 39 repositories, counted 2026-11-02
+// 39 repositories, counted 2026-11-05
 export const CODE = {
-  total: 133785,
+  total: 143863,
   repos: 39,
   asOf: "Nov 2026",
   languages: [
-    { name: "Swift", lines: 63571 },
-    { name: "HTML", lines: 25418 },
-    { name: "Python", lines: 15892 },
-    { name: "JavaScript", lines: 13801 },
-    { name: "CSS", lines: 8394 },
-    { name: "C", lines: 5170 },
+    { name: "Swift", lines: 65023 },
+    { name: "HTML", lines: 25609 },
+    { name: "Python", lines: 15924 },
+    { name: "JavaScript", lines: 13510 },
+    { name: "CSS", lines: 7600 },
+    { name: "Rust", lines: 6971 },
+  ],
+  // Libraries and frameworks declared in the repositories' manifests, by how
+  // many repositories use each.
+  tools: [
+    { name: "Xcode", repos: 6 },
+    { name: "TypeScript", repos: 4 },
+    { name: "Vite", repos: 4 },
+    { name: "Framer Motion", repos: 3 },
+    { name: "Playwright", repos: 3 },
+    { name: "React", repos: 3 },
+    { name: "pandas", repos: 2 },
+    { name: "LangChain", repos: 1 },
+    { name: "FAISS", repos: 1 },
+    { name: "Hugging Face Transformers", repos: 1 },
+    { name: "Dagster", repos: 1 },
+    { name: "Streamlit", repos: 1 },
   ],
 };
 

@@ -187,6 +187,13 @@ function CodeBand() {
           </div>
         ))}
       </dl>
+      {CODE.tools?.length > 0 && (
+        <ul className="ed-code-tools" aria-label="Tools and frameworks used">
+          {CODE.tools.map((tool) => (
+            <li key={tool.name}>{tool.name}</li>
+          ))}
+        </ul>
+      )}
     </Enter>
   );
 }
