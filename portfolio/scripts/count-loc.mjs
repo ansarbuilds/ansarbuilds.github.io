@@ -15,10 +15,15 @@
 //
 //   node scripts/count-loc.mjs        # print the CODE block for content.js
 //   node scripts/count-loc.mjs --keep # keep the clones for a second run
+//   node scripts/count-loc.mjs --from DIR # count clones already in DIR, one per repo
+//
+// It also lists TOOLS: the libraries and frameworks the repositories declare in
+// their manifests (package.json, requirements.txt, pyproject.toml,
+// Package.swift) at the current tip, ranked by how many repositories use them.
 //
 // Needs the GitHub CLI, signed in: the private repositories come from its token.
 import { execFileSync } from "node:child_process";
-import { mkdtempSync, rmSync, statSync } from "node:fs";
+import { mkdtempSync, readdirSync, rmSync, statSync } from "node:fs";
 import { join } from "node:path";
 import { tmpdir } from "node:os";
 
@@ -56,16 +61,72 @@ const run = (cmd, args, cwd) =>
   execFileSync(cmd, args, { cwd, encoding: "utf8", maxBuffer: 256 << 20 });
 
 const keep = process.argv.includes("--keep");
-const root = keep ? join(tmpdir(), "portfolio-loc") : mkdtempSync(join(tmpdir(), "loc-"));
-const repos = run("gh", ["api", "user/repos", "--paginate", "-q", ".[]|select(.fork==false)|.full_name"])
-  .split("\n").filter(Boolean);
+const fromIndex = process.argv.indexOf("--from");
+const from = fromIndex > 0 ? process.argv[fromIndex + 1] : null;
+const root = from || (keep ? join(tmpdir(), "portfolio-loc") : mkdtempSync(join(tmpdir(), "loc-")));
+const repos = from
+  ? readdirSync(from).filter((name) => statSync(join(from, name)).isDirectory()).map((name) => `local/${name}`)
+  : run("gh", ["api", "user/repos", "--paginate", "-q", ".[]|select(.fork==false)|.full_name"])
+      .split("\n").filter(Boolean);
 
 const authors = new Set(AUTHORS.map((a) => a.toLowerCase()));
 const lines = new Map();
+const tools = new Map();
 let total = 0;
+
+// Libraries a repository declares, read from its manifests at the tip.
+const TOOL_NAMES = {
+  react: "React", "react-dom": null, vite: "Vite", tailwindcss: "Tailwind CSS",
+  "framer-motion": "Framer Motion", next: "Next.js", express: "Express", typescript: "TypeScript",
+  "@anthropic-ai/sdk": "Claude API", anthropic: "Claude API", openai: "OpenAI API",
+  "@modelcontextprotocol/sdk": "MCP", mcp: "MCP", playwright: "Playwright",
+  pandas: "pandas", numpy: "NumPy", "scikit-learn": "scikit-learn", sklearn: "scikit-learn",
+  matplotlib: "Matplotlib", seaborn: "seaborn", plotly: "Plotly", streamlit: "Streamlit",
+  fastapi: "FastAPI", flask: "Flask", django: "Django", requests: "Requests",
+  beautifulsoup4: "Beautiful Soup", selenium: "Selenium", nltk: "NLTK", spacy: "spaCy",
+  torch: "PyTorch", tensorflow: "TensorFlow", transformers: "Hugging Face Transformers",
+  langchain: "LangChain", dagster: "Dagster", sqlalchemy: "SQLAlchemy", pydantic: "Pydantic",
+  jupyter: "Jupyter", xgboost: "XGBoost", statsmodels: "statsmodels", scipy: "SciPy",
+  "yfinance": "yfinance", "chromadb": "Chroma", "faiss-cpu": "FAISS", "uvicorn": null,
+  "d3": "D3", "chart.js": "Chart.js", "three": "three.js", "electron": "Electron",
+};
+const manifestTools = (path) => {
+  let files;
+  try { files = run("git", ["ls-tree", "-r", "--name-only", "HEAD"], path).split("\n"); } catch { return []; }
+  const found = new Set();
+  const add = (dep) => {
+    const key = dep.toLowerCase().trim();
+    if (key in TOOL_NAMES) { if (TOOL_NAMES[key]) found.add(TOOL_NAMES[key]); }
+  };
+  for (const file of files.filter((f) => f && !skipped(f))) {
+    const name = file.split("/").pop();
+    if (!["package.json", "requirements.txt", "pyproject.toml", "Package.swift"].includes(name)) continue;
+    let text;
+    try { text = run("git", ["show", `HEAD:${file}`], path); } catch { continue; }
+    if (name === "package.json") {
+      try {
+        const pkg = JSON.parse(text);
+        Object.keys({ ...pkg.dependencies, ...pkg.devDependencies }).forEach(add);
+      } catch { /* not valid JSON */ }
+    } else if (name === "Package.swift") {
+      for (const m of text.matchAll(/\.package\([^)]*?url:\s*"[^"]*\/([^/"]+?)(?:\.git)?"/g)) {
+        found.add(m[1]);
+      }
+    } else {
+      for (const line of text.split("\n")) {
+        const dep = line.replace(/#.*/, "").match(/^\s*"?([A-Za-z0-9_.-]+)/);
+        if (dep) add(dep[1]);
+      }
+    }
+  }
+  if (files.some((f) => f.includes(".xcodeproj/"))) found.add("Xcode");
+  if (files.some((f) => f.endsWith(".ipynb"))) found.add("Jupyter");
+  return [...found];
+};
 for (const repo of repos) {
   const path = join(root, repo.split("/")[1]);
   const cloned = (() => { try { return statSync(path).isDirectory(); } catch { return false; } })();
+  if (!cloned && from) continue;
   if (!cloned) {
     process.stderr.write(`cloning ${repo}\n`);
     // Full history: --depth 1 would leave only the current tip to count.
@@ -79,6 +140,7 @@ for (const repo of repos) {
   // One record per commit: the author line, then a numstat line per file.
   const log = run("git", ["log", "--no-merges", "--numstat", "--format=%ae"], path);
   let mine = false;
+  let wrote = false;
   for (const line of log.split("\n")) {
     if (!line) continue;
     const columns = line.split("\t");
@@ -92,9 +154,11 @@ for (const repo of repos) {
     if (!language || !file.includes(".")) continue;
     lines.set(language, (lines.get(language) || 0) + Number(added));
     total += Number(added);
+    wrote = true;
   }
+  if (wrote) for (const tool of manifestTools(path)) tools.set(tool, (tools.get(tool) || 0) + 1);
 }
-if (!keep) rmSync(root, { recursive: true, force: true });
+if (!keep && !from) rmSync(root, { recursive: true, force: true });
 
 const ranked = [...lines.entries()].sort((a, b) => b[1] - a[1]);
 const asOf = new Date().toLocaleDateString("en-US", { month: "short", year: "numeric" });
@@ -105,6 +169,8 @@ export const CODE = {
   asOf: "${asOf}",
   languages: [
 ${ranked.filter(([, n]) => n >= 1000).slice(0, 6).map(([name, n]) => `    { name: "${name}", lines: ${n} },`).join("\n")}
+  ],
+  tools: [${[...tools.entries()].sort((a, b) => b[1] - a[1]).slice(0, 12).map(([name, n]) => `\n    { name: "${name}", repos: ${n} },`).join("")}
   ],
 };`);
 console.error(`\n${total.toLocaleString()} lines added across ${repos.length} repositories`);

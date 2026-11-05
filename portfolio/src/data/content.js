@@ -23,18 +23,43 @@ export const RECEIPTS = [
 // repository on the account, public and private, by commits Mohamed authored,
 // counting only hand-written source. Regenerate with `npm run count:loc` — the
 // script explains what it counts, what it leaves out, and why.
-// 39 repositories, counted 2026-11-02
+// 39 repositories, counted 2026-11-05
 export const CODE = {
-  total: 133785,
+  total: 143863,
   repos: 39,
   asOf: "Nov 2026",
   languages: [
-    { name: "Swift", lines: 63571 },
-    { name: "HTML", lines: 25418 },
-    { name: "Python", lines: 15892 },
-    { name: "JavaScript", lines: 13801 },
-    { name: "CSS", lines: 8394 },
-    { name: "C", lines: 5170 },
+    { name: "Swift", lines: 65023 },
+    { name: "HTML", lines: 25609 },
+    { name: "Python", lines: 15924 },
+    { name: "JavaScript", lines: 13510 },
+    { name: "CSS", lines: 7600 },
+    { name: "Rust", lines: 6971 },
+  ],
+  // Libraries and frameworks the code imports, curated by hand from a scan of
+  // every repository (manifests alone miss Swift frameworks and most Python),
+  // most-used first. `repos` is how many repositories use it.
+  tools: [
+    { name: "SwiftUI", repos: 6 },
+    { name: "SwiftData", repos: 4 },
+    { name: "pandas", repos: 7 },
+    { name: "Claude API", repos: 8 },
+    { name: "React", repos: 3 },
+    { name: "TypeScript", repos: 4 },
+    { name: "Vite", repos: 4 },
+    { name: "Hugging Face Transformers", repos: 3 },
+    { name: "PyTorch", repos: 1 },
+    { name: "MCP", repos: 1 },
+    { name: "Playwright", repos: 3 },
+    { name: "Tauri", repos: 1 },
+    { name: "Flutter", repos: 1 },
+    { name: "dbt", repos: 1 },
+    { name: "Dagster", repos: 2 },
+    { name: "DuckDB", repos: 2 },
+    { name: "SQLite", repos: 8 },
+    { name: "Streamlit", repos: 1 },
+    { name: "LangChain", repos: 1 },
+    { name: "Docker", repos: 1 },
   ],
 };
 
