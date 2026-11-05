@@ -36,21 +36,30 @@ export const CODE = {
     { name: "CSS", lines: 7600 },
     { name: "Rust", lines: 6971 },
   ],
-  // Libraries and frameworks declared in the repositories' manifests, by how
-  // many repositories use each.
+  // Libraries and frameworks the code imports, curated by hand from a scan of
+  // every repository (manifests alone miss Swift frameworks and most Python),
+  // most-used first. `repos` is how many repositories use it.
   tools: [
-    { name: "Xcode", repos: 6 },
+    { name: "SwiftUI", repos: 6 },
+    { name: "SwiftData", repos: 4 },
+    { name: "pandas", repos: 7 },
+    { name: "Claude API", repos: 8 },
+    { name: "React", repos: 3 },
     { name: "TypeScript", repos: 4 },
     { name: "Vite", repos: 4 },
-    { name: "Framer Motion", repos: 3 },
+    { name: "Hugging Face Transformers", repos: 3 },
+    { name: "PyTorch", repos: 1 },
+    { name: "MCP", repos: 1 },
     { name: "Playwright", repos: 3 },
-    { name: "React", repos: 3 },
-    { name: "pandas", repos: 2 },
-    { name: "LangChain", repos: 1 },
-    { name: "FAISS", repos: 1 },
-    { name: "Hugging Face Transformers", repos: 1 },
-    { name: "Dagster", repos: 1 },
+    { name: "Tauri", repos: 1 },
+    { name: "Flutter", repos: 1 },
+    { name: "dbt", repos: 1 },
+    { name: "Dagster", repos: 2 },
+    { name: "DuckDB", repos: 2 },
+    { name: "SQLite", repos: 8 },
     { name: "Streamlit", repos: 1 },
+    { name: "LangChain", repos: 1 },
+    { name: "Docker", repos: 1 },
   ],
 };
 
