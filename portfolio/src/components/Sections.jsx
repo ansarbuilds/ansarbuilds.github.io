@@ -61,6 +61,7 @@ const BUILT = [
   ["My Take on Jev", "Python", "an AI study"],
   ["Agent Flight Recorder", "Python", "a local agent debugging tool"],
   ["My Take on REA", "Python", "an independent AI study"],
+  ["My Take on PRH-JEPA", "PyTorch", "an independent AI study"],
   ["StoryEra", "Codex", "a skill for writers"],
   ["Site Recon", "Playwright", "a site inspector"],
   ["Exposure Audit", "Python", "a safe public-surface checker"],
@@ -271,14 +272,14 @@ function ProjectPlate({ project, compact = false }) {
     {!compact && <span className="ed-plate-caption">{project.kind}</span>}
   </div>;
   const screenshot = project.cardShot || project.shots?.[0];
-  const study = project.slug === "decision-models" || project.slug === "rea-study";
+  const study = project.slug === "decision-models" || project.slug === "rea-study" || project.slug === "prh-jepa";
   if (study) return <div className={`ed-project-plate ed-study-cover ${project.slug === "rea-study" ? "ed-cover-rea" : "ed-cover-jev"}`} aria-hidden="true">
     <div className="ed-cover-grid" />
     <div className="ed-cover-orbit" />
     <p className="ed-cover-label">{project.kind}</p>
-    <span className="ed-cover-type">{project.slug === "rea-study" ? "REA" : "JEV"}</span>
+    <span className="ed-cover-type">{project.slug === "rea-study" ? "REA" : project.slug === "prh-jepa" ? "PRH" : "JEV"}</span>
     <img className="ed-cover-icon ed-lazy-media" src={media(project.icon)} alt="" loading="lazy" onLoad={revealImage} />
-    <span className="ed-cover-stamp">{project.slug === "rea-study" ? "TESTED, NOT ASSUMED" : "SMALL MODELS. REAL TESTS."}</span>
+    <span className="ed-cover-stamp">{project.slug === "rea-study" ? "TESTED, NOT ASSUMED" : project.slug === "prh-jepa" ? "CLAIMS, REPRODUCED." : "SMALL MODELS. REAL TESTS."}</span>
     <div className="ed-cover-flow">{project.flow?.columns.map((column, i) => <span key={column.label}>{column.label}{i < project.flow.columns.length - 1 && <b>↗</b>}</span>)}</div>
     <ProjectMotionPreview project={project} />
   </div>;

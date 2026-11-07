@@ -18,6 +18,12 @@ export const CASE_SUMMARIES = {
     proof: '153 scored runs, raw results, a claims ledger and a held-out review.',
     limits: 'One model and machine were tested; near-ceiling scores and a small held-out set limit the conclusion.',
   },
+  'prh-jepa': {
+    problem: 'Do the released code, WIT-1024 baselines and good-views theory in PRH-JEPA hold up when checked independently on one laptop?',
+    outcome: '135 of 139 tests passed, 6 of 6 open text baselines reproduced within 0.0012, and coordinate clipping proved to drive 35% of Qwen2.5-3B’s score.',
+    proof: 'Frozen analysis plan, independent NumPy metrics, 6 baseline extractions, 20 finite worlds, 6 laptop LeJEPA runs and a 24-claim ledger.',
+    limits: 'One 16 GB Mac; web-scale 940M-image runs and 72B models are audited from released CSVs only, and laptop LeJEPA runs are 1/844 of the paper’s smallest WIT run.',
+  },
   'decision-models': {
     problem: 'Can smaller decision models route support messages accurately and report honest confidence?',
     outcome: 'The best small model routed 80% of the held-out messages to the right team.',

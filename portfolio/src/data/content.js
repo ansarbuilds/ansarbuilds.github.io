@@ -14,7 +14,7 @@ export const HERO = {
 // Quick proof, right under the intro, before anyone reads a paragraph.
 export const RECEIPTS = [
   { value: "2", label: "apps for Apple devices live on the App Store", accent: "amber" },
-  { value: "2", label: "independent AI studies, each with a full report", accent: "rose" },
+  { value: "3", label: "independent AI studies, each with a full report", accent: "rose" },
   { value: "PROJECTS", label: "projects with code, write-ups or live demos", accent: "green" },
   { value: "2019", label: "the year I started working with data", accent: "cyan" },
 ];
@@ -74,7 +74,7 @@ export const ABOUT = {
   title: "What I do, and what I know",
   story: [
     "Amazon Prime Video taught me that bad data rarely looks like an error. It looks like a confident report. Since then I've wanted to build the systems that move and check data, not just read the results. I check my own numbers before anyone else has to.",
-    "Outside work I keep building. Two apps for Apple devices, two independent AI studies, data tools with honest tests, and a growing pile of things made with AI as a coding partner. None of it was assigned. It's just how I learn.",
+    "Outside work I keep building. Two apps for Apple devices, three independent AI studies, data tools with honest tests, and a growing pile of things made with AI as a coding partner. None of it was assigned. It's just how I learn.",
   ],
   groups: [
     { title: "Data", accent: "cyan", items: ["SQL", "Snowflake", "BigQuery", "Python", "pandas", "DuckDB", "Airflow", "ETL and ELT"] },
@@ -203,7 +203,7 @@ export const EMET_TOPICS = [
       { text: ", a personal AI agent that runs on my Mac. I also have two apps on the " },
       { text: "App Store", cls: "font-bold" },
       { text: " (Haloscript for novelists, RepTrack for workouts), " },
-      { text: "two independent AI studies", cls: "font-bold" },
+      { text: "three independent AI studies", cls: "font-bold" },
       {
         text:
           " with full technical reports, open-source agent skills, and data tools that test themselves. Most have a live demo or a write-up.",
@@ -244,6 +244,7 @@ export const COMMAND_ITEMS = [
   { label: "Jarvis, personal AI agent", go: "#project/jarvis", group: "Projects" },
   { label: "My Take on Jev, project page", go: "#project/decision-models", group: "Projects" },
   { label: "My Take on REA, project page", go: "#project/rea-study", group: "Projects" },
+  { label: "My Take on PRH-JEPA, project page", go: "#project/prh-jepa", group: "Projects" },
   { label: "StoryEra, novel continuity skill", go: "#project/storyera", group: "Projects" },
   { label: "Site Recon, website inspection skill", go: "#project/site-recon", group: "Projects" },
   { label: "Exposure Audit, authorized website review skill", go: "#project/authorized-web-exposure-audit", group: "Projects" },
@@ -254,6 +255,7 @@ export const COMMAND_ITEMS = [
   { label: "RepTrack on the App Store", href: "https://apps.apple.com/us/app/reptrack-workout-log/id6761032027", group: "Links" },
   { label: "My Take on Jev, technical report", href: "/p/decision-models/report.html", group: "Links" },
   { label: "My Take on REA, technical report", href: "/p/rea-study/report.html", group: "Links" },
+  { label: "My Take on PRH-JEPA, technical report", href: "/p/prh-jepa/report.html", group: "Links" },
   { label: "Site Recon on GitHub", href: "https://github.com/kmsmohamedansar/site-recon", group: "Links" },
   { label: "Exposure Audit on GitHub", href: "https://github.com/kmsmohamedansar/authorized-web-exposure-audit", group: "Links" },
   { label: "GitHub", href: CONTACT.github, group: "Links" },

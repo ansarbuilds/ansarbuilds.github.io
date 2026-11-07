@@ -47,6 +47,21 @@ export const DEPTH = {
     },
   },
 
+  "prh-jepa": {
+    found:
+      "I started sketching a study on whether joint-embedding models converge toward vision representations faster than next-token language models, and found that Balestriero and LeCun had released a paper and codebase answering that exact question six days earlier. Nobody independent had checked it yet, so I turned my repo into an audit and replication of what fits on one Mac.",
+    tradeoffs: [
+      { chose: "Writing my own NumPy metrics before trusting their PyTorch scorer", over: "calling their scoring function directly", because: "writing the math twice caught a sample-shrinkage bug in my first bootstrap and exposed how 0.95 coordinate clipping behaves under rotation." },
+      { chose: "Reporting both sample ratios (41.67×) and token ratios (13.89×)", over: "repeating only the headline number", because: "each good-view sample reads three captions. Both numbers are real, and showing both is fairer to the reader." },
+      { chose: "Streaming 8 images at a time and cleaning model caches after every run", over: "loading the dataset at once or running 7B weights into swap", because: "one 100.5-megapixel Wikimedia image inside WIT-1024 spiked my first run to 19 GB on a 16 GB laptop with 17 GiB of free disk." },
+      { chose: "Treating null 10-NN separation at 51,200 scenes as a scale limit", over: "claiming the laptop run refutes a 5,500 GPU-hour paper", because: "204,800 views is 1/844 of their smallest WIT run. Global CKA already separated on all 3 seeds even while discrete 10-NN stayed near initialization." },
+    ],
+    ai: {
+      label: "What held up?",
+      text: "Everything I could run directly held up: 135 of 139 tests passed, and all 6 open text baselines matched their WIT-1024 tables within 0.0012. The most useful finding was about the benchmark itself: 0.95 coordinate clipping breaks rotation invariance in theory, yet supplies 35% of Qwen2.5-3B's alignment score in practice.",
+    },
+  },
+
   "catalogue-checker": {
     found:
       "My old categorization notebook used a large AI model on five products in about twelve minutes, with no answer key. So I couldn't say whether it was accurate, or whether it could ever check a real catalogue. I rebuilt it to answer both.",

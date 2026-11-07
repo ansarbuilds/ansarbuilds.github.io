@@ -7,4 +7,4 @@ export const DATA_PREVIEW_READOUTS = {
   "catalogue-checker": "PRODUCT → AISLE? → FLAG",
 };
 export const DATA_PREVIEW_PROJECTS = new Set(Object.keys(DATA_PREVIEW_READOUTS));
-export const PREVIEWABLE_PROJECTS = new Set(["decision-models", "rea-study", "storyera", "site-recon", "haloscript", "digital-double", "jarvis", ...DATA_PREVIEW_PROJECTS]);
+export const PREVIEWABLE_PROJECTS = new Set(["decision-models", "rea-study", "prh-jepa", "storyera", "site-recon", "haloscript", "digital-double", "jarvis", ...DATA_PREVIEW_PROJECTS]);

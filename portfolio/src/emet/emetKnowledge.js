@@ -18,6 +18,7 @@ const EMAIL = CONTACT.email;
 const PROJECT_ALIASES = {
   "decision-models": ["jev", "decision model", "small ai", "typesafe"],
   "rea-study": ["rea", "reverse engineering", "decompiler"],
+  "prh-jepa": ["prh", "jepa", "platonic", "lejepa", "dinov2", "lecun"],
   storyera: ["story era", "novel", "continuity"],
   "site-recon": ["site recon", "recon"],
   "authorized-web-exposure-audit": ["exposure audit", "web audit", "security audit"],

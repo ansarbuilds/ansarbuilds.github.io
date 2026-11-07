@@ -4,6 +4,7 @@
 export const STEP_TOOLS = {
   "decision-models": [[], [], ["Ollama", "qwen2.5:7b", "Strands Decider 2B", "Kev-0.8B", "Laya", "MLX"], ["Python"]],
   "rea-study": [[], ["REA", "Ghidra", "Model Context Protocol"], ["Claude Code", "Claude Sonnet 5.5"], ["Python"]],
+  "prh-jepa": [["pytest", "pandas"], ["PyTorch", "DINOv2", "Qwen2.5", "Hugging Face Transformers"], ["PyTorch", "Python"], ["Python"]],
   "agent-flight-recorder": [["Python", "Model Context Protocol"], ["SQLite"], ["Python"], ["Model Context Protocol"]],
   "site-recon": [["Playwright"], ["JavaScript"], ["Agent Skills", "Markdown"], ["React"]],
   "authorized-web-exposure-audit": [["Agent Skills"], ["Python"], ["Python"], ["Markdown", "JSON"]],

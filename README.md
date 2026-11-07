@@ -27,6 +27,7 @@ Other projects live in their own repositories:
 - [storyera](https://github.com/kmsmohamedansar/storyera)
 - [agent-flight-recorder](https://github.com/kmsmohamedansar/agent-flight-recorder)
 - [rea-study](https://github.com/kmsmohamedansar/rea-study)
+- [prh-jepa](https://github.com/kmsmohamedansar/prh-jepa)
 - [authorized-web-exposure-audit](https://github.com/kmsmohamedansar/authorized-web-exposure-audit)
 - [mcp-analytics-stub](https://github.com/kmsmohamedansar/mcp-analytics-stub)
 - [mv3-sidepanel-starter](https://github.com/kmsmohamedansar/mv3-sidepanel-starter)
