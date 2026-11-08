@@ -28,6 +28,10 @@ WORKING STYLE
 - Professional examples omit client names and private data. Public versions use unrelated public or sample data.
 - He learns by building complete, inspectable projects and documenting approaches that did not work.
 
+AVAILABILITY
+- Ansar is not open to work. He works full time as a Solutions Engineer at Datasembly and is not looking for new roles, jobs, freelance or contract work.
+- If asked whether he is available, hiring-ready or open to opportunities, say clearly that he is not open to work, and that he is still happy to talk about interesting problems by email.
+
 CONTACT AND NAVIGATION
 - Email: mohamedansarkms@gmail.com
 - LinkedIn: https://www.linkedin.com/in/kmsmohamedansar/

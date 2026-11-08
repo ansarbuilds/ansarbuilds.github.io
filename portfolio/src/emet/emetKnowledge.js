@@ -216,8 +216,8 @@ const INTENT_ENTRIES = [
     label: "Whether he's available",
     group: "intent",
     destination: "contact",
-    answer: `He's working full time as ${currentRole.title} at ${currentRole.company}, so he isn't looking for freelance work on the side. He is always happy to talk about interesting problems. Email ${EMAIL}.`,
-    phrases: ["is he available", "is he looking", "open to work", "for hire", "can i hire him", "freelance work", "contract work", "job opportunity", "new role"],
+    answer: `Ansar isn't open to work right now. He's working full time as ${currentRole.title} at ${currentRole.company} and isn't looking for new roles, freelance or contract work. He is always happy to talk about interesting problems, though. Email ${EMAIL}.`,
+    phrases: ["is he available", "is he looking", "open to work", "open to new roles", "open to opportunities", "looking for a job", "looking for work", "for hire", "can i hire him", "freelance work", "contract work", "job opportunity", "new role"],
     strong: ["available", "availability", "hire", "hiring", "freelance", "contract", "consulting", "recruiter", "opportunity", "vacancy"],
     weak: ["open", "looking"],
   },
@@ -360,9 +360,9 @@ const DEFAULT_SUGGESTIONS = [
 ];
 
 const ROUTE_SUGGESTIONS = {
-  experience: ["Where has he worked?", "What is his data experience?", "Is he available for freelance?", "How can I contact him?"],
+  experience: ["Where has he worked?", "What is his data experience?", "Is he open to work?", "How can I contact him?"],
   about: ["What does he know?", "Does he know Snowflake?", "Where is he based?", "What has he built?"],
-  contact: ["How can I contact him?", "Is he available for freelance?", "Can I see his resume?", "What has he built?"],
+  contact: ["How can I contact him?", "Is he open to work?", "Can I see his resume?", "What has he built?"],
   ai: ["What are his AI projects?", "What is My Take on Jev?", "What is Site Recon?", "How can I contact him?"],
   projects: ["What is RepTrack?", "What is Haloscript?", "What are his AI projects?", "How can I contact him?"],
 };
