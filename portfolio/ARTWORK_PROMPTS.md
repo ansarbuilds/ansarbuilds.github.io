@@ -1,5 +1,9 @@
 # Spotlight artwork prompts
 
+## PRH-JEPA
+
+The spotlight cover, project hero, caption-view illustration and rotation/clipping illustration were generated with the built-in image generation tool on 2026-11-07. Their exact prompts are preserved in [artwork/prh-jepa-prompts.json](artwork/prh-jepa-prompts.json). The published images are JPEG copies of the PNG originals. These are conceptual illustrations: their node positions, rotations, view counts and clipping boundaries are visual metaphors. The existing SVG figures remain the source of measured results.
+
 The Flight Recorder and Exposure Audit covers were generated with the built-in image generation tool on 2026-10-27 and optimized as JPEGs for the portfolio. They are conceptual illustrations, not screenshots or evidence from either product.
 
 ## Agent Flight Recorder

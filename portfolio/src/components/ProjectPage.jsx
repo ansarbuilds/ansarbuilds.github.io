@@ -88,7 +88,7 @@ function PageTitle({ project }) {
 }
 
 function SignatureArtwork({ project, reduced }) {
-  const art = project.spotlightArt || project.cardArt;
+  const art = project.heroArt || project.spotlightArt || project.cardArt;
   if (!art) return null;
   return (
     <motion.figure
@@ -99,10 +99,10 @@ function SignatureArtwork({ project, reduced }) {
       transition={{ duration: .5, ease: EASE_REVEAL }}
     >
       <div className="project-signature-frame">
-        <img src={media(art)} alt={`${project.title} conceptual artwork`} loading="eager" />
+        <img src={media(art)} alt={project.heroAlt || `${project.title} conceptual artwork`} loading="eager" />
         <ProjectMotionPreview project={project} active expanded />
       </div>
-      <figcaption>{project.slug === "site-recon" ? "A public page, separated into the evidence a browser can verify." : `${project.title} · project visual`}</figcaption>
+      <figcaption>{project.heroCaption || (project.slug === "site-recon" ? "A public page, separated into the evidence a browser can verify." : `${project.title} · project visual`)}</figcaption>
     </motion.figure>
   );
 }

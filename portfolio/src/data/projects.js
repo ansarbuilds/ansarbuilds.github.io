@@ -248,6 +248,10 @@ export const PROJECTS = [
   {
     slug: "prh-jepa",
     featured: true,
+    spotlightArt: "/shots/spotlight/prh-jepa.jpg",
+    heroArt: "/shots/prh-jepa/project-hero.jpg",
+    heroAlt: "Orange and teal node sculptures beside image and text tiles, a laptop, and research notes.",
+    heroCaption: "Independently testing representation alignment on one laptop. Conceptual artwork.",
     spotlightGroup: "open-source",
     spotlightCategory: "studies",
     spotlightLink: { label: "Read the report", href: "/p/prh-jepa/report.html" },
@@ -290,6 +294,8 @@ export const PROJECTS = [
       "Test good views against bad views across 20 exact finite worlds and 6 controlled BERT-T LeJEPA runs (51,200 COCO scenes per run across 3 seeds).",
     ],
     figures: [
+      { src: "/shots/prh-jepa/caption-views.jpg", alt: "Several descriptions connected to one sailboat scene, beside masked fragments of a single description.", caption: "Different descriptions of one scene versus masked crops of one caption: a conceptual illustration of the study's view constructors." },
+      { src: "/shots/prh-jepa/rotation-clipping.jpg", alt: "Three node structures showing a change in orientation and a coordinate threshold.", caption: "A conceptual illustration of rotation and coordinate clipping. The measured sensitivity results appear in the charts below." },
       { src: "/p/prh-jepa/fig2-wit1024-baselines.svg", caption: "WIT-1024 mutual 10-NN alignment with DINOv2-B. All six open text encoders we ran matched the paper's reported numbers within 0.0012.", wide: true },
       { src: "/p/prh-jepa/fig3-metric-sensitivity.svg", caption: "Removing the benchmark's 0.95-quantile coordinate clip cuts Qwen2.5-3B by 35% (.126 to .082) and flattens Qwen scaling, while contrastive mpnet barely moves.", wide: true },
       { src: "/p/prh-jepa/fig4-good-vs-bad-views.svg", caption: "Good views against bad views: exact finite worlds separate cleanly, while at 51,200 COCO scenes on a laptop, global CKA separates on all 3 seeds while discrete 10-NN stays near initialization.", wide: true },
