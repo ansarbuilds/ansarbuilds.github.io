@@ -10,7 +10,6 @@ import { MatrixBackground } from "./components/RouteBackgrounds";
 import IntroCurtain from "./components/IntroCurtain";
 import PaletteSwatch from "./components/PaletteSwatch";
 import Cursor from "./components/Cursor";
-import { magnetic } from "./lib/pointerFx";
 import { shouldPlayIntro } from "./lib/intro";
 import { EASE_OUT } from "./lib/motion";
 import { titleForRoute } from "./lib/routeTitle";
@@ -215,9 +214,22 @@ function Nav() {
   function openPalette() {
     window.dispatchEvent(new KeyboardEvent("keydown", { key: "k", metaKey: true }));
   }
+  // On a phone the section links fold into one menu button, so every
+  // section stays reachable while "Get in touch" keeps its place in the bar.
+  const [menuOpen, setMenuOpen] = useState(false);
+  const menuRef = useRef(null);
+  useEffect(() => {
+    if (!menuOpen) return undefined;
+    const close = (event) => {
+      if (event.type === "keydown" ? event.key === "Escape" : !menuRef.current?.contains(event.target)) setMenuOpen(false);
+    };
+    document.addEventListener("pointerdown", close);
+    document.addEventListener("keydown", close);
+    return () => { document.removeEventListener("pointerdown", close); document.removeEventListener("keydown", close); };
+  }, [menuOpen]);
   return <nav className={`ed-nav ${overHero ? "is-over-hero" : ""}`} aria-label="Main navigation"><div className="ed-nav-inner">
     <button onClick={() => navigate("deck")} className="ed-wordmark" aria-label="Mohamed Ansar, home"><span className="ed-wordmark-symbol" aria-hidden="true">ma</span><span>mohamed ansar</span></button>
-    <div className="ed-nav-links">{editorial ? <><a href="#projects">Work</a><a href="#capabilities" className="ed-nav-wide">Capabilities</a><a href="#ai" className="ed-nav-wide">Playground</a><a href={CONTACT.github} className="ed-nav-wide" target="_blank" rel="noopener noreferrer">GitHub</a><a href="#contact" className="ed-nav-contact" {...magnetic}>Get in touch ↗</a></> : <button onClick={() => navigate("deck")}>← Home</button>}
+    <div className="ed-nav-links">{editorial ? <><a href="#projects" className="ed-nav-wide">Work</a><a href="#capabilities" className="ed-nav-wide">Capabilities</a><a href="#ai" className="ed-nav-wide">Playground</a><a href={CONTACT.github} className="ed-nav-wide" target="_blank" rel="noopener noreferrer">GitHub</a><span ref={menuRef} className="ed-nav-menu"><button type="button" aria-expanded={menuOpen} aria-controls="nav-menu" onClick={() => setMenuOpen((open) => !open)}>Menu</button>{menuOpen && <span id="nav-menu" className="ed-nav-menu-list" onClick={() => setMenuOpen(false)}><a href="#projects">Work</a><a href="#capabilities">Capabilities</a><a href="#more">More work</a><a href="#ai">Playground</a><a href={CONTACT.github} target="_blank" rel="noopener noreferrer">GitHub ↗</a></span>}</span><a href="#contact" className="ed-nav-contact">Get in touch ↗</a></> : <button onClick={() => navigate("deck")}>← Home</button>}
       <button onClick={openPalette} className="ed-nav-command" aria-label="Open command palette">⌘ K</button>
     </div>
   </div></nav>;

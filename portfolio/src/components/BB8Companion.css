@@ -541,3 +541,7 @@
   .bb8-edge-guide,
   .bb8-edge-chat { animation: none; }
 }
+
+/* Home page: the droid fades out rather than sit on top of the work. */
+.bb8-edge--over-content { opacity: 0 !important; pointer-events: none !important; transition: opacity .25s; }
+.bb8-edge--over-content * { pointer-events: none !important; }
