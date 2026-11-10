@@ -4,7 +4,7 @@ import { getProject } from "../data/projects";
    tab title, and focus moved to the new heading. Without this every project
    shares one title in tabs, history and bookmarks, and a screen reader is
    never told the view changed. */
-export const SITE_TITLE = "Mohamed Ansar · Solutions Engineer, data and AI tools";
+export const SITE_TITLE = "Mohamed Ansar · Agents, AI studies and apps";
 
 // The takeover views that are not a project page.
 const VIEW_TITLES = {

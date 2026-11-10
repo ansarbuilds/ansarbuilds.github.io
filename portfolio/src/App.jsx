@@ -1,7 +1,7 @@
 import { Component, createRef, lazy, Suspense, useCallback, useContext, useEffect, useMemo, useRef, useState } from "react";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import EmetSection from "./components/EmetSection";
-import { Hero, ProjectsSection, ExperienceSection, AboutSection, ExperimentsSection, ContactSection } from "./components/Sections";
+import { Hero, ProjectsSection, CapabilitiesSection, MoreWorkSection, ExperimentsSection, ContactSection } from "./components/Sections";
 import ProjectPage from "./components/ProjectPage";
 import ProjectWorkPage from "./components/ProjectWorkPage";
 import SandboxStubs from "./components/SandboxStubs";
@@ -9,6 +9,8 @@ import CommandPalette from "./components/CommandPalette";
 import { MatrixBackground } from "./components/RouteBackgrounds";
 import IntroCurtain from "./components/IntroCurtain";
 import PaletteSwatch from "./components/PaletteSwatch";
+import Cursor from "./components/Cursor";
+import { magnetic } from "./lib/pointerFx";
 import { shouldPlayIntro } from "./lib/intro";
 import { EASE_OUT } from "./lib/motion";
 import { titleForRoute } from "./lib/routeTitle";
@@ -28,8 +30,8 @@ const BB8Companion = lazy(() => import("./components/BB8Companion"));
    ROUTER: "emet", "explore", "lineage-demo", "digital-double" and "project/<slug>" are
    full takeover views (reached from cards, the nav or the command
    palette). "main" is everything else: a single scrolled page, the
-   hero followed by Projects, Experience, About, Built with AI and
-   Contact, so a nav link
+   hero followed by Selected work, What I bring, More work, the
+   Playground and Contact, so a nav link
    pointing at one of those doesn't swap a view, it smooth-scrolls to
    that section's id within the document. Hash-based so every existing
    <a href="#build"> (nav, emet's shortcuts, the command palette) keeps
@@ -59,7 +61,8 @@ function scrollToSection(id, tries = 60) {
   requestAnimationFrame(() => {
     const el = document.getElementById(id);
     if (el) {
-      const archive = el.closest("details");
+      // A build row is its own <details>; older archives wrap their links in one.
+      const archive = el.tagName === "DETAILS" ? el : el.closest("details");
       if (archive) archive.open = true;
       const scroller = el.closest("main");
       const distance = scroller ? Math.abs(el.getBoundingClientRect().top - scroller.getBoundingClientRect().top) : 0;
@@ -188,15 +191,43 @@ function SandboxProvider({ children }) {
 function Nav() {
   const { route, navigate } = useRoute();
   const editorial = route === "main";
+  // While the dark hero is behind it, the nav goes dark glass to match.
+  const scrollContainerRef = useContext(ScrollContext);
+  const [overHero, setOverHero] = useState(editorial);
+  useEffect(() => {
+    const scroller = scrollContainerRef?.current;
+    if (!editorial || !scroller) { setOverHero(false); return undefined; }
+    let raf = 0;
+    const update = () => {
+      raf = 0;
+      // The hero is pinned on desktop, so watch the sheet that slides over
+      // it rather than the hero's own box.
+      const sheet = document.querySelector(".ed-intro");
+      setOverHero(!!sheet && sheet.getBoundingClientRect().top > 70);
+    };
+    const onScroll = () => { if (!raf) raf = requestAnimationFrame(update); };
+    // The home page mounts a moment after the route changes.
+    const settle = setTimeout(update, 400);
+    update();
+    scroller.addEventListener("scroll", onScroll, { passive: true });
+    return () => { scroller.removeEventListener("scroll", onScroll); cancelAnimationFrame(raf); clearTimeout(settle); };
+  }, [editorial, scrollContainerRef]);
   function openPalette() {
     window.dispatchEvent(new KeyboardEvent("keydown", { key: "k", metaKey: true }));
   }
-  return <nav className="ed-nav" aria-label="Main navigation"><div className="ed-nav-inner">
-    <button onClick={() => navigate("deck")} className="ed-wordmark" aria-label="Mohamed Ansar, home"><span className="ed-wordmark-symbol" aria-hidden="true">ma</span><span>mohamed ansar<small>Solutions engineer</small></span></button>
-    <div className="ed-nav-links">{editorial ? <><a href="#projects">Work</a><a href="#about" className="ed-nav-wide">About</a><a href="#experience" className="ed-nav-wide">Experience</a>{CONTACT.resume && <a href={CONTACT.resume} className="ed-nav-wide" target="_blank" rel="noopener noreferrer">CV</a>}<a href="#contact" className="ed-nav-contact">Let's talk ↗</a></> : <button onClick={() => navigate("deck")}>← Home</button>}
+  return <nav className={`ed-nav ${overHero ? "is-over-hero" : ""}`} aria-label="Main navigation"><div className="ed-nav-inner">
+    <button onClick={() => navigate("deck")} className="ed-wordmark" aria-label="Mohamed Ansar, home"><span className="ed-wordmark-symbol" aria-hidden="true">ma</span><span>mohamed ansar</span></button>
+    <div className="ed-nav-links">{editorial ? <><a href="#projects">Work</a><a href="#capabilities" className="ed-nav-wide">Capabilities</a><a href="#ai" className="ed-nav-wide">Playground</a><a href={CONTACT.github} className="ed-nav-wide" target="_blank" rel="noopener noreferrer">GitHub</a><a href="#contact" className="ed-nav-contact" {...magnetic}>Get in touch ↗</a></> : <button onClick={() => navigate("deck")}>← Home</button>}
       <button onClick={openPalette} className="ed-nav-command" aria-label="Open command palette">⌘ K</button>
     </div>
   </div></nav>;
+}
+
+// The trailing cursor belongs to the home page only: the takeover views
+// (terminal, 3D scenes) have their own pointer behaviour.
+function HomeCursor() {
+  const { route } = useRoute();
+  return route === "main" ? <Cursor /> : null;
 }
 
 function ScrollProgress() {
@@ -287,10 +318,10 @@ function MainDocument({ bootDone }) {
   return (
     <>
       <Hero ready={bootDone} scrollContainerRef={scrollContainerRef} />
-      <ProjectsSection scrollContainerRef={scrollContainerRef} />
+      <ProjectsSection />
+      <CapabilitiesSection />
+      <MoreWorkSection />
       <ExperimentsSection />
-      <AboutSection scrollContainerRef={scrollContainerRef} />
-      <ExperienceSection />
       <ContactSection />
     </>
   );
@@ -489,6 +520,7 @@ function AppShell({ bootDone }) {
             <Nav />
             <ScrollProgress />
             <PaletteSwatch />
+            <HomeCursor />
             {companionReady && <Suspense fallback={null}><BB8Companion /></Suspense>}
             {/* No page-level `perspective` here on purpose: setting it on an
                 ancestor this high up turns it into the CSS containing block

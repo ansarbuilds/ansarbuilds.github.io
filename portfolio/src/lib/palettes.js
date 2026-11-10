@@ -10,20 +10,23 @@
    accentInk accent for text on paper (>= 4.5:1 against paper)
    onDark    accent for text on ink (>= 4.5:1 against ink) */
 export const PALETTES = {
-  // Opening: burnt orange, warm ivory, soft black.
-  lumen: { paper: "#e6d5bd", ink: "#101010", accent: "#d5360c", accentInk: "#74200d", onDark: "#ff8a5f" },
-  // 02 Things I've built: warm ivory, deep editorial blue, coral orange.
-  bloom: { paper: "#eae6de", ink: "#1b4e76", accent: "#ef8557", accentInk: "#953812", onDark: "#ffc2a6" },
-  // Test the claim: ink black, warm ivory, electric teal.
-  lumora: { paper: "#e8e4d3", ink: "#031211", accent: "#00aebb", accentInk: "#00616a", onDark: "#00aebb" },
-  // 03 What if I tried this?: jet black, cerulean blue, neon rose.
-  neon: { paper: "#e9e7ee", ink: "#0a0a0a", accent: "#ff2d95", accentInk: "#b8005f", onDark: "#ff2d95" },
-  // 04 The person: mocha brown, platinum, pale lavender.
-  choreo: { paper: "#e6e0f0", ink: "#2e1f16", accent: "#6f4e37", accentInk: "#6f4e37", onDark: "#cdb8e8" },
-  // 05 Experience: charcoal, earth brown, burnt amber.
-  field: { paper: "#e9dfcf", ink: "#090907", accent: "#b99d73", accentInk: "#6c5636", onDark: "#b99d73" },
-  // 06 Contact, the one dark ending: midnight navy, cobalt blue, bright red.
-  blueBloom: { paper: "#e8ecf8", ink: "#021861", accent: "#de1110", accentInk: "#255dce", onDark: "#ff6b5e" },
+  // One dark theme end to end. Each part of the page keeps the same carbon
+  // and bone, tinted a few points toward its own accent, so the page shifts
+  // mood as it scrolls without ever changing character.
+  // Opening: coral.
+  lumen: { paper: "#0c0a09", ink: "#efe6d8", accent: "#ff8a5f", accentInk: "#ff8a5f", onDark: "#74200d" },
+  // Selected work: sky blue.
+  bloom: { paper: "#090b10", ink: "#e8ecf4", accent: "#6aa8ff", accentInk: "#8fc1ff", onDark: "#1b4e76" },
+  // More work: teal.
+  lumora: { paper: "#070e0e", ink: "#e6efec", accent: "#19c2cf", accentInk: "#4fd8e2", onDark: "#00535b" },
+  // The playground: neon rose.
+  neon: { paper: "#0d090c", ink: "#f1e9ee", accent: "#ff2d95", accentInk: "#ff6fb5", onDark: "#a8004f" },
+  // Lavender (project pages that ask for it).
+  choreo: { paper: "#0c0a10", ink: "#ece8f3", accent: "#a98be0", accentInk: "#cdb8e8", onDark: "#4b2f6b" },
+  // What I bring: amber.
+  field: { paper: "#0d0b08", ink: "#f0e8da", accent: "#d9a85a", accentInk: "#e3bd7c", onDark: "#5c4521" },
+  // Contact: cobalt with a red button.
+  blueBloom: { paper: "#070a16", ink: "#e8ecf8", accent: "#ff4d42", accentInk: "#8ea8ff", onDark: "#1d3fae" },
 };
 
 export const DEFAULT_PALETTE = "lumen";
@@ -31,13 +34,13 @@ export const DEFAULT_PALETTE = "lumen";
 // What the swatch card in the corner calls each palette and its colours,
 // in the reels' style: a name, then each colour's name and hex.
 export const PALETTE_LABELS = {
-  lumen: { title: "Lumen", paper: "Warm Ivory", ink: "Soft Black", accent: "Burnt Orange" },
-  bloom: { title: "Bloom", paper: "Warm Ivory", ink: "Deep Editorial Blue", accent: "Coral Orange" },
-  lumora: { title: "Lumora", paper: "Warm Ivory", ink: "Ink Black", accent: "Electric Teal" },
-  neon: { title: "Human Next", paper: "Cool White", ink: "Jet Black", accent: "Neon Rose" },
-  choreo: { title: "Choreo", paper: "Pale Lavender", ink: "Deep Mocha", accent: "Mocha Brown" },
-  field: { title: "Field / Form", paper: "Bone", ink: "Charcoal", accent: "Burnt Amber" },
-  blueBloom: { title: "Blue Bloom", paper: "Ice White", ink: "Midnight Navy", accent: "Bright Red" },
+  lumen: { title: "Ember", paper: "Carbon", ink: "Bone", accent: "Coral" },
+  bloom: { title: "Signal", paper: "Blue Carbon", ink: "Frost", accent: "Sky Blue" },
+  lumora: { title: "Lumora", paper: "Deep Teal", ink: "Mist", accent: "Electric Teal" },
+  neon: { title: "Human Next", paper: "Plum Black", ink: "Blush White", accent: "Neon Rose" },
+  choreo: { title: "Choreo", paper: "Violet Black", ink: "Pale Lavender", accent: "Lavender" },
+  field: { title: "Field / Form", paper: "Umber Black", ink: "Bone", accent: "Amber" },
+  blueBloom: { title: "Blue Bloom", paper: "Midnight", ink: "Ice White", accent: "Signal Red" },
 };
 
 // applyPalette and clearPalette announce the palette now showing, so

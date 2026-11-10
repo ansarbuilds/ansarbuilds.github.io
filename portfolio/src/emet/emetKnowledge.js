@@ -7,7 +7,7 @@
 //
 // House style: plain words, short sentences, no em dashes.
 
-import { ABOUT, CONTACT, HERO, ROLES } from "../data/content.js";
+import { ABOUT, CONTACT, ROLES } from "../data/content.js";
 import { EXPERIMENTS, FEATURED, FEATURED_GRID, LISTED_PROJECTS, OPEN_SOURCE_PROJECTS } from "../data/projects.js";
 import { TOOL_INFO } from "../data/tools.js";
 import { createMatcher, normalize, tokenize } from "./emetMatcher.js";
@@ -101,7 +101,7 @@ function toolEntries() {
       id: `tool:${name}`,
       label: name,
       group: "tools",
-      destination: used.length === 1 ? `project/${used[0].slug}` : "about",
+      destination: used.length === 1 ? `project/${used[0].slug}` : "capabilities",
       answer: parts.join(" "),
       phrases: [name],
       strong: [name],
@@ -139,8 +139,8 @@ const INTENT_ENTRIES = [
     id: "about",
     label: "Who Ansar is",
     group: "intent",
-    destination: "about",
-    answer: `${HERO.eyebrow}. ${HERO.title} By day he works on retail pricing data with SQL and Snowflake. The rest of the time he builds his own things: ${list([...FEATURED, ...FEATURED_GRID].map((project) => project.title), 3)}.`,
+    destination: "capabilities",
+    answer: `Ansar builds agents, tests AI claims and ships apps, and publishes the code and numbers for each. A few to start with: ${list([...FEATURED, ...FEATURED_GRID].map((project) => project.title), 3)}.`,
     phrases: [
       "who is he", "who is ansar", "about him", "about ansar", "tell me about him", "tell me about ansar",
       "his background", "introduce him", "what does he do", "what do you do", "what does ansar do",
@@ -165,7 +165,7 @@ const INTENT_ENTRIES = [
     id: "skills",
     label: "His skills",
     group: "intent",
-    destination: "about",
+    destination: "capabilities",
     answer: ABOUT.groups.map((group) => `${group.title}: ${list(group.items, 5)}.`).join(" "),
     phrases: ["what does he know", "his skills", "tech stack", "what languages", "what tools"],
     strong: ["skill", "stack", "toolkit", "technology", "language", "expertise", "proficient"],
@@ -226,7 +226,7 @@ const INTENT_ENTRIES = [
     label: "His resume",
     group: "intent",
     destination: "experience",
-    answer: `There's no PDF to download here. The experience section is the resume: every role, what he did, and the tools behind it. For a copy, email ${EMAIL}.`,
+    answer: `There's no resume here. This site is about the builds. His jobs are listed in one line at the bottom of the page, and the code is on GitHub. For anything else, email ${EMAIL}.`,
     phrases: ["his resume", "his cv", "download resume", "send me his resume"],
     strong: ["resume", "cv", "curriculum"],
     weak: ["pdf", "download"],
@@ -236,7 +236,7 @@ const INTENT_ENTRIES = [
     label: "Where he is",
     group: "intent",
     destination: "experience",
-    answer: `${HERO.eyebrow}. He works remotely from Canada, and worked in India before that.`,
+    answer: `He's based in Canada. He works remotely from Canada, and worked in India before that.`,
     phrases: ["where is he", "where does he live", "what timezone", "is he remote", "based in"],
     strong: ["location", "canada", "remote", "timezone", "country", "city", "live", "based"],
     weak: ["where"],
@@ -282,11 +282,11 @@ function destinationAction(entry) {
   if (!entry?.destination) return null;
   if (entry.destination.startsWith("project/")) return `Open ${entry.label}`;
   const labels = {
-    about: "Open about",
-    ai: "Open AI projects",
+    capabilities: "Open what I bring",
+    ai: "Open the playground",
     contact: "Open contact",
-    experience: "Open experience",
-    projects: "Open projects",
+    experience: "Open day jobs",
+    projects: "Open selected work",
   };
   return labels[entry.destination] || "Open section";
 }
