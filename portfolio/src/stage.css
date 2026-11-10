@@ -92,16 +92,11 @@
 .st-clip button.is-on i { background: #ff8a5f; }
 .st-clip button.is-on i::after { translate: 16px 0; }
 .st-clip-bar { height: 8px; border-radius: 999px; background: rgb(255 255 255 / .08); overflow: hidden; }
-.st-clip-bar span { display: block; height: 100%; border-radius: inherit; background: linear-gradient(90deg, #ff8a5f, #ffc478); transition: width .8s var(--ease-out); }
+.st-clip-bar span { display: block; height: 100%; border-radius: inherit; background: linear-gradient(90deg, #ff8a5f, #ffc478); }
 .st-clip strong { font: 600 .68rem var(--font-body); color: #f2f4f8; min-width: 9.5em; text-align: right; }
 
 /* Haloscript devices */
 .st-devices { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 16px; min-height: 0; }
-.st-device { position: relative; flex: 1; min-height: 0; width: 100%; aspect-ratio: 16 / 10; max-height: 100%; border: 1px solid rgb(255 255 255 / .16); border-radius: 14px; overflow: hidden; background: #111; box-shadow: 0 40px 80px -30px rgb(0 0 0 / .8); transition: width .7s var(--ease-out), aspect-ratio .7s var(--ease-out), border-radius .7s var(--ease-out); }
-.st-device.is-ipad { width: 74%; aspect-ratio: 4 / 3; border-radius: 20px; }
-.st-device.is-iphone { width: 27%; aspect-ratio: 9 / 19.5; border-radius: 26px; }
-.st-device img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: top; opacity: 0 !important; transition: opacity .5s; }
-.st-device img.is-shown { opacity: 1 !important; }
 .st-device-tabs { display: inline-flex; padding: 4px; border: 1px solid var(--st-line); border-radius: 999px; }
 .st-device-tabs button { min-height: 30px; padding: 0 16px; border-radius: 999px; font: 600 .66rem var(--font-body); opacity: .65; transition: background .25s, color .25s, opacity .25s; }
 .st-device-tabs button.is-on { background: var(--ed-blue); color: var(--ed-ivory); opacity: 1; }
@@ -142,6 +137,100 @@
 }
 @media (prefers-reduced-motion: reduce) {
   .st-tab-bar i, .st-launch, .st-caret::after { animation: none; }
-  .st-panel, .st-device, .st-clip-bar span { transition: none; }
+  .st-panel, .st-clip-bar span { transition: none; }
   .st-term li { opacity: 1; transform: none; animation: none !important; }
 }
+
+/* ============================================================
+   SCENE CHANGES. Everything below moves with transform and
+   opacity only, in 200 to 600ms, and rests when the stage is off
+   screen or the tab is hidden (.is-resting).
+   ============================================================ */
+
+/* Compact, so the tabs and the whole demo fit one screen under the heading. */
+.st-tab { padding: 15px 16px 17px; }
+.st-panel { padding: clamp(20px, 2.6vw, 34px); gap: clamp(24px, 3.4vw, 48px); }
+.st-info h3 { margin-top: 14px; font-size: clamp(2.2rem, 3.6vw, 3.3rem); }
+.st-headline { margin-top: 10px; font-size: clamp(1.15rem, 1.6vw, 1.4rem); }
+.st-copy { margin-top: 10px; font-size: .82rem; line-height: 1.62; }
+.st-stats { margin-top: 16px; }
+.st-stats > div { padding-block: 12px 11px; }
+.st-stack { margin-top: 13px; }
+.st-ctas { margin-top: 16px; }
+.st-demo { aspect-ratio: 16 / 10.4; }
+
+/* One panel leaves (fade, 16px up) before the next arrives (fade, settle
+   from 16px below): 180ms out, then 270ms in, so two demos never overlap. */
+.st-panel { opacity: 0; visibility: hidden; transform: translateY(-16px); transition: opacity .18s ease-in, transform .18s ease-in, visibility 0s .18s; }
+.st-panel.is-active { opacity: 1; visibility: visible; transform: none; transition: none; animation: st-enter .27s var(--ease-out) .18s both; }
+@keyframes st-enter { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: none; } }
+
+/* Jarvis: the frame settles as the live demo takes the screenshot's place. */
+.st-frame.is-live { animation: st-settle .45s var(--ease-out) both; }
+@keyframes st-settle { from { transform: scale(.98); opacity: .7; } to { transform: none; opacity: 1; } }
+
+/* Flight Recorder: a playhead rides down the steps, and each diff line
+   lights as it arrives. Rows are a fixed height so the playhead can travel
+   by transform alone. */
+.st-flight-steps { --row: 37px; }
+.st-flight-steps > li:not(.st-playhead) { height: 34px; }
+.st-flight-steps button { height: 100%; align-items: center; }
+.st-playhead { position: absolute; left: 4px; top: 12px; width: 3px; height: 34px; border-radius: 2px; background: #ff8a5f; box-shadow: 0 0 12px rgb(255 138 95 / .8); transform: translateY(calc(var(--step) * var(--row))); transition: transform .45s var(--ease-out); pointer-events: none; }
+.st-flight-detail pre code { opacity: 0; transform: translateX(-6px); animation: st-codeline .3s var(--ease-out) forwards; animation-delay: calc(var(--i) * 90ms + 120ms); }
+@keyframes st-codeline { to { opacity: 1; transform: none; } }
+
+/* PRH-JEPA: the bar scales, the caption cross-fades. */
+.st-clip-bar span { width: 100%; transform-origin: left center; transition: transform .6s var(--ease-out); }
+.st-clip-caption { position: relative; display: grid; }
+.st-clip-caption span { grid-area: 1 / 1; opacity: 0; transition: opacity .3s; }
+.st-clip-caption span.is-shown { opacity: 1; }
+
+/* Haloscript: three shells drawn in CSS, cross-faded, the incoming one
+   tilting 6 degrees and settling. The screenshots inside are the real app. */
+.st-devices { height: 100%; min-height: 0; overflow: hidden; }
+.st-shells { position: relative; flex: 1 1 0; height: 0; min-height: 0; width: 100%; display: grid; place-items: center; perspective: 1400px; }
+.st-shell { position: absolute; top: 50%; left: 50%; translate: -50% -50%; opacity: 0; pointer-events: none; transition: opacity .3s; background: #1a1b1f; box-shadow: 0 40px 80px -30px rgb(0 0 0 / .85), inset 0 0 0 1px rgb(255 255 255 / .14); }
+.st-shell.is-shown { opacity: 1; pointer-events: auto; animation: st-tilt .55s var(--ease-out) both; }
+@keyframes st-tilt { from { transform: rotateY(6deg) translateY(8px); } to { transform: none; } }
+.st-shell-screen { position: relative; overflow: hidden; width: 100%; height: 100%; background: #000; }
+.st-shell-screen img { width: 100%; height: 100%; object-fit: cover; object-position: top; display: block; }
+/* Mac: thin bezel, camera dot, a hinge and base underneath. */
+.st-shell.is-mac { height: 82%; aspect-ratio: 16 / 10.3; padding: 1.6% 1.6% 2%; border-radius: 14px 14px 4px 4px; top: 47%; }
+.st-shell.is-mac .st-shell-screen { border-radius: 4px; }
+.st-shell.is-mac::before { content: ""; position: absolute; top: 1%; left: 50%; width: 5px; height: 5px; margin-left: -2px; border-radius: 50%; background: #3a3d45; }
+.st-shell.is-mac::after { content: ""; position: absolute; left: -7%; right: -7%; bottom: -5%; height: 5%; border-radius: 2px 2px 12px 12px; background: linear-gradient(#2b2d33, #17181c); box-shadow: inset 0 1px 0 rgb(255 255 255 / .18); }
+/* iPad: an even, rounded bezel. */
+.st-shell.is-ipad { height: 94%; aspect-ratio: 4 / 3; padding: 1.8%; border-radius: 22px; }
+.st-shell.is-ipad .st-shell-screen { border-radius: 10px; }
+/* iPhone: tall, heavily rounded, with the pill cut-out. */
+.st-shell.is-iphone { height: 97%; aspect-ratio: 9 / 19.2; padding: 1%; border-radius: 30px; }
+.st-shell.is-iphone .st-shell-screen { border-radius: 24px; }
+.st-shell.is-iphone::before { content: ""; position: absolute; z-index: 1; top: 3.2%; left: 50%; width: 26%; height: 2.6%; translate: -50% 0; border-radius: 999px; background: #000; }
+
+/* Digital Me: a slow push in on the cover while it is on stage. */
+.st-panel.is-active .st-cover img { animation: st-kenburns 12s ease-in-out infinite alternate; }
+@keyframes st-kenburns { from { transform: scale(1); } to { transform: scale(1.06); } }
+
+/* Site Recon: lines print 90ms apart while the panel is on stage, then hold. */
+.st-frame.is-running .st-term li { animation-delay: calc(var(--i) * 90ms + 220ms); }
+
+/* Rest: off screen or in a hidden tab, nothing keeps animating. */
+/* Only the things that loop or play out over time; a panel that is
+   arriving still has to finish arriving. */
+.st.is-resting :is(.st-cover img, .st-tab-bar i, .st-term li, .st-flight-detail pre code), .st.is-resting .st-caret::after { animation-play-state: paused !important; }
+
+@media (max-width: 999px) {
+  .st-panel, .st-panel.is-active { opacity: 1; visibility: visible; transform: none; transition: none; animation: none; }
+  .st-playhead { display: none; }
+  .st-flight-steps > li:not(.st-playhead) { height: auto; }
+  .st-demo:has(.st-devices) { aspect-ratio: 4 / 3.6; }
+  .st-shell.is-mac { height: 72%; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .st-panel, .st-panel.is-active, .st-frame.is-live, .st-shell, .st-shell.is-shown, .st-panel.is-active .st-cover img { animation: none; transition: none; transform: none; }
+  .st-panel.is-active { opacity: 1; }
+  .st-playhead, .st-clip-bar span, .st-clip-caption span { transition: none; }
+  .st-flight-detail pre code { opacity: 1; transform: none; animation: none; }
+}
+/* The launch button holds still; its glow is enough. */
+.st-launch { animation: none; }

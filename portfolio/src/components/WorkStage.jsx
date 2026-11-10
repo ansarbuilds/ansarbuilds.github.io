@@ -1,10 +1,11 @@
 import { useEffect, useRef, useState } from "react";
-import { useInView, useReducedMotion } from "framer-motion";
+import { animate, useInView, useReducedMotion } from "framer-motion";
 import { ArrowUpRight, ExternalLink, Play, RotateCcw } from "lucide-react";
 import { FLAGSHIPS } from "../data/showcase";
 import { getProject } from "../data/projects";
 import { media } from "../lib/media";
-import { magnetic } from "../lib/pointerFx";
+import { EASE_OUT } from "../lib/motion";
+import { usePageVisible } from "../lib/usePageVisible";
 import "../stage.css";
 
 /* The flagship work as one stage instead of six long sections: pick a
@@ -49,6 +50,32 @@ function useAutoStep(count, run, ms, loop = true) {
   return [step, pick, replay, held || (!loop && step === count - 1)];
 }
 
+/* A stat that counts from zero to its real value in 600ms, once, the first
+   time its panel is on stage. Values with no number in them, and reduced
+   motion, print as they are. Screen readers always get the final value. */
+function StatValue({ value, run }) {
+  const reduced = useReducedMotion();
+  const ref = useRef(null);
+  const done = useRef(false);
+  const [, prefix = "", digits = "", suffix = ""] = String(value).match(/^(\D*)(\d+)(.*)$/) || [];
+  const target = Number(digits);
+  const counts = !!digits && target > 0 && !reduced;
+  useEffect(() => {
+    const el = ref.current;
+    if (!counts || !run || done.current || !el) return undefined;
+    done.current = true;
+    const controls = animate(0, target, {
+      duration: 0.6,
+      ease: EASE_OUT,
+      onUpdate: (v) => { el.textContent = `${prefix}${Math.round(v)}${suffix}`; },
+    });
+    // Leaving mid-count (a tab switch) settles on the real value.
+    return () => { controls.stop(); el.textContent = value; };
+  }, [counts, run, target, prefix, suffix, value]);
+  if (!counts) return value;
+  return <><span ref={ref} aria-hidden="true">{value}</span><span className="sr-only">{value}</span></>;
+}
+
 function Frame({ title, children, className = "" }) {
   return <div className={`st-frame ${className}`}>
     <div className="st-frame-bar" aria-hidden="true"><i /><i /><i /><span>{title}</span></div>
@@ -59,7 +86,7 @@ function Frame({ title, children, className = "" }) {
 /* Jarvis: the real demo, with made-up sample data, loaded on request. */
 function JarvisDemo() {
   const [live, setLive] = useState(false);
-  return <Frame title={live ? "jarvis · live demo, sample data" : "jarvis · dashboard, sample data"} className="is-browser">
+  return <Frame title={live ? "jarvis · live demo, sample data" : "jarvis · dashboard, sample data"} className={`is-browser ${live ? "is-live" : ""}`}>
     {live
       ? <iframe src={media("/p/jarvis/demo/index.html")} title="Jarvis demo with sample data" loading="lazy" />
       : <>
@@ -82,14 +109,14 @@ function FlightDemo({ active }) {
   const [step, pick, replay, held] = useAutoStep(FLIGHT_STEPS.length, active, 1700, false);
   const current = FLIGHT_STEPS[step];
   return <Frame title="flight-recorder · timeline" className="is-flight">
-    <ol className="st-flight-steps">{FLIGHT_STEPS.map((item, i) => <li key={item.tag}>
+    <ol className="st-flight-steps" style={{ "--step": step }}><li className="st-playhead" aria-hidden="true" />{FLIGHT_STEPS.map((item, i) => <li key={item.tag}>
       <button type="button" aria-pressed={i === step} className={`${i === step ? "is-on" : ""} ${i < step ? "is-past" : ""} ${item.tone ? `is-${item.tone}` : ""} ${current.points === i ? "is-suspect" : ""}`} onClick={() => pick(i)}>
         <b>{item.tag}</b><span>{item.what}</span>
       </button>
     </li>)}</ol>
     <div className="st-flight-detail" aria-live="polite">
       <p>{current.note}</p>
-      <pre>{current.lines.map(([sign, text], i) => <code key={i} className={sign === "+" ? "is-add" : sign === "-" ? "is-del" : ""}>{sign} {text}{"\n"}</code>)}</pre>
+      <pre key={step}>{current.lines.map(([sign, text], i) => <code key={i} style={{ "--i": i }} className={sign === "+" ? "is-add" : sign === "-" ? "is-del" : ""}>{sign} {text}{"\n"}</code>)}</pre>
       <div className="st-demo-foot"><span>Illustrative run</span>{held && <button type="button" onClick={replay}><RotateCcw size={12} aria-hidden="true" />Replay</button>}</div>
     </div>
   </Frame>;
@@ -102,8 +129,8 @@ function PrhDemo() {
     <img className="ed-lazy-media" src={media("/p/prh-jepa/fig2-wit1024-baselines.svg")} alt="Figure 2 from the report: alignment of six open text encoders with DINOv2 on WIT-1024" loading="lazy" onLoad={reveal} />
     <div className="st-clip">
       <button type="button" role="switch" aria-checked={clip} className={clip ? "is-on" : ""} onClick={() => setClip((v) => !v)}><i aria-hidden="true" />Hidden outlier clip {clip ? "on" : "off"}</button>
-      <div className="st-clip-bar" aria-hidden="true"><span style={{ width: clip ? "100%" : "65%" }} /></div>
-      <strong aria-live="polite">{clip ? "Reported score" : "−35% without it"}</strong>
+      <div className="st-clip-bar" aria-hidden="true"><span style={{ transform: `scaleX(${clip ? 1 : 0.65})` }} /></div>
+      <strong className="st-clip-caption"><span className={clip ? "is-shown" : ""} aria-hidden={clip ? undefined : "true"}>Reported score</span><span className={clip ? "" : "is-shown"} aria-hidden={clip ? "true" : undefined}>−35% without it</span></strong>
     </div>
   </Frame>;
 }
@@ -117,8 +144,10 @@ const HALO_SHOTS = [
 function HaloDemo({ active }) {
   const [shot, pick] = useAutoStep(HALO_SHOTS.length, active, 3200);
   return <div className="st-devices">
-    <div className={`st-device is-${HALO_SHOTS[shot].device.toLowerCase()}`}>
-      {HALO_SHOTS.map((item, i) => <img key={item.device} className={`ed-lazy-media ${i === shot ? "is-shown" : ""}`} src={media(item.src)} alt={i === shot ? item.alt : ""} aria-hidden={i === shot ? undefined : "true"} loading="lazy" onLoad={reveal} />)}
+    <div className="st-shells">
+      {HALO_SHOTS.map((item, i) => <div key={item.device} className={`st-shell is-${item.device.toLowerCase()} ${i === shot ? "is-shown" : ""}`} aria-hidden={i === shot ? undefined : "true"}>
+        <div className="st-shell-screen"><img className="ed-lazy-media" src={media(item.src)} alt={i === shot ? item.alt : ""} loading="lazy" onLoad={reveal} /></div>
+      </div>)}
     </div>
     <div className="st-device-tabs" role="group" aria-label="Device">{HALO_SHOTS.map((item, i) => <button key={item.device} type="button" aria-pressed={i === shot} className={i === shot ? "is-on" : ""} onClick={() => pick(i)}>{item.device}</button>)}</div>
   </div>;
@@ -162,6 +191,8 @@ export default function WorkStage() {
   const desktop = useDesktop();
   const ref = useRef(null);
   const inView = useInView(ref, { amount: 0.35 });
+  const pageVisible = usePageVisible();
+  const live = inView && pageVisible;
   const [active, setActive] = useState(0);
   // Once the visitor picks a project, the stage stops moving on by itself.
   const [held, setHeld] = useState(false);
@@ -190,8 +221,8 @@ export default function WorkStage() {
     ref.current?.querySelectorAll("[role='tab']")[next]?.focus();
   };
 
-  const auto = desktop && inView && !held && !reduced;
-  return <div ref={ref} className={`st ${auto && !hover ? "" : "is-paused"} ${held ? "is-held" : ""}`} onPointerEnter={() => setHover(true)} onPointerLeave={() => setHover(false)}>
+  const auto = desktop && live && !held && !reduced;
+  return <div ref={ref} className={`st ${auto && !hover ? "" : "is-paused"} ${held ? "is-held" : ""} ${live ? "" : "is-resting"}`} onPointerEnter={() => setHover(true)} onPointerLeave={() => setHover(false)}>
     <div className="st-tabs" role="tablist" aria-label="Flagship projects" onKeyDown={onKey}>
       {STAGE.map(({ flag, project }, i) => <button key={flag.slug} type="button" role="tab" id={`st-tab-${flag.slug}`} aria-selected={i === active} aria-controls={`card-${flag.slug}`} tabIndex={i === active ? 0 : -1} className={`st-tab ${i === active ? "is-active" : ""}`} onClick={() => choose(i)}>
         <span className="st-tab-num">{String(i + 1).padStart(2, "0")}</span>
@@ -206,16 +237,16 @@ export default function WorkStage() {
         const shown = !desktop || i === active;
         const outbound = outboundLink(project);
         return <article key={flag.slug} id={`card-${flag.slug}`} role={desktop ? "tabpanel" : undefined} aria-labelledby={desktop ? `st-tab-${flag.slug}` : undefined} className={`st-panel ${shown ? "is-active" : ""}`} inert={!shown}>
-          <div className="st-demo">{Demo ? <Demo flag={flag} project={project} active={shown && (desktop ? inView : true)} /> : <div className="st-cover"><img className="ed-lazy-media" src={media(coverOf(project))} alt="" loading="lazy" onLoad={reveal} /></div>}</div>
+          <div className="st-demo">{Demo ? <Demo flag={flag} project={project} active={shown && live} /> : <div className="st-cover"><img className="ed-lazy-media" src={media(coverOf(project))} alt="" loading="lazy" onLoad={reveal} /></div>}</div>
           <div className="st-info">
             <p className="st-eyebrow"><span>{String(i + 1).padStart(2, "0")} / {String(STAGE.length).padStart(2, "0")}</span><em><i aria-hidden="true" />{flag.badge}</em></p>
             <h3><a href={`#project/${project.slug}`}>{project.title}</a></h3>
             <p className="st-headline">{flag.headline}</p>
             <p className="st-copy">{flag.copy}</p>
-            <dl className="st-stats">{flag.stats.map(([value, label]) => <div key={label}><dt>{value}</dt><dd>{label}</dd></div>)}</dl>
+            <dl className="st-stats">{flag.stats.map(([value, label]) => <div key={label}><dt><StatValue value={value} run={shown && live} /></dt><dd>{label}</dd></div>)}</dl>
             <ul className="st-stack" aria-label="Built with">{flag.stack.map((tool) => <li key={tool}>{tool}</li>)}</ul>
             <div className="st-ctas">
-              <a className="sc-btn" href={`#project/${project.slug}`} {...magnetic}>Read the case study<ArrowUpRight size={18} aria-hidden="true" /></a>
+              <a className="sc-btn" href={`#project/${project.slug}`}>Read the case study<ArrowUpRight size={18} aria-hidden="true" /></a>
               {outbound && <a className="sc-btn-ghost" href={outbound.href} target="_blank" rel="noopener noreferrer">{outbound.label}<ExternalLink size={15} aria-hidden="true" /></a>}
             </div>
           </div>

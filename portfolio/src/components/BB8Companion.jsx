@@ -49,6 +49,7 @@ const GUIDE_LINKS = [
 // a terminal with controls at the bottom edge. Keep the companion mounted so
 // its personality/session state survives navigation, but do not let it cover
 // or compete with those interfaces.
+const AVOID_ON_HOME = ".sc-card, .st-panel, .sc-email, .ed-contact-email, .sc-feed-card";
 const HIDDEN_ROUTES = new Set(["emet", "explore", "lineage-demo", "infinity", "digital-double"]);
 
 function readSessionFlag(key) {
@@ -84,6 +85,24 @@ function isEditableTarget(target) {
 export default function BB8Companion() {
   const { route, navigate } = useRoute();
   const routeHidden = HIDDEN_ROUTES.has(route);
+  // On the home page the droid may not sit on top of the work: it hides
+  // whenever it would overlap a project card, the stage or the contact
+  // address. The playground and the project pages are its own ground.
+  const [overContent, setOverContent] = useState(false);
+  useEffect(() => {
+    if (route !== "main") { setOverContent(false); return undefined; }
+    const check = () => {
+      const box = edgeRef.current?.querySelector(".bb8-edge-character")?.getBoundingClientRect();
+      if (!box || !box.width) return;
+      const hit = [...document.querySelectorAll(AVOID_ON_HOME)].some((el) => {
+        const r = el.getBoundingClientRect();
+        return r.width > 0 && r.left < box.right && r.right > box.left && r.top < box.bottom && r.bottom > box.top;
+      });
+      setOverContent((was) => (was === hit ? was : hit));
+    };
+    const id = setInterval(check, 200);
+    return () => clearInterval(id);
+  }, [route]);
   const edgeRef = useRef(null);
   const viewportRef = useRef(null);
   const guideTriggerRef = useRef(null);
@@ -600,7 +619,7 @@ export default function BB8Companion() {
   return (
     <aside
       ref={edgeRef}
-      className={`bb8-edge bb8-edge--${phase} bb8-edge--${routine}${routine !== "contextual" ? " bb8-edge--quiet" : ""}${uiOnRight ? " bb8-edge--ui-right" : ""}${panelOpen ? " bb8-edge--panel-open" : ""}${routeHidden ? " bb8-edge--route-hidden" : ""}`}
+      className={`bb8-edge bb8-edge--${phase} bb8-edge--${routine}${routine !== "contextual" ? " bb8-edge--quiet" : ""}${uiOnRight ? " bb8-edge--ui-right" : ""}${panelOpen ? " bb8-edge--panel-open" : ""}${routeHidden ? " bb8-edge--route-hidden" : ""}${overContent ? " bb8-edge--over-content" : ""}`}
       aria-label="Emet portfolio companion"
       aria-hidden={routeHidden || undefined}
     >

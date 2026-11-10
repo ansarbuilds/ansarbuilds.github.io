@@ -130,7 +130,7 @@
 .sc-card:hover h3 svg { transform: translate(3px, -3px); color: var(--ed-coral-ink); }
 .sc-card-metric { display: flex; align-items: baseline; gap: 10px; margin-top: 14px; }
 .sc-card-metric strong { font: 400 2.2rem/1 var(--font-serif); letter-spacing: -.04em; color: var(--ed-coral-ink); }
-.sc-card-metric span { font: .56rem var(--font-mono); text-transform: uppercase; letter-spacing: .05em; }
+.sc-card-metric > span { font: .56rem var(--font-mono); text-transform: uppercase; letter-spacing: .05em; }
 .sc-card-line { margin-top: 12px; font-size: .84rem; line-height: 1.65; }
 .sc-card-status { margin-top: auto; padding-top: 16px; font: .55rem var(--font-mono); text-transform: uppercase; letter-spacing: .06em; opacity: .75; }
 
@@ -440,3 +440,82 @@
 .sc-card-media { background: color-mix(in srgb, var(--ed-blue) 6%, var(--ed-ivory)); box-shadow: 0 0 0 1px var(--ed-rule); }
 .sc-card-kind { background: rgb(10 9 8 / .7); color: #efe6d8; }
 .sc-jump, .sc-flags { display: none; }
+
+/* ============================================================
+   DIRECTED PASS. Less scroll before the work, a gallery grid, and
+   contact as the closing shot. Motion here is transform, opacity
+   and clip-path only.
+   ============================================================ */
+
+/* The short version: one sentence, the receipts on one line, the tools. */
+.sc-brief { padding-block: 46px 0; }
+.sc-brief .sc-statement { max-width: none; margin-bottom: 20px; font-size: clamp(1.45rem, 2.5vw, 2.15rem); line-height: 1.18; }
+.sc-brief .sc-statement em { display: inline; margin: 0; max-width: none; font-size: 1em; letter-spacing: -.03em; }
+.sc-receipts { display: flex; flex-wrap: wrap; gap: 10px 26px; }
+@media (min-width: 1240px) { .sc-receipts { flex-wrap: nowrap; white-space: nowrap; } }
+.sc-receipts > div { display: flex; align-items: baseline; gap: 10px; }
+.sc-receipts dt { font: 400 1.5rem/1 var(--font-serif); letter-spacing: -.03em; color: var(--ed-coral-ink); }
+.sc-receipts dd { font: .52rem/1.4 var(--font-mono); text-transform: uppercase; letter-spacing: .03em; opacity: .78; }
+.sc-brief .sc-marquee { margin-top: 34px; }
+.sc-brief .sc-marquee li { padding-block: 15px; font-size: clamp(1.1rem, 1.9vw, 1.55rem); }
+
+/* The stage heading introduces the work and gets out of the way. */
+.ed-projects.ed-section { padding-top: 44px; scroll-margin-top: 70px; }
+.sc-stage-heading { align-items: end; margin-bottom: 22px; gap: 40px; }
+.sc-stage-heading h2 { margin-top: 10px; font-size: clamp(1.7rem, 3vw, 2.5rem); line-height: 1.05; letter-spacing: -.055em; }
+.sc-stage-heading .ed-heading-aside { max-width: 380px; padding-bottom: 4px; font-size: .8rem; line-height: 1.6; }
+.ed-projects .ed-section-watermark { font-size: 11vw; top: 0; }
+
+/* Gallery wall: each image unmasks from an 8% inset, 60ms apart; hover
+   pushes in slowly on the image only. */
+.sc-card-media { clip-path: inset(8% round 18px); opacity: 0; transition: clip-path .7s var(--ease-out), opacity .5s ease; transition-delay: calc(var(--i, 0) * 60ms); }
+.is-in > .sc-card .sc-card-media { clip-path: inset(0 round 18px); opacity: 1; }
+.sc-card-media img { scale: none; transform: scale(1); transition: transform .8s var(--ease-out); }
+.is-in > .sc-card .sc-card-media img { scale: none; }
+.is-in > .sc-card:hover .sc-card-media img, .is-in > .sc-card:focus-visible .sc-card-media img { scale: none; transform: scale(1.04); transition-duration: .8s; }
+
+/* Contact: the address is the headline. */
+.sc-contact { padding-top: 84px; }
+.sc-contact h2 { margin-top: 22px; font-size: clamp(1.2rem, 2.6vw, 2.2rem); letter-spacing: -.045em; }
+.sc-email { position: relative; display: inline-block; max-width: 100%; margin: 14px 0 40px; padding-bottom: .08em; font: 600 clamp(1.3rem, 5.6vw, 4.3rem)/1.04 var(--font-body); letter-spacing: -.055em; overflow-wrap: anywhere; color: var(--ed-blue); transition: color .3s; }
+.sc-email::after { content: ""; position: absolute; inset: auto 0 0; height: .05em; min-height: 2px; background: var(--ed-coral); transform: scaleX(0); transform-origin: left; transition: transform .5s var(--ease-out); }
+.sc-email:hover, .sc-email:focus-visible { color: var(--ed-coral-ink); }
+.sc-email:hover::after, .sc-email:focus-visible::after { transform: scaleX(1); }
+.sc-contact .ed-contact-bottom { margin-block: 0 60px; justify-content: flex-start; align-items: flex-start; }
+.sc-contact .ed-contact-bottom > div { max-width: 46ch; }
+.sc-contact .ed-contact-email { font-size: 1.15rem; padding: 16px 22px; gap: 30px; }
+.sc-contact .ed-contact-email svg { width: 20px; height: 20px; }
+.sc-contact-field { mask-image: none; opacity: .42; }
+
+/* Phone menu: one button holds the section links. */
+.ed-nav-menu { position: relative; display: none; }
+.ed-nav-menu > button { min-height: 44px; padding: 0 12px; border: 1px solid var(--ed-rule); font: inherit; }
+.ed-nav.is-over-hero .ed-nav-menu > button { border-color: rgb(239 230 216 / .25); }
+.ed-nav-menu-list { position: absolute; right: 0; top: calc(100% + 10px); z-index: 5; display: flex; flex-direction: column; min-width: 190px; padding: 8px; border: 1px solid var(--ed-rule); border-radius: 14px; background: color-mix(in srgb, var(--ed-blue) 6%, var(--ed-ivory)); color: var(--ed-blue); box-shadow: 0 30px 60px -20px rgb(0 0 0 / .8); animation: sc-menu .2s var(--ease-out); }
+.ed-nav-links .ed-nav-menu-list a { justify-content: flex-start; min-height: 44px; padding: 0 12px; border: 0; border-radius: 8px; font-size: .8rem; }
+.ed-nav-links .ed-nav-menu-list a:hover { background: color-mix(in srgb, var(--ed-blue) 8%, transparent); }
+@keyframes sc-menu { from { opacity: 0; transform: translateY(-6px); } }
+@media (max-width: 640px) {
+  .ed-nav-menu { display: inline-flex; }
+  .sc-brief { padding-top: 34px; }
+  .sc-receipts { gap: 8px 22px; }
+  .sc-receipts dt { font-size: 1.35rem; }
+  .ed-section-heading.sc-stage-heading h2 { font-size: 1.7rem; }
+  .sc-contact { padding-top: 60px; }
+  .sc-contact h2 { font-size: 1.15rem; }
+  .sc-contact .ed-contact-bottom { flex-direction: column; gap: 26px; margin-bottom: 44px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .sc-card-media { clip-path: none; opacity: 1; transition: none; }
+  .sc-card-media img, .sc-email, .sc-email::after { transition: none; }
+  .ed-nav-menu-list { animation: none; }
+}
+
+/* Motion budget: UI moves in 200 to 600ms and then stops. Only the canvas
+   keeps moving. These override the longer and looping effects above. */
+.sc-hero-name > span:first-child { animation: none; background: none; -webkit-background-clip: border-box; background-clip: border-box; color: inherit; text-shadow: 0 0 40px rgb(7 7 7 / .6); }
+.sc-hero-kicker i { animation: none; }
+.ed-section-heading h2 { transition-duration: .6s; }
+.ed-section-heading h2 em { transition: opacity .45s var(--ease-out) .15s, transform .5s var(--ease-out) .15s; }
+.ed-section-heading .ed-heading-aside { transition: opacity .45s ease .25s; }
+.sc-cap .sc-cap-count, .sc-cap .sc-cap-count > * { transition-duration: .6s; }
