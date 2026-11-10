@@ -39,10 +39,10 @@ const ROUTINE_COPY = {
 };
 
 const GUIDE_LINKS = [
-  { href: "#projects", eyebrow: "Start here", label: "Selected work", detail: "The projects I’m proudest of" },
-  { href: "#ai", eyebrow: "Explore", label: "AI experiments", detail: "Interactive things to try" },
-  { href: "#about", eyebrow: "Background", label: "About me", detail: "How I work and what I use" },
-  { href: "#contact", eyebrow: "Connect", label: "Say hello", detail: "Email and profile links" },
+  { href: "#projects", eyebrow: "Start here", label: "Selected work", detail: "Six flagship builds" },
+  { href: "#capabilities", eyebrow: "Skills", label: "What I bring", detail: "Agents, evals and shipping" },
+  { href: "#ai", eyebrow: "Explore", label: "The playground", detail: "Interactive things to try" },
+  { href: "#contact", eyebrow: "Connect", label: "Get in touch", detail: "Email, GitHub and LinkedIn" },
 ];
 
 // These takeover routes dedicate the full viewport to pointer-driven tools or

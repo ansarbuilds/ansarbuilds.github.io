@@ -5,33 +5,35 @@ React 19, Vite, Tailwind v4, Framer Motion, and three.js for the interactive exp
 
 ## How the site is laid out
 
-One scrolling page, then a detail page per project:
+A portfolio of agents, AI studies and shipped apps, with the proof for each. One scrolling page, then a detail page per project:
 
-1. **Hero**: particles gather into my name, then morph into what I build. The rotating project/tool line stays underneath, and the pointer disperses either text shape.
-2. **Projects**: one open-source feature split into two collections: the JEV and REA studies, then the StoryEra and Site Recon agent skills. The other featured stories and project grid follow.
-3. **Built with AI**: the EMET terminal, solar system, and infinity loop.
-4. **Skills ticker** and **About**.
-5. **Experience**.
-6. **Contact**.
+1. **Hero**: a dark stage with a turning network of nodes and travelling signals (`SignalField.jsx`). It tilts with the pointer, a click sends a burst of signals from the nearest node, and it fades and swells as the page scrolls on. The name decodes in, then one plain line, two actions, and a live strip of four flagship projects. The nav turns to dark glass while the hero is behind it, and the same network, dimmed, sits behind Contact.
 
-The portfolio opens in warm ivory (`#e6d5bd`), near-black ink (`#101010`), and
-coral (`#d5360c`, with `#74200d` for coral text). Each later section has its own
-palette (`src/lib/palettes.js`): sections tagged `data-palette` swap the colour
-tokens as they reach the middle of the screen, and the page eases between them
-(more briefly on phones). Project pages use the palette of the section that
-lists them, and the companion's bubble follows the current accent. Contact is the
-one dark ending, in midnight navy with a bright red button. A swatch card in
-the bottom-left corner (`src/components/PaletteSwatch.jsx`) names the palette
-on screen and opens into its colours and hex codes.
+   **Motion across the page** (all of it switches off for reduced motion, and the pointer effects never mount on touch screens):
+   - `Cursor.jsx`: a ring that trails the pointer, swells over links, and becomes a labelled disc over anything tagged `data-cursor`.
+   - `lib/pointerFx.js`: magnetic buttons (`{...magnetic}`) and the pointer spotlight helper.
+   - On desktop the hero is pinned and the next section slides over it as a rounded sheet.
+   - `ScrubText` lights the intro statement word by word as it scrolls in; `VelocityMarquee` takes its speed, direction and lean from the scroll; `Expand` widens dark sections from a rounded card to full bleed; `SplitTitle` raises flagship titles letter by letter.
+2. **The short version**: the positioning statement, four counts, the lines-of-code band, and a moving row of the tools I build with.
+3. **Selected work** (`#projects`): one interactive stage (`WorkStage.jsx`, `stage.css`) instead of six long sections. Tabs along the top pick a project; the demo sits on the left and the short version on the right. It moves on by itself until the visitor picks a tab. Jarvis runs its real sample-data demo in a frame, Haloscript switches between its own Mac, iPad and iPhone screenshots, PRH-JEPA shows a report figure with a toggle for its headline finding, and the Flight Recorder replay and Site Recon terminal are illustrations that say so. On small screens the tabs drop away and the six projects stack.
+4. **What I bring** (`#capabilities`): agents and tooling, evaluation and research, product and shipping, each with the projects that prove it.
+5. **More shipped work** (`#more`): image cards with one highlight each, then an "Also built" toggle for internal tools and early experiments.
+6. **The playground** (`#ai`): the EMET terminal, solar system, and infinity loop.
+7. **Contact** (`#contact`): email first, then GitHub and LinkedIn. Day jobs sit underneath as one quiet line (title and company only, `#experience`).
+
+The whole site is one dark theme: carbon surfaces and bone text. Each later
+section tints that base a few points toward its own accent
+(`src/lib/palettes.js`): sections tagged `data-palette` swap the colour tokens
+as they reach the middle of the screen, and the page eases between them. A
+swatch card in the bottom-left corner (`src/components/PaletteSwatch.jsx`)
+names the palette on screen and opens into its colours and hex codes.
 `src/lib/palettes.test.mjs` holds every palette to AA contrast. `src/editorial.css` contains the homepage's layout and light/dark
 surfaces. Shared compatibility tokens live in `src/index.css`. The main page uses
 oversized condensed headings, illustrated covers using the original project
-icons, an open project grid, an experience timeline, and a dark
-interactive experiments section. The particle name-to-statement sequence and
-rotating project/tool line remain in the opening. The terminal and 3D scenes
-keep their own colors. The opening pauses offscreen and in hidden tabs, caps
-particles at 7,000 on desktop and 3,200 on phones, and reserves space for the
-rotating copy to avoid layout shifts.
+icons, flagship case-study spreads, an image grid, and a dark
+interactive experiments section. The hero network pauses offscreen and in
+hidden tabs, uses fewer nodes on phones, and draws one still frame for
+reduced motion. The terminal and 3D scenes keep their own colors.
 
 Clicking a project opens `#project/<slug>`: the story, a flow diagram, what I took from it, and links.
 
@@ -46,14 +48,15 @@ src/
     ProjectPage.jsx     the per-project detail page
     ui.jsx              Rail (scroller), FlowDiagram, tags, section heading
     EmetSection.jsx     the terminal
-    NameParticles.jsx    canvas name animation
+    SignalField.jsx      the hero's node network canvas
+    NameParticles.jsx    the old particle name animation (no longer used)
     SolarSystemExplorer.jsx, DataLineageExplorer.jsx, InfinityLoop.jsx
 public/shots/           screenshots used on project pages
 ```
 
 ## Adding or changing a project
 
-Edit `src/data/projects.js`. Set `featured: true` for a featured story. Add `spotlightGroup: "open-source"` to include a featured project in the shared Open Source & Experiments collection. Each card keeps its own artwork, copy, evidence and detail route; `spotlightLink` adds a direct report or documentation link. Flow diagrams are columns of boxes; boxes link to the next column automatically, or list `links` like `"0.0>1.1"` for a specific shape. Add images to `public/shots/` and list them under `shots`.
+Edit `src/data/projects.js` for the full story. The home page order and its short copy live in `src/data/showcase.js`: `FLAGSHIPS` (the six spreads, with their headline, stats, stack and floating visual), `MORE_WORK` (the image cards), `CAPABILITIES` and `STACK_MARQUEE`. Any listed project not named there appears under "Also built". Flow diagrams are columns of boxes; boxes link to the next column automatically, or list `links` like `"0.0>1.1"` for a specific shape. Add images to `public/shots/` and list them under `shots`.
 
 ## Writing style
 
@@ -80,12 +83,7 @@ Questions the local matcher cannot answer are kept only in the visitor's session
 
 ## Studies, tools and skills
 
-The homepage no longer presents JEV, REA and StoryEra as three equivalent cards. It introduces two clearer collections:
-
-- **Independent AI studies:** My Take on Jev and My Take on REA, each with its original report, methods, saved results and individual project page.
-- **Open-source tools & skills:** Agent Flight Recorder, StoryEra, Site Recon and Exposure Audit. Each has its own documentation, limits and public repository; Flight Recorder is also published on PyPI.
-
-The homepage renders two editorial collection cards on desktop and stacks them on smaller screens. Inside each collection, every project has its own artwork or type treatment, summary, story link and repository/report link. Project anchors, the full project index and command palette expose the entries individually.
+The studies (My Take on Jev, REA and PRH-JEPA) and the open-source tools and skills (Agent Flight Recorder, StoryEra, Site Recon, Exposure Audit) each sit on their own shelf in the builds list, with their own row, cover, story link and repository or report link.
 
 StoryEra documents a continuity-audit workflow for novels. Site Recon documents and automates public website inspection, including stack evidence, exact browser-visible animation values, mobile and reduced-motion comparison, and clean-room rebuild guidance.
 

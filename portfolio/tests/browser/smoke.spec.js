@@ -57,7 +57,7 @@ test('Jarvis project page renders and links its sample-data demo', async ({ page
   await expect(page.getByText('Portfolio demo with made-up sample data.')).toBeVisible();
 });
 
-test('scrolling over the open-source collections moves the page, not a box inside it', async ({ page, isMobile }) => {
+test('scrolling over the work grid moves the page, not a box inside it', async ({ page, isMobile }) => {
   test.skip(isMobile, 'wheel input is a desktop concern; touch scrolls the page directly');
   // Skip the intro title card, which covers the page for its first moments.
   await page.addInitScript((key) => sessionStorage.setItem(key, '1'), INTRO_SESSION_KEY);
@@ -66,22 +66,22 @@ test('scrolling over the open-source collections moves the page, not a box insid
   // the lists, so keep it out of the way.
   await page.addStyleTag({ content: '.bb8-edge { display: none !important; }' });
   const main = page.getByRole('main');
-  const list = page.locator('.ed-open-source-items').last();
+  const list = page.locator('.sc-card-grid').last();
   // Bring the list's top to just under the fixed nav, so the point we wheel
   // over is on the list itself and not on the nav or off screen.
   await list.evaluate((node) => {
     const scroller = document.querySelector('main');
     scroller.scrollTop += node.getBoundingClientRect().top - 160;
   });
-  // Nothing in the collections may be a scroll box of its own.
-  const scrollers = await page.locator('.ed-open-source *').evaluateAll((nodes) => nodes.filter((node) => {
+  // Nothing in the work grid may be a scroll box of its own.
+  const scrollers = await page.locator('.sc-card-grid *').evaluateAll((nodes) => nodes.filter((node) => {
     const { overflowY } = getComputedStyle(node);
     return (overflowY === 'auto' || overflowY === 'scroll') && node.scrollHeight > node.clientHeight;
   }).length);
   expect(scrollers).toBe(0);
   const box = await list.boundingBox();
   const point = { x: box.x + box.width / 2, y: box.y + 120 };
-  expect(await page.evaluate(({ x, y }) => !!document.elementFromPoint(x, y)?.closest('.ed-open-source-items'), point)).toBe(true);
+  expect(await page.evaluate(({ x, y }) => !!document.elementFromPoint(x, y)?.closest('.sc-card-grid'), point)).toBe(true);
   await page.mouse.move(point.x, point.y);
   const before = await main.evaluate((node) => node.scrollTop);
   await page.mouse.wheel(0, 1200);

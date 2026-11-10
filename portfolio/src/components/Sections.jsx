@@ -1,18 +1,18 @@
-import { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
-import { AnimatePresence, animate, motion, useReducedMotion, useInView } from "framer-motion";
-import { ArrowDown, ArrowRight, ArrowUpRight, ExternalLink, Info, Mail } from "lucide-react";
-import NameParticles from "./NameParticles";
-import ProjectMotionPreview from "./ProjectMotionPreview";
-import { ABOUT, CODE, CONTACT, HERO, RECEIPTS, ROLES } from "../data/content";
-import { EARLIER_PROJECTS, EXPERIMENTS, FEATURED, FEATURED_GRID, LISTED_PROJECTS, MORE_PROJECTS, OPEN_SOURCE_GROUPS } from "../data/projects";
-import { TOOL_INFO } from "../data/tools";
+import { useContext, useEffect, useRef, useState } from "react";
+import { animate, motion, useAnimationFrame, useInView, useMotionValue, useReducedMotion, useScroll, useSpring, useTransform, useVelocity } from "framer-motion";
+import { ArrowDown, ArrowRight, ArrowUpRight, ExternalLink, Mail } from "lucide-react";
+import SignalField from "./SignalField";
+import WorkStage from "./WorkStage";
+import { CODE, CONTACT, HERO, RECEIPTS, ROLES } from "../data/content";
+import { EXPERIMENTS, LISTED_PROJECTS, getProject } from "../data/projects";
+import { CAPABILITIES, FLAGSHIPS, MORE_WORK, STACK_MARQUEE } from "../data/showcase";
 import { EASE_REVEAL } from "../lib/motion";
 import { media } from "../lib/media";
-import { useStaticHero } from "../lib/staticHero";
-import { useRoute } from "../appContexts";
+import { magnetic, trackPointer } from "../lib/pointerFx";
+import { ScrollContext, useRoute } from "../appContexts";
 import "../editorial.css";
+import "../showcase.css";
 
-const firstSentence = (text) => text.match(/[^.!?]+[.!?]+(?:\s|$)/)?.[0]?.trim() || text;
 const revealImage = (event) => event.currentTarget.classList.add("is-loaded");
 
 // "is-in" lets CSS run the slower media reveals (cover apertures, image
@@ -53,119 +53,58 @@ function IndexLabel({ number, children }) {
 function ArrowLink({ href, children, light = false }) {
   return <a className={`ed-link ${light ? "ed-link-light" : ""}`} href={href}>{children}<ArrowUpRight size={18} aria-hidden="true" /></a>;
 }
-const BUILT = [
-  ["RepTrack", "Swift", "an iOS app"],
-  ["Haloscript", "SwiftUI", "a writing app"],
-  ["Sitescout", "TypeScript", "a Chrome extension"],
-  ["Integration-in-a-box", "Keycloak", "a working integration"],
-  ["My Take on Jev", "Python", "an AI study"],
-  ["Agent Flight Recorder", "Python", "a local agent debugging tool"],
-  ["My Take on REA", "Python", "an independent AI study"],
-  ["My Take on PRH-JEPA", "PyTorch", "an independent AI study"],
-  ["StoryEra", "Codex", "a skill for writers"],
-  ["Site Recon", "Playwright", "a site inspector"],
-  ["Exposure Audit", "Python", "a safe public-surface checker"],
-  ["my digital double", "Claude Code", "a 3D head"],
-  ["a catalogue checker", "embeddings", "a data quality check"],
-  ["a weekly data delivery", "DuckDB", "a pipeline that stops itself"],
-];
-const START_HERE = [
-  ["jarvis", "Jarvis", "Personal AI agent · runs on my Mac"],
-  ["haloscript", "Haloscript", "Writing app · live on the App Store"],
-  ["rea-study", "My Take on REA", "An independent AI study"],
-];
-const PROJECT_STYLES = [
-  "font-serif italic text-[#74200d]",
-  "font-condensed uppercase tracking-[.02em] text-[#101010]",
-  "font-display font-bold text-[#74200d]",
-  "font-serif italic text-[#101010]",
-];
-const TOOL_STYLES = [
-  "font-mono font-semibold text-[#74200d]",
-  "font-condensed uppercase tracking-[.03em] text-[#101010]",
-  "font-mono font-semibold text-[#74200d]",
-];
-
-/* One swapping word. The slot eases to the incoming word's width while the
-   old word leaves upward and the new one rises in, so the rest of the
-   sentence glides instead of jumping, and neither word ever leaves a gap.
-   A hidden copy of the incoming word is what gets measured; watching it
-   with a ResizeObserver also catches the late web-font swap. */
-function SwapWord({ text, cls, reduced }) {
-  const measureRef = useRef(null);
-  // The slot and the words take turns so a word never runs into its
-  // neighbour or gets clipped ("HALOSCRIP"). The incoming word is only shown
-  // once it has been measured, so it knows whether to wait for the slot to
-  // open; a shorter word arrives at once and the slot closes in behind it.
-  // The slot clips top and bottom only (see .ed-swap-word) as a backstop.
-  const [{ width, grows }, setSize] = useState({ width: null, grows: false });
-  const [shown, setShown] = useState({ text, cls });
-  useLayoutEffect(() => {
-    const el = measureRef.current;
-    if (!el) return;
-    const measure = () => {
-      const next = el.getBoundingClientRect().width;
-      setSize((size) => (size.width != null && Math.abs(next - size.width) < 0.5
-        ? size
-        : { width: next, grows: size.width != null && next > size.width }));
+/* The name prints itself: each letter cycles through random glyphs, then
+   locks in, left to right. Screen readers get the plain name from the h1. */
+const DECODE_GLYPHS = "ABCDEFGHJKLMNPQRSTUVWXYZ0123456789/<>#*+";
+function DecodeLine({ text, run, delay = 0, className = "" }) {
+  const reduced = useReducedMotion();
+  const [shown, setShown] = useState("");
+  useEffect(() => {
+    if (reduced || !run) return undefined;
+    let raf = 0;
+    const startAt = performance.now() + delay;
+    const tick = (now) => {
+      const t = now - startAt;
+      if (t >= 0) {
+        let done = true;
+        const out = [...text].map((ch, i) => {
+          if (t >= i * 70 + 320) return ch;
+          done = false;
+          return t < i * 30 ? "\u00a0" : DECODE_GLYPHS[Math.floor(Math.random() * DECODE_GLYPHS.length)];
+        }).join("");
+        setShown(out);
+        if (done) return;
+      }
+      raf = requestAnimationFrame(tick);
     };
-    measure();
-    setShown({ text, cls });
-    const ro = new ResizeObserver(measure);
-    ro.observe(el);
-    return () => ro.disconnect();
-  }, [text, cls]);
-  return (
-    <motion.span
-      className="ed-swap-word"
-      initial={false}
-      animate={width == null ? undefined : { width }}
-      transition={reduced ? { duration: 0 } : grows ? { duration: 0.24, ease: "easeOut" } : { duration: 0.3, delay: 0.2, ease: EASE_REVEAL }}
-    >
-      <span ref={measureRef} className={`ed-swap-measure ${cls}`} aria-hidden="true">{text}</span>
-      <AnimatePresence initial={false}>
-        <motion.span
-          key={`${shown.text}|${shown.cls}`}
-          initial={reduced ? false : { y: "120%" }}
-          animate={{ y: "0%" }}
-          exit={reduced ? undefined : { y: "-120%", transition: { duration: 0.3, ease: EASE_REVEAL } }}
-          transition={{ duration: 0.42, delay: grows ? 0.2 : 0, ease: EASE_REVEAL }}
-          className={`ed-swap-text ${shown.cls}`}
-        >
-          {shown.text}
-        </motion.span>
-      </AnimatePresence>
-      {/* Holds the line's height and baseline; the words above are absolute. */}
-      <span className="ed-swap-strut" aria-hidden="true">{"\u00a0"}</span>
-    </motion.span>
-  );
+    raf = requestAnimationFrame(tick);
+    return () => cancelAnimationFrame(raf);
+  }, [run, text, delay, reduced]);
+  return <span className={className} aria-hidden="true">{reduced ? text : shown || "\u00a0"}</span>;
 }
 
-/* "I built RepTrack with Swift." The project and tool swap every few
-   seconds, each rising in from below in a new font and colour. */
-function BuiltLine({ run }) {
+/* Four flagships as a live status strip. One card at a time takes the
+   spotlight, with a light sweep across it. */
+const HERO_FEED = FLAGSHIPS.slice(0, 4);
+function HeroFeed({ run }) {
   const reduced = useReducedMotion();
-  const [i, setI] = useState(0);
+  const [active, setActive] = useState(0);
   useEffect(() => {
-    if (!run || reduced) return;
-    const id = setInterval(() => setI((n) => (n + 1) % BUILT.length), 2600);
+    if (!run || reduced) return undefined;
+    const id = setInterval(() => setActive((n) => (n + 1) % HERO_FEED.length), 2600);
     return () => clearInterval(id);
   }, [run, reduced]);
-  const [project, tool, what] = BUILT[i];
-  return (
-    <div>
-      <p className="font-display text-[clamp(1.25rem,2.4vw,2rem)] leading-snug text-[#101010]">
-        I built <SwapWord text={project} cls={PROJECT_STYLES[i % PROJECT_STYLES.length]} reduced={reduced} /> with{" "}
-        <SwapWord text={tool} cls={TOOL_STYLES[i % TOOL_STYLES.length]} reduced={reduced} />
-      </p>
-      <p className="mt-2 font-mono text-xs uppercase tracking-[.18em] text-[#51463c]">
-        <span className="sr-only">That's </span>
-        {what} · {i + 1} of {BUILT.length}
-      </p>
-    </div>
-  );
+  return <nav className="sc-feed" aria-label="Flagship projects">{HERO_FEED.map((flag, i) => {
+    const project = getProject(flag.slug);
+    return project && <a key={flag.slug} href={`#project/${project.slug}`} className={`sc-feed-card ${i === active ? "is-active" : ""}`} data-cursor="Open">
+      <span className="sc-feed-status"><i aria-hidden="true" />{flag.badge}</span>
+      <strong>{project.title}</strong>
+      <span className="sc-feed-metric"><b>{flag.stats[0][0]}</b>{flag.stats[0][1]}</span>
+      <span className="sc-feed-scan" aria-hidden="true" />
+      <span className="sc-feed-timer" aria-hidden="true" />
+    </a>;
+  })}</nav>;
 }
-
 
 // The receipts are counts of things; this is the one measurement, so it gets
 // its own band rather than a fifth column too narrow to hold a five-digit
@@ -199,171 +138,182 @@ function CodeBand() {
   );
 }
 
+/* Copy that lights up word by word as it crosses the screen. Every word is
+   in the page from the start, only dimmed, so nothing is hidden from
+   readers, search or reduced motion (which gets it fully lit). */
+function ScrubWord({ progress, range, children }) {
+  const opacity = useTransform(progress, range, [0.16, 1]);
+  return <motion.span style={{ opacity }}>{children} </motion.span>;
+}
+function ScrubText({ lead, rest, className }) {
+  const scrollRef = useContext(ScrollContext);
+  const reduced = useReducedMotion();
+  const ref = useRef(null);
+  const { scrollYProgress } = useScroll({ container: scrollRef, target: ref, offset: ["start 0.9", "start 0.3"] });
+  const leadWords = lead.split(" "), restWords = rest.split(" ");
+  const total = leadWords.length + restWords.length;
+  const word = (text, i) => (reduced ? `${text} ` : <ScrubWord key={i} progress={scrollYProgress} range={[i / total, (i + 1) / total]}>{text}</ScrubWord>);
+  return <p ref={ref} className={className}>{leadWords.map(word)}<em>{restWords.map((text, i) => word(text, leadWords.length + i))}</em></p>;
+}
+
 export function Hero({ ready = true }) {
   const reduced = useReducedMotion();
-  const staticHero = useStaticHero();
+  const scrollRef = useContext(ScrollContext);
   const heroRef = useRef(null);
   const visible = useInView(heroRef, { margin: "50px" });
-  const [settled, setSettled] = useState(false);
-  const onSettled = useCallback(() => setSettled(true), []);
-  return <>
-    <section ref={heroRef} id="hero" aria-labelledby="hero-name" className="ed-hero ed-light" data-palette="lumen">
-      <div className="ed-hero-meta"><span>Mohamed Ansar / Selected work</span><span>Solutions engineer · Canada</span></div>
-      <h1 id="hero-name" className="sr-only">Hi, I'm Mohamed Ansar</h1>
-      <div className="ed-hero-canvas"><NameParticles ready={ready} onSettled={onSettled} /></div>
-      {/* Shown only when the canvas stays static, so it never doubles the
-          statement the animated hero morphs into. */}
-      {staticHero && <p className={reduced ? "ed-static-statement" : "ed-mobile-statement"}>{HERO.title}</p>}
-      <div className="ed-hero-bottom">
-        <motion.div initial={reduced ? false : { opacity: 0, y: 12 }} animate={settled || reduced ? { opacity: 1, y: 0 } : { opacity: 0, y: 12 }} transition={{ duration: 0.28 }}><BuiltLine run={(settled || reduced) && visible} /></motion.div>
-        <a href="#projects" className="ed-scroll-link">Explore the work <ArrowDown size={20} aria-hidden="true" /></a>
-      </div>
-      <div className="ed-hero-edge" aria-hidden="true"><span>DATA / APPS / EXPERIMENTS</span><span>A little curiosity goes a long way.</span></div>
+  const run = ready && visible;
+  // As the hero scrolls away, the copy lifts and fades while the network
+  // swells slightly, so the page seems to move through it.
+  // Measured in pixels, not against the hero's own box: on desktop the hero
+  // is pinned while the next section slides over it, so its box never moves.
+  const { scrollY } = useScroll({ container: scrollRef });
+  const copyY = useTransform(scrollY, [0, 800], reduced ? [0, 0] : [0, -150]);
+  const copyOpacity = useTransform(scrollY, [0, 560], reduced ? [1, 1] : [1, 0]);
+  const feedY = useTransform(scrollY, [0, 800], reduced ? [0, 0] : [0, -60]);
+  const feedOpacity = useTransform(scrollY, [80, 620], reduced ? [1, 1] : [1, 0]);
+  const fieldScale = useTransform(scrollY, [0, 900], reduced ? [1, 1] : [1, 1.3]);
+  const fieldOpacity = useTransform(scrollY, [0, 900], reduced ? [1, 1] : [1, 0.3]);
+  const appear = (delay) => (reduced ? {} : {
+    initial: { opacity: 0, y: 16 },
+    animate: ready ? { opacity: 1, y: 0 } : { opacity: 0, y: 16 },
+    transition: { duration: 0.6, delay, ease: EASE_REVEAL },
+  });
+  return <div className="sc-open">
+    <section ref={heroRef} id="hero" aria-labelledby="hero-name" className="sc-hero" data-palette="lumen" onPointerMove={trackPointer}>
+      <motion.div className="sc-hero-stage" style={{ scale: fieldScale, opacity: fieldOpacity }}><SignalField className="sc-hero-field" /></motion.div>
+      <div className="sc-hero-grid" aria-hidden="true" />
+      <div className="sc-hero-spot" aria-hidden="true" />
+      <motion.div className="sc-hero-inner" style={{ y: copyY, opacity: copyOpacity }}>
+        <motion.p className="sc-hero-kicker" {...appear(0.1)}><i aria-hidden="true" />Index of work · {CODE.asOf}</motion.p>
+        <h1 id="hero-name" className="sc-hero-name" aria-label="Mohamed Ansar"><DecodeLine text="MOHAMED" run={run} /><DecodeLine text="ANSAR" run={run} delay={240} className="is-outline" /></h1>
+        <motion.p className="sc-hero-line" {...appear(0.9)}>{HERO.title} <em>Here are {LISTED_PROJECTS.length} of them.</em></motion.p>
+        <motion.div className="sc-hero-ctas" {...appear(1.05)}>
+          <a href="#projects" className="sc-hero-btn" {...magnetic}>See the work<ArrowDown size={18} aria-hidden="true" /></a>
+          <a href="#contact" className="sc-hero-ghost">Get in touch<ArrowUpRight size={16} aria-hidden="true" /></a>
+          <span className="sc-hero-hint" aria-hidden="true">Click the network</span>
+        </motion.div>
+      </motion.div>
+      <motion.div className="sc-hero-bottom" style={{ y: feedY, opacity: feedOpacity }}><motion.div {...appear(1.2)}><HeroFeed run={run} /></motion.div></motion.div>
     </section>
-    <section className="ed-intro ed-light" aria-label="What I build" data-palette="lumen">
+    <section className="ed-intro ed-light" aria-label="The short version" data-palette="lumen">
       <div className="ed-wrap">
         <Enter className="ed-intro-grid">
-          <IndexLabel number="01">A bit of context</IndexLabel>
-          <div><p className="ed-intro-copy">Reliable data systems.<br /><em>Evidence-backed AI tools.</em></p>
-            <blockquote className="ed-intro-quote">Bad data rarely shows up as an error. It shows up two teams later as a <em>wrong decision.</em></blockquote>
+          <IndexLabel number="01">The short version</IndexLabel>
+          <div><ScrubText className="sc-statement" lead="Most AI demos stop at the demo." rest="Mine ship with tests, real numbers and a write-up, including the parts that failed." />
             <p className="ed-copy">{HERO.lede.map((part) => part.text).join("")}</p>
-            <ArrowLink href="#about">More about me</ArrowLink>
+            <div className="sc-intro-links"><ArrowLink href="#projects">See the flagship work</ArrowLink><ArrowLink href="#contact">Get in touch</ArrowLink></div>
           </div>
         </Enter>
         <dl className="ed-receipts">{RECEIPTS.map((item) => <div key={item.label}><dt><CountUp value={item.value === "PROJECTS" ? `${LISTED_PROJECTS.length}+` : item.value} /></dt><dd>{item.label}</dd></div>)}</dl>
         <CodeBand />
       </div>
+      <StackMarquee />
     </section>
-  </>;
+  </div>;
 }
 
-// The title starts below its own mask, so the mask (not the clipped title)
-// has to be what we watch - otherwise it never counts as in view and the
-// reveal never runs.
-function PunchTitle({ text }) {
+
+
+/* A row that never stops, and takes its speed and lean from the scroll:
+   scroll fast and it rushes and skews, scroll back and it reverses. The
+   second copy only exists so the loop has no seam; reduced motion gets a
+   still, wrapping list instead. */
+function VelocityMarquee({ items, label, className = "", speed = 1.1 }) {
+  const scrollRef = useContext(ScrollContext);
   const reduced = useReducedMotion();
-  const maskRef = useRef(null);
-  // "some" rather than a share of the box: a long title in the narrow rail
-  // never shows 72% of itself, and would stay hidden for good.
-  const inView = useInView(maskRef, { once: true, margin: "0px 0px 20% 0px" });
-  return <span className="ed-title-mask" ref={maskRef} aria-hidden="true"><motion.span
-    className="ed-punch-title"
-    initial={reduced ? false : { y: "112%" }}
-    animate={reduced ? undefined : { y: inView ? "0%" : "112%" }}
-    transition={{ duration: 0.48, ease: EASE_REVEAL }}
-  ><i>{text[0]}</i><span>{text.slice(1)}</span></motion.span></span>;
+  const { scrollY } = useScroll({ container: scrollRef });
+  const velocity = useSpring(useVelocity(scrollY), { damping: 50, stiffness: 400 });
+  const boost = useTransform(velocity, [-1500, 0, 1500], [-5, 0, 5], { clamp: false });
+  const skewX = useTransform(velocity, [-2600, 2600], [9, -9]);
+  const offset = useMotionValue(0);
+  const direction = useRef(1);
+  useAnimationFrame((_, delta) => {
+    if (reduced) return;
+    const push = boost.get();
+    if (push < -0.2) direction.current = -1;
+    else if (push > 0.2) direction.current = 1;
+    let next = offset.get() - direction.current * speed * (Math.min(delta, 64) / 1000) * (1 + Math.abs(push));
+    if (next <= -50) next += 50;
+    else if (next > 0) next -= 50;
+    offset.set(next);
+  });
+  const x = useTransform(offset, (value) => `${value}%`);
+  return <div className={`sc-marquee ${className}`}><motion.div className="sc-marquee-track" style={reduced ? undefined : { x, skewX }}>
+    {[0, 1].map((copy) => <ul key={copy} aria-label={copy ? undefined : label} aria-hidden={copy ? "true" : undefined}>
+      {items.map((item, i) => <li key={`${item}-${i}`}>{item}<span aria-hidden="true">✳</span></li>)}
+    </ul>)}
+  </motion.div></div>;
 }
-function ProjectPlate({ project, compact = false }) {
-  const [broken, setBroken] = useState(false);
-  const [artBroken, setArtBroken] = useState(false);
-  // Spotlight covers sit on the large spreads and set their own proportion;
-  // card covers ride the tile's, so they only differ by which class shapes
-  // the plate. The artwork carries no copy, and the card already names the
-  // project, so it is decorative. If it fails, fall through to the plate this
-  // project had before it got one, rather than leaving an empty frame behind
-  // the caption. Tracked apart from `broken` so a failed cover still gets the
-  // screenshot.
-  const coverArt = project.spotlightArt || project.cardArt;
-  if (coverArt && !artBroken) return <div className={`ed-project-plate ${project.spotlightArt ? "ed-spotlight-cover" : "ed-card-cover"} ${compact ? "ed-plate-compact" : ""}`} aria-hidden="true">
-    <img className="ed-spotlight-art ed-lazy-media" src={media(coverArt)} alt="" loading="lazy" onLoad={revealImage} onError={() => setArtBroken(true)} />
-    <ProjectMotionPreview project={project} />
-    <span className="ed-poster-cross">✳</span>
-    {/* Compact cards print the kind beside the plate already. */}
-    {!compact && <span className="ed-plate-caption">{project.kind}</span>}
-  </div>;
-  const screenshot = project.cardShot || project.shots?.[0];
-  const study = project.slug === "decision-models" || project.slug === "rea-study" || project.slug === "prh-jepa";
-  if (study) return <div className={`ed-project-plate ed-study-cover ${project.slug === "rea-study" ? "ed-cover-rea" : "ed-cover-jev"}`} aria-hidden="true">
-    <div className="ed-cover-grid" />
-    <div className="ed-cover-orbit" />
-    <p className="ed-cover-label">{project.kind}</p>
-    <span className="ed-cover-type">{project.slug === "rea-study" ? "REA" : project.slug === "prh-jepa" ? "PRH" : "JEV"}</span>
-    <img className="ed-cover-icon ed-lazy-media" src={media(project.icon)} alt="" loading="lazy" onLoad={revealImage} />
-    <span className="ed-cover-stamp">{project.slug === "rea-study" ? "TESTED, NOT ASSUMED" : project.slug === "prh-jepa" ? "CLAIMS, REPRODUCED." : "SMALL MODELS. REAL TESTS."}</span>
-    <div className="ed-cover-flow">{project.flow?.columns.map((column, i) => <span key={column.label}>{column.label}{i < project.flow.columns.length - 1 && <b>↗</b>}</span>)}</div>
-    <ProjectMotionPreview project={project} />
-  </div>;
-  return <div className={`ed-project-plate ed-poster-plate ed-poster-${project.slug} ${compact ? "ed-plate-compact" : ""} ${!screenshot && project.icon ? "ed-plate-icon" : ""} ${project.slug === "haloscript" ? "ed-plate-app" : ""}`}>
-    <span className="ed-poster-word" aria-hidden="true">{project.title}</span><span className="ed-poster-cross" aria-hidden="true">✳</span>
-    {screenshot && !broken ? <img className="ed-project-image ed-lazy-media" src={media(screenshot)} alt={`${project.title} interface`} loading="lazy" onLoad={revealImage} onError={() => setBroken(true)} /> : project.icon ? <><span className="ed-app-watermark" aria-hidden="true">{project.title}</span><img className="ed-project-icon ed-lazy-media" src={media(project.icon)} alt="" loading="lazy" onLoad={revealImage} /></> : <div className="ed-type-plate" aria-hidden="true"><span>{project.kind}</span><strong>{project.title}</strong><ArrowUpRight size={56} /></div>}
-    <span className="ed-plate-caption">{project.kind}</span>
-  </div>;
-}
-function FeaturedSpread({ project, index }) {
-  return <Enter className={`ed-feature ${index % 2 ? "ed-feature-reverse" : ""}`}>
-    <a href={`#project/${project.slug}`} id={`card-${project.slug}`} aria-label={`Read ${project.title}${project.stats?.[0] ? `. ${project.stats[0].value} ${project.stats[0].label}` : ""}`} className="ed-feature-image"><ProjectPlate project={project} /></a>
-    <div className="ed-feature-body"><p className="ed-label"><span>02.{index + 1}</span>{project.kind}</p>
-      <h3><a href={`#project/${project.slug}`} aria-label={project.title}><PunchTitle text={project.title} /></a></h3>
-      <p className="ed-copy">{project.hook}</p>
-      <p className="ed-project-status">{project.status}</p>
-      {project.companions?.map((companion) => <a key={companion.slug} href={`#project/${companion.slug}`} className="ed-companion-link">{companion.label}<ArrowUpRight size={16} aria-hidden="true" /></a>)}
-      {project.stats && <dl className="ed-project-stats">{project.stats.map((stat) => <div key={stat.label}><dt><CountUp value={stat.value} /></dt><dd>{stat.short || stat.label}</dd></div>)}</dl>}
-      <ArrowLink href={`#project/${project.slug}`}>Read the story</ArrowLink>
-    </div>
-  </Enter>;
+const StackMarquee = () => <VelocityMarquee items={STACK_MARQUEE} label="Tools I build with" />;
+
+/* Dark sections arrive as a rounded card and widen to the full page as they
+   scroll in. The wrapper paints the paper colour behind the corners. */
+function Expand({ children }) {
+  const scrollRef = useContext(ScrollContext);
+  const reduced = useReducedMotion();
+  const ref = useRef(null);
+  const { scrollYProgress } = useScroll({ container: scrollRef, target: ref, offset: ["start end", "start 0.3"] });
+  const clipPath = useTransform(scrollYProgress, (p) => `inset(0 ${((1 - p) * 6).toFixed(2)}% 0 ${((1 - p) * 6).toFixed(2)}% round ${Math.round((1 - p) * 56)}px ${Math.round((1 - p) * 56)}px 0 0)`);
+  return <div ref={ref} className="sc-expand"><motion.div style={reduced ? undefined : { clipPath }}>{children}</motion.div></div>;
 }
 
-function OpenSourceProject({ project }) {
-  return <article className="ed-open-source-project" aria-labelledby={`open-source-title-${project.slug}`}>
-    <a id={`card-${project.slug}`} href={`#project/${project.slug}`} aria-label={`Read ${project.title}`} className="ed-feature-image"><ProjectPlate project={project} compact /></a>
-    <div className="ed-feature-body">
-      <p className="ed-label">{project.cardTitle ? project.title : project.kind}</p>
-      <h4 id={`open-source-title-${project.slug}`}><a href={`#project/${project.slug}`}>{project.cardTitle || project.title}</a></h4>
-      <p className="ed-copy">{project.cardTitle ? firstSentence(project.hook.slice(firstSentence(project.hook).length).trim()) : firstSentence(project.hook)}</p>
-      <p className="ed-project-status">{project.status}</p>
-      <div className="ed-open-source-links"><ArrowLink href={`#project/${project.slug}`}>Read the story</ArrowLink>{project.spotlightLink && <ArrowLink href={project.spotlightLink.href}>{project.spotlightLink.label}</ArrowLink>}</div>
-    </div>
-  </article>;
-}
-
-// Keep every project story discoverable while the two collections stay compact.
-function OpenSourceSpotlight({ number }) {
-  return <Enter className="ed-open-source" data-palette="lumora">
-    <div className="ed-open-source-heading">
-      <div><p className="ed-label"><span>{number}</span>Open source & experiments</p><h3>Test the claim.<br /><em>Share the method.</em></h3></div>
-      <p>Independent studies and reusable agent tools.<br />The evidence, code and limits stay public.</p>
-    </div>
-    <div className="ed-open-source-grid">
-      {OPEN_SOURCE_GROUPS.map((group) => <section key={group.id} className={`ed-open-source-group ed-open-source-group-${group.id}`} aria-labelledby={`open-source-group-${group.id}`}>
-        <header className="ed-open-source-group-heading">
-          <p className="ed-label">{group.label}</p>
-          <h3 id={`open-source-group-${group.id}`}>{group.title}</h3>
-          <p>{group.description}</p>
-        </header>
-        <div className="ed-open-source-items">{group.projects.map((project) => <OpenSourceProject key={project.slug} project={project} />)}</div>
-      </section>)}
-    </div>
-  </Enter>;
-}
-function ProjectTile({ project, index }) {
-  return <Enter delay={(index % 2) * 0.08} className="ed-project-tile">
-    <a id={`card-${project.slug}`} href={`#project/${project.slug}`}><ProjectPlate project={project} compact /><div className="ed-tile-heading"><h3 aria-label={project.title}><PunchTitle text={project.title} /></h3><ArrowUpRight size={26} aria-hidden="true" /></div><p className="ed-copy">{firstSentence(project.hook)}</p><p className="ed-tile-tags">{project.tags.slice(0, 3).join(" / ")}</p></a>
-  </Enter>;
-}
-// The big spreads lead: Jarvis, then the apps (Haloscript carries a link to
-// RepTrack, the other App Store app), then Digital Me. The studies and
-// open-source tools follow straight after, and the data work comes next.
-const SPREAD_ORDER = ["jarvis", "haloscript", "digital-double"];
-const SPREADS = SPREAD_ORDER.map((slug) => FEATURED.find((p) => p.slug === slug)).filter(Boolean)
-  .concat(FEATURED.filter((p) => !SPREAD_ORDER.includes(p.slug)));
-const GRID_ORDER = ["data-delivery", "integration", "analytics-assistant", "catalogue-checker", "sitescout"];
-const DATA_FIRST = GRID_ORDER.map((slug) => FEATURED_GRID.find((p) => p.slug === slug)).filter(Boolean)
-  .concat(FEATURED_GRID.filter((p) => !GRID_ORDER.includes(p.slug) && p.slug !== "reptrack"));
+const coverOf = (project) => project.spotlightArt || project.cardArt || project.cardShot || project.shots?.[0];
 export function ProjectsSection() {
   return <section id="projects" className="ed-projects ed-light ed-section" data-palette="bloom">
-    <div className="ed-section-watermark" aria-hidden="true">PROJECTS</div>
-    <div className="ed-wrap"><Enter className="ed-section-heading"><div><IndexLabel number="02">Selected projects</IndexLabel><h2>Things I’ve <em>built.</em></h2></div><div className="ed-heading-aside"><p>Apps, data systems, and questions I wanted to test for myself.</p><ArrowLink href="#work">The full project index</ArrowLink></div></Enter>
-      <div className="ed-grid-heading"><h3>Start here.</h3><p>Three ways into the work: an AI agent, a shipped app, and an independent study.</p></div>
-      <div className="ed-start-links">{START_HERE.map(([slug, title, detail]) => <a key={slug} href={`#project/${slug}`}><strong>{title}</strong><span>{detail}</span><ArrowUpRight size={20} aria-hidden="true" /></a>)}</div>
-      <div className="ed-feature-list">{SPREADS.map((project, i) => <FeaturedSpread key={project.slug} project={project} index={i} />)}<OpenSourceSpotlight number={`02.${SPREADS.length + 1}`} /></div>
-      <div className="ed-grid-heading"><h3>Data work, built to hold up.</h3></div>
-      <div className="ed-project-grid">{DATA_FIRST.map((project, i) => <ProjectTile key={project.slug} project={project} index={i} />)}</div>
-      <div className="ed-work-list"><IndexLabel number="↳">Behind the scenes</IndexLabel><p className="ed-copy">Professional work is described without client names or private data. Public practice versions use unrelated public or sample data.</p>
-        {MORE_PROJECTS.map((project, i) => <a key={project.slug} id={`card-${project.slug}`} href={`#project/${project.slug}`} className="ed-work-row"><span className="ed-row-number">{String(i + 1).padStart(2, "0")}</span><div><h3>{project.title}</h3><p>{project.kind}</p></div><ArrowUpRight size={22} aria-hidden="true" /></a>)}
-        <details className="ed-archive"><summary>Earlier work <span>{EARLIER_PROJECTS.length} projects</span></summary><ul>{EARLIER_PROJECTS.map((project) => <li key={project.slug}><a id={`card-${project.slug}`} href={`#project/${project.slug}`}>{project.title}<ArrowUpRight size={16} /></a></li>)}</ul></details>
-      </div>
+    <div className="ed-section-watermark" aria-hidden="true">WORK</div>
+    <div className="ed-wrap">
+      <Enter className="ed-section-heading"><div><IndexLabel number="02">Selected work</IndexLabel><h2>Don’t read about it.<br /><em>Try it.</em></h2></div><div className="ed-heading-aside"><p>Six builds, each one live on this page: run the agent, replay the failure, flip the finding, switch the device.</p></div></Enter>
+      <WorkStage />
     </div>
   </section>;
+}
+
+export function CapabilitiesSection() {
+  return <Expand><section id="capabilities" className="sc-caps ed-section" data-palette="field"><div className="ed-wrap">
+    <Enter className="ed-section-heading"><div><IndexLabel number="03">What I bring</IndexLabel><h2>Three things,<br /><em>done properly.</em></h2></div><p className="ed-heading-aside">The same loop on every build: make it work, measure it honestly, and ship it to real people.</p></Enter>
+    <div className="sc-cap-grid">{CAPABILITIES.map((cap, i) => <Enter key={cap.id} delay={i * 0.06} className="sc-cap" onPointerMove={trackPointer}>
+      <p className="sc-cap-count"><CountUp value={cap.count} /></p>
+      <p className="sc-cap-unit">{cap.unit}</p>
+      <h3>{cap.title}</h3>
+      <p className="sc-cap-copy">{cap.copy}</p>
+      <ul>{cap.proof.map((slug) => { const project = getProject(slug); return project && <li key={slug}><a href={`#project/${slug}`}>{project.title}<ArrowUpRight size={14} aria-hidden="true" /></a></li>; })}</ul>
+    </Enter>)}</div>
+  </div></section></Expand>;
+}
+
+function WorkCard({ item, index }) {
+  const project = getProject(item.slug);
+  const [broken, setBroken] = useState(false);
+  if (!project) return null;
+  const cover = coverOf(project);
+  return <Enter delay={(index % 3) * 0.06}>
+    <a id={`card-${project.slug}`} href={`#project/${project.slug}`} className="sc-card" data-cursor="View">
+      <div className="sc-card-media">
+        {cover && !broken ? <img className="ed-lazy-media" src={media(cover)} alt="" loading="lazy" onLoad={revealImage} onError={() => setBroken(true)} /> : <span className="sc-card-type" aria-hidden="true">{project.title}</span>}
+        <span className="sc-card-kind">{project.kind}</span>
+      </div>
+      <div className="sc-card-body">
+        <h3>{project.title}<ArrowUpRight size={20} aria-hidden="true" /></h3>
+        {item.metric && <p className="sc-card-metric"><strong>{item.metric}</strong><span>{item.unit}</span></p>}
+        <p className="sc-card-line">{item.line}</p>
+        <p className="sc-card-status">{project.status}</p>
+      </div>
+    </a>
+  </Enter>;
+}
+
+const SHOWN = new Set([...FLAGSHIPS, ...MORE_WORK].map((item) => item.slug));
+const ALSO_BUILT = LISTED_PROJECTS.filter((project) => !SHOWN.has(project.slug));
+
+export function MoreWorkSection() {
+  return <section id="more" className="sc-more ed-light ed-section" data-palette="lumora"><div className="ed-wrap">
+    <Enter className="ed-section-heading"><div><IndexLabel number="04">More shipped work</IndexLabel><h2>And plenty<br /><em>more shipped.</em></h2></div><p className="ed-heading-aside">Studies, agent skills, data pipelines and apps. Every card opens a full write-up.</p></Enter>
+    <div className="sc-card-grid">{MORE_WORK.map((item, i) => <WorkCard key={item.slug} item={item} index={i} />)}</div>
+    {ALSO_BUILT.length > 0 && <details className="sc-also">
+      <summary><span>Also built</span><small>{ALSO_BUILT.length} more, from internal tools to early experiments</small></summary>
+      <ul>{ALSO_BUILT.map((project) => <li key={project.slug}><a id={`card-${project.slug}`} href={`#project/${project.slug}`}><strong>{project.title}</strong><span>{project.kind}</span><ArrowUpRight size={16} aria-hidden="true" /></a></li>)}</ul>
+    </details>}
+  </div></section>;
 }
 
 // Keep the real screenshot as a fallback if a decorative cover cannot load.
@@ -373,30 +323,18 @@ function ExperimentImage({ experiment }) {
 }
 
 export function ExperimentsSection() {
-  return <section id="ai" className="ed-experiments ed-section" data-palette="neon"><div className="ed-wrap">
-    <Enter className="ed-section-heading"><div><IndexLabel number="03">The curiosity department</IndexLabel><h2>What if<br /><em>I tried this?</em></h2></div><p className="ed-heading-aside">Small experiments, made with AI as a coding partner. Open one and have a play.</p></Enter>
-    <div className="ed-experiment-grid">{EXPERIMENTS.map((experiment, i) => <Enter key={experiment.id} delay={i * 0.07}><a href={experiment.href} className="ed-experiment"><div className="ed-experiment-image"><ExperimentImage experiment={experiment} /><span>0{i + 1} / Interactive</span></div><div className="ed-experiment-title"><h3>{experiment.title}</h3><ArrowUpRight size={22} /></div><p>{experiment.hook}</p><span className="ed-experiment-cta">{experiment.cta}<ArrowRight size={16} /></span></a></Enter>)}</div>
-  </div></section>;
+  return <Expand><section id="ai" className="ed-experiments ed-section" data-palette="neon"><div className="ed-wrap">
+    <Enter className="ed-section-heading"><div><IndexLabel number="05">The playground</IndexLabel><h2>What if<br /><em>I tried this?</em></h2></div><p className="ed-heading-aside">Interactive experiments built with AI as a pair programmer. Open one and have a play.</p></Enter>
+    <div className="ed-experiment-grid">{EXPERIMENTS.map((experiment, i) => <Enter key={experiment.id} delay={i * 0.07}><a href={experiment.href} className="ed-experiment" data-cursor="Play"><div className="ed-experiment-image"><ExperimentImage experiment={experiment} /><span>0{i + 1} / Interactive</span></div><div className="ed-experiment-title"><h3>{experiment.title}</h3><ArrowUpRight size={22} /></div><p>{experiment.hook}</p><span className="ed-experiment-cta">{experiment.cta}<ArrowRight size={16} /></span></a></Enter>)}</div>
+  </div></section></Expand>;
 }
 
-function SkillGroup({ group }) {
-  const [active, setActive] = useState(null);
-  const id = `ed-skill-${group.title.toLowerCase().replace(/\W+/g, "-")}`;
-  return <div className="ed-skill-group"><h3>{group.title}</h3><div className="ed-skills">{group.items.map((item) => <button key={item} type="button" aria-expanded={active === item} aria-controls={id} onClick={() => setActive((value) => value === item ? null : item)}>{item}{TOOL_INFO[item] && <Info size={12} aria-hidden="true" />}</button>)}</div><div id={id} aria-live="polite">{active && TOOL_INFO[active] && <p className="ed-skill-definition"><strong>{active}.</strong> {TOOL_INFO[active]}</p>}</div></div>;
-}
-export function AboutSection() {
-  return <section id="about" className="ed-about ed-light ed-section" data-palette="choreo"><div className="ed-wrap ed-about-grid">
-    <Enter><IndexLabel number="04">The person behind the projects</IndexLabel><h2>Always<br /><em>learning.</em><br />Usually<br />building.</h2><div className="ed-about-mark" aria-hidden="true">ma<span>✳</span></div></Enter>
-    <div><Enter className="ed-about-story">{ABOUT.story.map((paragraph) => <p key={paragraph}>{paragraph}</p>)}</Enter><div className="ed-skill-groups">{ABOUT.groups.map((group) => <SkillGroup key={group.title} group={group} />)}</div></div>
-  </div></section>;
-}
-export function ExperienceSection() {
-  return <section id="experience" className="ed-experience ed-section" data-palette="field"><div className="ed-wrap"><Enter className="ed-section-heading"><div><IndexLabel number="05">Experience</IndexLabel><h2>The path<br /><em>so far.</em></h2></div><p className="ed-heading-aside">From checking content catalogues to working with retail pricing data. More responsibility. More things to figure out.</p></Enter>
-    <div className="ed-timeline">{ROLES.map((role) => <Enter key={role.company + role.title} className={`ed-role ${role.compact ? "ed-role-compact" : ""}`}><div className="ed-role-when"><span>{role.when}</span>{role.current && <b>Currently here</b>}</div><div><p className="ed-role-company">{role.company}</p><h3>{role.title}</h3>{!role.compact && <><p className="ed-role-summary">{role.summary}</p><ul>{role.bullets.map((bullet) => <li key={bullet}>{bullet}</li>)}</ul></>}</div><span className="ed-role-arrow" aria-hidden="true">↗</span></Enter>)}</div>
-  </div></section>;
-}
+// The jobs are a footnote on purpose: title and company, one quiet line.
 export function ContactSection() {
   const { navigate } = useRoute();
-  return <section id="contact" className="ed-contact" data-palette="blueBloom"><div className="ed-wrap"><IndexLabel number="06">Something in mind?</IndexLabel><h2>Let's make<br /><em>something work.</em></h2><div className="ed-contact-bottom"><a href={`mailto:${CONTACT.email}`} className="ed-contact-email">Say hello<ArrowUpRight aria-hidden="true" /></a><div><p>Questions about a project, or want to talk data?<br />I read every message.</p><div className="ed-socials"><a href={CONTACT.linkedin} target="_blank" rel="noopener noreferrer">LinkedIn<ExternalLink size={14} /></a><a href={CONTACT.github} target="_blank" rel="noopener noreferrer">GitHub<ExternalLink size={14} /></a><a href={`mailto:${CONTACT.email}`}><Mail size={14} />Email</a>{CONTACT.resume && <a href={CONTACT.resume} target="_blank" rel="noopener noreferrer">CV (PDF)<ArrowUpRight size={14} aria-hidden="true" /></a>}</div></div></div><footer className="ed-footer"><span>Mohamed Ansar © {new Date().getFullYear()}</span><span>Made with curiosity. And a lot of testing.</span><button onClick={() => navigate("deck")} aria-label="Back to top">Back to top ↑</button></footer></div></section>;
+  return <section id="contact" className="ed-contact sc-contact" data-palette="blueBloom"><SignalField className="sc-contact-field" quiet /><div className="ed-wrap"><IndexLabel number="06">Contact</IndexLabel><h2>Building something<br /><em>ambitious?</em></h2>
+    <div className="ed-contact-bottom"><a href={`mailto:${CONTACT.email}`} className="ed-contact-email" {...magnetic}>Email me<ArrowUpRight aria-hidden="true" /></a><div><p>I like the hard part: agents that have to be trusted, evals that have to be honest, and products that have to ship. If that sounds like your problem, write to me.</p><div className="ed-socials"><a href={CONTACT.github} target="_blank" rel="noopener noreferrer">GitHub<ExternalLink size={14} /></a><a href={CONTACT.linkedin} target="_blank" rel="noopener noreferrer">LinkedIn<ExternalLink size={14} /></a><a href={`mailto:${CONTACT.email}`}><Mail size={14} />{CONTACT.email}</a></div></div></div>
+    <VelocityMarquee className="is-giant" items={["Say hello", "Let's build", "Say hello", "Let's build"]} label="Say hello" speed={1.6} />
+    <div id="experience" className="bd-dayjobs"><span>Day jobs</span><ul>{ROLES.map((role) => <li key={role.company + role.title}>{role.title} at {role.company}</li>)}</ul></div>
+    <footer className="ed-footer"><span>© {new Date().getFullYear()}</span><span>Designed and built by me, with AI as the pair programmer.</span><button onClick={() => navigate("deck")} aria-label="Back to top">Back to top ↑</button></footer></div></section>;
 }
-

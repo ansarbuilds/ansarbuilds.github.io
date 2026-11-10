@@ -1,13 +1,13 @@
 /* Warm ivory / soft black / burnt orange. The orange is an event, not body text.
    That is the opening palette; lib/palettes.js swaps these tokens per section
    as the page scrolls. Registering them as colours lets them transition. */
-@property --ed-ivory { syntax: "<color>"; inherits: true; initial-value: #e6d5bd; }
-@property --ed-blue { syntax: "<color>"; inherits: true; initial-value: #101010; }
-@property --ed-deep { syntax: "<color>"; inherits: true; initial-value: #101010; }
-@property --ed-coral { syntax: "<color>"; inherits: true; initial-value: #d5360c; }
-@property --ed-coral-ink { syntax: "<color>"; inherits: true; initial-value: #74200d; }
-@property --ed-on-dark { syntax: "<color>"; inherits: true; initial-value: #ff8a5f; }
-:root { --ed-ivory: #e6d5bd; --ed-blue: #101010; --ed-coral: #d5360c; --ed-coral-ink: #74200d; --ed-on-dark: #ff8a5f; --ed-deep: #101010; --ed-rule: color-mix(in srgb, var(--ed-blue) 22%, transparent);
+@property --ed-ivory { syntax: "<color>"; inherits: true; initial-value: #0c0a09; }
+@property --ed-blue { syntax: "<color>"; inherits: true; initial-value: #efe6d8; }
+@property --ed-deep { syntax: "<color>"; inherits: true; initial-value: #efe6d8; }
+@property --ed-coral { syntax: "<color>"; inherits: true; initial-value: #ff8a5f; }
+@property --ed-coral-ink { syntax: "<color>"; inherits: true; initial-value: #ff8a5f; }
+@property --ed-on-dark { syntax: "<color>"; inherits: true; initial-value: #74200d; }
+:root { --ed-ivory: #0c0a09; --ed-blue: #efe6d8; --ed-coral: #ff8a5f; --ed-coral-ink: #ff8a5f; --ed-on-dark: #74200d; --ed-deep: #efe6d8; --ed-rule: color-mix(in srgb, var(--ed-blue) 22%, transparent);
   transition: --ed-ivory .9s var(--ease-out), --ed-blue .9s var(--ease-out), --ed-deep .9s var(--ease-out), --ed-coral .9s var(--ease-out), --ed-coral-ink .9s var(--ease-out), --ed-on-dark .9s var(--ease-out); }
 /* Every element inherits these, so each frame of the fade restyles the whole
    page. Phones get a quarter of the frames; reduced motion gets none. */
@@ -701,3 +701,10 @@ a:hover .ed-poster-plate .ed-project-image { transform: rotate(0) scale(1.025); 
  .ed-swatch-toggle { padding: 8px 10px; }
 }
 @media (prefers-reduced-motion: reduce) { .ed-swatch-chips b { transition: none; } }
+
+/* The day jobs: one quiet line above the footer, never a section. */
+.bd-dayjobs { display: flex; gap: 22px; align-items: baseline; padding-block: 22px; border-top: 1px solid color-mix(in srgb, var(--ed-ivory) 18%, transparent); font: .55rem/1.8 var(--font-mono); opacity: .62; scroll-margin-top: 120px; }
+.bd-dayjobs > span { text-transform: uppercase; letter-spacing: .12em; white-space: nowrap; }
+.bd-dayjobs ul { display: flex; flex-wrap: wrap; gap: 0 10px; }
+.bd-dayjobs li + li::before { content: "·"; margin-right: 10px; }
+@media (max-width: 640px) { .bd-dayjobs { flex-direction: column; gap: 6px; } }
