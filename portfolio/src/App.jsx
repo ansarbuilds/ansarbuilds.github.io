@@ -352,7 +352,6 @@ function Stage({ bootDone }) {
 
   return (
     <main id="main-content" tabIndex={-1} ref={scrollContainerRef} className="relative flex-1 min-h-0 overflow-y-auto mono-scroll">
-      <div className="ed-paper-grain" aria-hidden="true" />
       <AnimatePresence mode="wait">
         {route === "emet" ? (
           <motion.div

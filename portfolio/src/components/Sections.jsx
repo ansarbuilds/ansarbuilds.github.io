@@ -7,9 +7,8 @@ import { CODE, CONTACT, HERO, RECEIPTS, ROLES } from "../data/content";
 import { EXPERIMENTS, LISTED_PROJECTS, getProject } from "../data/projects";
 import { CAPABILITIES, FLAGSHIPS, MORE_WORK, STACK_MARQUEE } from "../data/showcase";
 import { DUR, EASE } from "../lib/motion";
-import { usePageVisible } from "../lib/usePageVisible";
 import { media } from "../lib/media";
-import { magnetic, trackPointer } from "../lib/pointerFx";
+import { magnetic } from "../lib/pointerFx";
 import { ScrollContext, useRoute } from "../appContexts";
 import "../editorial.css";
 import "../showcase.css";
@@ -51,48 +50,11 @@ function CountUp({ value }) {
 function IndexLabel({ number, children }) {
   return <p className="ed-label"><span>{number}</span>{children}</p>;
 }
-/* The name prints itself: each letter cycles through random glyphs, then
-   locks in, left to right. Screen readers get the plain name from the h1. */
-const DECODE_GLYPHS = "ABCDEFGHJKLMNPQRSTUVWXYZ0123456789/<>#*+";
-function DecodeLine({ text, run, delay = 0, className = "" }) {
-  const reduced = useReducedMotion();
-  const [shown, setShown] = useState("");
-  useEffect(() => {
-    if (reduced || !run) return undefined;
-    let raf = 0;
-    const startAt = performance.now() + delay;
-    const tick = (now) => {
-      const t = now - startAt;
-      if (t >= 0) {
-        let done = true;
-        const out = [...text].map((ch, i) => {
-          if (t >= i * 45 + 240) return ch;
-          done = false;
-          return t < i * 20 ? "\u00a0" : DECODE_GLYPHS[Math.floor(Math.random() * DECODE_GLYPHS.length)];
-        }).join("");
-        setShown(out);
-        if (done) return;
-      }
-      raf = requestAnimationFrame(tick);
-    };
-    raf = requestAnimationFrame(tick);
-    return () => cancelAnimationFrame(raf);
-  }, [run, text, delay, reduced]);
-  return <span className={className} aria-hidden="true">{reduced ? text : shown || "\u00a0"}</span>;
-}
-
-/* Four flagships as a live status strip. One card at a time takes the
-   spotlight, with a light sweep across it. */
+/* Four flagships as a status strip. It does not rotate: the hero already
+   has one thing moving. A card lights up when it is hovered or focused. */
 const HERO_FEED = FLAGSHIPS.slice(0, 4);
-function HeroFeed({ run, ready, delay }) {
+function HeroFeed({ ready, delay }) {
   const reduced = useReducedMotion();
-  const pageVisible = usePageVisible();
-  const [active, setActive] = useState(0);
-  useEffect(() => {
-    if (!run || reduced || !pageVisible) return undefined;
-    const id = setInterval(() => setActive((n) => (n + 1) % HERO_FEED.length), 2600);
-    return () => clearInterval(id);
-  }, [run, reduced, pageVisible]);
   // The cards rise 12px one after another, 70ms apart, last in the hero's entrance.
   const rise = (i) => (reduced ? {} : {
     initial: { opacity: 0, y: 12 },
@@ -101,12 +63,10 @@ function HeroFeed({ run, ready, delay }) {
   });
   return <nav className="sc-feed" aria-label="Flagship projects">{HERO_FEED.map((flag, i) => {
     const project = getProject(flag.slug);
-    return project && <motion.a key={flag.slug} href={`#project/${project.slug}`} className={`sc-feed-card ${i === active ? "is-active" : ""}`} data-cursor="Open" {...rise(i)}>
+    return project && <motion.a key={flag.slug} href={`#project/${project.slug}`} className="sc-feed-card" data-cursor="Open" {...rise(i)}>
       <span className="sc-feed-status"><i aria-hidden="true" />{flag.badge}</span>
       <strong>{project.title}</strong>
       <span className="sc-feed-metric"><b>{flag.stats[0][0]}</b>{flag.stats[0][1]}</span>
-      <span className="sc-feed-scan" aria-hidden="true" />
-      <span className="sc-feed-timer" aria-hidden="true" />
     </motion.a>;
   })}</nav>;
 }
@@ -134,7 +94,14 @@ export function Hero({ ready = true }) {
   const scrollRef = useContext(ScrollContext);
   const heroRef = useRef(null);
   const visible = useInView(heroRef, { margin: "50px" });
-  const run = ready && visible;
+  // The hint only appears if the hero has sat untouched for a while, and
+  // goes for good at the first click.
+  const [hint, setHint] = useState(false);
+  useEffect(() => {
+    if (!ready || !visible || reduced) return undefined;
+    const id = setTimeout(() => setHint(true), 7000);
+    return () => clearTimeout(id);
+  }, [ready, visible, reduced]);
   // As the hero scrolls away, the copy lifts and fades while the network
   // swells slightly, so the page seems to move through it.
   // Measured in pixels, not against the hero's own box: on desktop the hero
@@ -154,21 +121,20 @@ export function Hero({ ready = true }) {
     transition: { duration: DUR.base, delay, ease: EASE.out },
   });
   return <div className="sc-open">
-    <section ref={heroRef} id="hero" aria-labelledby="hero-name" className="sc-hero" data-palette="lumen" onPointerMove={trackPointer}>
+    <section ref={heroRef} id="hero" aria-labelledby="hero-name" className="sc-hero" data-palette="lumen" onPointerDown={() => setHint(false)}>
       <motion.div className="sc-hero-stage" style={{ scale: fieldScale, opacity: fieldOpacity }}><SignalField className="sc-hero-field" labels={HERO_LABELS} /></motion.div>
       <div className="sc-hero-grid" aria-hidden="true" />
-      <div className="sc-hero-spot" aria-hidden="true" />
       <motion.div className="sc-hero-inner" style={{ y: copyY, opacity: copyOpacity }}>
         <motion.p className="sc-hero-kicker" {...appear(0)}><i aria-hidden="true" />Index of work · {CODE.asOf}</motion.p>
-        <h1 id="hero-name" className="sc-hero-name" aria-label="Mohamed Ansar"><DecodeLine text="MOHAMED" run={run} delay={80} /><DecodeLine text="ANSAR" run={run} delay={200} className="is-outline" /></h1>
+        <h1 id="hero-name" className="sc-hero-name" aria-label="Mohamed Ansar"><span aria-hidden="true">MOHAMED</span><span aria-hidden="true" className="is-outline">ANSAR</span></h1>
         <motion.p className="sc-hero-line" {...appear(0.5)}>{HERO.title} <em>Here are {LISTED_PROJECTS.length} of them.</em></motion.p>
         <motion.div className="sc-hero-ctas" {...appear(0.62)}>
           <a href="#projects" className="sc-hero-btn" {...magnetic}>See the work<ArrowDown size={18} aria-hidden="true" /></a>
           <a href="#contact" className="sc-hero-ghost">Get in touch<ArrowUpRight size={16} aria-hidden="true" /></a>
-          <span className="sc-hero-hint" aria-hidden="true">Click the network</span>
+          <span className={`sc-hero-hint ${hint ? "is-shown" : ""}`} aria-hidden="true">Click the network</span>
         </motion.div>
       </motion.div>
-      <motion.div className="sc-hero-bottom" style={{ y: feedY, opacity: feedOpacity }}><HeroFeed run={run} ready={ready} delay={0.76} /></motion.div>
+      <motion.div className="sc-hero-bottom" style={{ y: feedY, opacity: feedOpacity }}><HeroFeed ready={ready} delay={0.76} /></motion.div>
     </section>
     <section className="ed-intro ed-light sc-brief" aria-label="The short version" data-palette="lumen">
       <div className="ed-wrap">
@@ -184,7 +150,7 @@ export function Hero({ ready = true }) {
 const HERO_LABELS = ["Jarvis", "Flight Recorder", "PRH-JEPA", "Haloscript"];
 
 /* A row that never stops, and takes its speed and lean from the scroll:
-   scroll fast and it rushes and skews, scroll back and it reverses. The
+   scroll fast and it rushes and leans a couple of degrees, scroll back and it reverses. The
    second copy only exists so the loop has no seam; reduced motion gets a
    still, wrapping list instead. */
 function VelocityMarquee({ items, label, className = "", speed = 1.1 }) {
@@ -193,7 +159,7 @@ function VelocityMarquee({ items, label, className = "", speed = 1.1 }) {
   const { scrollY } = useScroll({ container: scrollRef });
   const velocity = useSpring(useVelocity(scrollY), { damping: 50, stiffness: 400 });
   const boost = useTransform(velocity, [-1500, 0, 1500], [-5, 0, 5], { clamp: false });
-  const skewX = useTransform(velocity, [-2600, 2600], [9, -9]);
+  const skewX = useTransform(velocity, [-2600, 2600], [2, -2]);
   const offset = useMotionValue(0);
   const direction = useRef(1);
   const rowRef = useRef(null);
@@ -242,7 +208,7 @@ export function ProjectsSection() {
 export function CapabilitiesSection() {
   return <Expand><section id="capabilities" className="sc-caps ed-section" data-palette="field"><div className="ed-wrap">
     <Enter className="ed-section-heading"><div><IndexLabel number="03">What I bring</IndexLabel><h2>Three things,<br /><em>done properly.</em></h2></div><p className="ed-heading-aside">The same loop on every build: make it work, measure it honestly, and ship it to real people.</p></Enter>
-    <div className="sc-cap-grid">{CAPABILITIES.map((cap, i) => <Enter key={cap.id} delay={i * 0.06} className="sc-cap" onPointerMove={trackPointer}>
+    <div className="sc-cap-grid">{CAPABILITIES.map((cap, i) => <Enter key={cap.id} delay={i * 0.06} className="sc-cap">
       <p className="sc-cap-count"><CountUp value={cap.count} /></p>
       <p className="sc-cap-unit">{cap.unit}</p>
       <h3>{cap.title}</h3>

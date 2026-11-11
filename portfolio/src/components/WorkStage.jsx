@@ -142,7 +142,7 @@ const HALO_SHOTS = [
   { device: "iPhone", src: "/shots/haloscript/home_iphone.jpg", alt: "Haloscript home screen on an iPhone" },
 ];
 function HaloDemo({ active }) {
-  const [shot, pick] = useAutoStep(HALO_SHOTS.length, active, 3200);
+  const [shot, pick] = useAutoStep(HALO_SHOTS.length, active, 3200, false);
   return <div className="st-devices">
     <div className="st-shells">
       {HALO_SHOTS.map((item, i) => <div key={item.device} className={`st-shell is-${item.device.toLowerCase()} ${i === shot ? "is-shown" : ""}`} aria-hidden={i === shot ? undefined : "true"}>

@@ -57,9 +57,8 @@
 .st-frame-bar span { margin-left: 10px; font: .56rem var(--font-mono); color: #8a8f9c; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .st-frame-body { position: relative; flex: 1; min-height: 0; display: flex; }
 .st-frame.is-browser img, .st-frame.is-browser iframe { width: 100%; height: 100%; object-fit: cover; object-position: top left; border: 0; background: #fff; }
-.st-launch { position: absolute; left: 50%; bottom: 22px; translate: -50% 0; display: inline-flex; align-items: center; gap: 10px; min-height: 46px; padding: 0 20px; border-radius: 999px; background: #ff8a5f; color: #160b06; font: 700 .78rem var(--font-body); white-space: nowrap; box-shadow: 0 12px 40px -6px rgb(255 138 95 / .7), 0 0 0 6px rgb(255 138 95 / .16); transition: scale var(--dur-fast) var(--ease-out), box-shadow var(--dur-fast); animation: st-beckon 2.6s var(--ease-standard) infinite; }
+.st-launch { position: absolute; left: 50%; bottom: 22px; translate: -50% 0; display: inline-flex; align-items: center; gap: 10px; min-height: 46px; padding: 0 20px; border-radius: 999px; background: #ff8a5f; color: #160b06; font: 700 .78rem var(--font-body); white-space: nowrap; box-shadow: 0 12px 40px -6px rgb(255 138 95 / .7), 0 0 0 6px rgb(255 138 95 / .16); transition: scale var(--dur-fast) var(--ease-out), box-shadow var(--dur-fast); }
 .st-launch:hover { scale: 1.05; }
-@keyframes st-beckon { 50% { box-shadow: 0 12px 40px -6px rgb(255 138 95 / .7), 0 0 0 12px rgb(255 138 95 / 0); } }
 
 /* Flight Recorder replay */
 .st-frame.is-flight .st-frame-body { display: grid; grid-template-columns: minmax(0, .95fr) minmax(0, 1.25fr); }
@@ -208,7 +207,7 @@
 .st-shell.is-iphone::before { content: ""; position: absolute; z-index: 1; top: 3.2%; left: 50%; width: 26%; height: 2.6%; translate: -50% 0; border-radius: 999px; background: #000; }
 
 /* Digital Me: a slow push in on the cover while it is on stage. */
-.st-panel.is-active .st-cover img { animation: st-kenburns 12s var(--ease-standard) infinite alternate; }
+.st-panel.is-active .st-cover img { animation: st-kenburns 12s var(--ease-standard) forwards; }
 @keyframes st-kenburns { from { transform: scale(1); } to { transform: scale(1.06); } }
 
 /* Site Recon: lines print 90ms apart while the panel is on stage, then hold. */
@@ -232,5 +231,3 @@
   .st-playhead, .st-clip-bar span, .st-clip-caption span { transition: none; }
   .st-flight-detail pre code { opacity: 1; transform: none; animation: none; }
 }
-/* The launch button holds still; its glow is enough. */
-.st-launch { animation: none; }

@@ -4,9 +4,11 @@ import { useEffect, useRef } from "react";
    behind another, like a network seen at an angle, wired forward from the
    input layer to the output. Signals enter on the left and run through to
    the far side, and every node flares as a signal reaches it. The graph
-   sways slowly, leans toward the pointer, and a click sends a burst out of
-   the nearest node, with a short label if `labels` are given. Fine dust
-   drifts behind it for depth.
+   sways slowly and leans toward the pointer. It is the one ambient thing in
+   its viewport, so it stays calm until it is touched: a click sends a burst
+   out of the nearest node (with a short label if `labels` are given) and
+   moves the whole graph on to its next shape, and it settles back by
+   itself a few seconds later.
 
    `gatherTo` (a CSS selector inside the same section) turns it into a
    closing shot: the first time it scrolls in, signals travel inward to
@@ -75,10 +77,11 @@ function buildGraph(sizes) {
   ];
   return { nodes, forms, edges, rings, inputs: edges.filter(([from]) => layers[0].includes(from)) };
 }
-// How long each shape holds, how long the change takes, and the warp-in.
-const HOLD_S = 5.2;
-const MORPH_S = 1.7;
-const WARP_S = 1.2;
+// A click changes the shape. This is how long the change takes, how long the
+// new shape stays before the graph settles back, and the arrival on load.
+const MORPH_S = 1.2;
+const REST_S = 9;
+const WARP_S = 0.9;
 const smooth = (k) => k * k * k * (k * (k * 6 - 15) + 10);
 
 const WIDE_LAYERS = [4, 7, 11, 14, 11, 7, 4];
@@ -104,14 +107,14 @@ export default function SignalField({ className = "", quiet = false, labels = nu
     let raf = 0, running = false, visible = true;
     const pointer = { x: 0, y: 0, tx: 0, ty: 0, px: -9999, py: -9999 };
     const pulses = [];
-    // Dust: slow specks behind the sphere, in unit coordinates.
-    const dust = Array.from({ length: quiet ? 40 : 90 }, () => ({ x: Math.random(), y: Math.random(), r: 0.4 + Math.random() * 1.1, v: 0.004 + Math.random() * 0.012, a: 0.12 + Math.random() * 0.4 }));
     let projectedNow = [];
     // How brightly each node is lit by an arriving signal, fading out.
     let flare = [];
     // A click shoves nearby nodes outward; they spring back. Screen pixels.
     let shove = [];
-    let spin = 0, lastT = 0;
+    let spin = 0, lastT = 0, nowT = 0;
+    // Which shape the graph is leaving and heading for, and since when.
+    const shape = { from: 0, to: 0, since: 0 };
     // Burst labels: { node, text, born }.
     const tags = [];
     let nextLabel = 0;
@@ -150,22 +153,24 @@ export default function SignalField({ className = "", quiet = false, labels = nu
       // so the signals always read as running left to right.
       const dt = Math.min(0.05, Math.max(0, t - lastT));
       lastT = t;
+      nowT = t;
 
       // Which shape, and how far into the change to the next one. The quiet
       // copy behind Contact, and reduced motion, stay on the first shape.
-      const still = quiet || reduced;
-      const beat = HOLD_S + MORPH_S;
-      const at = still ? 0 : Math.floor(t / beat) % sphere.forms.length;
-      const into = still ? 0 : (t % beat) - HOLD_S;
-      const morph = into > 0 ? smooth(into / MORPH_S) : 0;
-      const from = sphere.forms[at], to = sphere.forms[(at + 1) % sphere.forms.length];
+      // The graph rests in its layered shape. A click sends it to the next
+      // shape, and if it is left alone it comes home. Nothing changes shape
+      // by itself, so the hero has one calm thing moving, not a show.
+      if (shape.to !== 0 && shape.from === shape.to && t - shape.since > REST_S) { shape.from = shape.to; shape.to = 0; shape.since = t; }
+      const morph = shape.from === shape.to ? 1 : smooth(Math.min(1, (t - shape.since) / MORPH_S));
+      if (morph >= 1 && shape.from !== shape.to) { shape.from = shape.to; shape.since = t; }
+      const from = sphere.forms[shape.from], to = sphere.forms[shape.to];
       // How much of the layered graph is showing (its rings fade with it).
-      const layered = (at === 0 ? 1 - morph : 0) + ((at + 1) % sphere.forms.length === 0 ? morph : 0);
+      const layered = (shape.from === 0 ? 1 - morph : 0) + (shape.to === 0 ? morph : 0);
       // Mid-change the nodes fly apart before they find their new seats.
-      const scatter = Math.sin(morph * Math.PI) * 0.55;
+      const scatter = Math.sin(morph * Math.PI) * 0.35;
       // The other shapes turn on the spot; the layered graph only sways, and
       // eases back to face front when it returns.
-      if (layered < 0.5) spin += dt * 0.42;
+      if (layered < 0.5) spin += dt * 0.18;
       else spin += (Math.round(spin / (Math.PI * 2)) * Math.PI * 2 - spin) * Math.min(1, dt * 3);
       // Warp in: everything arrives from far out in the first second.
       const warp = reduced ? 1 : smooth(Math.min(1, t / WARP_S));
@@ -209,15 +214,6 @@ export default function SignalField({ className = "", quiet = false, labels = nu
 
       projectedNow = projected;
       ctx.clearRect(0, 0, w, h);
-
-      for (const speck of dust) {
-        const dy = (speck.y - t * speck.v) % 1;
-        const twinkle = 0.6 + Math.sin(t * 1.3 + speck.x * 40) * 0.4;
-        ctx.fillStyle = `rgba(${INK},${(speck.a * twinkle).toFixed(3)})`;
-        ctx.beginPath();
-        ctx.arc(speck.x * w + pointer.x * -30 * speck.r * dpr, (dy < 0 ? dy + 1 : dy) * h, speck.r * dpr, 0, Math.PI * 2);
-        ctx.fill();
-      }
 
       // A warm core, breathing slowly.
       const core = ctx.createRadialGradient(ox, oy, 0, ox, oy, R * 1.25);
@@ -263,8 +259,8 @@ export default function SignalField({ className = "", quiet = false, labels = nu
         ctx.beginPath();
         ctx.arc(x, y, (1.5 + depth * 2.4 + near * 3) * s * dpr, 0, Math.PI * 2);
         ctx.fill();
-        // The nearest nodes, and any that are lit, carry a soft halo.
-        const halo = Math.max(near, (depth - 0.62) * 1.4, scatter * 0.5);
+        // A node that is lit, by the pointer or a signal, carries a soft halo.
+        const halo = near;
         if (halo > 0.05) {
           const size = (10 + halo * 16) * s * dpr;
           const glow = ctx.createRadialGradient(x, y, 0, x, y, size);
@@ -278,7 +274,7 @@ export default function SignalField({ className = "", quiet = false, labels = nu
       }
 
       // Signals: spawn on random wires, travel end to end, fade out.
-      if (!reduced && !gathered && now - lastSpawn > (narrow ? 220 : 150) && pulses.length < (quiet ? 10 : narrow ? 14 : 26)) {
+      if (!reduced && !gathered && now - lastSpawn > (narrow ? 420 : 300) && pulses.length < (quiet ? 6 : narrow ? 8 : 12)) {
         lastSpawn = now;
         pulses.push({ edge: sphere.inputs[Math.floor(Math.random() * sphere.inputs.length)], t: 0, speed: 0.9 + Math.random() * 0.9, color: SIGNALS[Math.floor(Math.random() * SIGNALS.length)], hops: 12 });
       }
@@ -426,6 +422,8 @@ export default function SignalField({ className = "", quiet = false, labels = nu
         pulses.push({ edge: i === best ? [i, k] : [k, i], t: 0, speed: 1.5 + Math.random(), color: SIGNALS[Math.floor(Math.random() * SIGNALS.length)], hops: 12 });
       }
       flare[best] = 1;
+      // Each click moves the graph on to its next shape.
+      if (!quiet && shape.from === shape.to) { shape.to = (shape.from + 1) % sphere.forms.length; shape.since = nowT; }
       // Shockwave: everything near the click is thrown outward.
       projectedNow.forEach(([x, y], n) => {
         const dx = x - px, dy = y - py, far = Math.hypot(dx, dy) || 1;

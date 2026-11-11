@@ -4,13 +4,6 @@
 const fine = () => typeof window !== "undefined" && window.matchMedia("(hover: hover) and (pointer: fine)").matches;
 const calm = () => typeof window !== "undefined" && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
-// Sets --mx/--my on the element under the pointer, for CSS spotlights.
-export function trackPointer(event) {
-  const box = event.currentTarget.getBoundingClientRect();
-  event.currentTarget.style.setProperty("--mx", `${event.clientX - box.left}px`);
-  event.currentTarget.style.setProperty("--my", `${event.clientY - box.top}px`);
-}
-
 // Magnetic buttons: the element leans toward the pointer, then springs back.
 export function magnet(event) {
   if (!fine() || calm()) return;
