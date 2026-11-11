@@ -8,7 +8,7 @@ import { TOOL_INFO } from "../data/tools";
 import { BEFORE_AFTER, STEP_TOOLS } from "../data/summaries";
 import FlowDiagram, { FlourishTitle, Kicker, TagPill } from "./ui";
 import ProjectMotionPreview from "./ProjectMotionPreview";
-import { EASE_REVEAL } from "../lib/motion";
+import { DUR, EASE } from "../lib/motion";
 import { media } from "../lib/media";
 
 // The accent is a CSS colour (the current palette's accent ink), so its
@@ -96,7 +96,7 @@ function SignatureArtwork({ project, reduced }) {
       initial={reduced ? false : { opacity: 0, y: 18, scale: .985 }}
       whileInView={{ opacity: 1, y: 0, scale: 1 }}
       viewport={{ once: true, amount: .18 }}
-      transition={{ duration: .5, ease: EASE_REVEAL }}
+      transition={{ duration: DUR.slow, ease: EASE.out }}
     >
       <div className="project-signature-frame">
         <img src={media(art)} alt={project.heroAlt || `${project.title} conceptual artwork`} loading="eager" />
@@ -177,7 +177,7 @@ function SummaryChart({ project }) {
             initial={{ height: 0, opacity: 0 }}
             animate={{ height: "auto", opacity: 1 }}
             exit={{ height: 0, opacity: 0 }}
-            transition={{ duration: 0.3, ease: EASE_REVEAL }}
+            transition={{ duration: DUR.base, ease: EASE.out }}
             className="overflow-hidden"
           >
             <div className="flex flex-col px-5 pb-6 sm:px-7">
@@ -318,7 +318,7 @@ function ToolList({ tools, usage = {}, accent }) {
               initial={{ opacity: 0, y: -6 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -4 }}
-              transition={{ duration: 0.18 }}
+              transition={{ duration: DUR.fast }}
               className="rounded-xl border border-blue/12 bg-blue/[.04] p-4"
               style={{ borderLeft: `3px solid ${a.hex}` }}
             >
@@ -406,7 +406,7 @@ export default function ProjectPage({ slug }) {
     <motion.article
       initial={reduced ? false : { opacity: 0, y: 18, clipPath: "inset(0 0 5% 0 round 24px)" }}
       animate={{ opacity: 1, y: 0, clipPath: "inset(0 0 0% 0 round 24px)" }}
-      transition={{ duration: 0.48, ease: EASE_REVEAL }}
+      transition={{ duration: DUR.slow, ease: EASE.out }}
       className="mx-auto w-full max-w-4xl px-5 pt-28 pb-24"
     >
       <a href={LISTED_PROJECTS.some((p) => p.slug === slug) ? `#card-${slug}` : "#projects"} className="inline-flex min-h-11 items-center gap-2 font-mono text-xs uppercase tracking-[.12em] text-[color:var(--ink-200)] transition-colors duration-200 hover:text-[color:var(--ink-100)]">
@@ -422,7 +422,7 @@ export default function ProjectPage({ slug }) {
           <span className="text-[color:var(--ink-300)]">{project.status}</span>
         </div>
         <h1 aria-label={project.title} className="mt-4 overflow-hidden text-[color:var(--ink-100)] leading-[.92] text-[clamp(3rem,8vw,6.5rem)]">
-          <motion.span className="block" initial={reduced ? false : { y: "108%" }} animate={{ y: "0%" }} transition={{ duration: .52, delay: .06, ease: EASE_REVEAL }}>
+          <motion.span className="block" initial={reduced ? false : { y: "108%" }} animate={{ y: "0%" }} transition={{ duration: DUR.slow, delay: .06, ease: EASE.out }}>
             <PageTitle project={project} style={theme.title} />
           </motion.span>
         </h1>

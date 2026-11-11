@@ -1,12 +1,11 @@
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
-import { EASE_REVEAL } from "../lib/motion";
+import { DUR, EASE } from "../lib/motion";
 import { INTRO_SESSION_KEY } from "../lib/intro";
 
 const NAME = "Mohamed Ansar";
 // A fast-in, fast-out curve for the curtain itself: it should feel like a
 // shutter lifting, not drift.
-const CURTAIN_EASE = [0.76, 0, 0.24, 1];
 
 /* A blink of a title card on a first visit only: the name rises, a hairline
    draws across, and the curtain lifts. It covers the page for well under
@@ -39,7 +38,7 @@ export default function IntroCurtain({ onReveal, onGone }) {
       onClick={() => setLifting(true)}
       initial={{ clipPath: "inset(0% 0% 0% 0%)" }}
       animate={lifting ? { clipPath: "inset(0% 0% 100% 0%)" } : undefined}
-      transition={{ duration: LIFT_S, ease: CURTAIN_EASE }}
+      transition={{ duration: LIFT_S, ease: EASE.standard }}
       onAnimationComplete={() => lifting && onGone()}
       className="fixed inset-0 z-[400] grid place-items-center bg-ink px-5"
     >
@@ -55,7 +54,7 @@ export default function IntroCurtain({ onReveal, onGone }) {
               key={i}
               className="inline-block"
               variants={{ hidden: { y: "110%" }, shown: { y: "0%" } }}
-              transition={{ duration: 0.2, ease: EASE_REVEAL }}
+              transition={{ duration: DUR.fast, ease: EASE.out }}
             >
               {ch === " " ? " " : ch}
             </motion.span>
@@ -65,7 +64,7 @@ export default function IntroCurtain({ onReveal, onGone }) {
           className="mx-auto mt-5 h-px origin-left bg-coral"
           initial={{ scaleX: 0 }}
           animate={{ scaleX: 1 }}
-          transition={{ duration: 0.2, ease: EASE_REVEAL }}
+          transition={{ duration: DUR.fast, ease: EASE.out }}
         />
       </div>
     </motion.div>

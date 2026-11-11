@@ -11,7 +11,7 @@ import IntroCurtain from "./components/IntroCurtain";
 import PaletteSwatch from "./components/PaletteSwatch";
 import Cursor from "./components/Cursor";
 import { shouldPlayIntro } from "./lib/intro";
-import { EASE_OUT } from "./lib/motion";
+import { DUR, EASE } from "./lib/motion";
 import { titleForRoute } from "./lib/routeTitle";
 import { CONTACT } from "./data/content";
 import { applyPalette, clearPalette, paletteForRoute, pickPalette } from "./lib/palettes";
@@ -360,7 +360,7 @@ function Stage({ bootDone }) {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            transition={{ duration: 0.14, ease: EASE_OUT }}
+            transition={{ duration: DUR.instant, ease: EASE.out }}
             className="h-full"
           >
             <EmetSection />
@@ -371,7 +371,7 @@ function Stage({ bootDone }) {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            transition={{ duration: 0.14, ease: EASE_OUT }}
+            transition={{ duration: DUR.instant, ease: EASE.out }}
             className="h-full"
           >
             <Suspense fallback={<RouteLoader label="Loading solar system" />}>
@@ -384,7 +384,7 @@ function Stage({ bootDone }) {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            transition={{ duration: 0.12, ease: EASE_OUT }}
+            transition={{ duration: DUR.instant, ease: EASE.out }}
           >
             <ProjectWorkPage />
           </motion.div>
@@ -394,7 +394,7 @@ function Stage({ bootDone }) {
             initial={reduced ? { opacity: 0 } : { opacity: 0, y: 14 }}
             animate={{ opacity: 1, y: 0 }}
             exit={reduced ? { opacity: 0 } : { opacity: 0, y: -10 }}
-            transition={{ duration: reduced ? 0.12 : 0.3, ease: EASE_OUT }}
+            transition={{ duration: reduced ? DUR.instant : DUR.base, ease: EASE.out }}
           >
             {route === "project/digital-double" ? (
               <Suspense fallback={<RouteLoader label="Loading 3D project" />}>
@@ -414,7 +414,7 @@ function Stage({ bootDone }) {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            transition={{ duration: 0.14, ease: EASE_OUT }}
+            transition={{ duration: DUR.instant, ease: EASE.out }}
             className="h-full"
           >
             <Suspense fallback={<RouteLoader label="Loading data explorer" />}>
@@ -427,7 +427,7 @@ function Stage({ bootDone }) {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            transition={{ duration: 0.14, ease: EASE_OUT }}
+            transition={{ duration: DUR.instant, ease: EASE.out }}
             className="h-full"
           >
             <Suspense fallback={<RouteLoader label="Loading particle scene" />}>
@@ -440,7 +440,7 @@ function Stage({ bootDone }) {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            transition={{ duration: 0.14, ease: EASE_OUT }}
+            transition={{ duration: DUR.instant, ease: EASE.out }}
             className="h-full"
           >
             <Suspense fallback={<RouteLoader label="Loading 3D project" />}>
@@ -453,7 +453,7 @@ function Stage({ bootDone }) {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            transition={{ duration: 0.14, ease: EASE_OUT }}
+            transition={{ duration: DUR.instant, ease: EASE.out }}
           >
             <MainDocument bootDone={bootDone} />
           </motion.div>

@@ -6,7 +6,7 @@ import WorkStage from "./WorkStage";
 import { CODE, CONTACT, HERO, RECEIPTS, ROLES } from "../data/content";
 import { EXPERIMENTS, LISTED_PROJECTS, getProject } from "../data/projects";
 import { CAPABILITIES, FLAGSHIPS, MORE_WORK, STACK_MARQUEE } from "../data/showcase";
-import { EASE_OUT, EASE_REVEAL } from "../lib/motion";
+import { DUR, EASE } from "../lib/motion";
 import { usePageVisible } from "../lib/usePageVisible";
 import { media } from "../lib/media";
 import { magnetic, trackPointer } from "../lib/pointerFx";
@@ -21,7 +21,7 @@ const revealImage = (event) => event.currentTarget.classList.add("is-loaded");
 function Enter({ children, className = "", delay = 0, ...rest }) {
   const reduced = useReducedMotion();
   const [shown, setShown] = useState(false);
-  return <motion.div {...rest} className={`${className} ${shown || reduced ? "is-in" : ""}`} initial={reduced ? false : { opacity: 0, y: 12 }} whileInView={{ opacity: 1, y: 0 }} onViewportEnter={() => setShown(true)} viewport={{ once: true, amount: 0, margin: "0px 0px 20% 0px" }} transition={{ duration: 0.3, delay: Math.min(delay, 0.06), ease: EASE_REVEAL }}>{children}</motion.div>;
+  return <motion.div {...rest} className={`${className} ${shown || reduced ? "is-in" : ""}`} initial={reduced ? false : { opacity: 0, y: 12 }} whileInView={{ opacity: 1, y: 0 }} onViewportEnter={() => setShown(true)} viewport={{ once: true, amount: 0, margin: "0px 0px 20% 0px" }} transition={{ duration: DUR.base, delay: Math.min(delay, 0.06), ease: EASE.out }}>{children}</motion.div>;
 }
 /* A stat that counts up the first time it comes into view. Small numbers
    and years print as they are: counting to 2, or from 0 to 2019, reads as
@@ -40,7 +40,7 @@ function CountUp({ value }) {
     if (!counts || !inView || !ref.current) return;
     const controls = animate(start, target, {
       duration: Math.min(1.4, 0.7 + target / 600),
-      ease: EASE_REVEAL,
+      ease: EASE.out,
       onUpdate: (v) => { if (ref.current) ref.current.textContent = `${prefix}${Math.round(v)}${suffix}`; },
     });
     return () => controls.stop();
@@ -97,7 +97,7 @@ function HeroFeed({ run, ready, delay }) {
   const rise = (i) => (reduced ? {} : {
     initial: { opacity: 0, y: 12 },
     animate: ready ? { opacity: 1, y: 0 } : { opacity: 0, y: 12 },
-    transition: { duration: 0.45, delay: delay + i * 0.07, ease: EASE_OUT },
+    transition: { duration: DUR.base, delay: delay + i * 0.07, ease: EASE.out },
   });
   return <nav className="sc-feed" aria-label="Flagship projects">{HERO_FEED.map((flag, i) => {
     const project = getProject(flag.slug);
@@ -151,7 +151,7 @@ export function Hero({ ready = true }) {
   const appear = (delay) => (reduced ? {} : {
     initial: { opacity: 0, y: 12 },
     animate: ready ? { opacity: 1, y: 0 } : { opacity: 0, y: 12 },
-    transition: { duration: 0.45, delay, ease: EASE_OUT },
+    transition: { duration: DUR.base, delay, ease: EASE.out },
   });
   return <div className="sc-open">
     <section ref={heroRef} id="hero" aria-labelledby="hero-name" className="sc-hero" data-palette="lumen" onPointerMove={trackPointer}>

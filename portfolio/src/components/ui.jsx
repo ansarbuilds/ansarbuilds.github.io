@@ -1,7 +1,7 @@
 import { Fragment, useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import { motion, useReducedMotion, useScroll, useTransform } from "framer-motion";
 import { ArrowDown, ArrowRight, ArrowUpRight } from "lucide-react";
-import { EASE_REVEAL } from "../lib/motion";
+import { DUR, EASE } from "../lib/motion";
 import { ACCENTS } from "../data/projects";
 import { useScrollContainer } from "../appContexts";
 import { media } from "../lib/media";
@@ -16,7 +16,7 @@ export function Reveal({ children, className = "", delay = 0, y = 24 }) {
       initial={reduced ? false : { opacity: 0, y }}
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, amount: 0.15 }}
-      transition={{ duration: 0.4, delay: Math.min(delay, 0.08), ease: EASE_REVEAL }}
+      transition={{ duration: DUR.base, delay: Math.min(delay, 0.08), ease: EASE.out }}
     >
       {children}
     </motion.div>
@@ -57,7 +57,7 @@ export function RiseText({ text, className = "", stagger = 0.045 }) {
             <motion.span
               className="inline-block"
               variants={{ hidden: { y: "105%", rotate: 4 }, shown: { y: "0%", rotate: 0 } }}
-              transition={{ duration: 0.95, ease: EASE_REVEAL }}
+              transition={{ duration: DUR.scene, ease: EASE.out }}
             >
               {w}
             </motion.span>

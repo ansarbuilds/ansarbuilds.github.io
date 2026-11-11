@@ -2,14 +2,14 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { motion, useMotionValue, useSpring, useTransform } from "framer-motion";
 import { EMET_TOPICS } from "../data/content";
 import { useSandbox } from "../appContexts";
-import { HEAVY_OBJECT, EASE_OUT } from "../lib/motion";
+import { SPRING, EASE as CURVES } from "../lib/motion";
 import { answerLocally } from "../emet/emetKnowledge";
 
 const prefersReducedMotion = () =>
   typeof window !== "undefined" &&
   window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
-const EASE = EASE_OUT;
+const EASE = CURVES.out;
 
 /* ── Typewriter automation queue ──────────────────────────────
    Each segment types character-by-character at its own speed (ms/char),
@@ -204,7 +204,7 @@ function CrtChassis({ children, className = "" }) {
 
   const px = useMotionValue(0.5);
   const py = useMotionValue(0.5);
-  const spring = HEAVY_OBJECT;
+  const spring = SPRING.heavy;
   const springX = useSpring(px, spring);
   const springY = useSpring(py, spring);
   const rotateX = useTransform(springY, [0, 1], [9, -9]);

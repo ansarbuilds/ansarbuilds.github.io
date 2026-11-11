@@ -4,7 +4,7 @@ import { ArrowUpRight, ExternalLink, Play, RotateCcw } from "lucide-react";
 import { FLAGSHIPS } from "../data/showcase";
 import { getProject } from "../data/projects";
 import { media } from "../lib/media";
-import { EASE_OUT } from "../lib/motion";
+import { DUR, EASE } from "../lib/motion";
 import { usePageVisible } from "../lib/usePageVisible";
 import "../stage.css";
 
@@ -65,8 +65,8 @@ function StatValue({ value, run }) {
     if (!counts || !run || done.current || !el) return undefined;
     done.current = true;
     const controls = animate(0, target, {
-      duration: 0.6,
-      ease: EASE_OUT,
+      duration: DUR.slow,
+      ease: EASE.out,
       onUpdate: (v) => { el.textContent = `${prefix}${Math.round(v)}${suffix}`; },
     });
     // Leaving mid-count (a tab switch) settles on the real value.
