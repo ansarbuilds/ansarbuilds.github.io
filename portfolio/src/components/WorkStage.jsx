@@ -1,10 +1,11 @@
 import { useEffect, useRef, useState } from "react";
-import { animate, motion, useInView, useReducedMotion } from "framer-motion";
+import { motion, useInView, useReducedMotion } from "framer-motion";
 import { ArrowUpRight, ExternalLink, Play, RotateCcw } from "lucide-react";
 import { FLAGSHIPS } from "../data/showcase";
 import { getProject } from "../data/projects";
 import { media } from "../lib/media";
-import { DUR, EASE, spring } from "../lib/motion";
+import { spring } from "../lib/motion";
+import Count from "./Count";
 import { usePageVisible } from "../lib/usePageVisible";
 import "../stage.css";
 
@@ -48,32 +49,6 @@ function useAutoStep(count, run, ms, loop = true) {
   const pick = (n) => { setHeld(true); setStep(n); };
   const replay = () => { setHeld(false); setStep(0); };
   return [step, pick, replay, held || (!loop && step === count - 1)];
-}
-
-/* A stat that counts from zero to its real value in 600ms, once, the first
-   time its panel is on stage. Values with no number in them, and reduced
-   motion, print as they are. Screen readers always get the final value. */
-function StatValue({ value, run }) {
-  const reduced = useReducedMotion();
-  const ref = useRef(null);
-  const done = useRef(false);
-  const [, prefix = "", digits = "", suffix = ""] = String(value).match(/^(\D*)(\d+)(.*)$/) || [];
-  const target = Number(digits);
-  const counts = !!digits && target > 0 && !reduced;
-  useEffect(() => {
-    const el = ref.current;
-    if (!counts || !run || done.current || !el) return undefined;
-    done.current = true;
-    const controls = animate(0, target, {
-      duration: DUR.slow,
-      ease: EASE.out,
-      onUpdate: (v) => { el.textContent = `${prefix}${Math.round(v)}${suffix}`; },
-    });
-    // Leaving mid-count (a tab switch) settles on the real value.
-    return () => { controls.stop(); el.textContent = value; };
-  }, [counts, run, target, prefix, suffix, value]);
-  if (!counts) return value;
-  return <><span ref={ref} aria-hidden="true">{value}</span><span className="sr-only">{value}</span></>;
 }
 
 function Frame({ title, children, className = "" }) {
@@ -248,7 +223,7 @@ export default function WorkStage() {
             <h3><a href={`#project/${project.slug}`}>{project.title}</a></h3>
             <p className="st-headline">{flag.headline}</p>
             <p className="st-copy">{flag.copy}</p>
-            <dl className="st-stats">{flag.stats.map(([value, label]) => <div key={label}><dt><StatValue value={value} run={shown && live} /></dt><dd>{label}</dd></div>)}</dl>
+            <dl className="st-stats">{flag.stats.map(([value, label]) => <div key={label}><dt><Count value={value} run={shown && live} /></dt><dd>{label}</dd></div>)}</dl>
             <ul className="st-stack" aria-label="Built with">{flag.stack.map((tool) => <li key={tool}>{tool}</li>)}</ul>
             <div className="st-ctas">
               <a className="sc-btn" href={`#project/${project.slug}`}>Read the case study<ArrowUpRight size={18} aria-hidden="true" /></a>

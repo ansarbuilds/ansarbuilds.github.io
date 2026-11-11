@@ -15,12 +15,20 @@ export default function Cursor() {
     if (!window.matchMedia("(hover: hover) and (pointer: fine)").matches) return undefined;
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return undefined;
 
-    let x = -100, y = -100, tx = -100, ty = -100, raf = 0, shown = false;
-    const tick = () => {
-      x += (tx - x) * 0.2;
-      y += (ty - y) * 0.2;
+    let x = -100, y = -100, tx = -100, ty = -100, raf = 0, shown = false, last = 0;
+    // Smoothing by elapsed time, not per frame, so the ring trails at the
+    // same speed on a 60Hz and a 120Hz screen. FOLLOW is how quickly it
+    // closes the gap: higher is tighter.
+    const FOLLOW = 16;
+    const tick = (now) => {
+      const dt = last ? Math.min(0.064, (now - last) / 1000) : 1 / 60;
+      last = now;
+      const k = 1 - Math.exp(-FOLLOW * dt);
+      x += (tx - x) * k;
+      y += (ty - y) * k;
       ring.style.transform = `translate3d(${x.toFixed(1)}px, ${y.toFixed(1)}px, 0)`;
-      raf = Math.abs(tx - x) + Math.abs(ty - y) > 0.2 ? requestAnimationFrame(tick) : 0;
+      if (Math.abs(tx - x) + Math.abs(ty - y) > 0.2) raf = requestAnimationFrame(tick);
+      else { raf = 0; last = 0; }
     };
     const read = (target) => {
       const tagged = target?.closest?.("[data-cursor]");

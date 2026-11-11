@@ -66,7 +66,7 @@
 .sc-card-body { display: flex; flex-direction: column; flex: 1; padding-top: 20px; }
 .sc-card-body h3 { display: flex; justify-content: space-between; align-items: flex-start; gap: 14px; font: 600 1.35rem/1.15 var(--font-body); letter-spacing: -.045em; }
 .sc-card-body h3 svg { flex-shrink: 0; transition: transform var(--dur-fast); }
-.sc-card:hover h3 svg { transform: translate(3px, -3px); color: var(--ed-coral-ink); }
+.sc-card:hover h3 svg { color: var(--ed-coral-ink); }
 .sc-card-metric { display: flex; align-items: baseline; gap: 10px; margin-top: 14px; }
 .sc-card-metric strong { font: 400 2.2rem/1 var(--font-serif); letter-spacing: -.04em; color: var(--ed-coral-ink); }
 .sc-card-metric > span { font: .56rem var(--font-mono); text-transform: uppercase; letter-spacing: .05em; }
@@ -135,7 +135,7 @@
 .sc-hero-line em { font: italic 400 1.14em var(--font-serif); color: #ff8a5f; }
 .sc-hero-ctas { display: flex; flex-wrap: wrap; align-items: center; gap: 14px 28px; margin-top: 32px; }
 .sc-hero-btn { display: inline-flex; align-items: center; gap: 16px; min-height: 52px; padding: 0 24px; border-radius: 999px; background: #ff8a5f; color: #160b06; font: 700 .82rem var(--font-body); transition: transform var(--dur-fast), box-shadow var(--dur-fast); }
-.sc-hero-btn:hover, .sc-hero-btn:focus-visible { transform: translateY(-2px); box-shadow: 0 12px 40px -8px rgb(255 138 95 / .65); }
+.sc-hero-btn:hover, .sc-hero-btn:focus-visible { box-shadow: 0 12px 40px -8px rgb(255 138 95 / .65); }
 .sc-hero-ghost { display: inline-flex; align-items: center; gap: 8px; min-height: 44px; border-bottom: 1px solid rgb(239 230 216 / .5); font: 600 .8rem var(--font-body); }
 .sc-hero-ghost:hover { border-color: #ff8a5f; color: #ff8a5f; }
 .sc-hero :focus-visible { outline: 2px solid #ff8a5f; outline-offset: 4px; }
@@ -205,19 +205,7 @@
    letter and image reveals.
    ============================================================ */
 
-/* Cursor: a ring that trails the pointer. */
-.sc-cursor { position: fixed; left: 0; top: 0; z-index: 300; pointer-events: none; opacity: 0; transition: opacity var(--dur-base); mix-blend-mode: difference; }
-.sc-cursor.is-shown { opacity: 1; }
-.sc-cursor > span { position: absolute; left: 0; top: 0; display: grid; place-items: center; width: 34px; height: 34px; margin: -17px 0 0 -17px; border: 1.5px solid #fff; border-radius: 50%; transition: width var(--dur-base) var(--ease-out), height var(--dur-base) var(--ease-out), margin var(--dur-base) var(--ease-out), background var(--dur-base), border-color var(--dur-base), scale var(--dur-fast); }
-.sc-cursor b { font: 700 .62rem var(--font-body); letter-spacing: .02em; color: #160b06; opacity: 0; transition: opacity var(--dur-fast); }
-.sc-cursor.is-link > span { width: 58px; height: 58px; margin: -29px 0 0 -29px; background: rgb(255 255 255 / .14); }
-.sc-cursor.is-label { mix-blend-mode: normal; }
-.sc-cursor.is-label > span { width: 84px; height: 84px; margin: -42px 0 0 -42px; background: #ff8a5f; border-color: #ff8a5f; }
-.sc-cursor.is-label b { opacity: 1; }
-.sc-cursor.is-down > span { scale: .86; }
 
-/* Magnetic buttons ease back when the pointer leaves. */
-[data-magnetic] { transition-property: translate, transform, background, gap, box-shadow, color; transition-duration: var(--dur-base); transition-timing-function: var(--ease-out); will-change: translate; }
 
 /* The hero stays pinned while the page slides over it like a sheet. */
 .sc-open { position: relative; }
@@ -231,8 +219,6 @@
   .sc-open > .ed-intro { border-radius: 36px 36px 0 0; box-shadow: 0 -40px 90px -10px rgb(0 0 0 / .6); }
 }
 
-/* Scrubbed copy: the serif line keeps its block layout. */
-.sc-statement span { transition: opacity var(--dur-instant) linear; }
 
 /* Velocity marquees are driven from script, not a keyframe. */
 
@@ -244,12 +230,10 @@
 
 @media (max-width: 640px) { .sc-marquee.is-giant { margin-bottom: 30px; } }
 @media (prefers-reduced-motion: reduce) {
-  .sc-cursor { display: none; }
   .sc-card-media { clip-path: none; transition: none; }
   .sc-card-media img { scale: 1; transition: none; }
   .sc-statement span { opacity: 1 !important; }
 }
-.ed-nav-links a[data-magnetic] { transition: translate var(--dur-base) var(--ease-out), background var(--dur-base), color var(--dur-base); }
 
 /* ============================================================
    ONE DARK THEME. The palettes are all carbon and bone now, so
@@ -412,4 +396,46 @@ html.is-vt .rt { animation: none; }
   .rt, .rt-page { animation: none; }
   .ed-nav { transition: none; }
   ::view-transition-group(*), ::view-transition-old(*), ::view-transition-new(*) { animation: none !important; }
+}
+
+/* ============================================================
+   TOUCH. The cursor, and one hover and press language for
+   everything that can be clicked.
+   ============================================================ */
+
+/* The trailing ring. One fixed-size disc that only ever scales (--s), so
+   nothing lays out as it changes state: small at rest, larger over a link,
+   full size and filled, with its label, over a project. No blend mode: the
+   site is one dark theme, so a bone ring reads everywhere. */
+.sc-cursor { position: fixed; left: 0; top: 0; z-index: 300; pointer-events: none; opacity: 0; transition: opacity var(--dur-base) var(--ease-out); }
+.sc-cursor.is-shown { opacity: 1; }
+.sc-cursor > span { --s: .4; position: absolute; left: -42px; top: -42px; display: grid; place-items: center; width: 84px; height: 84px; border-radius: 50%; box-shadow: inset 0 0 0 calc(1.5px / var(--s)) rgb(239 230 216 / .7); scale: var(--s); transition: scale var(--dur-base) var(--ease-out), background var(--dur-fast) var(--ease-out), box-shadow var(--dur-fast) var(--ease-out); }
+.sc-cursor b { font: 700 .62rem var(--font-body); letter-spacing: .02em; color: #160b06; opacity: 0; transition: opacity var(--dur-fast) var(--ease-out); }
+.sc-cursor.is-link > span { --s: .66; background: rgb(239 230 216 / .1); }
+.sc-cursor.is-label > span { --s: 1; background: #ff8a5f; box-shadow: none; }
+.sc-cursor.is-label b { opacity: 1; }
+.sc-cursor.is-down > span { scale: calc(var(--s) * .88); }
+
+/* Hover: a card lifts a little, its image pushes in, its arrow nudges.
+   Press: anything clickable gives slightly. The same for every card and
+   button, from the tokens. (The two magnetic buttons press with a spring,
+   in Magnetic.jsx; `translate` and `scale` here compose with it.) */
+.sc-card, .sc-feed-card, .ed-experiment { transition: translate var(--dur-fast) var(--ease-out), border-color var(--dur-fast) var(--ease-out), background var(--dur-fast) var(--ease-out); }
+.sc-card:hover, .sc-feed-card:hover, .ed-experiment:hover { translate: 0 -4px; }
+.sc-card-body h3 svg, .ed-experiment-title svg, .ed-experiment-cta svg { transition: translate var(--dur-fast) var(--ease-out), color var(--dur-fast) var(--ease-out); }
+.sc-card:hover h3 svg, .ed-experiment:hover .ed-experiment-title svg { translate: 3px -3px; }
+.ed-experiment:hover .ed-experiment-cta svg { translate: 4px 0; }
+.sc-hero-btn, .sc-btn, .ed-contact-email, .ed-nav-contact, .st-tab, .st-launch, .st-device-tabs button { transition-property: translate, scale, background, color, box-shadow, gap, border-color, opacity; transition-duration: var(--dur-fast); transition-timing-function: var(--ease-out); }
+.sc-hero-btn:hover, .sc-hero-btn:focus-visible { translate: 0 -2px; }
+.ed-contact-email:hover { transform: none; translate: -3px -3px; }
+:is(.sc-btn, .ed-nav-contact, .st-tab, .st-launch, .st-device-tabs button, .sc-card, .sc-feed-card, .ed-experiment):active { scale: .98; }
+
+/* Playground links: the accent, not the surface colour they were left on
+   when the site went dark (they measured about 1.1 to 1 against it). */
+.ed-experiment-cta { color: var(--ed-coral-ink); }
+
+@media (prefers-reduced-motion: reduce) {
+  .sc-cursor { display: none; }
+  .sc-card, .sc-feed-card, .ed-experiment, .sc-card-body h3 svg, .ed-experiment-title svg, .ed-experiment-cta svg, .sc-hero-btn, .sc-btn, .ed-contact-email { transition: none; translate: none; }
+  .sc-card:hover, .sc-feed-card:hover, .ed-experiment:hover, .sc-hero-btn:hover, :is(.sc-btn, .sc-card, .sc-feed-card, .ed-experiment):active { translate: none; scale: none; }
 }

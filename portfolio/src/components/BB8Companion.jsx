@@ -49,7 +49,7 @@ const GUIDE_LINKS = [
 // a terminal with controls at the bottom edge. Keep the companion mounted so
 // its personality/session state survives navigation, but do not let it cover
 // or compete with those interfaces.
-const AVOID_ON_HOME = ".sc-card, .st-panel, .sc-email, .ed-contact-email, .sc-feed-card";
+const AVOID_ON_HOME = ".sc-card, .st-panel, .sc-email, .ed-contact-email, .sc-feed-card, .ed-footer";
 const HIDDEN_ROUTES = new Set(["emet", "explore", "lineage-demo", "infinity", "digital-double"]);
 
 function readSessionFlag(key) {

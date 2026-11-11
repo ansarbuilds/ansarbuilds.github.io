@@ -9,7 +9,8 @@ import { CAPABILITIES, FLAGSHIPS, MORE_WORK, STACK_MARQUEE } from "../data/showc
 import { EASE, STAGGER, tween } from "../lib/motion";
 import { INTRO_SESSION_KEY } from "../lib/intro";
 import { media } from "../lib/media";
-import { magnetic } from "../lib/pointerFx";
+import Count from "./Count";
+import MagneticLink from "./Magnetic";
 import { ScrollContext, useRoute } from "../appContexts";
 import "../editorial.css";
 import "../showcase.css";
@@ -42,31 +43,6 @@ function Enter({ children, className = "", index = 0, style, ...rest }) {
     return () => observer.disconnect();
   }, [reduced, scrollRef]);
   return <div ref={ref} {...rest} style={{ "--i": index, ...style }} className={`rv ${className} ${shown || reduced ? "is-in" : ""}`}>{children}</div>;
-}
-/* A stat that counts up the first time it comes into view. Small numbers
-   and years print as they are: counting to 2, or from 0 to 2019, reads as
-   noise. Screen readers get the final value only. */
-function CountUp({ value }) {
-  const reduced = useReducedMotion();
-  const ref = useRef(null);
-  const inView = useInView(ref, { once: true, margin: "0px 0px -10% 0px" });
-  const [, prefix = "", digits = "", suffix = ""] = String(value).match(/^(\D*)(\d+)(.*)$/) || [];
-  const target = Number(digits);
-  const counts = digits && target >= 10 && digits.length < 4 && !reduced;
-  // Start most of the way there: a fast scroll past "0+" reads as a broken
-  // stat, while the last stretch still gives the number its tick.
-  const start = Math.round(target * 0.6);
-  useEffect(() => {
-    if (!counts || !inView || !ref.current) return;
-    const controls = animate(start, target, {
-      duration: Math.min(1.4, 0.7 + target / 600),
-      ease: EASE.out,
-      onUpdate: (v) => { if (ref.current) ref.current.textContent = `${prefix}${Math.round(v)}${suffix}`; },
-    });
-    return () => controls.stop();
-  }, [counts, inView, start, target, prefix, suffix]);
-  if (!counts) return value;
-  return <><span ref={ref} aria-hidden="true" className="ed-count">{`${prefix}${inView ? target : start}${suffix}`}</span><span className="sr-only">{value}</span></>;
 }
 function IndexLabel({ number, children }) {
   return <p className="ed-label"><span>{number}</span>{children}</p>;
@@ -235,7 +211,7 @@ export function Hero({ ready = true, onReady }) {
         </motion.h1>
         <motion.p className="sc-hero-line" {...appear(1)}>{HERO.title} <em>Here are {LISTED_PROJECTS.length} of them.</em></motion.p>
         <motion.div className="sc-hero-ctas" {...appear(2)}>
-          <a href="#projects" className="sc-hero-btn" {...magnetic}>See the work<ArrowDown size={18} aria-hidden="true" /></a>
+          <MagneticLink href="#projects" className="sc-hero-btn">See the work<ArrowDown size={18} aria-hidden="true" /></MagneticLink>
           <a href="#contact" className="sc-hero-ghost">Get in touch<ArrowUpRight size={16} aria-hidden="true" /></a>
           <span className={`sc-hero-hint ${hint ? "is-shown" : ""}`} aria-hidden="true">Click the network</span>
         </motion.div>
@@ -312,7 +288,7 @@ export function CapabilitiesSection() {
   return <Sheet><section id="capabilities" className="sc-caps ed-section" data-palette="field"><div className="ed-wrap">
     <Enter className="ed-section-heading"><div><IndexLabel number="03">What I bring</IndexLabel><h2>Three things,<br /><em>done properly.</em></h2></div><p className="ed-heading-aside">The same loop on every build: make it work, measure it honestly, and ship it to real people.</p></Enter>
     <div className="sc-cap-grid">{CAPABILITIES.map((cap, i) => <Enter key={cap.id} index={i} className="sc-cap">
-      <p className="sc-cap-count"><CountUp value={cap.count} /></p>
+      <p className="sc-cap-count"><Count value={cap.count} /></p>
       <p className="sc-cap-unit">{cap.unit}</p>
       <h3>{cap.title}</h3>
       <p className="sc-cap-copy">{cap.copy}</p>
@@ -334,7 +310,7 @@ function WorkCard({ item, index }) {
       </div>
       <div className="sc-card-body">
         <h3>{project.title}<ArrowUpRight size={20} aria-hidden="true" /></h3>
-        {item.metric && <p className="sc-card-metric"><strong><CountUp value={item.metric} /></strong><span>{item.unit}</span></p>}
+        {item.metric && <p className="sc-card-metric"><strong><Count value={item.metric} /></strong><span>{item.unit}</span></p>}
         <p className="sc-card-line">{item.line}</p>
         <p className="sc-card-status">{project.status}</p>
       </div>
@@ -379,7 +355,7 @@ export function ContactSection() {
     <IndexLabel number="06">Contact</IndexLabel>
     <h2>Building something <em>ambitious?</em></h2>
     <a href={`mailto:${CONTACT.email}`} className="sc-email" data-cursor="Write">{CONTACT.email}</a>
-    <div className="ed-contact-bottom"><a href={`mailto:${CONTACT.email}`} className="ed-contact-email" {...magnetic}>Email me<ArrowUpRight aria-hidden="true" /></a><div><p>I like the hard part: agents that have to be trusted, evals that have to be honest, and products that have to ship. If that sounds like your problem, write to me.</p><div className="ed-socials"><a href={CONTACT.github} target="_blank" rel="noopener noreferrer">GitHub<ExternalLink size={14} /></a><a href={CONTACT.linkedin} target="_blank" rel="noopener noreferrer">LinkedIn<ExternalLink size={14} /></a></div></div></div>
+    <div className="ed-contact-bottom"><MagneticLink href={`mailto:${CONTACT.email}`} className="ed-contact-email">Email me<ArrowUpRight aria-hidden="true" /></MagneticLink><div><p>I like the hard part: agents that have to be trusted, evals that have to be honest, and products that have to ship. If that sounds like your problem, write to me.</p><div className="ed-socials"><a href={CONTACT.github} target="_blank" rel="noopener noreferrer">GitHub<ExternalLink size={14} /></a><a href={CONTACT.linkedin} target="_blank" rel="noopener noreferrer">LinkedIn<ExternalLink size={14} /></a></div></div></div>
     <div id="experience" className="bd-dayjobs"><span>Day jobs</span><ul>{ROLES.map((role) => <li key={role.company + role.title}>{role.title} at {role.company}</li>)}</ul></div>
     <footer className="ed-footer"><span>© {new Date().getFullYear()}</span><span>Designed and built by me, with AI as the pair programmer.</span><button onClick={() => navigate("deck")} aria-label="Back to top">Back to top ↑</button></footer></div></section>;
 }
