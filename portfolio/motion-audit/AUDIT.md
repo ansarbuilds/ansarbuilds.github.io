@@ -211,14 +211,90 @@ These go in Phase 2, pending your OK:
 
 ## Performance, before and after
 
+Same script (`measure.mjs`), same machine, 1440x900, full home scroll under
+4x CPU throttling.
+
 | Measure | Before | After |
 | --- | --- | --- |
-| Average fps, full home scroll, 4x CPU | 54.2 | to be filled in Phase 5 |
-| p95 frame time | 23.7ms | |
-| p99 frame time | 40.2ms | |
-| Frames over 33ms | 7 of 463 | |
-| Long tasks over 50ms | 1 (117ms) | |
-| `@keyframes` | 33 | |
-| Distinct CSS durations | 67 | |
-| Distinct CSS easings | 14 | |
-| Home page length | 7,845px | |
+| Average fps | 54.2 | 55.6 |
+| p50 frame time | 17.1ms | 16.8ms |
+| p95 frame time | 23.7ms | 25.3ms |
+| p99 frame time | 40.2ms | 34.5ms |
+| Frames over 33ms | 7 of 463 | 5 of 463 |
+| Long tasks over 50ms | 1 (117ms) | 1 (117ms) |
+| `@keyframes` | 33 | 26 |
+| Distinct CSS durations | 67 | 27 (5 tokens, the rest are delays and ambient loops) |
+| Distinct CSS easings | 14 | 8 (3 tokens, `linear`, two `steps()`, and BB-8's own two) |
+| Lines in showcase, editorial and stage CSS | 1,467 | 1,064 |
+| Home page length | 7,845px | 7,845px |
+
+Read these honestly: the scroll numbers barely moved. The page was already
+close to 60fps at 4x throttle, and run-to-run noise on these figures is a
+frame or two. The pass made the motion calmer and consistent; it did not make
+scrolling measurably faster. What did change is the work per frame that no
+longer happens at all: no full-viewport repaint every 0.72s (paper grain), no
+React re-render per frame (the name scramble), no clip-path string rebuilt on
+every scroll frame (Expand), no 0.9s whole-page restyle on a palette change.
+
+The one long task is not motion code. It starts at 3,089ms, as the BB-8
+companion's scripts arrive (the first at 3,099ms): that is three.js loading
+on first input. BB-8's internals were out of scope for this pass.
+
+## What changed, phase by phase
+
+**Phase 1, system.** `src/lib/motion.js` holds five durations, three curves,
+three staggers and the springs. `index.css` mirrors them. Every transition
+and animation in the four main stylesheets uses them. `MOTION.md` is the
+reference.
+
+**Phase 2, subtract.** Cut: paper grain, the name scramble, the hero feed's
+rotation with its scan and timer, the hero spotlight, the capability glow,
+canvas dust, 431 dead CSS rules. Calmed: the hero graph changes shape only
+when clicked, the marquee leans 2 degrees, the hint waits for idle, palette
+changes take 0.35s.
+
+**Phase 3, signature moments.**
+1. Intro handoff: the hero is its own title card. The name sets large
+   mid-screen and the same `h1` travels to its place. Measured on a first
+   visit: the rest of the hero starts arriving 0.86s after the name appears,
+   and the name is in place at 1.41s. Any input skips it.
+2. Hero entrance on one timeline; scroll-away in fractions of the viewport.
+3. One reveal (`Enter`, firing at about 30% visible) and one heading pattern.
+   `Expand` became a static sheet.
+4. Card to project page with the View Transitions API, both directions, and
+   one `RouteTransition` in place of eight wrappers.
+5. Work stage: a sliding tab highlight, cross-fading panels, copy sliding in
+   from the side the stage moved.
+
+**Phase 4, touch.** Frame-rate independent cursor that only scales; spring
+magnets at half strength; one hover and press language; one counter; the
+playground link colour (about 1.1 to 1, now about 9 to 1); BB-8 off the
+footer.
+
+**Phase 5, polish.** Removed the standing `will-change` on the hero name.
+Recorded the after videos (`motion-audit/after/`, same flows and viewports).
+
+## Left alone, on purpose
+
+- **BB-8's internals** and its three.js load, as the brief asked.
+- **Project pages' own animations** (`ProjectPage.jsx`, `ui.jsx`): moved onto
+  the tokens, not redesigned.
+- **Takeover views** (EMET, solar system, infinity, digital double): their
+  CRT flicker and float loops are theirs.
+- **The palette shift per section**: kept, shortened.
+- **The pinned hero and the sheet sliding over it**: already the right idea.
+- **No GSAP, no Lenis**: nothing measured asked for them, and native
+  container scroll is what the anchors and tests rely on.
+
+## Not verified
+
+- **Reduced motion** was not exercised in a browser. Every effect added in
+  this pass has a reduced-motion branch in code, and the existing ones were
+  kept.
+- **Safari and Firefox.** Everything here was checked in Chrome. The view
+  transition falls back to a fade where the API is missing.
+- **A real 120Hz display.** The cursor change is by construction, not by
+  measurement on such a screen.
+- **The alternative for the intro**, a separate curtain element with a FLIP
+  to the `h1`, was not built. Making the hero its own title card was simpler
+  and lands the name exactly, because it is the same element throughout.

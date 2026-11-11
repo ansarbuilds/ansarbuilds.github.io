@@ -7,25 +7,36 @@ const BASE = process.env.BASE || "http://localhost:5174";
 const browser = await chromium.launch({ channel: "chrome" });
 const result = {};
 
-// 1. Intro: how long the curtain covers the page on a first visit.
+// 1. Intro on a first visit. Before the motion pass this was a curtain
+// (an element at z-[400]); now the hero is its own title card and hands
+// over when the nav stops being held back (.is-booting). Both are timed,
+// so the script works on either side of the change.
 {
   const context = await browser.newContext({ viewport: { width: 1440, height: 900 } });
   await context.addInitScript(() => {
-    window.__curtain = { seen: null, gone: null };
+    window.__intro = { curtainSeen: null, curtainGone: null, heroSeen: null, handedOver: null, nameSettled: null };
     const check = () => {
-      const el = document.querySelector('[class*="z-[400]"]');
-      const now = performance.now();
-      if (el && window.__curtain.seen === null) window.__curtain.seen = now;
-      if (!el && window.__curtain.seen !== null && window.__curtain.gone === null) window.__curtain.gone = now;
-      if (window.__curtain.gone === null) requestAnimationFrame(check);
+      const now = performance.now(), t = window.__intro;
+      const curtain = document.querySelector('[class*="z-[400]"]');
+      if (curtain && t.curtainSeen === null) t.curtainSeen = now;
+      if (!curtain && t.curtainSeen !== null && t.curtainGone === null) t.curtainGone = now;
+      const name = document.querySelector(".sc-hero-name");
+      if (name && t.heroSeen === null) t.heroSeen = now;
+      const nav = document.querySelector(".ed-nav");
+      if (nav && name && !nav.classList.contains("is-booting") && t.handedOver === null) t.handedOver = now;
+      if (name && t.handedOver !== null && t.nameSettled === null && getComputedStyle(name).transform === "none") t.nameSettled = now;
+      if (now < 6000) requestAnimationFrame(check);
     };
     requestAnimationFrame(check);
   });
   const page = await context.newPage();
   await page.goto(BASE);
-  await page.waitForTimeout(3500);
-  const c = await page.evaluate(() => window.__curtain);
-  result.intro = { firstSeenMs: Math.round(c.seen), goneMs: Math.round(c.gone), coveredMs: Math.round(c.gone - c.seen) };
+  await page.waitForTimeout(4000);
+  const t = await page.evaluate(() => window.__intro);
+  const since = (v) => (v === null ? null : Math.round(v - t.heroSeen));
+  result.intro = t.curtainSeen !== null
+    ? { kind: "curtain", coveredMs: Math.round(t.curtainGone - t.curtainSeen) }
+    : { kind: "handoff", restStartsMs: since(t.handedOver), nameInPlaceMs: since(t.nameSettled) };
   await context.close();
 }
 
@@ -62,7 +73,8 @@ const result = {};
   result.scroll4xCpu = await page.evaluate(async () => {
     const main = document.querySelector("main");
     const longTasks = [];
-    new PerformanceObserver((list) => list.getEntries().forEach((e) => longTasks.push(e.duration))).observe({ entryTypes: ["longtask"] });
+    const taskStarts = [];
+    new PerformanceObserver((list) => list.getEntries().forEach((e) => { longTasks.push(e.duration); taskStarts.push(Math.round(e.startTime)); })).observe({ entryTypes: ["longtask"] });
     const frames = [];
     let last = performance.now();
     const end = main.scrollHeight - main.clientHeight;
@@ -82,9 +94,22 @@ const result = {};
       framesOver33ms: frames.filter((f) => f > 33.4).length,
       framesOver50ms: frames.filter((f) => f > 50).length,
       longTasks: longTasks.length, longestTaskMs: Math.round(Math.max(0, ...longTasks)),
+      // The BB-8 companion loads three.js on first input. If a long task
+      // starts as that arrives, it is the companion, not the page's motion.
+      longTaskStartsMs: taskStarts,
+      companionScriptsArrivedMs: performance.getEntriesByType("resource").filter((r) => /three|BB8|createBB8/i.test(r.name)).map((r) => Math.round(r.responseEnd)).sort((a, b) => a - b).slice(0, 4),
     };
   });
   await cdp.send("Emulation.setCPUThrottlingRate", { rate: 1 });
+  result.css = await page.evaluate(() => {
+    let keyframes = 0;
+    const walk = (rules) => { for (const rule of rules) {
+      if (rule.type === CSSRule.KEYFRAMES_RULE) keyframes += 1;
+      if (rule.cssRules) walk(rule.cssRules);
+    } };
+    for (const sheet of document.styleSheets) { try { walk(sheet.cssRules); } catch { /* cross-origin */ } }
+    return { keyframes };
+  });
 
   // 3. Defects: playground CTA contrast, BB-8 over "Back to top".
   result.defects = await page.evaluate(async () => {

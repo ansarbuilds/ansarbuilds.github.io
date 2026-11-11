@@ -361,7 +361,7 @@
    the outline stroke and the tall caps from being clipped at the edges. */
 .sc-name-line { display: block; overflow: hidden; padding: .05em .04em .04em; margin: -.05em -.04em -.04em; }
 .sc-name-line > span { display: block; transform-origin: 0 100%; }
-.sc-hero-name { transform-origin: 50% 50%; will-change: transform; }
+.sc-hero-name { transform-origin: 50% 50%; }
 .sc-hero-fade { position: absolute; inset: 0; }
 
 /* The nav waits for the intro to hand over. */
