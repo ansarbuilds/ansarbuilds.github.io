@@ -12,7 +12,9 @@
 .st-tab { position: relative; display: grid; grid-template-columns: auto minmax(0, 1fr); column-gap: 10px; row-gap: 3px; align-items: baseline; padding: 20px 18px 22px; text-align: left; border-left: 1px solid var(--st-line); opacity: .5; transition: opacity var(--dur-base), background var(--dur-base); }
 .st-tab:first-child { border-left: none; }
 .st-tab:hover { opacity: .85; background: color-mix(in srgb, var(--ed-blue) 3%, transparent); }
-.st-tab.is-active { opacity: 1; background: color-mix(in srgb, var(--st-accent) 7%, transparent); }
+.st-tab.is-active { opacity: 1; }
+.st-tab { isolation: isolate; }
+.st-tab-active { position: absolute; inset: 0; z-index: -1; background: color-mix(in srgb, var(--st-accent) 8%, transparent); }
 .st-tab:focus-visible { outline: 2px solid var(--st-accent); outline-offset: -3px; }
 .st-tab-num { font: .56rem var(--font-mono); color: var(--st-accent); }
 .st-tab strong { font: 600 .86rem/1.2 var(--font-body); letter-spacing: -.02em; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
@@ -158,11 +160,15 @@
 .st-ctas { margin-top: 16px; }
 .st-demo { aspect-ratio: 16 / 10.4; }
 
-/* One panel leaves (fade, 16px up) before the next arrives (fade, settle
-   from 16px below): 180ms out, then 270ms in, so two demos never overlap. */
-.st-panel { opacity: 0; visibility: hidden; transform: translateY(-16px); transition: opacity var(--dur-fast) var(--ease-exit), transform var(--dur-fast) var(--ease-exit), visibility 0s .18s; }
-.st-panel.is-active { opacity: 1; visibility: visible; transform: none; transition: none; animation: st-enter var(--dur-fast) var(--ease-out) .18s both; }
-@keyframes st-enter { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: none; } }
+/* A tab change is one move: the two panels cross-fade (so the media
+   dissolves from one demo to the next), and the copy slides in from the side
+   the stage moved toward (--dir is 1 going forward, -1 going back). */
+.st-panel { opacity: 0; visibility: hidden; transform: none; transition: opacity var(--dur-base) var(--ease-standard), visibility 0s var(--dur-base); }
+.st-panel.is-active { opacity: 1; visibility: visible; transition: opacity var(--dur-base) var(--ease-standard); }
+.st-panel .st-info { opacity: 0; transform: translateX(calc(var(--dir, 1) * -28px)); transition: opacity var(--dur-instant) var(--ease-exit), transform var(--dur-base) var(--ease-exit); }
+/* The old copy clears first, so two blocks of text are never read at once. */
+.st-panel.is-active .st-info { opacity: 1; transform: none; transition: none; animation: st-info-in var(--dur-slow) var(--ease-out) var(--dur-instant) both; }
+@keyframes st-info-in { from { opacity: 0; transform: translateX(calc(var(--dir, 1) * 28px)); } }
 
 /* Jarvis: the frame settles as the live demo takes the screenshot's place. */
 .st-frame.is-live { animation: st-settle var(--dur-base) var(--ease-out) both; }
@@ -220,6 +226,7 @@
 
 @media (max-width: 999px) {
   .st-panel, .st-panel.is-active { opacity: 1; visibility: visible; transform: none; transition: none; animation: none; }
+  .st-panel .st-info, .st-panel.is-active .st-info { opacity: 1; transform: none; transition: none; animation: none; }
   .st-playhead { display: none; }
   .st-flight-steps > li:not(.st-playhead) { height: auto; }
   .st-demo:has(.st-devices) { aspect-ratio: 4 / 3.6; }
@@ -228,6 +235,7 @@
 @media (prefers-reduced-motion: reduce) {
   .st-panel, .st-panel.is-active, .st-frame.is-live, .st-shell, .st-shell.is-shown, .st-panel.is-active .st-cover img { animation: none; transition: none; transform: none; }
   .st-panel.is-active { opacity: 1; }
+  .st-panel .st-info, .st-panel.is-active .st-info { opacity: 1; transform: none; transition: none; animation: none; }
   .st-playhead, .st-clip-bar span, .st-clip-caption span { transition: none; }
   .st-flight-detail pre code { opacity: 1; transform: none; animation: none; }
 }

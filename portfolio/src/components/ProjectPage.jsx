@@ -9,6 +9,7 @@ import { BEFORE_AFTER, STEP_TOOLS } from "../data/summaries";
 import FlowDiagram, { FlourishTitle, Kicker, TagPill } from "./ui";
 import ProjectMotionPreview from "./ProjectMotionPreview";
 import { DUR, EASE } from "../lib/motion";
+import { isRouteTransitioning } from "../lib/routeTransition";
 import { media } from "../lib/media";
 
 // The accent is a CSS colour (the current palette's accent ink), so its
@@ -375,6 +376,9 @@ function LinkButton({ link, accent }) {
 }
 
 export default function ProjectPage({ slug }) {
+  // Arriving from a card by view transition: the header and title travel
+  // from the card, so the page's own entrance would only fight that.
+  const [travelled] = useState(isRouteTransitioning);
   const reduced = useReducedMotion();
   const project = getProject(slug);
 
@@ -404,7 +408,7 @@ export default function ProjectPage({ slug }) {
   return (
     <div className="ed-case-study min-h-full">
     <motion.article
-      initial={reduced ? false : { opacity: 0, y: 18, clipPath: "inset(0 0 5% 0 round 24px)" }}
+      initial={reduced || travelled ? false : { opacity: 0, y: 18, clipPath: "inset(0 0 5% 0 round 24px)" }}
       animate={{ opacity: 1, y: 0, clipPath: "inset(0 0 0% 0 round 24px)" }}
       transition={{ duration: DUR.slow, ease: EASE.out }}
       className="mx-auto w-full max-w-4xl px-5 pt-28 pb-24"
@@ -414,6 +418,7 @@ export default function ProjectPage({ slug }) {
       </a>
 
       <header
+        data-vt="frame"
         className="mt-5 rounded-3xl border p-6 sm:p-10"
         style={{ background: `radial-gradient(130% 100% at 0% 0%, ${tint(a.hex, 0x30)}, transparent 62%), rgba(16, 16, 16, 0.04)`, borderColor: `${tint(a.hex, 0x40)}` }}
       >
@@ -421,8 +426,8 @@ export default function ProjectPage({ slug }) {
           <span className={`font-semibold ${a.text}`}>{project.kind}</span>
           <span className="text-[color:var(--ink-300)]">{project.status}</span>
         </div>
-        <h1 aria-label={project.title} className="mt-4 overflow-hidden text-[color:var(--ink-100)] leading-[.92] text-[clamp(3rem,8vw,6.5rem)]">
-          <motion.span className="block" initial={reduced ? false : { y: "108%" }} animate={{ y: "0%" }} transition={{ duration: DUR.slow, delay: .06, ease: EASE.out }}>
+        <h1 data-vt="title" aria-label={project.title} className="mt-4 overflow-hidden text-[color:var(--ink-100)] leading-[.92] text-[clamp(3rem,8vw,6.5rem)]">
+          <motion.span className="block" initial={reduced || travelled ? false : { y: "108%" }} animate={{ y: "0%" }} transition={{ duration: DUR.slow, delay: .06, ease: EASE.out }}>
             <PageTitle project={project} style={theme.title} />
           </motion.span>
         </h1>

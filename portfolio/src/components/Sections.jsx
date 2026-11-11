@@ -1,4 +1,4 @@
-import { useContext, useEffect, useRef, useState } from "react";
+import { useContext, useEffect, useLayoutEffect, useRef, useState } from "react";
 import { animate, motion, useAnimationFrame, useInView, useMotionValue, useReducedMotion, useScroll, useSpring, useTransform, useVelocity } from "framer-motion";
 import { ArrowDown, ArrowRight, ArrowUpRight, ExternalLink } from "lucide-react";
 import SignalField from "./SignalField";
@@ -6,7 +6,8 @@ import WorkStage from "./WorkStage";
 import { CODE, CONTACT, HERO, RECEIPTS, ROLES } from "../data/content";
 import { EXPERIMENTS, LISTED_PROJECTS, getProject } from "../data/projects";
 import { CAPABILITIES, FLAGSHIPS, MORE_WORK, STACK_MARQUEE } from "../data/showcase";
-import { DUR, EASE } from "../lib/motion";
+import { EASE, STAGGER, tween } from "../lib/motion";
+import { INTRO_SESSION_KEY } from "../lib/intro";
 import { media } from "../lib/media";
 import { magnetic } from "../lib/pointerFx";
 import { ScrollContext, useRoute } from "../appContexts";
@@ -15,12 +16,32 @@ import "../showcase.css";
 
 const revealImage = (event) => event.currentTarget.classList.add("is-loaded");
 
-// "is-in" lets CSS run the slower media reveals (cover apertures, image
-// settle) off the same trigger as the fade, so both start together.
-function Enter({ children, className = "", delay = 0, ...rest }) {
+/* The one reveal on the page. It only adds "is-in" when about a third of the
+   element is on screen (less for things taller than the screen), once; the
+   motion itself is CSS (.rv in showcase.css), so a heading, a card and its
+   image all start from the same moment. `index` staggers siblings in
+   reading order. Reduced motion is "in" from the first paint. */
+function Enter({ children, className = "", index = 0, style, ...rest }) {
   const reduced = useReducedMotion();
+  const scrollRef = useContext(ScrollContext);
+  const ref = useRef(null);
   const [shown, setShown] = useState(false);
-  return <motion.div {...rest} className={`${className} ${shown || reduced ? "is-in" : ""}`} initial={reduced ? false : { opacity: 0, y: 12 }} whileInView={{ opacity: 1, y: 0 }} onViewportEnter={() => setShown(true)} viewport={{ once: true, amount: 0, margin: "0px 0px 20% 0px" }} transition={{ duration: DUR.base, delay: Math.min(delay, 0.06), ease: EASE.out }}>{children}</motion.div>;
+  useEffect(() => {
+    const el = ref.current;
+    if (!el || reduced) return undefined;
+    const root = scrollRef?.current || null;
+    const rootHeight = root?.clientHeight || window.innerHeight;
+    // 30% of the element, or 30% of the screen for anything taller than it.
+    const threshold = Math.min(0.3, (rootHeight * 0.3) / Math.max(1, el.offsetHeight));
+    const observer = new IntersectionObserver(([entry]) => {
+      if (!entry.isIntersecting) return;
+      setShown(true);
+      observer.disconnect();
+    }, { root, threshold });
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, [reduced, scrollRef]);
+  return <div ref={ref} {...rest} style={{ "--i": index, ...style }} className={`rv ${className} ${shown || reduced ? "is-in" : ""}`}>{children}</div>;
 }
 /* A stat that counts up the first time it comes into view. Small numbers
    and years print as they are: counting to 2, or from 0 to 2019, reads as
@@ -53,22 +74,26 @@ function IndexLabel({ number, children }) {
 /* Four flagships as a status strip. It does not rotate: the hero already
    has one thing moving. A card lights up when it is hovered or focused. */
 const HERO_FEED = FLAGSHIPS.slice(0, 4);
-function HeroFeed({ ready, delay }) {
-  const reduced = useReducedMotion();
-  // The cards rise 12px one after another, 70ms apart, last in the hero's entrance.
-  const rise = (i) => (reduced ? {} : {
-    initial: { opacity: 0, y: 12 },
-    animate: ready ? { opacity: 1, y: 0 } : { opacity: 0, y: 12 },
-    transition: { duration: DUR.base, delay: delay + i * 0.07, ease: EASE.out },
-  });
+function HeroFeed({ appear, from }) {
   return <nav className="sc-feed" aria-label="Flagship projects">{HERO_FEED.map((flag, i) => {
     const project = getProject(flag.slug);
-    return project && <motion.a key={flag.slug} href={`#project/${project.slug}`} className="sc-feed-card" data-cursor="Open" {...rise(i)}>
+    return project && <motion.a key={flag.slug} href={`#project/${project.slug}`} className="sc-feed-card" data-cursor="Open" {...appear(from + i * (STAGGER.base / STAGGER.loose))}>
       <span className="sc-feed-status"><i aria-hidden="true" />{flag.badge}</span>
       <strong>{project.title}</strong>
       <span className="sc-feed-metric"><b>{flag.stats[0][0]}</b>{flag.stats[0][1]}</span>
     </motion.a>;
   })}</nav>;
+}
+
+// The viewport's height, kept current, for scroll ranges that scale with it.
+function useViewportHeight() {
+  const [height, setHeight] = useState(() => (typeof window === "undefined" ? 800 : window.innerHeight));
+  useEffect(() => {
+    const onResize = () => setHeight(window.innerHeight);
+    window.addEventListener("resize", onResize);
+    return () => window.removeEventListener("resize", onResize);
+  }, []);
+  return height;
 }
 
 /* Copy that lights up word by word as it crosses the screen. Every word is
@@ -89,52 +114,133 @@ function ScrubText({ lead, rest, className }) {
   return <p ref={ref} className={className}>{leadWords.map(word)}<em>{restWords.map((text, i) => word(text, leadWords.length + i))}</em></p>;
 }
 
-export function Hero({ ready = true }) {
+/* The hero, and on a first visit the intro that hands over to it.
+
+   There is no curtain. On a first visit the hero itself is the title card:
+   everything but the name is held back, and the name sits large in the
+   middle of the screen. Its two lines rise out of their masks, then the
+   name travels to its real place (it is the same h1 throughout, so it lands
+   exactly) while the rest arrives in reading order: kicker, sentence,
+   buttons, proof cards, and the network last. Any click, key or scroll
+   skips straight to the end. A return visit plays the same entrance without
+   the travel. */
+const NAME_SET_S = 0.62; // how long the name holds centre stage before it moves
+const NAME_TRAVEL = { duration: 0.75, ease: EASE.out };
+export function Hero({ ready = true, onReady }) {
   const reduced = useReducedMotion();
   const scrollRef = useContext(ScrollContext);
   const heroRef = useRef(null);
+  const nameRef = useRef(null);
   const visible = useInView(heroRef, { margin: "50px" });
+  // `ready` is false only on a first visit, before the intro has handed over.
+  const [intro] = useState(() => !ready && !reduced);
+  const [arrived, setArrived] = useState(!intro);
+  const nameX = useMotionValue(0), nameY = useMotionValue(0), nameScale = useMotionValue(1);
+
+  // Before the first paint, move the name from its place to mid-screen.
+  const placed = useRef(false);
+  useLayoutEffect(() => {
+    // Measure once, from the name's untransformed box. A second run (React
+    // re-runs effects in development) would measure the moved name instead.
+    if (!intro || !nameRef.current || placed.current) return;
+    placed.current = true;
+    const box = nameRef.current.getBoundingClientRect();
+    nameX.set(window.innerWidth / 2 - (box.left + box.width / 2));
+    nameY.set(window.innerHeight / 2 - (box.top + box.height / 2));
+    nameScale.set(Math.min(1.22, Math.max(1, (window.innerWidth * 0.84) / box.width)));
+  }, [intro, nameX, nameY, nameScale]);
+
+  useEffect(() => {
+    if (!intro) { onReady?.(); return undefined; }
+    try {
+      window.sessionStorage.setItem(INTRO_SESSION_KEY, "1");
+      window.localStorage.setItem(INTRO_SESSION_KEY, "1");
+    } catch { /* storage unavailable: shouldPlayIntro already said no */ }
+    let moves = [];
+    let handed = false;
+    const handOver = () => {
+      if (handed) return;
+      handed = true;
+      setArrived(true);
+      onReady?.();
+    };
+    // The name leaves for its place; the rest starts a beat into the move.
+    const travel = setTimeout(() => {
+      moves = [animate(nameX, 0, NAME_TRAVEL), animate(nameY, 0, NAME_TRAVEL), animate(nameScale, 1, NAME_TRAVEL)];
+    }, NAME_SET_S * 1000);
+    const rest = setTimeout(handOver, (NAME_SET_S + 0.18) * 1000);
+    const skip = () => {
+      clearTimeout(travel);
+      moves.forEach((move) => move.stop());
+      nameX.set(0); nameY.set(0); nameScale.set(1);
+      handOver();
+    };
+    const events = ["pointerdown", "keydown", "wheel", "touchstart"];
+    events.forEach((name) => window.addEventListener(name, skip, { once: true, passive: true }));
+    return () => {
+      clearTimeout(travel);
+      clearTimeout(rest);
+      events.forEach((name) => window.removeEventListener(name, skip));
+    };
+  }, [intro, onReady, nameX, nameY, nameScale]);
+
   // The hint only appears if the hero has sat untouched for a while, and
   // goes for good at the first click.
   const [hint, setHint] = useState(false);
   useEffect(() => {
-    if (!ready || !visible || reduced) return undefined;
+    if (!arrived || !visible || reduced) return undefined;
     const id = setTimeout(() => setHint(true), 7000);
     return () => clearTimeout(id);
-  }, [ready, visible, reduced]);
+  }, [arrived, visible, reduced]);
+
   // As the hero scrolls away, the copy lifts and fades while the network
-  // swells slightly, so the page seems to move through it.
-  // Measured in pixels, not against the hero's own box: on desktop the hero
-  // is pinned while the next section slides over it, so its box never moves.
+  // swells slightly, so the page seems to move through it. The ranges are
+  // fractions of the viewport height (the hero is one viewport, pinned on
+  // desktop while the next section slides over it), not fixed pixels.
+  const vh = useViewportHeight();
   const { scrollY } = useScroll({ container: scrollRef });
-  const copyY = useTransform(scrollY, [0, 800], reduced ? [0, 0] : [0, -150]);
-  const copyOpacity = useTransform(scrollY, [0, 560], reduced ? [1, 1] : [1, 0]);
-  const feedY = useTransform(scrollY, [0, 800], reduced ? [0, 0] : [0, -60]);
-  const feedOpacity = useTransform(scrollY, [80, 620], reduced ? [1, 1] : [1, 0]);
-  const fieldScale = useTransform(scrollY, [0, 900], reduced ? [1, 1] : [1, 1.3]);
-  const fieldOpacity = useTransform(scrollY, [0, 900], reduced ? [1, 1] : [1, 0.3]);
-  // The entrance, in order: kicker, the name decoding, the sentence, the two
-  // buttons, then the four proof cards.
-  const appear = (delay) => (reduced ? {} : {
-    initial: { opacity: 0, y: 12 },
-    animate: ready ? { opacity: 1, y: 0 } : { opacity: 0, y: 12 },
-    transition: { duration: DUR.base, delay, ease: EASE.out },
+  const copyY = useTransform(scrollY, [0, vh * 0.9], reduced ? [0, 0] : [0, -vh * 0.16]);
+  const copyOpacity = useTransform(scrollY, [0, vh * 0.62], reduced ? [1, 1] : [1, 0]);
+  const feedY = useTransform(scrollY, [0, vh * 0.9], reduced ? [0, 0] : [0, -vh * 0.07]);
+  const feedOpacity = useTransform(scrollY, [vh * 0.09, vh * 0.7], reduced ? [1, 1] : [1, 0]);
+  const fieldScale = useTransform(scrollY, [0, vh], reduced ? [1, 1] : [1, 1.14]);
+  const fieldOpacity = useTransform(scrollY, [0, vh], reduced ? [1, 1] : [1, 0.3]);
+
+  // One timeline. The name's lines lead; each later part is a step behind
+  // the one before. Without the intro, the rest waits for the name to be
+  // well on its way.
+  const lead = intro ? 0 : 0.28;
+  const appear = (step) => (reduced ? {} : {
+    initial: { opacity: 0, y: 16 },
+    animate: arrived ? { opacity: 1, y: 0 } : { opacity: 0, y: 16 },
+    transition: tween("slow", "out", lead + step * STAGGER.loose),
+  });
+  const line = (i) => (reduced ? {} : {
+    initial: { y: "106%", skewY: 5 },
+    animate: { y: "0%", skewY: 0 },
+    transition: tween("slow", "out", i * STAGGER.loose),
   });
   return <div className="sc-open">
     <section ref={heroRef} id="hero" aria-labelledby="hero-name" className="sc-hero" data-palette="lumen" onPointerDown={() => setHint(false)}>
-      <motion.div className="sc-hero-stage" style={{ scale: fieldScale, opacity: fieldOpacity }}><SignalField className="sc-hero-field" labels={HERO_LABELS} /></motion.div>
+      <motion.div className="sc-hero-stage" style={{ scale: fieldScale, opacity: fieldOpacity }}>
+        {/* The network comes up last, once everything it sits behind is in. */}
+        <motion.div className="sc-hero-fade" initial={reduced ? false : { opacity: 0 }} animate={{ opacity: arrived ? 1 : 0 }} transition={tween("scene", "out", lead + 0.4)}><SignalField className="sc-hero-field" labels={HERO_LABELS} /></motion.div>
+      </motion.div>
       <div className="sc-hero-grid" aria-hidden="true" />
       <motion.div className="sc-hero-inner" style={{ y: copyY, opacity: copyOpacity }}>
         <motion.p className="sc-hero-kicker" {...appear(0)}><i aria-hidden="true" />Index of work · {CODE.asOf}</motion.p>
-        <h1 id="hero-name" className="sc-hero-name" aria-label="Mohamed Ansar"><span aria-hidden="true">MOHAMED</span><span aria-hidden="true" className="is-outline">ANSAR</span></h1>
-        <motion.p className="sc-hero-line" {...appear(0.5)}>{HERO.title} <em>Here are {LISTED_PROJECTS.length} of them.</em></motion.p>
-        <motion.div className="sc-hero-ctas" {...appear(0.62)}>
+        <motion.h1 ref={nameRef} id="hero-name" className="sc-hero-name" aria-label="Mohamed Ansar" style={{ x: nameX, y: nameY, scale: nameScale }}>
+          <span className="sc-name-line" aria-hidden="true"><motion.span {...line(0)}>MOHAMED</motion.span></span>
+          <span className="sc-name-line" aria-hidden="true"><motion.span className="is-outline" {...line(1)}>ANSAR</motion.span></span>
+        </motion.h1>
+        <motion.p className="sc-hero-line" {...appear(1)}>{HERO.title} <em>Here are {LISTED_PROJECTS.length} of them.</em></motion.p>
+        <motion.div className="sc-hero-ctas" {...appear(2)}>
           <a href="#projects" className="sc-hero-btn" {...magnetic}>See the work<ArrowDown size={18} aria-hidden="true" /></a>
           <a href="#contact" className="sc-hero-ghost">Get in touch<ArrowUpRight size={16} aria-hidden="true" /></a>
           <span className={`sc-hero-hint ${hint ? "is-shown" : ""}`} aria-hidden="true">Click the network</span>
         </motion.div>
       </motion.div>
-      <motion.div className="sc-hero-bottom" style={{ y: feedY, opacity: feedOpacity }}><HeroFeed ready={ready} delay={0.76} /></motion.div>
+      <motion.div className="sc-hero-bottom" style={{ y: feedY, opacity: feedOpacity }}><HeroFeed appear={appear} from={3} /></motion.div>
     </section>
     <section className="ed-intro ed-light sc-brief" aria-label="The short version" data-palette="lumen">
       <div className="ed-wrap">
@@ -183,15 +289,12 @@ function VelocityMarquee({ items, label, className = "", speed = 1.1 }) {
 }
 const StackMarquee = () => <VelocityMarquee items={STACK_MARQUEE} label="Tools I build with" />;
 
-/* Dark sections arrive as a rounded card and widen to the full page as they
-   scroll in. The wrapper paints the paper colour behind the corners. */
-function Expand({ children }) {
-  const scrollRef = useContext(ScrollContext);
-  const reduced = useReducedMotion();
-  const ref = useRef(null);
-  const { scrollYProgress } = useScroll({ container: scrollRef, target: ref, offset: ["start end", "start 0.3"] });
-  const clipPath = useTransform(scrollYProgress, (p) => `inset(0 ${((1 - p) * 6).toFixed(2)}% 0 ${((1 - p) * 6).toFixed(2)}% round ${Math.round((1 - p) * 56)}px ${Math.round((1 - p) * 56)}px 0 0)`);
-  return <div ref={ref} className="sc-expand"><motion.div style={reduced ? undefined : { clipPath }}>{children}</motion.div></div>;
+/* A section that arrives as a sheet sliding over the one before it: a
+   rounded top edge and a hairline, the same language as the page sliding
+   over the hero. It is plain CSS (.sc-sheet), so it costs nothing per
+   scroll frame. It used to animate a clip-path inset on every frame. */
+function Sheet({ children }) {
+  return <div className="sc-sheet">{children}</div>;
 }
 
 const coverOf = (project) => project.spotlightArt || project.cardArt || project.cardShot || project.shots?.[0];
@@ -206,16 +309,16 @@ export function ProjectsSection() {
 }
 
 export function CapabilitiesSection() {
-  return <Expand><section id="capabilities" className="sc-caps ed-section" data-palette="field"><div className="ed-wrap">
+  return <Sheet><section id="capabilities" className="sc-caps ed-section" data-palette="field"><div className="ed-wrap">
     <Enter className="ed-section-heading"><div><IndexLabel number="03">What I bring</IndexLabel><h2>Three things,<br /><em>done properly.</em></h2></div><p className="ed-heading-aside">The same loop on every build: make it work, measure it honestly, and ship it to real people.</p></Enter>
-    <div className="sc-cap-grid">{CAPABILITIES.map((cap, i) => <Enter key={cap.id} delay={i * 0.06} className="sc-cap">
+    <div className="sc-cap-grid">{CAPABILITIES.map((cap, i) => <Enter key={cap.id} index={i} className="sc-cap">
       <p className="sc-cap-count"><CountUp value={cap.count} /></p>
       <p className="sc-cap-unit">{cap.unit}</p>
       <h3>{cap.title}</h3>
       <p className="sc-cap-copy">{cap.copy}</p>
       <ul>{cap.proof.map((slug) => { const project = getProject(slug); return project && <li key={slug}><a href={`#project/${slug}`}>{project.title}<ArrowUpRight size={14} aria-hidden="true" /></a></li>; })}</ul>
     </Enter>)}</div>
-  </div></section></Expand>;
+  </div></section></Sheet>;
 }
 
 function WorkCard({ item, index }) {
@@ -223,7 +326,7 @@ function WorkCard({ item, index }) {
   const [broken, setBroken] = useState(false);
   if (!project) return null;
   const cover = coverOf(project);
-  return <Enter delay={(index % 3) * 0.06} style={{ "--i": index % 3 }}>
+  return <Enter index={index % 3}>
     <a id={`card-${project.slug}`} href={`#project/${project.slug}`} className="sc-card" data-cursor="View">
       <div className="sc-card-media">
         {cover && !broken ? <img className="ed-lazy-media" src={media(cover)} alt="" loading="lazy" onLoad={revealImage} onError={() => setBroken(true)} /> : <span className="sc-card-type" aria-hidden="true">{project.title}</span>}
@@ -260,10 +363,10 @@ function ExperimentImage({ experiment }) {
 }
 
 export function ExperimentsSection() {
-  return <Expand><section id="ai" className="ed-experiments ed-section" data-palette="neon"><div className="ed-wrap">
+  return <Sheet><section id="ai" className="ed-experiments ed-section" data-palette="neon"><div className="ed-wrap">
     <Enter className="ed-section-heading"><div><IndexLabel number="05">The playground</IndexLabel><h2>What if<br /><em>I tried this?</em></h2></div><p className="ed-heading-aside">Interactive experiments built with AI as a pair programmer. Open one and have a play.</p></Enter>
-    <div className="ed-experiment-grid">{EXPERIMENTS.map((experiment, i) => <Enter key={experiment.id} delay={i * 0.07}><a href={experiment.href} className="ed-experiment" data-cursor="Play"><div className="ed-experiment-image"><ExperimentImage experiment={experiment} /><span>0{i + 1} / Interactive</span></div><div className="ed-experiment-title"><h3>{experiment.title}</h3><ArrowUpRight size={22} /></div><p>{experiment.hook}</p><span className="ed-experiment-cta">{experiment.cta}<ArrowRight size={16} /></span></a></Enter>)}</div>
-  </div></section></Expand>;
+    <div className="ed-experiment-grid">{EXPERIMENTS.map((experiment, i) => <Enter key={experiment.id} index={i}><a href={experiment.href} className="ed-experiment" data-cursor="Play"><div className="ed-experiment-image"><ExperimentImage experiment={experiment} /><span>0{i + 1} / Interactive</span></div><div className="ed-experiment-title"><h3>{experiment.title}</h3><ArrowUpRight size={22} /></div><p>{experiment.hook}</p><span className="ed-experiment-cta">{experiment.cta}<ArrowRight size={16} /></span></a></Enter>)}</div>
+  </div></section></Sheet>;
 }
 
 /* The last shot: the address itself is the biggest thing in the section,

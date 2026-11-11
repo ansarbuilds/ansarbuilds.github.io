@@ -1,10 +1,10 @@
 import { useEffect, useRef, useState } from "react";
-import { animate, useInView, useReducedMotion } from "framer-motion";
+import { animate, motion, useInView, useReducedMotion } from "framer-motion";
 import { ArrowUpRight, ExternalLink, Play, RotateCcw } from "lucide-react";
 import { FLAGSHIPS } from "../data/showcase";
 import { getProject } from "../data/projects";
 import { media } from "../lib/media";
-import { DUR, EASE } from "../lib/motion";
+import { DUR, EASE, spring } from "../lib/motion";
 import { usePageVisible } from "../lib/usePageVisible";
 import "../stage.css";
 
@@ -193,19 +193,22 @@ export default function WorkStage() {
   const inView = useInView(ref, { amount: 0.35 });
   const pageVisible = usePageVisible();
   const live = inView && pageVisible;
-  const [active, setActive] = useState(0);
+  // Which project is on stage, and which way the stage last moved (1 is
+  // forward), so the incoming copy can slide in from that side.
+  const [{ active, dir }, setStage] = useState({ active: 0, dir: 1 });
+  const goTo = (index) => setStage((now) => ({ active: index, dir: index >= now.active ? 1 : -1 }));
   // Once the visitor picks a project, the stage stops moving on by itself.
   const [held, setHeld] = useState(false);
   const [hover, setHover] = useState(false);
 
-  const choose = (index) => { setHeld(true); setActive(index); };
+  const choose = (index) => { setHeld(true); goTo(index); };
 
   // Links to #card-<slug> (the project pages' back links, the command
   // palette) select that project.
   useEffect(() => {
     const onHash = () => {
       const index = STAGE.findIndex(({ flag }) => window.location.hash === `#card-${flag.slug}`);
-      if (index >= 0) { setHeld(true); setActive(index); }
+      if (index >= 0) { setHeld(true); setStage((now) => ({ active: index, dir: index >= now.active ? 1 : -1 })); }
     };
     onHash();
     window.addEventListener("hashchange", onHash);
@@ -222,13 +225,15 @@ export default function WorkStage() {
   };
 
   const auto = desktop && live && !held && !reduced;
-  return <div ref={ref} className={`st ${auto && !hover ? "" : "is-paused"} ${held ? "is-held" : ""} ${live ? "" : "is-resting"}`} onPointerEnter={() => setHover(true)} onPointerLeave={() => setHover(false)}>
+  return <div ref={ref} className={`st ${auto && !hover ? "" : "is-paused"} ${held ? "is-held" : ""} ${live ? "" : "is-resting"}`} style={{ "--dir": dir }} onPointerEnter={() => setHover(true)} onPointerLeave={() => setHover(false)}>
     <div className="st-tabs" role="tablist" aria-label="Flagship projects" onKeyDown={onKey}>
       {STAGE.map(({ flag, project }, i) => <button key={flag.slug} type="button" role="tab" id={`st-tab-${flag.slug}`} aria-selected={i === active} aria-controls={`card-${flag.slug}`} tabIndex={i === active ? 0 : -1} className={`st-tab ${i === active ? "is-active" : ""}`} onClick={() => choose(i)}>
         <span className="st-tab-num">{String(i + 1).padStart(2, "0")}</span>
         <strong>{TAB_TITLE[flag.slug] || project.title}</strong>
         <small>{flag.eyebrow}</small>
-        <span className="st-tab-bar" aria-hidden="true">{i === active && <i onAnimationEnd={() => setActive((n) => (n + 1) % STAGE.length)} />}</span>
+        <span className="st-tab-bar" aria-hidden="true">{i === active && <i onAnimationEnd={() => setStage((now) => ({ active: (now.active + 1) % STAGE.length, dir: 1 }))} />}</span>
+        {/* One highlight shared by all six tabs: it slides to the active one. */}
+        {i === active && <motion.span layoutId="st-tab-active" className="st-tab-active" aria-hidden="true" transition={reduced ? { duration: 0 } : spring("light")} />}
       </button>)}
     </div>
     <div className="st-panels">

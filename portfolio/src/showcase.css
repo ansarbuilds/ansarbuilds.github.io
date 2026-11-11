@@ -171,7 +171,6 @@
    ============================================================ */
 
 /* Nav: dark glass while the hero is behind it. */
-.ed-nav { transition: background var(--dur-base) var(--ease-out), color var(--dur-base) var(--ease-out), border-color var(--dur-base) var(--ease-out); }
 .ed-nav.is-over-hero { background: rgb(9 8 8 / .5); color: #efe6d8; border-bottom-color: rgb(239 230 216 / .1); }
 .ed-nav.is-over-hero .ed-nav-contact { background: #ff8a5f; color: #160b06; box-shadow: none; }
 .ed-nav.is-over-hero .ed-nav-command { border-color: rgb(239 230 216 / .25); }
@@ -183,13 +182,6 @@
 /* The lit feed card shows how long until the next one takes over. */
 .sc-feed-card.is-active .sc-feed-timer { animation: sc-timer 2.6s linear forwards; }
 
-/* Section headings rise out of a mask, the serif line a beat later. */
-.ed-section-heading h2 { clip-path: inset(-10% -5% 100% -5%); transform: translateY(46px); transition: clip-path var(--dur-scene) var(--ease-out), transform var(--dur-scene) var(--ease-out); }
-.ed-section-heading.is-in h2 { clip-path: inset(-10% -5% -15% -5%); transform: none; }
-.ed-section-heading h2 em { display: inline-block; opacity: 0; transform: translateX(-28px); transition: opacity var(--dur-scene) var(--ease-out) .35s, transform var(--dur-scene) var(--ease-out) .35s; }
-.ed-section-heading.is-in h2 em { opacity: 1; transform: none; }
-.ed-section-heading .ed-heading-aside { opacity: 0; transition: opacity var(--dur-scene) var(--ease-standard) .55s; }
-.ed-section-heading.is-in .ed-heading-aside { opacity: 1; }
 
 /* Flagship visuals lean toward the pointer, the floating card lifting most. */
 
@@ -204,7 +196,6 @@
 @media (max-width: 1000px) { .sc-contact-field { opacity: .28; mask-image: none; } }
 @media (prefers-reduced-motion: reduce) {
   .ed-nav, .sc-flag .sc-art, .sc-float { transition: none; transform: none; rotate: none; translate: none; }
-  .ed-section-heading h2, .ed-section-heading h2 em, .ed-section-heading .ed-heading-aside { clip-path: none; transform: none; opacity: 1; transition: none; }
 }
 @media (max-width: 760px), (pointer: coarse) { .sc-hero-hint { display: none; } }
 
@@ -245,25 +236,17 @@
 
 /* Velocity marquees are driven from script, not a keyframe. */
 
-/* Expanding sections: paper shows behind the rounded corners. */
-.sc-expand { background: var(--ed-ivory); }
-.sc-expand > div { will-change: clip-path; }
 
 /* Flagship titles: letters rise one after another. */
 /* The rest of each spread follows in order. */
 
 
-/* Capability numbers drop in. */
-.sc-cap-count { overflow: hidden; }
-.sc-cap .sc-cap-count > * , .sc-cap .sc-cap-count { transition: transform var(--dur-scene) var(--ease-out), opacity var(--dur-scene); }
-.sc-cap:not(.is-in) .sc-cap-count { transform: translateY(40px); opacity: 0; }
 
 @media (max-width: 640px) { .sc-marquee.is-giant { margin-bottom: 30px; } }
 @media (prefers-reduced-motion: reduce) {
   .sc-cursor { display: none; }
   .sc-card-media { clip-path: none; transition: none; }
   .sc-card-media img { scale: 1; transition: none; }
-  .sc-cap:not(.is-in) .sc-cap-count { transform: none; opacity: 1; }
   .sc-statement span { opacity: 1 !important; }
 }
 .ed-nav-links a[data-magnetic] { transition: translate var(--dur-base) var(--ease-out), background var(--dur-base), color var(--dur-base); }
@@ -358,9 +341,75 @@
 
 /* Motion budget: UI moves in 200 to 600ms and then stops. Only the canvas
    keeps moving. These override the longer and looping effects above. */
-.ed-section-heading h2 { transition-duration: var(--dur-slow); }
-.ed-section-heading h2 em { transition: opacity var(--dur-base) var(--ease-out) .15s, transform var(--dur-slow) var(--ease-out) .15s; }
-.ed-section-heading .ed-heading-aside { transition: opacity var(--dur-base) var(--ease-standard) .25s; }
-.sc-cap .sc-cap-count, .sc-cap .sc-cap-count > * { transition-duration: var(--dur-slow); }
 
 .sc-hero-hint.is-shown { opacity: 1; }
+
+
+/* ============================================================
+   SCENES. One way in for everything below the hero, one way to
+   change route, and the hero's own entrance. Durations, curves
+   and staggers are the tokens in index.css (see MOTION.md).
+   ============================================================ */
+
+/* The reveal. Enter adds .is-in once about a third of the element is on
+   screen. Siblings stagger in reading order through --i. */
+.rv { opacity: 0; transform: translateY(28px); transition: opacity var(--dur-slow) var(--ease-out), transform var(--dur-slow) var(--ease-out); transition-delay: calc(var(--i, 0) * var(--stagger-base)); }
+.rv.is-in { opacity: 1; transform: none; }
+
+/* The section heading, the same everywhere: index label, then the headline
+   rising out of a mask, then its serif line, then the aside. The wrapper
+   holds still; its parts do the arriving. */
+.ed-section-heading.rv { opacity: 1; transform: none; }
+.ed-section-heading .ed-label { opacity: 0; transition: opacity var(--dur-base) var(--ease-out); }
+.ed-section-heading h2 { clip-path: inset(-10% -5% 100% -5%); transform: translateY(40px); transition: clip-path var(--dur-slow) var(--ease-out) var(--stagger-loose), transform var(--dur-slow) var(--ease-out) var(--stagger-loose); }
+.ed-section-heading h2 em { display: inline-block; opacity: 0; transform: translateY(.35em); transition: opacity var(--dur-slow) var(--ease-out) calc(var(--stagger-loose) * 2), transform var(--dur-slow) var(--ease-out) calc(var(--stagger-loose) * 2); }
+.ed-section-heading .ed-heading-aside { opacity: 0; transform: translateY(14px); transition: opacity var(--dur-slow) var(--ease-out) calc(var(--stagger-loose) * 3), transform var(--dur-slow) var(--ease-out) calc(var(--stagger-loose) * 3); }
+.ed-section-heading.is-in .ed-label { opacity: 1; }
+.ed-section-heading.is-in h2 { clip-path: inset(-10% -5% -15% -5%); transform: none; }
+.ed-section-heading.is-in h2 em, .ed-section-heading.is-in .ed-heading-aside { opacity: 1; transform: none; }
+
+/* A sheet: a section that slides over the one before it, like the page over
+   the hero. Rounded top, a hairline, nothing animated. */
+.sc-sheet { background: var(--ed-ivory); }
+.sc-sheet > section { border-radius: 36px 36px 0 0; box-shadow: inset 0 1px 0 color-mix(in srgb, var(--ed-blue) 14%, transparent); }
+
+/* Hero: each line of the name rises out of its own mask. The padding keeps
+   the outline stroke and the tall caps from being clipped at the edges. */
+.sc-name-line { display: block; overflow: hidden; padding: .05em .04em .04em; margin: -.05em -.04em -.04em; }
+.sc-name-line > span { display: block; transform-origin: 0 100%; }
+.sc-hero-name { transform-origin: 50% 50%; will-change: transform; }
+.sc-hero-fade { position: absolute; inset: 0; }
+
+/* The nav waits for the intro to hand over. */
+.ed-nav.is-booting { opacity: 0; pointer-events: none; }
+.ed-nav { transition: background var(--dur-base) var(--ease-out), color var(--dur-base) var(--ease-out), border-color var(--dur-base) var(--ease-out), opacity var(--dur-slow) var(--ease-out); }
+
+/* Routes: the incoming view fades in, pages rise a little. */
+.rt { animation: rt-fade var(--dur-base) var(--ease-out) both; }
+.rt-page { animation: rt-rise var(--dur-slow) var(--ease-out) both; }
+@keyframes rt-fade { from { opacity: 0; } }
+@keyframes rt-rise { from { opacity: 0; transform: translateY(16px); } }
+
+/* Card to project page (lib/routeTransition.js). The card's image becomes
+   the page's header panel and its title becomes the h1; the rest of the page
+   cross-fades behind them. The nav is its own layer so it does not blink. */
+.ed-case-study [data-vt="frame"] { view-transition-name: vt-frame; }
+.ed-case-study [data-vt="title"] { view-transition-name: vt-title; }
+.ed-nav { view-transition-name: vt-nav; }
+html.is-vt .rt { animation: none; }
+::view-transition-group(vt-frame), ::view-transition-group(vt-title) { animation-duration: var(--dur-slow); animation-timing-function: var(--ease-out); }
+::view-transition-old(vt-frame), ::view-transition-new(vt-frame) { height: 100%; object-fit: cover; }
+::view-transition-old(vt-title), ::view-transition-new(vt-title) { height: 100%; object-fit: contain; object-position: left center; }
+::view-transition-old(root) { animation: vt-leave var(--dur-fast) var(--ease-exit) both; }
+::view-transition-new(root) { animation: vt-arrive var(--dur-slow) var(--ease-out) both; }
+::view-transition-old(vt-nav), ::view-transition-new(vt-nav) { animation: none; }
+@keyframes vt-leave { to { opacity: 0; } }
+@keyframes vt-arrive { from { opacity: 0; } }
+
+@media (max-width: 640px) { .sc-sheet > section { border-radius: 24px 24px 0 0; } }
+@media (prefers-reduced-motion: reduce) {
+  .rv, .ed-section-heading .ed-label, .ed-section-heading h2, .ed-section-heading h2 em, .ed-section-heading .ed-heading-aside { opacity: 1; transform: none; clip-path: none; transition: none; }
+  .rt, .rt-page { animation: none; }
+  .ed-nav { transition: none; }
+  ::view-transition-group(*), ::view-transition-old(*), ::view-transition-new(*) { animation: none !important; }
+}
