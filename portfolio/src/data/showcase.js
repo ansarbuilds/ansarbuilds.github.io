@@ -5,11 +5,20 @@
 //
 // House style: plain words, short sentences, no em dashes.
 
-// The six flagship case studies, in order. `visual` is the optional second
+// The seven flagship case studies, in order. `visual` is the optional second
 // image that floats over the cover art: a real screenshot or figure ("shot"),
 // or a short illustrated terminal ("terminal") for tools that have no screen
 // of their own. Leave it out and the cover fills the frame on its own.
 export const FLAGSHIPS = [
+  {
+    slug: "saywhen",
+    eyebrow: "Open source · desktop app",
+    badge: "New · open source beta",
+    headline: "Look at the screen. Say the command. It types it, and can press Enter.",
+    copy: "Voice input for terminals and coding assistants with no hotkey. The webcam notices you are facing the screen and talking, speech becomes text on your own computer, and every send waits behind a preview you can cancel.",
+    stats: [["34/34", "spoken commands cleaned exactly"], ["0%", "false starts on 56 replay clips"], ["4", "ways to send, all cancelable"]],
+    stack: ["Tauri", "Rust", "TypeScript", "MediaPipe", "Whisper"],
+  },
   {
     slug: "jarvis",
     eyebrow: "Autonomous agent",

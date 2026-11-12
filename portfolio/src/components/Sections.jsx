@@ -278,7 +278,7 @@ export function ProjectsSection() {
   return <section id="projects" className="ed-projects ed-light ed-section" data-palette="bloom">
     <div className="ed-section-watermark" aria-hidden="true">WORK</div>
     <div className="ed-wrap">
-      <Enter className="ed-section-heading sc-stage-heading"><div><IndexLabel number="02">Selected work</IndexLabel><h2>Don’t read about it. <em>Try it.</em></h2></div><div className="ed-heading-aside"><p>Six builds, each one live on this page: run the agent, replay the failure, flip the finding, switch the device.</p></div></Enter>
+      <Enter className="ed-section-heading sc-stage-heading"><div><IndexLabel number="02">Selected work</IndexLabel><h2>Don’t read about it. <em>Try it.</em></h2></div><div className="ed-heading-aside"><p>Seven builds, each one live on this page: watch the film, run the agent, replay the failure, flip the finding, switch the device.</p></div></Enter>
       <WorkStage />
     </div>
   </section>;

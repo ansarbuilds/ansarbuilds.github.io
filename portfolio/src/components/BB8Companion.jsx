@@ -39,7 +39,7 @@ const ROUTINE_COPY = {
 };
 
 const GUIDE_LINKS = [
-  { href: "#projects", eyebrow: "Start here", label: "Selected work", detail: "Six flagship builds" },
+  { href: "#projects", eyebrow: "Start here", label: "Selected work", detail: "Seven flagship builds" },
   { href: "#capabilities", eyebrow: "Skills", label: "What I bring", detail: "Agents, evals and shipping" },
   { href: "#ai", eyebrow: "Explore", label: "The playground", detail: "Interactive things to try" },
   { href: "#contact", eyebrow: "Connect", label: "Get in touch", detail: "Email, GitHub and LinkedIn" },

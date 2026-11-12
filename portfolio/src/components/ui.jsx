@@ -154,7 +154,7 @@ export function FlourishTitle({ text, accent }) {
   const a = ACCENTS[accent];
   return (
     <span aria-hidden="true">
-      <span className={`font-serif italic font-normal normal-case text-[1.12em] leading-none pr-[.04em] ${a.text}`}>{text[0]}</span>
+      <span className={`font-serif italic font-normal normal-case text-[1.12em] leading-none pr-[.04em] ${a.text}`}>{text[0].toUpperCase()}</span>
       <span className="font-condensed uppercase">{text.slice(1)}</span>
     </span>
   );

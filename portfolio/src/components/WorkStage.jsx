@@ -9,12 +9,12 @@ import Count from "./Count";
 import { usePageVisible } from "../lib/usePageVisible";
 import "../stage.css";
 
-/* The flagship work as one stage instead of six long sections: pick a
+/* The flagship work as one stage instead of seven long sections: pick a
    project along the top and try it on the left, read the short version on
    the right. It moves on by itself until the visitor takes over. On small
    screens the tabs drop away and every project is simply stacked.
 
-   Each demo is either the real thing (Jarvis runs its sample-data demo in a
+   Each demo is either the real thing (saywhen plays its launch film; Jarvis runs its sample-data demo in a
    frame; Haloscript shows its own screenshots; PRH-JEPA shows a figure from
    the report) or an illustration that says so (the Flight Recorder replay
    and the Site Recon terminal). */
@@ -56,6 +56,26 @@ function Frame({ title, children, className = "" }) {
     <div className="st-frame-bar" aria-hidden="true"><i /><i /><i /><span>{title}</span></div>
     <div className="st-frame-body">{children}</div>
   </div>;
+}
+
+/* saywhen: its launch film, muted and looping while it is on stage. The film
+   is an animation, and the frame title says so. The full version with sound
+   lives on the project page. */
+function SaywhenDemo({ active }) {
+  const reduced = useReducedMotion();
+  const video = useRef(null);
+  const saveData = typeof navigator !== "undefined" && navigator.connection?.saveData;
+  const autoplay = !reduced && !saveData;
+  useEffect(() => {
+    const node = video.current;
+    if (!node) return;
+    if (active && autoplay) node.play().catch(() => {});
+    else node.pause();
+  }, [active, autoplay]);
+  return <Frame title="saywhen · launch film, animation" className="is-film">
+    <video ref={video} src={media("/p/saywhen/demo.mp4")} poster={media("/p/saywhen/poster.jpg")} muted loop playsInline preload="none" controls={!autoplay} aria-label="saywhen launch film: look at the screen, speak a command, check the preview, and it is sent to the terminal" />
+    <a className="st-launch" href={media("/p/saywhen/")}><Play size={16} aria-hidden="true" />Watch with sound</a>
+  </Frame>;
 }
 
 /* Jarvis: the real demo, with made-up sample data, loaded on request. */
@@ -149,6 +169,7 @@ function ReconDemo({ flag, active }) {
 }
 
 const DEMOS = {
+  saywhen: SaywhenDemo,
   jarvis: JarvisDemo,
   "agent-flight-recorder": FlightDemo,
   "prh-jepa": PrhDemo,
@@ -157,7 +178,7 @@ const DEMOS = {
   "site-recon": ReconDemo,
 };
 
-// Tab labels have to fit six across, so two titles get a short form.
+// Tab labels have to fit seven across, so two titles get a short form.
 const TAB_TITLE = { "agent-flight-recorder": "Flight Recorder", "prh-jepa": "PRH-JEPA" };
 const STAGE = FLAGSHIPS.map((flag) => ({ flag, project: getProject(flag.slug) })).filter((item) => item.project);
 
@@ -207,7 +228,7 @@ export default function WorkStage() {
         <strong>{TAB_TITLE[flag.slug] || project.title}</strong>
         <small>{flag.eyebrow}</small>
         <span className="st-tab-bar" aria-hidden="true">{i === active && <i onAnimationEnd={() => setStage((now) => ({ active: (now.active + 1) % STAGE.length, dir: 1 }))} />}</span>
-        {/* One highlight shared by all six tabs: it slides to the active one. */}
+        {/* One highlight shared by all the tabs: it slides to the active one. */}
         {i === active && <motion.span layoutId="st-tab-active" className="st-tab-active" aria-hidden="true" transition={reduced ? { duration: 0 } : spring("light")} />}
       </button>)}
     </div>

@@ -200,7 +200,7 @@ export const CONTACT = {
 };
 
 export const COMMAND_ITEMS = [
-  { label: "Selected work · six flagship builds", go: "#projects", group: "Sections" },
+  { label: "Selected work · seven flagship builds", go: "#projects", group: "Sections" },
   { label: "What I bring · agents, evals, shipping", go: "#capabilities", group: "Sections" },
   { label: "More shipped work", go: "#more", group: "Sections" },
   { label: "Playground · interactive experiments", go: "#ai", group: "Sections" },
