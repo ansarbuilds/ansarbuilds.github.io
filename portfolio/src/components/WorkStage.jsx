@@ -59,22 +59,34 @@ function Frame({ title, children, className = "" }) {
 }
 
 /* saywhen: its launch film, muted and looping while it is on stage. The film
-   is an animation, and the frame title says so. The full version with sound
-   lives on the project page. */
-function SaywhenDemo({ active }) {
+   is an animation, and the frame title says so. "Play with sound" restarts
+   it here with sound and the browser's own controls, so nobody has to leave
+   the page to hear it. */
+function SaywhenDemo({ active, hold }) {
   const reduced = useReducedMotion();
   const video = useRef(null);
+  const [sound, setSound] = useState(false);
   const saveData = typeof navigator !== "undefined" && navigator.connection?.saveData;
   const autoplay = !reduced && !saveData;
   useEffect(() => {
     const node = video.current;
     if (!node) return;
-    if (active && autoplay) node.play().catch(() => {});
-    else node.pause();
-  }, [active, autoplay]);
-  return <Frame title="saywhen · launch film, animation" className="is-film">
-    <video ref={video} src={media("/p/saywhen/demo.mp4")} poster={media("/p/saywhen/poster.jpg")} muted loop playsInline preload="none" controls={!autoplay} aria-label="saywhen launch film: look at the screen, speak a command, check the preview, and it is sent to the terminal" />
-    <a className="st-launch" href={media("/p/saywhen/")}><Play size={16} aria-hidden="true" />Watch with sound</a>
+    if (!active) { node.pause(); return; }
+    if (autoplay && !sound) node.play().catch(() => {});
+  }, [active, autoplay, sound]);
+  const playWithSound = () => {
+    const node = video.current;
+    if (!node) return;
+    setSound(true);
+    hold?.(); // keep the stage on this project while the film plays
+    node.muted = false;
+    node.loop = false;
+    node.currentTime = 0;
+    node.play().catch(() => {});
+  };
+  return <Frame title={sound ? "saywhen · launch film, with sound" : "saywhen · launch film, animation"} className="is-film">
+    <video ref={video} src={media("/p/saywhen/demo.mp4")} poster={media("/p/saywhen/poster.jpg")} muted={!sound} loop={!sound} playsInline preload="none" controls={sound || !autoplay} aria-label="saywhen launch film: look at the screen, speak a command, check the preview, and it is sent to the terminal" />
+    {!sound && <button type="button" className="st-launch" onClick={playWithSound}><Play size={16} aria-hidden="true" />Play with sound</button>}
   </Frame>;
 }
 
@@ -238,7 +250,7 @@ export default function WorkStage() {
         const shown = !desktop || i === active;
         const outbound = outboundLink(project);
         return <article key={flag.slug} id={`card-${flag.slug}`} role={desktop ? "tabpanel" : undefined} aria-labelledby={desktop ? `st-tab-${flag.slug}` : undefined} className={`st-panel ${shown ? "is-active" : ""}`} inert={!shown}>
-          <div className="st-demo">{Demo ? <Demo flag={flag} project={project} active={shown && live} /> : <div className="st-cover"><img className="ed-lazy-media" src={media(coverOf(project))} alt="" loading="lazy" onLoad={reveal} /></div>}</div>
+          <div className="st-demo">{Demo ? <Demo flag={flag} project={project} active={shown && live} hold={() => setHeld(true)} /> : <div className="st-cover"><img className="ed-lazy-media" src={media(coverOf(project))} alt="" loading="lazy" onLoad={reveal} /></div>}</div>
           <div className="st-info">
             <p className="st-eyebrow"><span>{String(i + 1).padStart(2, "0")} / {String(STAGE.length).padStart(2, "0")}</span><em><i aria-hidden="true" />{flag.badge}</em></p>
             <h3><a href={`#project/${project.slug}`}>{project.title}</a></h3>
