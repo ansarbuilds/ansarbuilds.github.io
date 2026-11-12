@@ -266,16 +266,31 @@ kbd { font: 500 .8em var(--mono); padding: .12em .5em; border-radius: 6px; borde
 .warn { margin-top: 32px; padding: 18px 22px; border-radius: 18px; border: 1px dashed rgb(243 234 217 / .32); font-size: .92rem; color: rgb(243 234 217 / .82); }
 .warn b { color: #fff; }
 
-/* who */
-.bar { display: flex; height: 14px; margin-top: 22px; border-radius: 999px; overflow: hidden; background: var(--paper-2); }
-.bar span { height: 100%; transform-origin: left; }
-.js .bar span { transform: scaleX(0); transition: transform 1.2s var(--ease); }
-.js .bar.in span { transform: none; }
-.bar span:nth-child(2) { transition-delay: .15s; } .bar span:nth-child(3) { transition-delay: .3s; } .bar span:nth-child(4) { transition-delay: .45s; }
-.legend { display: flex; flex-wrap: wrap; gap: 8px 22px; list-style: none; padding: 0; margin: 14px 0 0; font-size: .9rem; color: var(--ink-2); }
-.legend i { display: inline-block; width: 10px; height: 10px; margin-right: 8px; border-radius: 50%; vertical-align: -1px; }
-.who-grid { display: grid; grid-template-columns: 1.3fr 1fr; gap: clamp(28px, 5vw, 70px); align-items: center; margin-top: 44px; }
-.who-grid .frame { margin-top: 0; }
+/* who / app showcase */
+.who-grid { display: grid; grid-template-columns: 1.28fr 1fr; gap: clamp(26px, 4.5vw, 56px); align-items: center; margin-top: 40px; }
+.who-stage { position: relative; border-radius: 26px; padding: clamp(12px, 1.8vw, 18px); background: radial-gradient(85% 95% at 18% 12%, rgb(251 179 3 / .18), transparent 62%), radial-gradient(70% 80% at 90% 95%, rgb(196 90 164 / .22), transparent 60%), linear-gradient(160deg, #270821, #140311); box-shadow: 0 46px 90px -42px rgb(34 6 28 / .72), 0 0 0 1px rgb(34 6 28 / .14); overflow: hidden; }
+.who-stage-bar { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 2px 4px 12px; color: rgb(246 241 234 / .76); font: 500 .72rem var(--mono); }
+.who-dots { display: inline-flex; gap: 6px; }
+.who-dots i { width: 9px; height: 9px; border-radius: 50%; background: rgb(255 255 255 / .22); }
+.who-pill { display: inline-flex; align-items: center; gap: 7px; padding: 4px 10px; border-radius: 999px; background: rgb(255 255 255 / .08); border: 1px solid rgb(255 255 255 / .14); color: #fff; font: 500 .7rem var(--sans); }
+.who-pill i { width: 6px; height: 6px; border-radius: 50%; background: var(--amber); box-shadow: 0 0 8px var(--amber); }
+.who-shots { position: relative; aspect-ratio: 1120 / 780; border-radius: 15px; overflow: hidden; background: #0c0910; box-shadow: 0 24px 50px -24px #000, 0 0 0 1px rgb(255 255 255 / .1); }
+.who-shot { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; opacity: 0; transform: scale(1.018); transition: opacity .45s var(--ease), transform .55s var(--ease); pointer-events: none; }
+.who-shot.active { opacity: 1; transform: scale(1); pointer-events: auto; }
+.who-foot { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-top: 12px; padding-inline: 2px; }
+.who-progress { flex: 1; height: 3px; border-radius: 999px; background: rgb(255 255 255 / .14); overflow: hidden; }
+.who-progress i { display: block; height: 100%; width: 100%; background: linear-gradient(90deg, var(--amber), #f582b8); transform-origin: left; transform: scaleX(.333); transition: transform .35s var(--ease); }
+.who-step-tag { font: 500 .68rem var(--mono); color: rgb(246 241 234 / .65); white-space: nowrap; }
+.who-cards { display: flex; flex-direction: column; gap: 10px; margin-top: 22px; }
+.who-card { width: 100%; text-align: left; font: inherit; color: inherit; cursor: pointer; padding: 16px 18px; border-radius: 18px; background: var(--card); border: 1px solid var(--line); transition: transform .25s var(--ease), border-color .25s, background .25s, box-shadow .25s; }
+.who-card:hover { transform: translateY(-2px); border-color: var(--line-2); }
+.who-card[aria-pressed="true"] { border-color: var(--ink); background: #fffbf2; box-shadow: 0 18px 34px -26px rgb(34 6 28 / .55), 0 0 0 1px var(--ink); }
+.who-card-top { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+.who-card-kicker { font: 500 .68rem var(--mono); letter-spacing: .08em; text-transform: uppercase; color: var(--amber-deep); }
+.who-card-badge { font: 500 .66rem var(--mono); padding: 2px 8px; border-radius: 999px; background: var(--paper-2); color: var(--ink-2); }
+.who-card[aria-pressed="true"] .who-card-badge { background: var(--ink); color: var(--paper); }
+.who-card h3 { margin: 6px 0 0; font: 400 1.48rem/1.1 var(--serif); }
+.who-card p { margin: 6px 0 0; font-size: .9rem; line-height: 1.5; color: var(--ink-2); }
 
 /* numbers */
 .nums { display: grid; grid-template-columns: repeat(4, 1fr); margin: 48px 0 0; border-top: 1px solid var(--line-2); }
@@ -338,12 +353,14 @@ footer a { color: var(--ink-2); text-decoration: none; } footer a:hover { color:
   .ctas .btn { width: 100%; }
   .row { grid-template-columns: minmax(0, 1fr); gap: 4px; } .rows-head { display: none; }
   .nums div { padding-right: 0; }
+  .who-stage-bar { flex-wrap: wrap; gap: 6px 10px; }
+  .who-dots { display: none; }
 }
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }
   *, *::before, *::after { animation: none !important; transition: none !important; }
   .js .rv, .js h1 .w { opacity: 1; transform: none; filter: none; }
-  .js .swash path { stroke-dashoffset: 0; } .js .bar span { transform: none; }
+  .js .swash path { stroke-dashoffset: 0; }
 }
 </style>
 </head>
@@ -543,15 +560,44 @@ footer a { color: var(--ink-2); text-decoration: none; } footer a:hover { color:
   </section>
 
   <section id="who" class="wrap" aria-labelledby="who-title">
-    <span class="eyebrow">Who it's for</span>
-    <h2 id="who-title">For the days you <em>work from home.</em></h2>
+    <span class="eyebrow">Inside the app</span>
+    <h2 id="who-title">Hands-free when solo. <em>Quiet in a shared room.</em></h2>
     <div class="who-grid">
-      <div class="frame"><video class="auto" muted loop playsinline preload="none" poster="/p/saywhen/keyboard-museum.jpg" width="1920" height="1080" aria-label="A keyboard sits in a glass case. Behind it, a person holds a cup and looks at a laptop while a small pill floats above the screen."><source src="/p/saywhen/keyboard-museum.mp4" type="video/mp4"></video></div>
+      <div class="who-stage" id="who-stage">
+        <div class="who-stage-bar">
+          <div class="who-dots" aria-hidden="true"><i></i><i></i><i></i></div>
+          <span id="who-win-label">saywhen · Home (Obsidian Dark)</span>
+          <span class="who-pill"><i></i><span id="who-pill-label">Just pause · Hands-free</span></span>
+        </div>
+        <div class="who-shots">
+          <img class="who-shot active" data-who-shot="solo" src="/p/saywhen/app-dark.webp" width="1600" height="1114" alt="saywhen desktop window in Dark Mode showing the Waiting orb, four send modes with Just pause selected, Camera status, and recent command cargo test --locked.">
+          <img class="who-shot" data-who-shot="office" src="/p/saywhen/app-light.webp" width="1600" height="1114" alt="saywhen desktop window in Blue Bloom Light Mode with Type only selected so Enter is never auto-pressed.">
+          <img class="who-shot" data-who-shot="telemetry" src="/p/saywhen/app-diagnostics.webp" width="1600" height="1114" alt="saywhen Diagnostics tab showing live Silero VAD speech curve, microphone loudness envelope, Whisper transcription latency, and head pose numbers.">
+        </div>
+        <div class="who-foot">
+          <div class="who-progress" aria-hidden="true"><i id="who-progress-fill"></i></div>
+          <span class="who-step-tag" id="who-step-tag">01 / 03</span>
+        </div>
+      </div>
       <div>
-        <p class="lead" style="margin-top:0">62% of developers in the JetBrains 2025 survey regularly use an AI coding assistant or agent. Talk to yours when you are home. At the office, pick Type only, or use the shortcut: <kbd>⌥ Space</kbd> on Mac, <kbd>Alt Space</kbd> on Windows.</p>
-        <div class="bar" id="bar" aria-hidden="true"><span style="width:32.4%;background:#fbb303"></span><span style="width:37.1%;background:#d9a35a"></span><span style="width:12.6%;background:#c9b8c4"></span><span style="width:17.9%;background:#5b3a55"></span></div>
-        <ul class="legend"><li><i style="background:#fbb303"></i>Fully remote 32.4%</li><li><i style="background:#d9a35a"></i>Hybrid 37.1%</li><li><i style="background:#c9b8c4"></i>Free to choose 12.6%</li><li><i style="background:#5b3a55"></i>Office 17.9%</li></ul>
-        <p class="footnote">Where developers worked, Stack Overflow Developer Survey 2025. It shows where they work, not who wants voice input. The film is an illustration.</p>
+        <p class="lead" style="margin-top:0">Built for developers working through long agent prompts and CLI loops out loud. Keep hands-free listening on at your own desk, or switch to Type only and a shortcut when people share the space.</p>
+        <div class="who-cards" role="group" aria-label="Choose a workspace view">
+          <button type="button" class="who-card" data-who="solo" aria-pressed="true">
+            <div class="who-card-top"><span class="who-card-kicker">01 · Solo desk</span><span class="who-card-badge">Just pause</span></div>
+            <h3>Speak prompts, keep hands off keys</h3>
+            <p>Look at the display, talk through a refactor, check the 1.8s preview, and let saywhen press Enter in allowlisted terminals.</p>
+          </button>
+          <button type="button" class="who-card" data-who="office" aria-pressed="false">
+            <div class="who-card-top"><span class="who-card-kicker">02 · Office or cafe</span><span class="who-card-badge"><kbd style="border:0;background:none;padding:0;font:inherit">⌥ Space</kbd></span></div>
+            <h3>Type only with one shortcut</h3>
+            <p>Turn off the camera gate, trigger with Option+Space on Mac or Alt+Space on Windows, and land clean text without Enter.</p>
+          </button>
+          <button type="button" class="who-card" data-who="telemetry" aria-pressed="false">
+            <div class="who-card-top"><span class="who-card-kicker">03 · Local diagnostics</span><span class="who-card-badge">On-device</span></div>
+            <h3>Inspect VAD, latency, and eight themes</h3>
+            <p>See Silero VAD voice probability, Whisper latency, and head pose live on your computer, in Dark, Light, or High Contrast.</p>
+          </button>
+        </div>
       </div>
     </div>
   </section>
@@ -947,12 +993,46 @@ npx tauri dev</code></pre><button class="copy" type="button">Copy</button></div>
     vids.forEach((v) => seen.observe(v));
   }
 
+  // Desktop showcase switcher (#who)
+  const whoBtns = [...document.querySelectorAll(".who-card[data-who]")];
+  const whoShots = [...document.querySelectorAll(".who-shot[data-who-shot]")];
+  const whoWinLabel = $("who-win-label"), whoPillLabel = $("who-pill-label"), whoProgressFill = $("who-progress-fill"), whoStepTag = $("who-step-tag");
+  const WHO_META = {
+    solo: { win: "saywhen · Home (Obsidian Dark)", pill: "Just pause · Hands-free", idx: 1 },
+    office: { win: "saywhen · Home (Blue Bloom Light)", pill: "Type only · Enter withheld", idx: 2 },
+    telemetry: { win: "saywhen · Diagnostics", pill: "Silero VAD · Head pose numbers", idx: 3 },
+  };
+  let whoAuto = !still, whoIndex = 0;
+  const setWhoSlide = (key) => {
+    const meta = WHO_META[key] || WHO_META.solo;
+    whoBtns.forEach((b, i) => {
+      const on = b.dataset.who === key;
+      b.setAttribute("aria-pressed", String(on));
+      if (on) whoIndex = i;
+    });
+    whoShots.forEach((img) => img.classList.toggle("active", img.dataset.whoShot === key));
+    if (whoWinLabel) whoWinLabel.textContent = meta.win;
+    if (whoPillLabel) whoPillLabel.textContent = meta.pill;
+    if (whoStepTag) whoStepTag.textContent = "0" + meta.idx + " / 03";
+    if (whoProgressFill) whoProgressFill.style.transform = "scaleX(" + (meta.idx / 3).toFixed(3) + ")";
+  };
+  whoBtns.forEach((btn) => btn.addEventListener("click", () => {
+    whoAuto = false;
+    setWhoSlide(btn.dataset.who);
+  }));
+  if (!still && whoBtns.length) {
+    setInterval(() => {
+      if (!whoAuto) return;
+      whoIndex = (whoIndex + 1) % whoBtns.length;
+      setWhoSlide(whoBtns[whoIndex].dataset.who);
+    }, 4200);
+  }
+
   // Reveal observer
   if (!still && io) {
     const rv = new IntersectionObserver((es) => es.forEach((e) => { if (e.isIntersecting) { e.target.classList.add("in"); rv.unobserve(e.target); } }), { threshold: 0.1, rootMargin: "0px 0px -6% 0px" });
     document.querySelectorAll("section .center, section > .eyebrow, section > h2, .band .wrap > .eyebrow, .band .wrap > h2, .band .wrap > .lead, .dev > *, .frame, .cap, .cancel, .who-grid > *, .caveat, .final > *, .warn, .works, .loop-strip, .mode-stage-card, .faq-item").forEach((el) => { el.classList.add("rv"); rv.observe(el); });
     document.querySelectorAll(".steps, .modes, .ways, .nums, .pillars").forEach((g) => [...g.children].forEach((c, i) => { c.classList.add("rv"); c.style.setProperty("--d", i * 95 + "ms"); rv.observe(c); }));
-    rv.observe($("bar"));
   }
 })();
 </script>
