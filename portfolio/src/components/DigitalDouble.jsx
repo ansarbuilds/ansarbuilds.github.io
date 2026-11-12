@@ -4,7 +4,7 @@ import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader.js";
 import { ArrowLeft, ArrowDown, ArrowUpRight } from "lucide-react";
 
 const MODEL_URL = `${import.meta.env.BASE_URL}models/digital_double.glb`;
-const CASE_STUDY_URL = "https://github.com/kmsmohamedansar/ai-digital-double";
+const CASE_STUDY_URL = "https://github.com/ansarbuilds/ai-digital-double";
 
 // How far the gaze target can move. Kept modest: past ~25 degrees the
 // eyeballs show too much white and stop reading as "looking at you".

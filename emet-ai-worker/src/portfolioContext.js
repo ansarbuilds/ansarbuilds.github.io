@@ -33,6 +33,6 @@ AVAILABILITY
 CONTACT AND NAVIGATION
 - Email: mohamedansarkms@gmail.com
 - LinkedIn: https://www.linkedin.com/in/kmsmohamedansar/
-- GitHub: https://github.com/kmsmohamedansar
+- GitHub: https://github.com/ansarbuilds
 - Portfolio sections: #projects, #ai, #about, #experience and #contact.
 `;

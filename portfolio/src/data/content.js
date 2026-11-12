@@ -192,7 +192,7 @@ export const EMET_TOPICS = [
 export const CONTACT = {
   email: "mohamedansarkms@gmail.com",
   linkedin: "https://www.linkedin.com/in/kmsmohamedansar/",
-  github: "https://github.com/kmsmohamedansar",
+  github: "https://github.com/ansarbuilds",
   // Drop a PDF in public/ and point this at it ("/mohamed-ansar-cv.pdf") to
   // show a CV link in Contact and the nav. Left empty, no link renders.
   resume: "",

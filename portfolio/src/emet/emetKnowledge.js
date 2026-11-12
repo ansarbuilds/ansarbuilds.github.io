@@ -190,7 +190,7 @@ const INTENT_ENTRIES = [
     label: "How to reach him",
     group: "intent",
     destination: "contact",
-    answer: `Email is fastest: ${EMAIL}. He's on LinkedIn as kmsmohamedansar and on GitHub as kmsmohamedansar. The contact section has all three.`,
+    answer: `Email is fastest: ${EMAIL}. He's on LinkedIn as kmsmohamedansar and on GitHub as ansarbuilds. The contact section has all three.`,
     phrases: ["how do i reach him", "contact him", "get in touch", "his email", "email address", "reach out"],
     strong: ["contact", "email", "linkedin", "github", "reach", "message"],
     weak: ["touch", "address"],

@@ -34,6 +34,7 @@ const AUTHORS = [
   "mohamedansarkms@icloud.com",
   "mohamedansar097@gmail.com",
   "119756764+kmsmohamedansar@users.noreply.github.com",
+  "119756764+ansarbuilds@users.noreply.github.com",
   "119756764+ansarkms97@users.noreply.github.com",
   "119756764+TheAlchemist97@users.noreply.github.com",
 ];

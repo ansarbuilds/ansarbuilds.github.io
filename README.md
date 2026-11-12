@@ -1,10 +1,10 @@
-# kmsmohamedansar.github.io
+# ansarbuilds.github.io
 
 Live portfolio for **Mohamed Ansar** — Solutions Engineer building reliable data systems, evidence-backed AI tools, and apps.
 
 **Live site:** [ansarbuilds.dev](https://ansarbuilds.dev)
 
-For the full project index, live demos, and how to reach out about private repos, see my [GitHub profile](https://github.com/kmsmohamedansar).
+For the full project index, live demos, and how to reach out about private repos, see my [GitHub profile](https://github.com/ansarbuilds).
 
 ## What's in this repo
 
@@ -18,19 +18,19 @@ projects/
 
 Other projects live in their own repositories:
 
-- [analytics-assistant](https://github.com/kmsmohamedansar/analytics-assistant)
-- [catalogue-checker](https://github.com/kmsmohamedansar/catalogue-checker)
-- [data-delivery](https://github.com/kmsmohamedansar/data-delivery)
-- [integration-in-a-box](https://github.com/kmsmohamedansar/integration-in-a-box)
-- [sitescout](https://github.com/kmsmohamedansar/sitescout)
-- [site-recon](https://github.com/kmsmohamedansar/site-recon)
-- [storyera](https://github.com/kmsmohamedansar/storyera)
-- [agent-flight-recorder](https://github.com/kmsmohamedansar/agent-flight-recorder)
-- [rea-study](https://github.com/kmsmohamedansar/rea-study)
-- [prh-jepa](https://github.com/kmsmohamedansar/prh-jepa)
-- [authorized-web-exposure-audit](https://github.com/kmsmohamedansar/authorized-web-exposure-audit)
-- [mcp-analytics-stub](https://github.com/kmsmohamedansar/mcp-analytics-stub)
-- [mv3-sidepanel-starter](https://github.com/kmsmohamedansar/mv3-sidepanel-starter)
+- [analytics-assistant](https://github.com/ansarbuilds/analytics-assistant)
+- [catalogue-checker](https://github.com/ansarbuilds/catalogue-checker)
+- [data-delivery](https://github.com/ansarbuilds/data-delivery)
+- [integration-in-a-box](https://github.com/ansarbuilds/integration-in-a-box)
+- [sitescout](https://github.com/ansarbuilds/sitescout)
+- [site-recon](https://github.com/ansarbuilds/site-recon)
+- [storyera](https://github.com/ansarbuilds/storyera)
+- [agent-flight-recorder](https://github.com/ansarbuilds/agent-flight-recorder)
+- [rea-study](https://github.com/ansarbuilds/rea-study)
+- [prh-jepa](https://github.com/ansarbuilds/prh-jepa)
+- [authorized-web-exposure-audit](https://github.com/ansarbuilds/authorized-web-exposure-audit)
+- [mcp-analytics-stub](https://github.com/ansarbuilds/mcp-analytics-stub)
+- [mv3-sidepanel-starter](https://github.com/ansarbuilds/mv3-sidepanel-starter)
 
 RepTrack and Haloscript live in their own repositories — reach out if you'd like a walkthrough.
 

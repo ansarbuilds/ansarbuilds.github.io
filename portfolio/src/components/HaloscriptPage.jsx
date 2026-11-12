@@ -2,7 +2,7 @@ import { ArrowLeft, ArrowUpRight, Lock } from "lucide-react";
 import { DEPTH } from "../data/depth";
 
 const IMG = (name) => `${import.meta.env.BASE_URL}shots/haloscript/${name}`;
-const SITE_URL = "https://ansarbuilds.dev/haloscript-site/";
+const SITE_URL = "https://ansarbuilds.github.io/haloscript-site/";
 const APP_STORE_URL = "https://apps.apple.com/ca/app/haloscript/id6820670080";
 const VIOLET = "#b9a8ff";
 const D = DEPTH.haloscript;

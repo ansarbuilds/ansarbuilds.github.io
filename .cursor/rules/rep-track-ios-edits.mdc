@@ -13,7 +13,7 @@ alwaysApply: true
   (iCloud Drive → Documents → IOs projects → RepTrack — the one opened in Xcode.)
 
 - **Do not edit:**
-  The `projects/reptrack/` folder inside this workspace (`kmsmohamedansar.github.io/projects/reptrack`) for app code. That copy is not the one the user runs in the simulator.
+  The `projects/reptrack/` folder inside this workspace (`ansarbuilds.github.io/projects/reptrack`) for app code. That copy is not the one the user runs in the simulator.
 
 When changing views, view models, models, or utilities for the iOS app, use full paths under:
 

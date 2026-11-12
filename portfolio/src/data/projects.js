@@ -131,13 +131,13 @@ export const PROJECTS = [
       links: [
         { label: "Read the technical report", href: "/p/decision-models/report.html", external: true, primary: true },
         { label: "Download the PDF", href: "/p/decision-models/report.pdf", external: true },
-        { label: "Code, data and every run", href: "https://github.com/kmsmohamedansar/decision-models", external: true },
+        { label: "Code, data and every run", href: "https://github.com/ansarbuilds/decision-models", external: true },
       ],
     },
     links: [
       { label: "Read the technical report", href: "/p/decision-models/report.html", external: true, primary: true },
       { label: "Download the PDF", href: "/p/decision-models/report.pdf", external: true },
-      { label: "Code, data and every run", href: "https://github.com/kmsmohamedansar/decision-models", external: true },
+      { label: "Code, data and every run", href: "https://github.com/ansarbuilds/decision-models", external: true },
     ],
   },
   {
@@ -234,13 +234,13 @@ export const PROJECTS = [
       links: [
         { label: "Read the technical report", href: "/p/rea-study/report.html", external: true, primary: true },
         { label: "Download the PDF", href: "/p/rea-study/report.pdf", external: true },
-        { label: "Code, data and every run", href: "https://github.com/kmsmohamedansar/rea-study", external: true },
+        { label: "Code, data and every run", href: "https://github.com/ansarbuilds/rea-study", external: true },
       ],
     },
     links: [
       { label: "Read the technical report", href: "/p/rea-study/report.html", external: true, primary: true },
       { label: "Download the PDF", href: "/p/rea-study/report.pdf", external: true },
-      { label: "Code, data and every run", href: "https://github.com/kmsmohamedansar/rea-study", external: true },
+      { label: "Code, data and every run", href: "https://github.com/ansarbuilds/rea-study", external: true },
       { label: "The earlier study it follows: My Take on Jev", href: "#project/decision-models" },
     ],
   },
@@ -343,14 +343,14 @@ export const PROJECTS = [
         { label: "Read the technical report", href: "/p/prh-jepa/report.html", external: true, primary: true },
         { label: "Download the PDF", href: "/p/prh-jepa/report.pdf", external: true },
         { label: "Illustrated explainer", href: "/p/prh-jepa/explainer.html", external: true },
-        { label: "Code, data and every run", href: "https://github.com/kmsmohamedansar/prh-jepa", external: true },
+        { label: "Code, data and every run", href: "https://github.com/ansarbuilds/prh-jepa", external: true },
       ],
     },
     links: [
       { label: "Read the technical report", href: "/p/prh-jepa/report.html", external: true, primary: true },
       { label: "Download the PDF", href: "/p/prh-jepa/report.pdf", external: true },
       { label: "Illustrated explainer", href: "/p/prh-jepa/explainer.html", external: true },
-      { label: "Code, data and every run", href: "https://github.com/kmsmohamedansar/prh-jepa", external: true },
+      { label: "Code, data and every run", href: "https://github.com/ansarbuilds/prh-jepa", external: true },
       { label: "Earlier study: My Take on REA", href: "#project/rea-study" },
     ],
   },
@@ -432,14 +432,14 @@ export const PROJECTS = [
       contents: ["The 60-second launch film", "How the camera and microphone agree", "Four ways to send, all cancelable", "Why it is safe to try", "What is measured and what is not", "Install on Mac or Windows"],
       links: [
         { label: "Watch the film", href: "/p/saywhen/", primary: true },
-        { label: "Code and installers", href: "https://github.com/kmsmohamedansar/saywhen", external: true },
-        { label: "How it works", href: "https://github.com/kmsmohamedansar/saywhen/blob/main/docs/HOW_IT_WORKS.md", external: true },
+        { label: "Code and installers", href: "https://github.com/ansarbuilds/saywhen", external: true },
+        { label: "How it works", href: "https://github.com/ansarbuilds/saywhen/blob/main/docs/HOW_IT_WORKS.md", external: true },
       ],
     },
     links: [
-      { label: "Code on GitHub", href: "https://github.com/kmsmohamedansar/saywhen", external: true, primary: true },
+      { label: "Code on GitHub", href: "https://github.com/ansarbuilds/saywhen", external: true, primary: true },
       { label: "Watch the film", href: "/p/saywhen/" },
-      { label: "Download the beta", href: "https://github.com/kmsmohamedansar/saywhen/releases/tag/v0.2.0", external: true },
+      { label: "Download the beta", href: "https://github.com/ansarbuilds/saywhen/releases/tag/v0.2.0", external: true },
     ],
   },
   {
@@ -447,7 +447,7 @@ export const PROJECTS = [
     featured: true,
     spotlightGroup: "open-source",
     spotlightCategory: "skills",
-    spotlightLink: { label: "Read the case study", href: "https://github.com/kmsmohamedansar/agent-flight-recorder/blob/main/PORTFOLIO.md" },
+    spotlightLink: { label: "Read the case study", href: "https://github.com/ansarbuilds/agent-flight-recorder/blob/main/PORTFOLIO.md" },
     theme: { title: "display" },
     title: "Agent Flight Recorder",
     kind: "A local black box for AI agents",
@@ -515,14 +515,14 @@ export const PROJECTS = [
       text: "The full write-up explains the design, payment regression, independent first-time-user evaluation, confirmed defects and regression-backed fixes. The demo script gives a short walkthrough you can reproduce locally.",
       contents: ["Why agent failures need a timeline", "Python, SQLite and MCP architecture", "The removed duplicate-payment guard", "Independent evaluation and confirmed defects", "Regression-backed fixes", "Privacy and replay limits"],
       links: [
-        { label: "Read the case study", href: "https://github.com/kmsmohamedansar/agent-flight-recorder/blob/main/PORTFOLIO.md", external: true, primary: true },
-        { label: "Run the demo", href: "https://github.com/kmsmohamedansar/agent-flight-recorder/blob/main/docs/demo-script.md", external: true },
+        { label: "Read the case study", href: "https://github.com/ansarbuilds/agent-flight-recorder/blob/main/PORTFOLIO.md", external: true, primary: true },
+        { label: "Run the demo", href: "https://github.com/ansarbuilds/agent-flight-recorder/blob/main/docs/demo-script.md", external: true },
         { label: "Install from PyPI", href: "https://pypi.org/project/flightrecorder-ai/", external: true },
       ],
     },
     links: [
-      { label: "Code and documentation", href: "https://github.com/kmsmohamedansar/agent-flight-recorder", external: true, primary: true },
-      { label: "Read the full case study", href: "https://github.com/kmsmohamedansar/agent-flight-recorder/blob/main/PORTFOLIO.md", external: true },
+      { label: "Code and documentation", href: "https://github.com/ansarbuilds/agent-flight-recorder", external: true, primary: true },
+      { label: "Read the full case study", href: "https://github.com/ansarbuilds/agent-flight-recorder/blob/main/PORTFOLIO.md", external: true },
       { label: "Install from PyPI", href: "https://pypi.org/project/flightrecorder-ai/", external: true },
     ],
   },
@@ -531,7 +531,7 @@ export const PROJECTS = [
     featured: true,
     spotlightGroup: "open-source",
     spotlightCategory: "skills",
-    spotlightLink: { label: "Get the skill", href: "https://github.com/kmsmohamedansar/storyera" },
+    spotlightLink: { label: "Get the skill", href: "https://github.com/ansarbuilds/storyera" },
     theme: { title: "display" },
     title: "StoryEra",
     kind: "An agent skill for novel continuity",
@@ -603,14 +603,14 @@ export const PROJECTS = [
       text: "The repository explains what StoryEra is, how to install it in Codex or Claude Code, how it was created, and what the saved evaluations actually show. No extra model or API key is required by the skill; you use your existing agent host.",
       contents: ["Codex and Claude Code setup", "Copyable audit prompts", "A cited case study from my novel", "How the skill was created", "Saved full and partial audit runs", "The known shortfall, kept in the results"],
       links: [
-        { label: "Install StoryEra", href: "https://github.com/kmsmohamedansar/storyera/blob/main/docs/installation.md", external: true, primary: true },
-        { label: "Read the novel case study", href: "https://github.com/kmsmohamedansar/storyera/blob/main/docs/case-study.md", external: true },
-        { label: "Code and documentation", href: "https://github.com/kmsmohamedansar/storyera", external: true },
+        { label: "Install StoryEra", href: "https://github.com/ansarbuilds/storyera/blob/main/docs/installation.md", external: true, primary: true },
+        { label: "Read the novel case study", href: "https://github.com/ansarbuilds/storyera/blob/main/docs/case-study.md", external: true },
+        { label: "Code and documentation", href: "https://github.com/ansarbuilds/storyera", external: true },
       ],
     },
     links: [
-      { label: "Read the documentation", href: "https://github.com/kmsmohamedansar/storyera", external: true, primary: true },
-      { label: "Install in Codex or Claude Code", href: "https://github.com/kmsmohamedansar/storyera/blob/main/docs/installation.md", external: true },
+      { label: "Read the documentation", href: "https://github.com/ansarbuilds/storyera", external: true, primary: true },
+      { label: "Install in Codex or Claude Code", href: "https://github.com/ansarbuilds/storyera/blob/main/docs/installation.md", external: true },
     ],
   },
   {
@@ -619,7 +619,7 @@ export const PROJECTS = [
     featured: true,
     spotlightGroup: "open-source",
     spotlightCategory: "skills",
-    spotlightLink: { label: "Get the skill", href: "https://github.com/kmsmohamedansar/site-recon" },
+    spotlightLink: { label: "Get the skill", href: "https://github.com/ansarbuilds/site-recon" },
     theme: { title: "display" },
     title: "Site Recon",
     kind: "An agent skill for understanding websites",
@@ -690,14 +690,14 @@ export const PROJECTS = [
       text: "The repository includes Codex and Claude Code installation, the Playwright inspector, extraction artifacts, responsible-use rules, regression tests and an original React motion starter.",
       contents: ["Codex and Claude Code setup", "Desktop, mobile and reduced-motion inspection", "Exact browser-visible keyframe extraction", "Evidence-backed stack detection", "Kigo Studio validation case study", "Original React ambient-motion starter"],
       links: [
-        { label: "Install Site Recon", href: "https://github.com/kmsmohamedansar/site-recon/blob/main/docs/installation.md", external: true, primary: true },
-        { label: "Read how it works", href: "https://github.com/kmsmohamedansar/site-recon/blob/main/docs/how-it-works.md", external: true },
-        { label: "Code and documentation", href: "https://github.com/kmsmohamedansar/site-recon", external: true },
+        { label: "Install Site Recon", href: "https://github.com/ansarbuilds/site-recon/blob/main/docs/installation.md", external: true, primary: true },
+        { label: "Read how it works", href: "https://github.com/ansarbuilds/site-recon/blob/main/docs/how-it-works.md", external: true },
+        { label: "Code and documentation", href: "https://github.com/ansarbuilds/site-recon", external: true },
       ],
     },
     links: [
-      { label: "Read the documentation", href: "https://github.com/kmsmohamedansar/site-recon", external: true, primary: true },
-      { label: "Install in Codex or Claude Code", href: "https://github.com/kmsmohamedansar/site-recon/blob/main/docs/installation.md", external: true },
+      { label: "Read the documentation", href: "https://github.com/ansarbuilds/site-recon", external: true, primary: true },
+      { label: "Install in Codex or Claude Code", href: "https://github.com/ansarbuilds/site-recon/blob/main/docs/installation.md", external: true },
     ],
   },
   {
@@ -706,7 +706,7 @@ export const PROJECTS = [
     featured: true,
     spotlightGroup: "open-source",
     spotlightCategory: "skills",
-    spotlightLink: { label: "Get the skill", href: "https://github.com/kmsmohamedansar/authorized-web-exposure-audit" },
+    spotlightLink: { label: "Get the skill", href: "https://github.com/ansarbuilds/authorized-web-exposure-audit" },
     theme: { title: "display" },
     title: "Exposure Audit",
     kind: "An authorization-first website audit skill",
@@ -775,14 +775,14 @@ export const PROJECTS = [
       text: "The repository includes Codex and Claude Code setup, a localhost demonstration, exact scope controls, deterministic scripts, sanitized sample findings and a responsible-disclosure workflow.",
       contents: ["Codex and Claude Code installation", "No-network dry runs", "Approved-scope JSON format", "Local fake vulnerable website", "Redacted JSON and Markdown findings", "Stop conditions and responsible disclosure"],
       links: [
-        { label: "Run the localhost demo", href: "https://github.com/kmsmohamedansar/authorized-web-exposure-audit#quick-start-safe-localhost-demonstration", external: true, primary: true },
-        { label: "Read the portfolio case study", href: "https://github.com/kmsmohamedansar/authorized-web-exposure-audit/blob/main/PORTFOLIO.md", external: true },
-        { label: "Code and documentation", href: "https://github.com/kmsmohamedansar/authorized-web-exposure-audit", external: true },
+        { label: "Run the localhost demo", href: "https://github.com/ansarbuilds/authorized-web-exposure-audit#quick-start-safe-localhost-demonstration", external: true, primary: true },
+        { label: "Read the portfolio case study", href: "https://github.com/ansarbuilds/authorized-web-exposure-audit/blob/main/PORTFOLIO.md", external: true },
+        { label: "Code and documentation", href: "https://github.com/ansarbuilds/authorized-web-exposure-audit", external: true },
       ],
     },
     links: [
-      { label: "Read the documentation", href: "https://github.com/kmsmohamedansar/authorized-web-exposure-audit", external: true, primary: true },
-      { label: "Run the safe localhost demo", href: "https://github.com/kmsmohamedansar/authorized-web-exposure-audit#quick-start-safe-localhost-demonstration", external: true },
+      { label: "Read the documentation", href: "https://github.com/ansarbuilds/authorized-web-exposure-audit", external: true, primary: true },
+      { label: "Run the safe localhost demo", href: "https://github.com/ansarbuilds/authorized-web-exposure-audit#quick-start-safe-localhost-demonstration", external: true },
     ],
   },
   {
@@ -830,7 +830,7 @@ export const PROJECTS = [
     links: [
       { label: "Get Haloscript on the App Store", href: "https://apps.apple.com/ca/app/haloscript/id6820670080", external: true, primary: true },
       { label: "See the full tour", href: "#project/haloscript", primary: true },
-      { label: "Support and privacy", href: "https://ansarbuilds.dev/haloscript-site/", external: true },
+      { label: "Support and privacy", href: "https://ansarbuilds.github.io/haloscript-site/", external: true },
       { label: "Source is private. Walkthrough on request.", href: "#contact", locked: true },
     ],
   },
@@ -875,7 +875,7 @@ export const PROJECTS = [
     },
     links: [
       { label: "Meet the model", href: "#digital-double", primary: true },
-      { label: "Full write-up", href: "https://github.com/kmsmohamedansar/ai-digital-double", external: true },
+      { label: "Full write-up", href: "https://github.com/ansarbuilds/ai-digital-double", external: true },
     ],
   },
   /* ───────────── spotlight: two-column grid ───────────── */
@@ -960,7 +960,7 @@ export const PROJECTS = [
       links: ["0.0>1.0", "1.0>1.1", "1.1>2.0", "2.0>3.0", "3.0>3.1"],
     },
     links: [
-      { label: "Code and full case study", href: "https://github.com/kmsmohamedansar/sitescout", external: true, primary: true },
+      { label: "Code and full case study", href: "https://github.com/ansarbuilds/sitescout", external: true, primary: true },
       { label: "The work tool behind it: Sidecar", href: "#project/sidecar" },
     ],
   },
@@ -1053,8 +1053,8 @@ export const PROJECTS = [
       links: ["0.0>1.0", "1.0>2.0", "2.0>2.1", "2.1>3.0"],
     },
     links: [
-      { label: "Code, case study and runbook", href: "https://github.com/kmsmohamedansar/integration-in-a-box", external: true, primary: true },
-      { label: "Watch the walkthrough", href: "https://github.com/kmsmohamedansar/integration-in-a-box/blob/main/docs/control-room-walkthrough.mp4", external: true },
+      { label: "Code, case study and runbook", href: "https://github.com/ansarbuilds/integration-in-a-box", external: true, primary: true },
+      { label: "Watch the walkthrough", href: "https://github.com/ansarbuilds/integration-in-a-box/blob/main/docs/control-room-walkthrough.mp4", external: true },
       { label: "The work behind it", href: "#project/health-dashboard" },
     ],
   },
@@ -1136,7 +1136,7 @@ export const PROJECTS = [
       links: ["0.0>1.0", "0.0>1.1", "1.0>2.0", "1.1>2.0", "2.0>3.0"],
     },
     links: [
-      { label: "Code, case study and results", href: "https://github.com/kmsmohamedansar/analytics-assistant", external: true, primary: true },
+      { label: "Code, case study and results", href: "https://github.com/ansarbuilds/analytics-assistant", external: true, primary: true },
       { label: "The work behind it", href: "#project/mcp-workflow" },
     ],
   },
@@ -1317,7 +1317,7 @@ export const PROJECTS = [
       ],
     },
     links: [
-      { label: "Code, case study and runbook", href: "https://github.com/kmsmohamedansar/data-delivery", external: true, primary: true },
+      { label: "Code, case study and runbook", href: "https://github.com/ansarbuilds/data-delivery", external: true, primary: true },
       { label: "See the lineage explorer", href: "#lineage-demo" },
     ],
   },
@@ -1389,7 +1389,7 @@ export const PROJECTS = [
       ],
     },
     links: [
-      { label: "Code, case study and results", href: "https://github.com/kmsmohamedansar/catalogue-checker", external: true, primary: true },
+      { label: "Code, case study and results", href: "https://github.com/ansarbuilds/catalogue-checker", external: true, primary: true },
       { label: "The notebook it grew from", href: "#project/smart-categorization" },
     ],
   },
@@ -1437,8 +1437,8 @@ export const PROJECTS = [
       ],
     },
     links: [
-      { label: "My public MCP stub", href: "https://github.com/kmsmohamedansar/mcp-analytics-stub", external: true, primary: true },
-      { label: "Chrome side panel starter", href: "https://github.com/kmsmohamedansar/mv3-sidepanel-starter", external: true },
+      { label: "My public MCP stub", href: "https://github.com/ansarbuilds/mcp-analytics-stub", external: true, primary: true },
+      { label: "Chrome side panel starter", href: "https://github.com/ansarbuilds/mv3-sidepanel-starter", external: true },
     ],
   },
   {
@@ -1651,7 +1651,7 @@ export const PROJECTS = [
     how: ["A basic method first, so there's something to beat.", "A more advanced AI model, trained further on the reviews, for the stronger result."],
     learned: ["A basic method is a measuring stick. Without one, you can't tell whether a clever model is worth it."],
     flow: { caption: "From a basic method to an AI model.", columns: [{ label: "Data", nodes: ["Review text"] }, { label: "Models", nodes: ["Basic method", "Advanced AI model"] }, { label: "Compare", nodes: ["How often each one is right"] }] },
-    links: [{ label: "GitHub repo", href: "https://github.com/kmsmohamedansar/amazon-fine-food-sentiment-analysis", external: true, primary: true }],
+    links: [{ label: "GitHub repo", href: "https://github.com/ansarbuilds/amazon-fine-food-sentiment-analysis", external: true, primary: true }],
   },
   {
     slug: "news-scraper",
@@ -1675,7 +1675,7 @@ export const PROJECTS = [
     how: ["An invisible browser loads the page fully.", "The results are tidied into the same layout every time."],
     learned: ["When a page is built inside the browser, the tool reading it has to be a browser too."],
     flow: { caption: "From web page to table.", columns: [{ label: "Page", nodes: ["A news page that loads its content late"] }, { label: "Browser", nodes: ["An invisible browser loads it fully"] }, { label: "Tidy", nodes: ["A clean table of stories"] }] },
-    links: [{ label: "GitHub repo", href: "https://github.com/kmsmohamedansar/yahoo-finance-news-scraper", external: true, primary: true }],
+    links: [{ label: "GitHub repo", href: "https://github.com/ansarbuilds/yahoo-finance-news-scraper", external: true, primary: true }],
   },
   {
     slug: "smart-categorization",
@@ -1733,7 +1733,7 @@ export const PROJECTS = [
       ],
     },
     links: [
-      { label: "GitHub repo", href: "https://github.com/kmsmohamedansar/NLP-Project-Smart-Category", external: true, primary: true },
+      { label: "GitHub repo", href: "https://github.com/ansarbuilds/NLP-Project-Smart-Category", external: true, primary: true },
     ],
   },
   {
@@ -1759,7 +1759,7 @@ export const PROJECTS = [
     how: ["Song features compared across the years.", "Charts built to make one point each."],
     learned: ["Good charts say one thing."],
     flow: { caption: "From data to story.", columns: [{ label: "Data", nodes: ["How each song sounds"] }, { label: "Explore", nodes: ["Changes over time"] }, { label: "Tell", nodes: ["Charts that make one point each"] }] },
-    links: [{ label: "GitHub repo", href: "https://github.com/kmsmohamedansar/Spotify-Data-Analysis", external: true, primary: true }],
+    links: [{ label: "GitHub repo", href: "https://github.com/ansarbuilds/Spotify-Data-Analysis", external: true, primary: true }],
   },
   {
     slug: "cpl-dream-xi",
@@ -1785,7 +1785,7 @@ export const PROJECTS = [
     how: ["Stats weighted by position.", "A dashboard built to explain the selection."],
     learned: ["The scoring has to match the job someone does on the pitch, or the ranking means nothing."],
     flow: { caption: "From stats to selection.", columns: [{ label: "Data", nodes: ["2019 player stats"] }, { label: "Score", nodes: ["Stats that matter for each position"] }, { label: "Pick", nodes: ["Best eleven"] }, { label: "Show", nodes: ["Power BI dashboard"] }] },
-    links: [{ label: "GitHub repo", href: "https://github.com/kmsmohamedansar/CPL-Dream-Team", external: true, primary: true }],
+    links: [{ label: "GitHub repo", href: "https://github.com/ansarbuilds/CPL-Dream-Team", external: true, primary: true }],
   },
   /* ───────────── hidden from the lists (pages still work for old links) ───────────── */
   {
@@ -1830,8 +1830,8 @@ export const PROJECTS = [
       ],
     },
     links: [
-      { label: "Open the playground", href: "https://ansarbuilds.dev/sql-playground", external: true, primary: true },
-      { label: "GitHub repo", href: "https://github.com/kmsmohamedansar/sql-playground", external: true },
+      { label: "Open the playground", href: "https://ansarbuilds.github.io/sql-playground/", external: true, primary: true },
+      { label: "GitHub repo", href: "https://github.com/ansarbuilds/sql-playground", external: true },
     ],
   },
   {
@@ -1992,7 +1992,7 @@ export const PROJECTS = [
     },
     links: [
       { label: "Open the demo", href: "https://huggingface.co/spaces/kmsmohamedansar/high-value-customer-predictor", external: true, primary: true },
-      { label: "GitHub repo", href: "https://github.com/kmsmohamedansar/high-value-customer-predictor", external: true },
+      { label: "GitHub repo", href: "https://github.com/ansarbuilds/high-value-customer-predictor", external: true },
     ],
   },
   {
@@ -2032,7 +2032,7 @@ export const PROJECTS = [
     },
     links: [
       { label: "Open the demo", href: "https://huggingface.co/spaces/kmsmohamedansar/ai_knowledge_assistant", external: true, primary: true },
-      { label: "GitHub repo", href: "https://github.com/kmsmohamedansar/ai_knowledge_assistant", external: true },
+      { label: "GitHub repo", href: "https://github.com/ansarbuilds/ai_knowledge_assistant", external: true },
     ],
   },
   {
@@ -2069,7 +2069,7 @@ export const PROJECTS = [
         { label: "Result", nodes: ["One dashboard page"] },
       ],
     },
-    links: [{ label: "Code on GitHub", href: "https://github.com/kmsmohamedansar/kmsmohamedansar.github.io/tree/main/projects/forex", external: true, primary: true }],
+    links: [{ label: "Code on GitHub", href: "https://github.com/ansarbuilds/ansarbuilds.github.io/tree/main/projects/forex", external: true, primary: true }],
   },
   {
     slug: "f1-telemetry",
@@ -2102,7 +2102,7 @@ export const PROJECTS = [
         { label: "Output", nodes: ["CSV files", "HTML report"] },
       ],
     },
-    links: [{ label: "Code on GitHub", href: "https://github.com/kmsmohamedansar/kmsmohamedansar.github.io/tree/main/projects/f1-telemetry", external: true, primary: true }],
+    links: [{ label: "Code on GitHub", href: "https://github.com/ansarbuilds/ansarbuilds.github.io/tree/main/projects/f1-telemetry", external: true, primary: true }],
   },
 ];
 
