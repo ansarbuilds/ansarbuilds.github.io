@@ -438,7 +438,7 @@ export const PROJECTS = [
     links: [
       { label: "Code on GitHub", href: "https://github.com/kmsmohamedansar/saywhen", external: true, primary: true },
       { label: "Watch the film", href: "/p/saywhen/" },
-      { label: "Download the beta", href: "https://github.com/kmsmohamedansar/saywhen/releases/latest", external: true },
+      { label: "Download the beta", href: "https://github.com/kmsmohamedansar/saywhen/releases/tag/v0.2.0", external: true },
     ],
   },
   {
