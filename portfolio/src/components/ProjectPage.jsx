@@ -458,7 +458,16 @@ export default function ProjectPage({ slug }) {
         </dl>
       </section>}
 
-      <SignatureArtwork project={project} reduced={reduced} />
+      {project.film
+        ? <figure className="mt-6">
+          <div className="overflow-hidden rounded-3xl border border-blue/12 bg-black">
+            <video className="block aspect-video w-full" controls playsInline preload="metadata" poster={media(project.film.poster)} aria-label={project.film.label}>
+              <source src={media(project.film.src)} type="video/mp4" />
+            </video>
+          </div>
+          <figcaption className="mt-3 text-sm text-[color:var(--ink-300)]">{project.film.caption}</figcaption>
+        </figure>
+        : <SignatureArtwork project={project} reduced={reduced} />}
 
       <SummaryChart project={project} />
 

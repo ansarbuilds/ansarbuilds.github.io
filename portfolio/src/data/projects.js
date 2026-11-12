@@ -367,6 +367,7 @@ export const PROJECTS = [
     heroAlt: "A wireframe face with a gaze cone pointing at the saywhen window, which shows Listening and the line: Attention replaces the hotkey.",
     heroCaption: "Poster frame from the launch film. An illustration, not a screenshot.",
     icon: "/shots/saywhen/icon.png",
+    film: { src: "/p/saywhen/demo.mp4", poster: "/p/saywhen/poster.jpg", label: "saywhen launch film, 60 seconds, with voice and sound", caption: "The 60-second launch film, with voice and sound. It is an animation that shows the idea, not a live screen recording." },
     shots: ["/shots/saywhen/home-preview.webp", "/shots/saywhen/send-styles.webp"],
     hook: "Look at the screen and say what you want. saywhen types it into your terminal or coding assistant, shows you a short preview you can cancel, and then presses Enter. There is no hotkey to hold, and your voice and camera stay on your computer.",
     stats: [
