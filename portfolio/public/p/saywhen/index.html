@@ -573,7 +573,7 @@ npx tauri dev</code></pre><button class="copy" type="button">Copy</button></div>
 
   // talk wave
   const wave = $("wave");
-  for (let i = 0; i < 26; i++) { const b = document.createElement("i"); b.style.animationDelay = (-Math.abs(Math.sin(i * 1.7)) * 1.1).toFixed(2) + "s"; b.style.animationDuration = (0.7 + (i % 5) * 0.12).toFixed(2) + "s"; wave.appendChild(b); }
+  for (let i = 0; i < 26; i++) { const b = document.createElement("i"); b.style.animationDelay = (-Math.abs(Math.sin(i * 1.7)) * 1.1).toFixed(2) + "s"; b.style.animationDuration = (0.7 + (i % 5) * 0.12).toFixed(2) + "s"; b.style.height = (22 + Math.abs(Math.sin(i * 0.9)) * 78).toFixed(0) + "%"; wave.appendChild(b); }
 
   // head angle readout
   if (!still) { const yaw = $("yaw"); let t = 0; setInterval(() => { t += 0.5; yaw.textContent = Math.round(3 + Math.sin(t) * 4) + "°"; }, 700); }
