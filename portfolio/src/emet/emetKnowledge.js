@@ -8,7 +8,7 @@
 // House style: plain words, short sentences, no em dashes.
 
 import { ABOUT, CONTACT, ROLES } from "../data/content.js";
-import { EXPERIMENTS, FEATURED, FEATURED_GRID, LISTED_PROJECTS, OPEN_SOURCE_PROJECTS } from "../data/projects.js";
+import { FEATURED, FEATURED_GRID, LISTED_PROJECTS, OPEN_SOURCE_PROJECTS } from "../data/projects.js";
 import { TOOL_INFO } from "../data/tools.js";
 import { createMatcher, normalize, tokenize } from "./emetMatcher.js";
 
@@ -60,19 +60,6 @@ function projectEntry(project) {
     phrases: [project.title, ...aliases],
     strong: [project.title, project.slug.replace(/-/g, " "), ...aliases],
     weak: [project.kind, ...(project.tags || []), ...(project.stack || [])],
-  };
-}
-
-function experimentEntry(experiment) {
-  return {
-    id: `experiment:${experiment.id}`,
-    label: experiment.title,
-    group: "fun",
-    destination: experiment.href?.replace(/^#/, "") || "projects",
-    answer: `${sentences(experiment.hook, 2)} ${sentences(experiment.body, 1)}`.trim(),
-    phrases: [experiment.title],
-    strong: [experiment.title, experiment.id],
-    weak: [experiment.hook],
   };
 }
 
@@ -182,7 +169,7 @@ const INTENT_ENTRIES = [
     id: "ai",
     label: "His AI work",
     group: "intent",
-    destination: "ai",
+    destination: "projects",
     answer: `He runs his own AI studies and writes them up in full, including the failures. ${list(OPEN_SOURCE_PROJECTS.map((project) => project.title), 5)} are the open ones, and there is a 3D model of his head made with AI that looks back at you.`,
     phrases: ["ai work", "ai projects", "machine learning", "llm", "his experiments", "ai experience"],
     strong: ["ai", "llm", "model", "experiment", "study", "ml"],
@@ -243,7 +230,6 @@ const INTENT_ENTRIES = [
 export const EMET_ENTRIES = [
   ...INTENT_ENTRIES,
   ...LISTED_PROJECTS.map(projectEntry),
-  ...EXPERIMENTS.map(experimentEntry),
   ...toolEntries(),
 ];
 

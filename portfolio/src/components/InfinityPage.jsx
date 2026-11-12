@@ -23,7 +23,7 @@ export default function InfinityPage() {
             swirl, then drift back. It used to open this site; now the same dots gather into my name instead.
           </p>
           <a
-            href="#ai"
+            href="#projects"
             className="mt-4 inline-flex min-h-11 items-center gap-2 rounded-full border border-white/30 px-5 py-2.5 text-sm font-medium text-white transition-colors duration-200 hover:bg-white/10"
           >
             <ArrowLeft size={15} /> Back to the site

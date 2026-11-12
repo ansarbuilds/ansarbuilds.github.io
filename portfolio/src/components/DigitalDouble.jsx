@@ -201,7 +201,7 @@ export default function DigitalDouble() {
         )}
         <div className="pointer-events-none absolute inset-x-0 bottom-0 p-5 sm:p-8">
           <div className="pointer-events-auto max-w-md">
-            <a href="#ai" className="inline-flex items-center gap-1.5 font-mono text-xs uppercase tracking-[.12em] text-rose">
+            <a href="#projects" className="inline-flex items-center gap-1.5 font-mono text-xs uppercase tracking-[.12em] text-rose">
               <ArrowLeft size={13} /> Back
             </a>
             <h1 className="mt-3 font-display text-2xl font-semibold text-white">A 3D model of me, made with AI</h1>
@@ -300,7 +300,7 @@ export default function DigitalDouble() {
             className="inline-flex items-center gap-2 rounded-full bg-rose px-5 py-3 text-sm font-semibold text-[#23091a] transition-transform hover:-translate-y-0.5">
             Read the full write-up on GitHub <ArrowUpRight size={15} />
           </a>
-          <a href="#ai" className="text-sm text-white/70 hover:text-white">Back to Built with AI</a>
+          <a href="#projects" className="text-sm text-white/70 hover:text-white">Back to selected work</a>
         </div>
       </article>
     </div>

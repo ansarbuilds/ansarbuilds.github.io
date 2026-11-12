@@ -1,6 +1,6 @@
 import { Component, createRef, lazy, Suspense, useCallback, useContext, useEffect, useMemo, useRef, useState } from "react";
 import EmetSection from "./components/EmetSection";
-import { Hero, ProjectsSection, CapabilitiesSection, MoreWorkSection, ExperimentsSection, ContactSection } from "./components/Sections";
+import { Hero, ProjectsSection, CapabilitiesSection, MoreWorkSection, ContactSection } from "./components/Sections";
 import ProjectPage from "./components/ProjectPage";
 import ProjectWorkPage from "./components/ProjectWorkPage";
 import SandboxStubs from "./components/SandboxStubs";
@@ -237,7 +237,7 @@ function Nav({ booting = false }) {
   }, [menuOpen]);
   return <nav className={`ed-nav ${overHero ? "is-over-hero" : ""} ${booting ? "is-booting" : ""}`} aria-label="Main navigation"><div className="ed-nav-inner">
     <button onClick={() => navigate("deck")} className="ed-wordmark" aria-label="Mohamed Ansar, home"><span className="ed-wordmark-symbol" aria-hidden="true">ma</span><span>mohamed ansar</span></button>
-    <div className="ed-nav-links">{editorial ? <><a href="#projects" className="ed-nav-wide">Work</a><a href="#capabilities" className="ed-nav-wide">Capabilities</a><a href="#ai" className="ed-nav-wide">Playground</a><a href={CONTACT.github} className="ed-nav-wide" target="_blank" rel="noopener noreferrer">GitHub</a><span ref={menuRef} className="ed-nav-menu"><button type="button" aria-expanded={menuOpen} aria-controls="nav-menu" onClick={() => setMenuOpen((open) => !open)}>Menu</button>{menuOpen && <span id="nav-menu" className="ed-nav-menu-list" onClick={() => setMenuOpen(false)}><a href="#projects">Work</a><a href="#capabilities">Capabilities</a><a href="#more">More work</a><a href="#ai">Playground</a><a href={CONTACT.github} target="_blank" rel="noopener noreferrer">GitHub ↗</a></span>}</span><a href="#contact" className="ed-nav-contact">Get in touch ↗</a></> : <button onClick={() => navigate("deck")}>← Home</button>}
+    <div className="ed-nav-links">{editorial ? <><a href="#projects" className="ed-nav-wide">Work</a><a href="#capabilities" className="ed-nav-wide">Capabilities</a><a href={CONTACT.github} className="ed-nav-wide" target="_blank" rel="noopener noreferrer">GitHub</a><span ref={menuRef} className="ed-nav-menu"><button type="button" aria-expanded={menuOpen} aria-controls="nav-menu" onClick={() => setMenuOpen((open) => !open)}>Menu</button>{menuOpen && <span id="nav-menu" className="ed-nav-menu-list" onClick={() => setMenuOpen(false)}><a href="#projects">Work</a><a href="#capabilities">Capabilities</a><a href="#more">More work</a><a href={CONTACT.github} target="_blank" rel="noopener noreferrer">GitHub ↗</a></span>}</span><a href="#contact" className="ed-nav-contact">Get in touch ↗</a></> : <button onClick={() => navigate("deck")}>← Home</button>}
       <button onClick={openPalette} className="ed-nav-command" aria-label="Open command palette">⌘ K</button>
     </div>
   </div></nav>;
@@ -341,7 +341,6 @@ function MainDocument({ bootDone, onBoot }) {
       <ProjectsSection />
       <CapabilitiesSection />
       <MoreWorkSection />
-      <ExperimentsSection />
       <ContactSection />
     </>
   );

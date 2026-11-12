@@ -67,7 +67,6 @@ export const SECTION_LINKS = [
   { id: "projects", label: "Selected work" },
   { id: "capabilities", label: "What I bring" },
   { id: "more", label: "More work" },
-  { id: "ai", label: "Playground" },
   { id: "contact", label: "Contact" },
 ];
 
@@ -203,7 +202,6 @@ export const COMMAND_ITEMS = [
   { label: "Selected work · six flagship builds", go: "#projects", group: "Sections" },
   { label: "What I bring · agents, evals, shipping", go: "#capabilities", group: "Sections" },
   { label: "More shipped work", go: "#more", group: "Sections" },
-  { label: "Playground · interactive experiments", go: "#ai", group: "Sections" },
   { label: "Contact", go: "#contact", group: "Sections" },
   { label: "RepTrack, project page", go: "#project/reptrack", group: "Projects" },
   { label: "Jarvis, personal AI agent", go: "#project/jarvis", group: "Projects" },
@@ -212,8 +210,6 @@ export const COMMAND_ITEMS = [
   { label: "My Take on PRH-JEPA, project page", go: "#project/prh-jepa", group: "Projects" },
   { label: "StoryEra, novel continuity skill", go: "#project/storyera", group: "Projects" },
   { label: "Haloscript, project page", go: "#project/haloscript", group: "Projects" },
-  { label: "EMET · ask the terminal", go: "#emet", group: "Fun" },
-  { label: "Solar system explorer", go: "#explore", group: "Fun" },
   { label: "A 3D model of me, made with AI", go: "#digital-double", group: "Fun" },
   { label: "RepTrack on the App Store", href: "https://apps.apple.com/us/app/reptrack-workout-log/id6761032027", group: "Links" },
   { label: "My Take on Jev, technical report", href: "/p/decision-models/report.html", group: "Links" },

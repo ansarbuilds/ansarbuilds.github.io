@@ -352,7 +352,7 @@ export function ExperimentsSection() {
 export function ContactSection() {
   const { navigate } = useRoute();
   return <section id="contact" className="ed-contact sc-contact" data-palette="blueBloom"><SignalField className="sc-contact-field" quiet gatherTo=".sc-email" /><div className="ed-wrap">
-    <IndexLabel number="06">Contact</IndexLabel>
+    <IndexLabel number="05">Contact</IndexLabel>
     <h2>Building something <em>ambitious?</em></h2>
     <a href={`mailto:${CONTACT.email}`} className="sc-email" data-cursor="Write">{CONTACT.email}</a>
     <div className="ed-contact-bottom"><MagneticLink href={`mailto:${CONTACT.email}`} className="ed-contact-email">Email me<ArrowUpRight aria-hidden="true" /></MagneticLink><div><p>I like the hard part: agents that have to be trusted, evals that have to be honest, and products that have to ship. If that sounds like your problem, write to me.</p><div className="ed-socials"><a href={CONTACT.github} target="_blank" rel="noopener noreferrer">GitHub<ExternalLink size={14} /></a><a href={CONTACT.linkedin} target="_blank" rel="noopener noreferrer">LinkedIn<ExternalLink size={14} /></a></div></div></div>

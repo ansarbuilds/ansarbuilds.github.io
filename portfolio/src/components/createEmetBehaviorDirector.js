@@ -17,13 +17,6 @@ export const EMET_READING_CONTEXTS = [
     question: "Can you give me a short overview of Ansar's selected projects?",
   },
   {
-    id: "ai",
-    selector: "#ai",
-    message: "Curious about these experiments? I can explain what they test.",
-    actionLabel: "Explain",
-    question: "What are Ansar's AI experiments about?",
-  },
-  {
     id: "about",
     selector: "#about",
     message: "Want a quick read on Ansar’s background and tools?",

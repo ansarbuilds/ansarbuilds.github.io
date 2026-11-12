@@ -1394,6 +1394,7 @@ export const PROJECTS = [
   },
   {
     slug: "mcp-workflow",
+    hidden: true,
     title: "AI assistant connected to work data",
     kind: "AI assistant tools",
     accent: "violet",
@@ -1441,6 +1442,7 @@ export const PROJECTS = [
   },
   {
     slug: "health-dashboard",
+    hidden: true,
     title: "Collection health dashboard",
     kind: "Web app",
     accent: "cyan",
@@ -1487,6 +1489,7 @@ export const PROJECTS = [
   },
   {
     slug: "category-copilot",
+    hidden: true,
     earlier: true,
     title: "Category analytics copilot",
     kind: "Prototype",
@@ -1534,6 +1537,7 @@ export const PROJECTS = [
   },
   {
     slug: "sidecar",
+    hidden: true,
     title: "Sidecar",
     kind: "Chrome extension",
     accent: "cyan",
@@ -1582,6 +1586,7 @@ export const PROJECTS = [
   },
   {
     slug: "scope-checker",
+    hidden: true,
     earlier: true,
     title: "In-scope checker",
     kind: "Chrome extension",
@@ -1623,6 +1628,7 @@ export const PROJECTS = [
   },
   {
     slug: "fine-food-sentiment",
+    hidden: true,
     title: "Fine food sentiment",
     kind: "Reading reviews with AI",
     accent: "cyan",
@@ -1648,6 +1654,7 @@ export const PROJECTS = [
   },
   {
     slug: "news-scraper",
+    hidden: true,
     title: "Yahoo Finance news scraper",
     kind: "Automation",
     accent: "violet",
@@ -1671,6 +1678,7 @@ export const PROJECTS = [
   },
   {
     slug: "smart-categorization",
+    hidden: true,
     earlier: true,
     title: "Smart product categorization",
     kind: "AI project",
@@ -1729,6 +1737,7 @@ export const PROJECTS = [
   },
   {
     slug: "spotify-trends",
+    hidden: true,
     title: "Spotify music trends",
     kind: "Analysis",
     accent: "green",
@@ -1753,6 +1762,7 @@ export const PROJECTS = [
   },
   {
     slug: "cpl-dream-xi",
+    hidden: true,
     title: "Canadian Premier League Dream XI",
     kind: "Analysis",
     accent: "rose",
