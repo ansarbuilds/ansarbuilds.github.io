@@ -80,7 +80,7 @@ kbd { border: 1px solid var(--line); }
 .shot img { display: block; width: 100%; height: auto; }
 .cap { margin-top: 12px; font-size: .84rem; color: var(--muted); }
 .scene { margin: 28px 0 0; }
-.scene img { display: block; width: 100%; height: auto; border: 1px solid var(--line); border-radius: 18px; }
+.scene img, .scene video { display: block; width: 100%; height: auto; border: 1px solid var(--line); border-radius: 18px; background: #160312; }
 .scene figcaption { margin-top: 12px; font-size: .84rem; color: var(--muted); }
 .workbar { margin-top: 28px; }
 .workbar h3 { margin: 0; font: 400 1.7rem/1.2 var(--serif); }
@@ -155,8 +155,8 @@ footer a { color: var(--silver); }
       <h2 id="who-title">For the day you work from home.</h2>
       <p class="sub">62% of developers in the JetBrains 2025 survey regularly use an AI coding assistant or agent. Talk on the days you are home. At the office, stay quiet: Type only never presses Enter, and the keyboard shortcut still starts listening.</p>
       <figure class="scene">
-        <img src="/p/saywhen/who-its-for.gif" width="960" height="652" alt="Home day: Look. Talk. Hands off the keyboard. Office day: Stay quiet. Then where developers worked in the 2025 Stack Overflow survey: 32.4% fully remote, 37.1% hybrid, 12.6% free to choose, 17.9% in an office.">
-        <figcaption>Home, then the office, then the survey. An illustration. The timing is not a measurement. In the US, 45% of Stack Overflow respondents worked fully remotely.</figcaption>
+        <video muted loop playsinline preload="metadata" poster="/p/saywhen/who-its-for.jpg" width="1920" height="1080" aria-label="At home, both hands rest off the keyboard while a small pill glows above an amber laptop screen. A thin line of light joins the pill to the screen. In the office, the same person types and the pill is dark."><source src="/p/saywhen/who-its-for.mp4" type="video/mp4"></video>
+        <figcaption>Eight silent seconds. Home, then the office. A film loop, not a screen recording, and its timing is not a measurement. In the US, 45% of Stack Overflow respondents worked fully remotely.</figcaption>
       </figure>
       <div class="workbar">
         <h3>Where developers worked in 2025</h3>
@@ -257,7 +257,7 @@ npx tauri dev</code></pre></div>
 </div>
 <script>
 (() => {
-  const loops = document.querySelectorAll(".loop video");
+  const loops = document.querySelectorAll(".loop video, .scene video");
   const still = matchMedia("(prefers-reduced-motion: reduce)").matches || (navigator.connection && navigator.connection.saveData);
   if (still || !("IntersectionObserver" in window)) { loops.forEach((v) => { v.controls = true; }); return; }
   const seen = new IntersectionObserver((entries) => entries.forEach(({ target, isIntersecting }) => {
