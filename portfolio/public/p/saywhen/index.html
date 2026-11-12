@@ -1,0 +1,196 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>saywhen · Look. Talk. Sent. · Mohamed Ansar</title>
+<meta name="description" content="Hands-free voice input for terminals and coding assistants. Look at the screen, say the command, and saywhen types it behind a preview you can cancel. Open source, runs on your own computer.">
+<link rel="canonical" href="https://ansarbuilds.dev/p/saywhen/">
+<link rel="icon" href="/shots/saywhen/icon.png">
+<meta name="theme-color" content="#22061c">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://ansarbuilds.dev/p/saywhen/">
+<meta property="og:title" content="saywhen · Look. Talk. Sent.">
+<meta property="og:description" content="Hands-free voice input for terminals and coding assistants. No hotkey. Open source, and it runs on your own computer.">
+<meta property="og:image" content="https://ansarbuilds.dev/p/saywhen/og.jpg">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="saywhen · Look. Talk. Sent.">
+<meta name="twitter:description" content="Hands-free voice input for terminals and coding assistants. No hotkey. Open source, and it runs on your own computer.">
+<meta name="twitter:image" content="https://ansarbuilds.dev/p/saywhen/og.jpg">
+<style>
+:root {
+  --plum: #22061c; --plum-2: #2e0b27; --plum-3: #3d1235; --line: rgb(223 229 236 / .14);
+  --silver: #dfe5ec; --muted: #b3a8b4; --amber: #fbb303; --amber-ink: #22061c;
+  --serif: "Instrument Serif", "Iowan Old Style", "Palatino Linotype", Palatino, Georgia, serif;
+  --sans: "Plus Jakarta Sans", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --mono: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+}
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+body { margin: 0; background: var(--plum); color: var(--silver); font: 17px/1.65 var(--sans); -webkit-font-smoothing: antialiased; }
+body::before { content: ""; position: fixed; inset: 0; z-index: -1; background: radial-gradient(60rem 36rem at 50% -8rem, rgb(251 179 3 / .16), transparent 70%), radial-gradient(50rem 40rem at 100% 60%, rgb(120 40 110 / .35), transparent 70%); }
+a { color: var(--amber); text-underline-offset: 3px; }
+a:focus-visible, button:focus-visible, video:focus-visible { outline: 2px solid var(--amber); outline-offset: 3px; border-radius: 6px; }
+.wrap { width: min(100% - 32px, 1080px); margin-inline: auto; }
+.skip { position: absolute; left: -999px; } .skip:focus { left: 16px; top: 12px; background: var(--amber); color: var(--amber-ink); padding: 8px 14px; border-radius: 8px; z-index: 5; }
+
+header.top { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding-block: 20px; font-size: .9rem; }
+.brand { display: inline-flex; align-items: center; gap: 10px; white-space: nowrap; color: var(--silver); text-decoration: none; font-weight: 600; }
+.brand img { width: 30px; height: 30px; border-radius: 8px; }
+.top nav { display: flex; flex-wrap: wrap; gap: 6px 20px; justify-content: flex-end; }
+.top nav a { color: var(--muted); text-decoration: none; } .top nav a:hover { color: var(--silver); }
+
+.hero { text-align: center; padding-block: clamp(36px, 7vw, 84px) clamp(28px, 4vw, 44px); }
+.kicker { font: 500 .72rem var(--mono); letter-spacing: .16em; text-transform: uppercase; color: var(--amber); }
+h1 { margin: 14px 0 0; font: 400 clamp(3.2rem, 10vw, 6.8rem)/.98 var(--serif); letter-spacing: -.02em; text-wrap: balance; }
+h1 em { font-style: normal; color: var(--amber); }
+.lede { max-width: 40rem; margin: 22px auto 0; font-size: clamp(1.05rem, 1.6vw, 1.22rem); color: #ece6ee; text-wrap: pretty; }
+.ctas { display: flex; flex-wrap: wrap; justify-content: center; gap: 12px; margin-top: 30px; }
+.btn { display: inline-flex; align-items: center; min-height: 48px; padding: 0 22px; border-radius: 999px; border: 1px solid var(--line); color: var(--silver); text-decoration: none; font-weight: 600; font-size: .95rem; transition: transform .18s ease, background .18s ease, border-color .18s ease; }
+.btn:hover { transform: translateY(-1px); border-color: rgb(223 229 236 / .4); }
+.btn.primary { background: var(--amber); border-color: var(--amber); color: var(--amber-ink); }
+.note { margin-top: 16px; font-size: .84rem; color: var(--muted); }
+
+.film { margin-top: clamp(20px, 3vw, 36px); }
+.film-frame { border: 1px solid var(--line); border-radius: 20px; overflow: hidden; background: #160312; box-shadow: 0 60px 120px -50px rgb(251 179 3 / .35), 0 30px 80px -30px rgb(0 0 0 / .8); }
+.film video { display: block; width: 100%; aspect-ratio: 16 / 9; background: #160312; }
+.film figcaption { margin-top: 14px; text-align: center; font-size: .84rem; color: var(--muted); }
+
+section { padding-block: clamp(48px, 8vw, 96px); }
+h2 { margin: 10px 0 0; font: 400 clamp(2.1rem, 5vw, 3.4rem)/1.05 var(--serif); letter-spacing: -.01em; text-wrap: balance; }
+.sub { max-width: 42rem; margin-top: 14px; color: #d9d0db; }
+.grid { display: grid; gap: 14px; margin-top: 32px; }
+.g4 { grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); }
+.g3 { grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); }
+.card { padding: 22px; border: 1px solid var(--line); border-radius: 18px; background: linear-gradient(180deg, rgb(255 255 255 / .05), rgb(255 255 255 / .02)); }
+.card h3 { margin: 0; font: 400 1.6rem/1.15 var(--serif); }
+.card p { margin: 8px 0 0; font-size: .93rem; color: #d9d0db; }
+.step { font: 500 .7rem var(--mono); letter-spacing: .14em; color: var(--amber); }
+.card .step + h3 { margin-top: 10px; }
+code, kbd { font: .86em var(--mono); background: rgb(255 255 255 / .08); padding: .12em .42em; border-radius: 6px; }
+kbd { border: 1px solid var(--line); }
+
+.shot { margin: 32px 0 0; border: 1px solid var(--line); border-radius: 18px; overflow: hidden; background: #fff; }
+.shot img { display: block; width: 100%; height: auto; }
+.cap { margin-top: 12px; font-size: .84rem; color: var(--muted); }
+
+.nums { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 0; margin-top: 32px; border-block: 1px solid var(--line); }
+.nums div { padding: 22px 18px 20px 0; }
+.nums dt { font: 400 2.6rem/1 var(--serif); color: var(--amber); font-variant-numeric: tabular-nums; }
+.nums dd { margin: 8px 0 0; font-size: .88rem; color: #d9d0db; }
+
+.install { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 14px; margin-top: 32px; }
+pre { margin: 14px 0 0; padding: 14px 16px; border-radius: 12px; background: #160312; border: 1px solid var(--line); overflow-x: auto; font: .82rem/1.6 var(--mono); color: #f1e9d2; }
+pre code { background: none; padding: 0; font: inherit; }
+
+footer { padding-block: 36px 56px; border-top: 1px solid var(--line); font-size: .88rem; color: var(--muted); display: flex; flex-wrap: wrap; gap: 8px 24px; justify-content: space-between; }
+footer a { color: var(--silver); }
+@media (max-width: 560px) { .top nav a.opt, .brand .who { display: none; } .top nav { flex-wrap: nowrap; } .btn { width: 100%; justify-content: center; } }
+@media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } .btn { transition: none; } }
+</style>
+</head>
+<body>
+<a class="skip" href="#main">Skip to main content</a>
+<div class="wrap">
+  <header class="top">
+    <a class="brand" href="/"><img src="/shots/saywhen/icon.png" alt="" width="30" height="30"><span class="who">Mohamed Ansar <span aria-hidden="true">/</span></span> saywhen</a>
+    <nav aria-label="Page">
+      <a class="opt" href="#how">How it works</a>
+      <a class="opt" href="#numbers">Numbers</a>
+      <a href="#install">Install</a>
+      <a href="https://github.com/kmsmohamedansar/saywhen">GitHub</a>
+    </nav>
+  </header>
+
+  <main id="main">
+    <div class="hero">
+      <p class="kicker">Open source · Mac and Windows · beta</p>
+      <h1>Look. Talk. <em>Sent.</em></h1>
+      <p class="lede">saywhen is hands-free voice input for terminals and coding assistants. Look at the screen and say what you want. It types it, shows you a short preview you can cancel, and then presses Enter. No hotkey to hold.</p>
+      <div class="ctas">
+        <a class="btn primary" href="https://github.com/kmsmohamedansar/saywhen">Get it on GitHub</a>
+        <a class="btn" href="https://github.com/kmsmohamedansar/saywhen/releases/latest">Download the beta</a>
+        <a class="btn" href="/#project/saywhen">Read the full case study</a>
+      </div>
+      <p class="note">Free, MIT licensed. Your voice and camera stay on your computer.</p>
+    </div>
+
+    <figure class="film" style="margin-inline:0">
+      <div class="film-frame">
+        <video controls playsinline preload="metadata" poster="/p/saywhen/poster.jpg" aria-label="saywhen launch film, 60 seconds, with voice and sound">
+          <source src="/p/saywhen/demo.mp4" type="video/mp4">
+          Your browser cannot play this video. <a href="/p/saywhen/demo.mp4">Download the MP4</a>.
+        </video>
+      </div>
+      <figcaption>The 60-second launch film, with voice and sound. It is an animation that shows the idea, not a live screen recording, and its timing is not a speed measurement.</figcaption>
+    </figure>
+
+    <section id="how" aria-labelledby="how-title">
+      <p class="kicker">How it works</p>
+      <h2 id="how-title">Attention replaces the hotkey.</h2>
+      <p class="sub">The webcam and the microphone have to agree before saywhen listens. Neither is enough alone: a camera cannot tell chewing from talking, and a microphone cannot tell who you are talking to.</p>
+      <div class="grid g4">
+        <div class="card"><p class="step">01 · LOOK</p><h3>Face the screen</h3><p>The camera notices you are facing the screen. It keeps a few numbers, such as head angle. Pictures are never saved or sent.</p></div>
+        <div class="card"><p class="step">02 · TALK</p><h3>Just speak</h3><p>When your lips move and the microphone hears a voice, it starts listening. The last half second is kept, so the first word is not lost.</p></div>
+        <div class="card"><p class="step">03 · CHECK</p><h3>See it first</h3><p>Speech becomes text on your computer. <code>dash dash release</code> becomes <code>--release</code>. A preview shows the result with a short countdown.</p></div>
+        <div class="card"><p class="step">04 · SENT</p><h3>Then Enter</h3><p>The text is typed into the app in front. Enter is pressed only in apps you trust. Press <kbd>Esc</kbd>, shake your head, or keep talking to cancel.</p></div>
+      </div>
+      <div class="shot"><img src="/shots/saywhen/home-preview.webp" alt="The saywhen Home screen showing a preview card with a countdown, and the four send styles." width="1440" height="1040" loading="lazy"></div>
+      <p class="cap">The app's Home screen, captured in its browser demo mode with demo data.</p>
+    </section>
+
+    <section aria-labelledby="send-title" style="padding-top:0">
+      <p class="kicker">You stay in control</p>
+      <h2 id="send-title">Four ways to send. All of them cancelable.</h2>
+      <div class="grid g4">
+        <div class="card"><h3>Just pause</h3><p>Stop talking. A short countdown runs, then it sends. The default.</p></div>
+        <div class="card"><h3>Nod to send</h3><p>Nothing is sent until you nod.</p></div>
+        <div class="card"><h3>Say "send it"</h3><p>End with "send it" to press Enter. Otherwise the text is only typed.</p></div>
+        <div class="card"><h3>Type only</h3><p>Your words are typed. Enter is never pressed. Best for a first try.</p></div>
+      </div>
+      <div class="grid g3">
+        <div class="card"><p class="step">TRUSTED APPS</p><h3>Enter only where it is safe</h3><p>Terminals and code editors are trusted by default. In chat, email and browsers, saywhen only types.</p></div>
+        <div class="card"><p class="step">RISKY COMMANDS</p><h3>Never sent for you</h3><p>Commands such as <code>rm -rf</code> and <code>git push --force</code> are typed with a warning. You press Enter yourself. The check is a heuristic, not a guarantee.</p></div>
+        <div class="card"><p class="step">PRIVATE</p><h3>It stays on your computer</h3><p>Camera frames live in memory for a moment. Audio is discarded after it becomes text. After the speech model is downloaded, it works offline.</p></div>
+      </div>
+    </section>
+
+    <section id="numbers" aria-labelledby="numbers-title" style="padding-top:0">
+      <p class="kicker">Measured, with the caveats</p>
+      <h2 id="numbers-title">What the numbers say, and what they do not.</h2>
+      <dl class="nums">
+        <div><dt>34/34</dt><dd>spoken developer commands cleaned to the exact text. It was 44.1% before the clean-up pass.</dd></div>
+        <div><dt>0%</dt><dd>false starts on 56 replay clips, down from 36.4%. Cut-offs went from 52.9% to 0%.</dd></div>
+        <div><dt>12–15 ms</dt><dd>face tracking per camera frame on Apple Silicon.</dd></div>
+        <div><dt>87–473 ms</dt><dd>to turn 1.5 seconds of speech into text with Whisper tiny.en on the GPU.</dd></div>
+      </dl>
+      <p class="cap">These come from my own prototype sessions on Apple Silicon. The replay clips are generated speech with simulated camera traces, not live users. Real-user accuracy, CPU and battery are not measured yet, and checks on Windows, Intel Macs and signed Mac builds are still open. The <a href="https://github.com/kmsmohamedansar/saywhen/blob/main/docs/LAUNCH_CHECKLIST.md">launch checklist</a> lists what is verified.</p>
+    </section>
+
+    <section id="install" aria-labelledby="install-title" style="padding-top:0">
+      <p class="kicker">Try it</p>
+      <h2 id="install-title">Three ways in.</h2>
+      <div class="install">
+        <div class="card"><h3>Download</h3><p>Get the <code>.dmg</code> for Apple Silicon Macs or the <code>-setup.exe</code> for Windows from the releases page. The beta builds are not signed yet, and the README explains the one extra step.</p><p><a href="https://github.com/kmsmohamedansar/saywhen/releases/latest">Open the latest release</a></p></div>
+        <div class="card"><h3>Ask your coding assistant</h3><p>Paste this into Claude Code or Cursor:</p><pre><code>Clone https://github.com/kmsmohamedansar/saywhen
+and open that folder. Then follow
+INSTALL_WITH_AI.md from the top.
+Ask me before you install anything.</code></pre></div>
+        <div class="card"><h3>Build it yourself</h3><p>You need Node.js 20+, Rust and CMake.</p><pre><code>git clone https://github.com/kmsmohamedansar/saywhen.git
+cd saywhen
+npm ci
+npx tauri dev</code></pre></div>
+      </div>
+      <p class="cap">Built with Tauri v2, Rust and TypeScript, with MediaPipe, Silero VAD and Whisper running on the device. <a href="https://github.com/kmsmohamedansar/saywhen/blob/main/docs/HOW_IT_WORKS.md">How it works, in plain words</a> · <a href="https://github.com/kmsmohamedansar/saywhen/blob/main/docs/ARCHITECTURE.md">Architecture</a></p>
+    </section>
+  </main>
+
+  <footer>
+    <span>Built by <a href="/">Mohamed Ansar</a>. MIT licensed.</span>
+    <span><a href="/#project/saywhen">Case study</a> · <a href="https://github.com/kmsmohamedansar/saywhen">GitHub</a> · <a href="https://github.com/kmsmohamedansar/saywhen/issues/new/choose">Report a problem</a> · <a href="/">Portfolio home</a></span>
+  </footer>
+</div>
+</body>
+</html>

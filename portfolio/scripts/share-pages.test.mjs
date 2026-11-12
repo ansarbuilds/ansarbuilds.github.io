@@ -4,7 +4,7 @@ import { readFile, access } from 'node:fs/promises';
 import { resolve } from 'node:path';
 import { PROJECTS } from '../src/data/projects.js';
 
-const slugs = ['agent-flight-recorder', 'storyera', 'site-recon', 'authorized-web-exposure-audit', 'reptrack', 'jarvis'];
+const slugs = ['agent-flight-recorder', 'storyera', 'site-recon', 'authorized-web-exposure-audit', 'reptrack', 'jarvis', 'saywhen'];
 
 test('share pages have their own URLs, case-study links and existing images', async () => {
   const sitemap = await readFile('public/sitemap.xml', 'utf8');

@@ -8,7 +8,7 @@
 .st::before { content: ""; position: absolute; inset: 0 0 auto; height: 1px; background: linear-gradient(90deg, transparent, var(--st-accent), transparent); opacity: .7; }
 
 /* Tabs */
-.st-tabs { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); border-bottom: 1px solid var(--st-line); }
+.st-tabs { display: grid; grid-auto-flow: column; grid-auto-columns: minmax(0, 1fr); border-bottom: 1px solid var(--st-line); }
 .st-tab { position: relative; display: grid; grid-template-columns: auto minmax(0, 1fr); column-gap: 10px; row-gap: 3px; align-items: baseline; padding: 20px 18px 22px; text-align: left; border-left: 1px solid var(--st-line); opacity: .5; transition: opacity var(--dur-base), background var(--dur-base); }
 .st-tab:first-child { border-left: none; }
 .st-tab:hover { opacity: .85; background: color-mix(in srgb, var(--ed-blue) 3%, transparent); }
@@ -58,6 +58,8 @@
 .st-frame-bar i:nth-child(2) { background: #febc2e; } .st-frame-bar i:nth-child(3) { background: #28c840; }
 .st-frame-bar span { margin-left: 10px; font: .56rem var(--font-mono); color: #8a8f9c; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .st-frame-body { position: relative; flex: 1; min-height: 0; display: flex; }
+.st-frame.is-film .st-frame-body { background: #22061c; }
+.st-frame.is-film video { width: 100%; height: 100%; object-fit: contain; background: #22061c; }
 .st-frame.is-browser img, .st-frame.is-browser iframe { width: 100%; height: 100%; object-fit: cover; object-position: top left; border: 0; background: #fff; }
 .st-launch { position: absolute; left: 50%; bottom: 22px; translate: -50% 0; display: inline-flex; align-items: center; gap: 10px; min-height: 46px; padding: 0 20px; border-radius: 999px; background: #ff8a5f; color: #160b06; font: 700 .78rem var(--font-body); white-space: nowrap; box-shadow: 0 12px 40px -6px rgb(255 138 95 / .7), 0 0 0 6px rgb(255 138 95 / .16); transition: scale var(--dur-fast) var(--ease-out), box-shadow var(--dur-fast); }
 .st-launch:hover { scale: 1.05; }

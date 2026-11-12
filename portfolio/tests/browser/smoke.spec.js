@@ -18,6 +18,7 @@ test('share pages open their matching case studies', async ({ page }) => {
     ['site-recon', 'Site Recon'],
     ['authorized-web-exposure-audit', 'Exposure Audit'],
     ['reptrack', 'RepTrack'],
+    ['saywhen', 'saywhen'],
   ];
   for (const [slug, title] of projects) {
     // Vite serves the explicit file; GitHub Pages also serves the folder URL.

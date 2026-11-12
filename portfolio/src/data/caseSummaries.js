@@ -1,5 +1,11 @@
 // Short, evidence-backed summaries for selected public projects.
 export const CASE_SUMMARIES = {
+  saywhen: {
+    problem: 'Voice tools for developers need a key press to start and another to send, or they listen to everything in the room.',
+    outcome: 'A Mac and Windows app that listens when you face the screen and talk, then types the command behind a cancelable preview.',
+    proof: 'A 56-clip replay benchmark, 34 spoken-command clean-up cases, per-frame timings and a public launch checklist.',
+    limits: 'Beta. The replay clips are generated speech with simulated camera traces, not live users. Windows, Intel Mac and signed-build checks are still open.',
+  },
   'agent-flight-recorder': {
     problem: 'Agent failures can be hard to trace back through earlier actions and edits.',
     outcome: 'A local recorder and investigator with command-line, web and MCP interfaces.',

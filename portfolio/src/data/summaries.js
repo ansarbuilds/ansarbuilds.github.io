@@ -2,6 +2,7 @@
 // order. The Summary panel on each project page puts these under the
 // matching step. Why and result come from the project itself.
 export const STEP_TOOLS = {
+  saywhen: [["MediaPipe", "Silero VAD", "TypeScript"], ["Rust"], ["Whisper", "Rust"], ["Tauri", "Rust"]],
   "decision-models": [[], [], ["Ollama", "qwen2.5:7b", "Strands Decider 2B", "Kev-0.8B", "Laya", "MLX"], ["Python"]],
   "rea-study": [[], ["REA", "Ghidra", "Model Context Protocol"], ["Claude Code", "Claude Sonnet 5.5"], ["Python"]],
   "prh-jepa": [["pytest", "pandas"], ["PyTorch", "DINOv2", "Qwen2.5", "Hugging Face Transformers"], ["PyTorch", "Python"], ["Python"]],

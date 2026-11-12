@@ -11,7 +11,7 @@ A portfolio of agents, AI studies and shipped apps, with the proof for each. One
 
    **Motion.** `MOTION.md` is the reference: the rules, the tokens in `src/lib/motion.js` (mirrored as CSS variables in `index.css`), and the reduced-motion policy. `motion-audit/AUDIT.md` records what was measured and why each thing moves. The moving parts: `Enter` (the one scroll reveal), `Count` (the one counter), `Magnetic.jsx` (the two primary buttons), `Cursor.jsx`, `lib/routeTransition.js` (card to project page), `ScrubText` and `VelocityMarquee` in `Sections.jsx`.
 2. **The short version**: the positioning statement, four counts, the lines-of-code band, and a moving row of the tools I build with.
-3. **Selected work** (`#projects`): one interactive stage (`WorkStage.jsx`, `stage.css`) instead of six long sections. Tabs along the top pick a project; the demo sits on the left and the short version on the right. It moves on by itself until the visitor picks a tab. Jarvis runs its real sample-data demo in a frame, Haloscript switches between its own Mac, iPad and iPhone screenshots, PRH-JEPA shows a report figure with a toggle for its headline finding, and the Flight Recorder replay and Site Recon terminal are illustrations that say so. On small screens the tabs drop away and the six projects stack.
+3. **Selected work** (`#projects`): one interactive stage (`WorkStage.jsx`, `stage.css`) instead of seven long sections. Tabs along the top pick a project; the demo sits on the left and the short version on the right. It moves on by itself until the visitor picks a tab. saywhen plays its launch film, muted (the film is an animation, and the frame says so), Jarvis runs its real sample-data demo in a frame, Haloscript switches between its own Mac, iPad and iPhone screenshots, PRH-JEPA shows a report figure with a toggle for its headline finding, and the Flight Recorder replay and Site Recon terminal are illustrations that say so. On small screens the tabs drop away and the seven projects stack.
 4. **What I bring** (`#capabilities`): agents and tooling, evaluation and research, product and shipping, each with the projects that prove it.
 5. **More shipped work** (`#more`): image cards with one highlight each, then an "Also built" toggle for internal tools and early experiments.
 6. **The playground** (`#ai`): the EMET terminal, solar system, and infinity loop.
@@ -52,11 +52,15 @@ public/shots/           screenshots used on project pages
 
 ## Adding or changing a project
 
-Edit `src/data/projects.js` for the full story. The home page order and its short copy live in `src/data/showcase.js`: `FLAGSHIPS` (the six spreads, with their headline, stats, stack and floating visual), `MORE_WORK` (the image cards), `CAPABILITIES` and `STACK_MARQUEE`. Any listed project not named there appears under "Also built". Flow diagrams are columns of boxes; boxes link to the next column automatically, or list `links` like `"0.0>1.1"` for a specific shape. Add images to `public/shots/` and list them under `shots`.
+Edit `src/data/projects.js` for the full story. The home page order and its short copy live in `src/data/showcase.js`: `FLAGSHIPS` (the seven spreads, with their headline, stats, stack and floating visual), `MORE_WORK` (the image cards), `CAPABILITIES` and `STACK_MARQUEE`. Any listed project not named there appears under "Also built". Flow diagrams are columns of boxes; boxes link to the next column automatically, or list `links` like `"0.0>1.1"` for a specific shape. Add images to `public/shots/` and list them under `shots`.
 
 ## Writing style
 
 Plain words, first person, short sentences, no em dashes. Work projects stay generic: no employer, product, customer or retailer names, and no numbers.
+
+## saywhen launch page
+
+`public/p/saywhen/index.html` is a standalone page at `/p/saywhen/` with the 60-second launch film (`demo.mp4`, a 720p re-encode of the film in the saywhen repository), its poster and the share image. The saywhen README links to it, so keep the URL stable. `public/shots/spotlight/saywhen.webp` is the film's poster frame, an illustration and not a screenshot. `public/shots/saywhen/home-preview.webp` is the app in its browser demo mode.
 
 ## Run it
 
