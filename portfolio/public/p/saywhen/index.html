@@ -79,6 +79,24 @@ kbd { border: 1px solid var(--line); }
 .shot { margin: 32px 0 0; border: 1px solid var(--line); border-radius: 18px; overflow: hidden; background: #fff; }
 .shot img { display: block; width: 100%; height: auto; }
 .cap { margin-top: 12px; font-size: .84rem; color: var(--muted); }
+.scene { margin: 28px 0 0; }
+.scene img { display: block; width: 100%; height: auto; border: 1px solid var(--line); border-radius: 18px; }
+.scene figcaption { margin-top: 12px; font-size: .84rem; color: var(--muted); }
+.workbar { margin-top: 28px; }
+.workbar h3 { margin: 0; font: 400 1.7rem/1.2 var(--serif); }
+.bar { display: flex; height: 16px; margin-top: 16px; border-radius: 999px; overflow: hidden; }
+.bar span { display: block; height: 100%; }
+.bar .remote { width: 32.4%; background: #fbb303; }
+.bar .hybrid { width: 37.1%; background: #e4c07a; }
+.bar .flex { width: 12.6%; background: #dfe5ec; }
+.bar .office { width: 17.9%; background: #6d5a68; }
+.legend { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 10px 16px; list-style: none; padding: 0; margin: 14px 0 0; }
+.legend li { font-size: .92rem; }
+.swatch { display: inline-block; width: .7rem; height: .7rem; margin-right: .45rem; border-radius: 99px; vertical-align: -1px; }
+.swatch.remote { background: #fbb303; }
+.swatch.hybrid { background: #e4c07a; }
+.swatch.flex { background: #dfe5ec; }
+.swatch.office { background: #6d5a68; }
 
 .nums { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 0; margin-top: 32px; border-block: 1px solid var(--line); }
 .nums div { padding: 22px 18px 20px 0; }
@@ -132,7 +150,28 @@ footer a { color: var(--silver); }
       <figcaption>The 60-second launch film, with voice and sound. It is an animation that shows the idea, not a live screen recording, and its timing is not a speed measurement.</figcaption>
     </figure>
 
-    <section id="how" aria-labelledby="how-title">
+    <section id="who" aria-labelledby="who-title">
+      <p class="kicker">Who it's for</p>
+      <h2 id="who-title">For the day you work from home.</h2>
+      <p class="sub">62% of developers in the JetBrains 2025 survey regularly use an AI coding assistant or agent. saywhen is a hands-free way to talk to one, on the days you are home.</p>
+      <figure class="scene">
+        <img src="/p/saywhen/home-day.jpg" width="1024" height="576" alt="Illustration of a person at a home desk, hands resting off the keyboard, with a small amber pill glowing above the laptop.">
+        <figcaption>An illustration of a home desk, not a photograph of a user. In the 2025 Stack Overflow survey, 32.4% of developers worked fully remotely. In the US, 45% did.</figcaption>
+      </figure>
+      <div class="workbar">
+        <h3>Where developers worked in 2025</h3>
+        <div class="bar" aria-hidden="true"><span class="remote"></span><span class="hybrid"></span><span class="flex"></span><span class="office"></span></div>
+        <ul class="legend">
+          <li><span class="swatch remote" aria-hidden="true"></span>Fully remote, 32.4%</li>
+          <li><span class="swatch hybrid" aria-hidden="true"></span>Hybrid, 37.1%</li>
+          <li><span class="swatch flex" aria-hidden="true"></span>Free to choose, 12.6%</li>
+          <li><span class="swatch office" aria-hidden="true"></span>In an office, 17.9%</li>
+        </ul>
+        <p class="cap">Stack Overflow Developer Survey 2025. Share of developers who answered the work question. This is not a measure of who wants voice input. The US figure, 45% fully remote, is separate from this global bar.</p>
+      </div>
+    </section>
+
+    <section id="how" aria-labelledby="how-title" style="padding-top:0">
       <p class="kicker">How it works</p>
       <h2 id="how-title">Attention replaces the hotkey.</h2>
       <p class="sub">The webcam and the microphone have to agree before saywhen listens. Neither is enough alone: a camera cannot tell chewing from talking, and a microphone cannot tell who you are talking to.</p>
@@ -179,6 +218,16 @@ footer a { color: var(--silver); }
         <div><dt>87–473 ms</dt><dd>to turn 1.5 seconds of speech into text with Whisper tiny.en on the GPU.</dd></div>
       </dl>
       <p class="cap">These come from my own prototype sessions on Apple Silicon. The replay clips are generated speech with simulated camera traces, not live users. Real-user accuracy, CPU and battery are not measured yet, and checks on Windows, Intel Macs and signed Mac builds are still open. The <a href="https://github.com/kmsmohamedansar/saywhen/blob/main/docs/LAUNCH_CHECKLIST.md">launch checklist</a> lists what is verified.</p>
+    </section>
+
+    <section id="where" aria-labelledby="where-title" style="padding-top:0">
+      <p class="kicker">Home and office</p>
+      <h2 id="where-title">Talk at home. Stay quiet at the office.</h2>
+      <p class="sub">A hybrid week has both kinds of day. saywhen is for the home days. At the office, the keyboard shortcut still starts listening, and Type only never presses Enter.</p>
+      <figure class="scene">
+        <img src="/p/saywhen/home-and-office.jpg" width="1024" height="576" alt="Illustration split between a home desk, where the pill glows and the hands rest, and an open office, where the person is typing and the pill is dim.">
+        <figcaption>Home is the left room. The office is the right room. This is an illustration, not a claim about a typical weekly schedule.</figcaption>
+      </figure>
     </section>
 
     <section id="safe" aria-labelledby="safe-title" style="padding-top:0">

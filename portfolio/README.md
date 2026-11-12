@@ -60,7 +60,7 @@ Plain words, first person, short sentences, no em dashes. Work projects stay gen
 
 ## saywhen launch page
 
-`public/p/saywhen/index.html` is a standalone page at `/p/saywhen/` with the 60-second launch film (`demo.mp4`, a 720p re-encode of the film in the saywhen repository), its poster and the share image. `public/p/saywhen/loops/` holds seven short silent loops (MP4, with a WebP still each) rendered from the saywhen repository's `docs/visuals/animated/`. They play only while on screen, and not at all for reduced motion or data saver. They are illustrations, not screen recordings. The saywhen README links to it, so keep the URL stable. `public/shots/spotlight/saywhen.webp` is the film's poster frame, an illustration and not a screenshot. `public/shots/saywhen/home-preview.webp` is the app in its browser demo mode.
+`public/p/saywhen/index.html` is a standalone page at `/p/saywhen/` with the 60-second launch film (`demo.mp4`, a 720p re-encode of the film in the saywhen repository), its poster and the share image. `home-day.jpg` and `home-and-office.jpg` are illustrations of a home desk and a home-and-office split. The survey figures next to them are set in the page text, not painted into the pictures. `public/p/saywhen/loops/` holds seven short silent loops (MP4, with a WebP still each) rendered from the saywhen repository's `docs/visuals/animated/`. They play only while on screen, and not at all for reduced motion or data saver. They are illustrations, not screen recordings. The saywhen README links to it, so keep the URL stable. `public/shots/spotlight/saywhen.webp` is the film's poster frame, an illustration and not a screenshot. `public/shots/saywhen/home-preview.webp` is the app in its browser demo mode.
 
 ## Run it
 
