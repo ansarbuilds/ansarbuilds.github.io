@@ -26,111 +26,137 @@
 :root {
   --paper: #f6f1ea; --paper-2: #efe6da; --card: #fffdf9;
   --ink: #22061c; --ink-2: #5b4857; --ink-3: #8a7a87; --line: rgb(34 6 28 / .1); --line-2: rgb(34 6 28 / .18);
-  --plum: #2a0823; --amber: #fbb303; --amber-deep: #9a6400; --mint: #2f8a55;
+  --plum: #2a0823; --plum-deep: #180414; --amber: #fbb303; --amber-deep: #9a6400; --mint: #2f8a55; --danger: #c43b5a;
   --serif: "Instrument Serif", "Iowan Old Style", Georgia, serif;
   --sans: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
   --mono: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
   --ease: cubic-bezier(.2, .7, .2, 1);
+  --spring: cubic-bezier(.22, 1.15, .36, 1);
+  --mx: 50%; --my: 30%;
 }
 * { box-sizing: border-box; }
-html { scroll-behavior: smooth; -webkit-text-size-adjust: 100%; }
-body { margin: 0; background: var(--paper); color: var(--ink); font: 17px/1.6 var(--sans); -webkit-font-smoothing: antialiased; overflow-x: hidden; }
-body::after { content: ""; position: fixed; inset: 0; z-index: 50; pointer-events: none; opacity: .35; mix-blend-mode: multiply;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 .4 0 0 0 0 .3 0 0 0 0 .2 0 0 0 .09 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E"); }
+html { scroll-behavior: smooth; -webkit-text-size-adjust: 100%; overflow-x: clip; }
+body { margin: 0; width: 100%; max-width: 100%; background: var(--paper); color: var(--ink); font: 17px/1.6 var(--sans); -webkit-font-smoothing: antialiased; overflow-x: clip; }
+body::after { content: ""; position: fixed; inset: 0; z-index: 50; pointer-events: none; opacity: .32; mix-blend-mode: multiply;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 .4 0 0 0 0 .3 0 0 0 0 .2 0 0 0 .08 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E"); }
 a { color: inherit; text-underline-offset: 3px; text-decoration-thickness: 1px; }
-a:focus-visible, button:focus-visible, video:focus-visible { outline: 2px solid var(--ink); outline-offset: 3px; border-radius: 8px; }
+a:focus-visible, button:focus-visible, video:focus-visible, summary:focus-visible { outline: 2px solid var(--ink); outline-offset: 3px; border-radius: 8px; }
 img, video { max-width: 100%; }
-.wrap { width: min(100% - 32px, 1160px); margin-inline: auto; }
+.wrap { width: min(100% - 32px, 1160px); margin-inline: auto; min-width: 0; }
 .skip { position: absolute; left: -999px; } .skip:focus { left: 16px; top: 12px; background: var(--ink); color: var(--paper); padding: 8px 14px; border-radius: 8px; z-index: 60; }
 .eyebrow { display: inline-flex; align-items: center; gap: 8px; font: 500 .74rem var(--mono); letter-spacing: .12em; text-transform: uppercase; color: var(--ink-2); }
 .eyebrow::before { content: ""; width: 7px; height: 7px; border-radius: 50%; background: var(--amber); box-shadow: 0 0 0 4px rgb(251 179 3 / .2); }
 h2 { margin: 14px 0 0; font: 400 clamp(2.4rem, 5.6vw, 4.4rem)/1 var(--serif); letter-spacing: -.02em; text-wrap: balance; }
 h2 em, h1 em { font-style: italic; }
-.lead { margin: 18px 0 0; max-width: 36rem; font-size: clamp(1.02rem, 1.5vw, 1.15rem); color: var(--ink-2); text-wrap: pretty; }
+.lead { margin: 18px 0 0; max-width: 38rem; font-size: clamp(1.02rem, 1.5vw, 1.15rem); color: var(--ink-2); text-wrap: pretty; }
 .center { text-align: center; } .center .lead { margin-inline: auto; }
-section { padding-block: clamp(72px, 11vw, 140px); }
-code { font: .86em var(--mono); background: rgb(34 6 28 / .06); padding: .1em .4em; border-radius: 6px; }
-.band code { background: rgb(255 255 255 / .1); }
+section { padding-block: clamp(68px, 10vw, 132px); }
+section[id], .scene-shell[id] { scroll-margin-top: 88px; }
+code { font: .86em var(--mono); background: rgb(34 6 28 / .06); padding: .1em .4em; border-radius: 6px; word-break: break-word; }
+.band code { background: rgb(255 255 255 / .12); }
 
-/* nav */
-.nav { position: sticky; top: 14px; z-index: 40; display: flex; align-items: center; justify-content: space-between; gap: 16px; width: min(100% - 24px, 1160px); margin: 14px auto 0; padding: 8px 8px 8px 16px; border-radius: 999px; background: rgb(246 241 234 / .72); border: 1px solid transparent; -webkit-backdrop-filter: blur(14px) saturate(1.3); backdrop-filter: blur(14px) saturate(1.3); transition: border-color .3s, box-shadow .3s; }
-.nav.scrolled { border-color: var(--line); box-shadow: 0 10px 30px -18px rgb(34 6 28 / .35); }
+/* nav + scroll progress */
+.nav { position: sticky; top: 14px; z-index: 40; display: flex; align-items: center; justify-content: space-between; gap: 14px; width: min(100% - 24px, 1160px); margin: 14px auto 0; padding: 8px 8px 8px 16px; border-radius: 999px; background: rgb(246 241 234 / .78); border: 1px solid rgb(34 6 28 / .06); -webkit-backdrop-filter: blur(16px) saturate(1.35); backdrop-filter: blur(16px) saturate(1.35); transition: border-color .3s, box-shadow .3s, background .3s; overflow: hidden; }
+.nav.scrolled { border-color: var(--line-2); background: rgb(255 253 249 / .88); box-shadow: 0 12px 32px -18px rgb(34 6 28 / .35); }
+.scroll-meter { position: absolute; left: 20px; right: 20px; bottom: 0; height: 2px; border-radius: 999px; background: linear-gradient(90deg, var(--amber), #d45b92); transform-origin: left; transform: scaleX(0); opacity: .75; pointer-events: none; }
 .brand { display: inline-flex; align-items: center; gap: 10px; font-weight: 600; text-decoration: none; letter-spacing: -.01em; white-space: nowrap; }
 .brand img { width: 28px; height: 28px; border-radius: 8px; }
 .brand small { font-weight: 400; color: var(--ink-3); }
-.nav-links { display: flex; align-items: center; gap: 26px; font-size: .92rem; }
-.nav-links a { text-decoration: none; color: var(--ink-2); } .nav-links a:hover { color: var(--ink); }
+.nav-links { display: flex; align-items: center; gap: 22px; font-size: .9rem; }
+.nav-links a { text-decoration: none; color: var(--ink-2); white-space: nowrap; transition: color .2s; }
+.nav-links a:hover { color: var(--ink); }
 
 /* buttons */
-.btn { display: inline-flex; align-items: center; justify-content: center; gap: 10px; min-height: 48px; padding: 0 24px; border-radius: 999px; font: 500 .96rem var(--sans); text-decoration: none; border: 1px solid var(--line-2); background: var(--card); color: var(--ink); transition: transform .25s var(--ease), box-shadow .25s var(--ease), background .25s; cursor: pointer; }
-.btn:hover { transform: translateY(-2px); box-shadow: 0 12px 26px -14px rgb(34 6 28 / .45); }
-.btn.dark, .nav-links a.btn.dark { background: var(--ink); color: var(--paper); border-color: var(--ink); box-shadow: inset 0 1px 0 rgb(255 255 255 / .14), 0 10px 24px -12px rgb(34 6 28 / .7); }
-.btn.dark:hover { background: #3a0f32; }
+.btn { display: inline-flex; align-items: center; justify-content: center; gap: 10px; min-height: 48px; padding: 0 24px; border-radius: 999px; font: 500 .95rem var(--sans); text-decoration: none; border: 1px solid var(--line-2); background: var(--card); color: var(--ink); transition: transform .25s var(--ease), box-shadow .25s var(--ease), background .25s, border-color .25s; cursor: pointer; }
+.btn:hover { transform: translateY(-2px); box-shadow: 0 12px 26px -14px rgb(34 6 28 / .45); border-color: rgb(34 6 28 / .3); }
+.btn:active { transform: translateY(0) scale(.985); }
+.btn.dark, .nav-links a.btn.dark { background: var(--ink); color: var(--paper); border-color: var(--ink); box-shadow: inset 0 1px 0 rgb(255 255 255 / .14), 0 12px 28px -12px rgb(34 6 28 / .7); }
+.btn.dark:hover { background: #3a0f32; box-shadow: inset 0 1px 0 rgb(255 255 255 / .18), 0 18px 34px -14px rgb(34 6 28 / .75); }
 .btn.sm { min-height: 38px; padding: 0 16px; font-size: .88rem; }
 .btn svg { width: 17px; height: 17px; flex: none; }
+.cta-tag { padding: 2px 8px; border-radius: 999px; background: rgb(251 179 3 / .2); color: var(--amber); font: 500 .66rem var(--mono); letter-spacing: .04em; text-transform: uppercase; }
+.btn:not(.dark) .cta-tag { background: rgb(34 6 28 / .07); color: var(--ink-2); }
 
 /* hero */
-.hero { position: relative; padding-top: clamp(56px, 9vw, 110px); text-align: center; }
-.hero::before { content: ""; position: absolute; left: 50%; top: -120px; width: min(1300px, 140vw); height: 900px; transform: translateX(-50%); z-index: -1; pointer-events: none;
-  background: radial-gradient(40% 45% at 50% 30%, rgb(251 179 3 / .22), transparent 70%), radial-gradient(35% 40% at 20% 60%, rgb(214 120 160 / .16), transparent 70%), radial-gradient(35% 40% at 82% 55%, rgb(150 70 140 / .14), transparent 70%); }
-.badge { display: inline-flex; align-items: center; gap: 10px; padding: 6px 14px 6px 6px; border-radius: 999px; background: var(--card); border: 1px solid var(--line); font-size: .86rem; color: var(--ink-2); text-decoration: none; box-shadow: 0 6px 20px -14px rgb(34 6 28 / .4); }
+.hero { position: relative; padding-top: clamp(48px, 8vw, 96px); text-align: center; overflow-x: clip; }
+.hero::before { content: ""; position: absolute; left: 50%; top: -120px; width: min(1300px, 100%); height: 900px; transform: translateX(-50%); z-index: -1; pointer-events: none;
+  background: radial-gradient(38% 42% at var(--mx) var(--my), rgb(251 179 3 / .24), transparent 70%), radial-gradient(35% 40% at 20% 60%, rgb(214 120 160 / .16), transparent 70%), radial-gradient(35% 40% at 82% 55%, rgb(150 70 140 / .14), transparent 70%); transition: background-position .1s linear; }
+.badge { display: inline-flex; align-items: center; gap: 10px; padding: 6px 14px 6px 6px; border-radius: 999px; background: var(--card); border: 1px solid var(--line); font-size: .86rem; color: var(--ink-2); text-decoration: none; box-shadow: 0 6px 20px -14px rgb(34 6 28 / .4); transition: border-color .25s, transform .25s var(--ease); }
 .badge b { padding: 3px 10px; border-radius: 999px; background: var(--ink); color: var(--paper); font: 500 .72rem var(--mono); letter-spacing: .06em; }
-.badge:hover { color: var(--ink); }
-h1 { margin: 26px 0 0; font: 400 clamp(3.6rem, 12vw, 9rem)/.9 var(--serif); letter-spacing: -.035em; }
+.badge:hover { color: var(--ink); border-color: var(--line-2); transform: translateY(-1px); }
+h1 { margin: 24px 0 0; font: 400 clamp(3.5rem, 11.8vw, 8.8rem)/.9 var(--serif); letter-spacing: -.035em; }
 h1 .w { display: inline-block; }
 h1 em { position: relative; }
 .swash { position: absolute; left: -2%; bottom: -.1em; width: 106%; height: .32em; overflow: visible; }
 .swash path { fill: none; stroke: var(--amber); stroke-width: 9; stroke-linecap: round; stroke-dasharray: 520; stroke-dashoffset: 0; }
-.hero .lead { margin: 30px auto 0; max-width: 34rem; font-size: clamp(1.08rem, 1.8vw, 1.28rem); }
-.ctas { display: flex; flex-wrap: wrap; justify-content: center; gap: 12px; margin-top: 34px; }
-.meta { margin-top: 18px; font-size: .84rem; color: var(--ink-3); }
+.hero .lead { margin: 28px auto 0; max-width: 35rem; font-size: clamp(1.08rem, 1.8vw, 1.26rem); }
+.ctas { display: flex; flex-wrap: wrap; justify-content: center; gap: 12px; margin-top: 32px; }
+.meta { margin-top: 16px; font-size: .84rem; color: var(--ink-3); }
 .meta a { color: var(--ink-2); }
 
-/* scene */
-.scene { position: relative; margin: clamp(48px, 7vw, 80px) auto 0; width: min(100% - 24px, 1180px); aspect-ratio: 16 / 9.4; border-radius: clamp(20px, 3vw, 34px); overflow: hidden; isolation: isolate;
+/* interactive stage scene */
+.scene-shell { width: min(100% - 24px, 1180px); margin: clamp(44px, 6.5vw, 72px) auto 0; }
+.stage-tabs { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; margin-bottom: 14px; }
+.stage-tab { display: inline-flex; align-items: center; gap: 7px; padding: 7px 14px; border-radius: 999px; border: 1px solid var(--line); background: var(--card); color: var(--ink-2); font: 500 .8rem var(--sans); cursor: pointer; transition: background .2s, border-color .2s, color .2s, transform .2s var(--ease); }
+.stage-tab:hover { border-color: var(--line-2); color: var(--ink); transform: translateY(-1px); }
+.stage-tab[aria-pressed="true"] { background: var(--ink); border-color: var(--ink); color: var(--paper); box-shadow: 0 10px 22px -12px rgb(34 6 28 / .7); }
+.stage-tab .tab-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--amber); opacity: .55; }
+.stage-tab[aria-pressed="true"] .tab-dot { opacity: 1; }
+.stage-tab.stage-tab-replay { background: transparent; border-style: dashed; }
+
+.scene { position: relative; width: 100%; aspect-ratio: 16 / 9.2; border-radius: clamp(20px, 3vw, 34px); overflow: hidden; isolation: isolate;
   background: radial-gradient(70% 90% at 50% 120%, #ffb347 0%, #f59e5b 22%, #d77a8f 46%, #7d3a7a 72%, #3d1235 100%); box-shadow: 0 50px 100px -40px rgb(61 18 53 / .55), 0 0 0 1px rgb(34 6 28 / .08); }
 .scene::before { content: ""; position: absolute; inset: 0; background: radial-gradient(60% 50% at 50% 0%, rgb(255 255 255 / .25), transparent 70%); z-index: -1; }
 .sun { position: absolute; left: 50%; bottom: -38%; width: 70%; aspect-ratio: 1; transform: translateX(-50%); border-radius: 50%; background: radial-gradient(closest-side, rgb(255 230 170 / .9), rgb(255 190 90 / .35) 55%, transparent 72%); z-index: -1; animation: breathe 9s ease-in-out infinite alternate; }
 @keyframes breathe { to { transform: translateX(-50%) scale(1.08); opacity: .85; } }
-.win { position: absolute; left: 50%; top: 9%; width: 74%; height: 70%; transform: translateX(-50%); border-radius: 14px; overflow: hidden; background: #fbf8f4; box-shadow: 0 40px 80px -30px rgb(34 6 28 / .7), 0 0 0 1px rgb(255 255 255 / .5); text-align: left; display: flex; flex-direction: column; }
-.win-bar { display: flex; align-items: center; gap: 7px; padding: 11px 14px; border-bottom: 1px solid var(--line); background: #f3eee8; font: 500 .72rem var(--sans); color: var(--ink-3); }
-.win-bar i { width: 11px; height: 11px; border-radius: 50%; background: #e2d8cf; }
-.win-bar span { flex: 1; text-align: center; margin-right: 48px; }
-.win-body { flex: 1; padding: clamp(12px, 2vw, 22px) clamp(14px, 2.4vw, 26px); font: clamp(.62rem, 1.25vw, .95rem)/1.8 var(--mono); color: #3a2a36; white-space: pre-wrap; overflow: hidden; }
-.win-body .p { color: #9a3b7f; } .win-body .d { color: var(--ink-3); } .win-body .ok { color: var(--mint); font-weight: 500; }
+.win { position: absolute; left: 50%; top: 8.5%; width: 76%; height: 70%; transform: translateX(-50%); border-radius: 14px; overflow: hidden; background: #fbf8f4; box-shadow: 0 40px 80px -30px rgb(34 6 28 / .7), 0 0 0 1px rgb(255 255 255 / .5); text-align: left; display: flex; flex-direction: column; }
+.win-bar { display: flex; align-items: center; gap: 7px; padding: 10px 14px; border-bottom: 1px solid var(--line); background: #f3eee8; font: 500 .72rem var(--sans); color: var(--ink-3); }
+.win-bar i { width: 10px; height: 10px; border-radius: 50%; background: #e2d8cf; }
+.win-bar span { flex: 1; text-align: center; margin-right: 40px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.win-body { flex: 1; padding: clamp(12px, 2vw, 22px) clamp(14px, 2.4vw, 26px); font: clamp(.66rem, 1.25vw, .94rem)/1.75 var(--mono); color: #3a2a36; white-space: pre-wrap; overflow: hidden; }
+.win-body .p { color: #9a3b7f; } .win-body .d { color: var(--ink-3); } .win-body .ok { color: var(--mint); font-weight: 500; } .win-body .warn-tx { color: var(--amber-deep); font-weight: 500; }
 .caret { display: inline-block; width: .55em; height: 1.15em; vertical-align: -3px; background: var(--ink); animation: blink 1.05s steps(2) infinite; }
 @keyframes blink { 50% { opacity: 0; } }
-.cam { position: absolute; right: 3.2%; top: 4.2%; display: inline-flex; align-items: center; gap: 7px; padding: 6px 12px; border-radius: 999px; background: rgb(34 6 28 / .35); color: #fff; font: 500 clamp(.6rem, 1vw, .76rem) var(--sans); -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px); border: 1px solid rgb(255 255 255 / .2); }
-.cam::before { content: ""; width: 7px; height: 7px; border-radius: 50%; background: rgb(255 255 255 / .45); transition: background .4s, box-shadow .4s; }
+.cam { position: absolute; right: 3%; top: 4%; display: inline-flex; align-items: center; gap: 7px; padding: 6px 12px; border-radius: 999px; background: rgb(34 6 28 / .42); color: #fff; font: 500 clamp(.62rem, 1vw, .76rem) var(--sans); -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px); border: 1px solid rgb(255 255 255 / .22); }
+.cam::before { content: ""; width: 7px; height: 7px; border-radius: 50%; background: rgb(255 255 255 / .45); transition: background .35s, box-shadow .35s; }
 .cam.on::before { background: #8ff0b0; box-shadow: 0 0 10px #8ff0b0; }
-.said { position: absolute; left: 50%; bottom: 25%; transform: translate(-50%, 10px); max-width: 84%; padding: 10px 18px; border-radius: 18px 18px 18px 6px; background: rgb(255 253 249 / .96); color: var(--ink); font: italic 400 clamp(1rem, 2.2vw, 1.7rem)/1.2 var(--serif); white-space: nowrap; opacity: 0; transition: opacity .35s, transform .45s var(--ease); box-shadow: 0 20px 40px -20px rgb(34 6 28 / .6); }
+.said { position: absolute; left: 50%; bottom: 25%; transform: translate(-50%, 10px); max-width: 86%; padding: 10px 18px; border-radius: 18px 18px 18px 6px; background: rgb(255 253 249 / .97); color: var(--ink); font: italic 400 clamp(.96rem, 2.1vw, 1.6rem)/1.25 var(--serif); opacity: 0; transition: opacity .3s, transform .4s var(--ease); box-shadow: 0 20px 40px -20px rgb(34 6 28 / .6); pointer-events: none; text-align: left; }
 .said.on { opacity: 1; transform: translate(-50%, 0); }
-.said .heard { display: block; margin-bottom: 2px; font: normal 500 .62rem var(--mono); letter-spacing: .1em; text-transform: uppercase; color: var(--ink-3); }
-.preview { position: absolute; left: 50%; bottom: 17%; width: min(62%, 520px); transform: translate(-50%, 16px) scale(.97); padding: clamp(10px, 1.6vw, 16px) clamp(12px, 1.8vw, 18px); border-radius: 16px; background: rgb(42 8 35 / .94); color: #fff; text-align: left; -webkit-backdrop-filter: blur(12px); backdrop-filter: blur(12px); border: 1px solid rgb(251 179 3 / .45); box-shadow: 0 30px 60px -24px #000; opacity: 0; transition: opacity .35s, transform .5s cubic-bezier(.2, .9, .2, 1.15); }
-.preview.on { opacity: 1; transform: translate(-50%, 0) scale(1); }
-.pv-top { display: flex; justify-content: space-between; font: 500 clamp(.56rem, .9vw, .72rem) var(--sans); color: rgb(255 255 255 / .6); }
-.pv-top b { font: italic 400 clamp(.9rem, 1.4vw, 1.1rem) var(--serif); color: var(--amber); }
-.pv-cmd { margin-top: 4px; font: 500 clamp(.78rem, 1.6vw, 1.12rem) var(--mono); }
+.said .heard { display: block; margin-bottom: 2px; font: normal 500 .6rem var(--mono); letter-spacing: .1em; text-transform: uppercase; color: var(--ink-3); }
+.preview { position: absolute; left: 50%; bottom: 16.5%; width: min(64%, 540px); transform: translate(-50%, 16px) scale(.97); padding: clamp(10px, 1.6vw, 16px) clamp(12px, 1.8vw, 18px); border-radius: 16px; background: rgb(34 6 28 / .95); color: #fff; text-align: left; -webkit-backdrop-filter: blur(14px); backdrop-filter: blur(14px); border: 1px solid rgb(251 179 3 / .5); box-shadow: 0 30px 60px -24px #000; opacity: 0; pointer-events: none; transition: opacity .3s, transform .45s var(--spring), border-color .25s; }
+.preview.on { opacity: 1; transform: translate(-50%, 0) scale(1); pointer-events: auto; }
+.preview.canceled { border-color: #ff8aa4; animation: shake-pv .42s var(--ease); }
+@keyframes shake-pv { 0%, 100% { transform: translate(-50%, 0); } 25% { transform: translate(calc(-50% - 7px), 0); } 55% { transform: translate(calc(-50% + 7px), 0); } 80% { transform: translate(calc(-50% - 3px), 0); } }
+.pv-top { display: flex; justify-content: space-between; align-items: center; gap: 10px; font: 500 clamp(.58rem, .9vw, .72rem) var(--sans); color: rgb(255 255 255 / .68); }
+.pv-top b { font: italic 400 clamp(.9rem, 1.4vw, 1.1rem) var(--serif); color: var(--amber); white-space: nowrap; }
+.pv-cmd { margin-top: 4px; font: 500 clamp(.78rem, 1.55vw, 1.08rem) var(--mono); word-break: break-word; }
 .pv-bar { height: 3px; margin-top: 10px; border-radius: 3px; background: rgb(255 255 255 / .14); overflow: hidden; }
-.pv-bar i { display: block; height: 100%; background: var(--amber); transform-origin: left; }
-.preview.on .pv-bar i { animation: drain 1.8s linear forwards; } @keyframes drain { from { transform: scaleX(1); } to { transform: scaleX(0); } }
-.pv-keys { margin-top: 8px; font: .6rem var(--mono); color: rgb(255 255 255 / .55); }
-.pv-keys kbd { font: inherit; padding: 1px 6px; border-radius: 5px; border: 1px solid rgb(255 255 255 / .25); color: #fff; background: none; }
-.pill { position: absolute; left: 50%; bottom: 5.5%; transform: translateX(-50%); display: inline-flex; align-items: center; gap: 10px; padding: 8px 18px 8px 8px; border-radius: 999px; background: rgb(30 5 25 / .9); color: #fff; font: 500 clamp(.66rem, 1.15vw, .88rem) var(--sans); white-space: nowrap; border: 1px solid rgb(255 255 255 / .16); box-shadow: 0 16px 40px -14px #000; -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px); transition: border-color .35s, box-shadow .35s; }
-.pill img { width: clamp(18px, 2vw, 24px); height: auto; border-radius: 6px; }
-.pill .dot { width: 8px; height: 8px; border-radius: 50%; background: rgb(255 255 255 / .35); transition: background .3s; }
-.pill .t { color: rgb(255 255 255 / .55); font-weight: 400; }
+.pv-bar i { display: block; height: 100%; background: var(--amber); transform-origin: left; width: 100%; transition: transform .09s linear; }
+.pv-foot { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px; margin-top: 10px; }
+.pv-keys { font: .62rem var(--mono); color: rgb(255 255 255 / .62); }
+.pv-keys kbd { font: inherit; padding: 1px 6px; border-radius: 5px; border: 1px solid rgb(255 255 255 / .28); color: #fff; background: none; }
+.pv-btns { display: inline-flex; gap: 6px; }
+.pv-btn { padding: 4px 11px; border-radius: 999px; border: 1px solid rgb(255 255 255 / .25); background: rgb(255 255 255 / .08); color: #fff; font: 500 .66rem var(--sans); cursor: pointer; transition: background .2s, transform .2s; }
+.pv-btn:hover { background: rgb(255 255 255 / .18); }
+.pv-btn-send { background: var(--amber); border-color: var(--amber); color: var(--ink); font-weight: 600; }
+.pv-btn-send:hover { background: #ffc42e; }
+.pill { position: absolute; left: 50%; bottom: 5%; transform: translateX(-50%); display: inline-flex; align-items: center; gap: 10px; padding: 8px 18px 8px 8px; border-radius: 999px; background: rgb(30 5 25 / .92); color: #fff; font: 500 clamp(.68rem, 1.15vw, .88rem) var(--sans); white-space: nowrap; max-width: calc(100% - 24px); overflow: hidden; border: 1px solid rgb(255 255 255 / .18); box-shadow: 0 16px 40px -14px #000; -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px); transition: border-color .35s, box-shadow .35s; }
+.pill img { width: clamp(18px, 2vw, 24px); height: auto; border-radius: 6px; flex: none; }
+.pill .dot { width: 8px; height: 8px; border-radius: 50%; background: rgb(255 255 255 / .35); transition: background .3s; flex: none; }
+.pill .t { color: rgb(255 255 255 / .6); font-weight: 400; overflow: hidden; text-overflow: ellipsis; }
 .pill[data-s="ready"] .dot { background: #fff; }
-.pill[data-s="listening"], .pill[data-s="check"] { border-color: rgb(251 179 3 / .8); box-shadow: 0 0 40px -8px rgb(251 179 3 / .8), 0 16px 40px -14px #000; }
+.pill[data-s="listening"], .pill[data-s="check"] { border-color: rgb(251 179 3 / .82); box-shadow: 0 0 42px -8px rgb(251 179 3 / .82), 0 16px 40px -14px #000; }
 .pill[data-s="listening"] .dot, .pill[data-s="check"] .dot, .pill[data-s="writing"] .dot { background: var(--amber); }
 .pill[data-s="listening"] b, .pill[data-s="check"] b { color: var(--amber); }
-.pill[data-s="sent"] .dot { background: #8ff0b0; } .pill[data-s="sent"] { border-color: rgb(143 240 176 / .6); }
+.pill[data-s="sent"] .dot { background: #8ff0b0; } .pill[data-s="sent"] { border-color: rgb(143 240 176 / .65); }
+.pill[data-s="canceled"] .dot { background: #ff8aa4; } .pill[data-s="canceled"] { border-color: rgb(255 138 164 / .7); }
+.pill[data-s="canceled"] b { color: #ff8aa4; }
 .eq { display: none; gap: 2px; height: 14px; align-items: center; }
 .pill[data-s="listening"] .eq { display: inline-flex; }
 .eq i { width: 3px; height: 100%; border-radius: 2px; background: var(--amber); animation: eq .6s ease-in-out infinite alternate; }
 .eq i:nth-child(2) { animation-delay: -.4s; } .eq i:nth-child(3) { animation-delay: -.15s; } .eq i:nth-child(4) { animation-delay: -.5s; } .eq i:nth-child(5) { animation-delay: -.3s; }
 @keyframes eq { from { transform: scaleY(.25); } to { transform: scaleY(1); } }
-.scene-cap { margin-top: 16px; text-align: center; font-size: .82rem; color: var(--ink-3); }
+.scene-cap { margin-top: 14px; text-align: center; font-size: .84rem; color: var(--ink-3); }
 
 /* marquee */
 .works { padding-block: clamp(40px, 6vw, 64px) 0; text-align: center; }
@@ -142,7 +168,7 @@ h1 em { position: relative; }
 @keyframes slide { to { transform: translateX(-50%); } }
 
 /* steps */
-.steps { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; margin-top: 56px; }
+.steps { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; margin-top: 52px; }
 .step { position: relative; border-radius: 26px; background: var(--card); border: 1px solid var(--line); overflow: hidden; transition: transform .4s var(--ease), box-shadow .4s var(--ease); }
 .step:hover { transform: translateY(-4px); box-shadow: 0 30px 60px -36px rgb(34 6 28 / .5); }
 .viz { position: relative; height: 230px; background: linear-gradient(180deg, var(--paper-2), #f7efe4); border-bottom: 1px solid var(--line); display: grid; place-items: center; overflow: hidden; }
@@ -150,7 +176,7 @@ h1 em { position: relative; }
 .step-copy .n { font: 500 .74rem var(--mono); color: var(--ink-3); letter-spacing: .1em; }
 .step-copy h3 { margin: 6px 0 0; font: 400 2.1rem/1 var(--serif); }
 .step-copy p { margin: 10px 0 0; color: var(--ink-2); font-size: .96rem; }
-.face { position: relative; width: 112px; height: 140px; }
+.face { position: relative; width: 112px; height: 140px; margin-bottom: 34px; transform: scale(.88); }
 .face .head { position: absolute; inset: 0; border-radius: 48% 48% 44% 44%; border: 1.5px solid var(--ink); background: var(--card); }
 .face .eye { position: absolute; top: 54px; width: 12px; height: 4px; border-radius: 4px; background: var(--ink); }
 .face .eye.l { left: 31px; } .face .eye.r { right: 31px; }
@@ -165,32 +191,38 @@ h1 em { position: relative; }
 .scan { position: absolute; left: -26px; right: -26px; height: 2px; top: -20px; z-index: 2; background: linear-gradient(90deg, transparent, var(--amber), transparent); animation: scan 2.6s var(--ease) infinite; }
 @keyframes scan { 50% { top: calc(100% + 18px); } }
 .readout { position: absolute; left: 0; right: 0; bottom: 12px; display: flex; justify-content: center; gap: 14px; font: .66rem var(--mono); color: var(--ink-2); white-space: nowrap; }
-.face { margin-bottom: 34px; transform: scale(.88); }
 .readout b { color: var(--mint); font-weight: 500; }
 .wave { display: flex; align-items: center; gap: 5px; height: 90px; margin-bottom: 30px; }
 .wave i { width: 6px; border-radius: 6px; background: var(--ink); animation: wave 1.1s ease-in-out infinite alternate; }
 @keyframes wave { from { height: 12%; } to { height: 100%; } }
-.talk-word { position: absolute; bottom: 18px; left: 0; right: 0; text-align: center; font: italic 1.3rem var(--serif); color: var(--ink-2); }
+.talk-word { position: absolute; bottom: 18px; left: 0; right: 0; text-align: center; font: italic 1.25rem var(--serif); color: var(--ink-2); }
 .mini { width: 78%; padding: 14px 16px; border-radius: 14px; background: var(--plum); color: #fff; box-shadow: 0 20px 40px -20px rgb(34 6 28 / .8); }
 .mini .pv-cmd { font-size: .9rem; }
 .mini .pv-bar i { animation: drain 2.4s linear infinite; }
+@keyframes drain { from { transform: scaleX(1); } to { transform: scaleX(0); } }
 .esc { position: absolute; right: 16px; bottom: 14px; display: inline-flex; align-items: center; justify-content: center; min-width: 46px; height: 32px; padding: 0 10px; border-radius: 8px; background: var(--card); border: 1px solid var(--line-2); border-bottom-width: 3px; font: 500 .74rem var(--mono); animation: press 2.4s ease-in-out infinite; }
 @keyframes press { 0%, 80%, 100% { transform: none; border-bottom-width: 3px; } 88% { transform: translateY(2px); border-bottom-width: 1px; } }
+.loop-strip { margin-top: 28px; display: grid; grid-template-columns: 1.1fr 1fr; gap: 20px; align-items: center; padding: 20px; border-radius: 24px; background: var(--card); border: 1px solid var(--line); }
+.loop-strip .frame { margin-top: 0; border-radius: 16px; }
+.loop-strip h4 { margin: 0; font: 400 1.65rem/1.1 var(--serif); }
+.loop-strip p { margin: 8px 0 0; font-size: .92rem; color: var(--ink-2); }
 
 /* dev speak */
-.dev { display: grid; grid-template-columns: 1fr 1.15fr; gap: clamp(32px, 6vw, 90px); align-items: center; }
+.dev { display: grid; grid-template-columns: 1fr 1.15fr; gap: clamp(32px, 6vw, 84px); align-items: center; }
 .rows { border-radius: 26px; background: var(--card); border: 1px solid var(--line); padding: 10px; box-shadow: 0 30px 70px -50px rgb(34 6 28 / .6); }
 .rows-head { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; padding: 10px 16px 6px; font: 500 .68rem var(--mono); letter-spacing: .1em; text-transform: uppercase; color: var(--ink-3); }
-.row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; align-items: center; padding: 14px 16px; border-radius: 16px; border-top: 1px solid var(--line); transition: background .4s; }
-.row .h { font: italic 1.2rem/1.25 var(--serif); color: var(--ink-3); text-decoration: line-through; text-decoration-color: rgb(34 6 28 / .25); }
-.row .c { font: 500 .92rem var(--mono); }
+.row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; align-items: center; width: 100%; padding: 13px 16px; border: 0; border-top: 1px solid var(--line); border-radius: 16px; background: transparent; text-align: left; cursor: pointer; font: inherit; transition: background .3s; }
+.row:hover { background: rgb(251 241 220 / .55); }
+.row .h { font: italic 1.15rem/1.25 var(--serif); color: var(--ink-3); text-decoration: line-through; text-decoration-color: rgb(34 6 28 / .25); }
+.row .c { font: 500 .9rem var(--mono); color: var(--ink); word-break: break-word; }
 .row.hot { background: #fbf1dc; border-top-color: transparent; }
 .row.hot + .row { border-top-color: transparent; }
 .row.hot .c::after { content: ""; display: inline-block; width: 7px; height: 7px; margin-left: 10px; border-radius: 50%; background: var(--amber); vertical-align: 2px; }
+.dev-rule { margin-top: 16px; padding: 12px 16px; border-radius: 14px; background: var(--paper-2); font: 500 .82rem var(--mono); color: var(--ink-2); }
 .footnote { margin-top: 14px; font-size: .82rem; color: var(--ink-3); }
 
 /* media */
-.frame { margin-top: 48px; border-radius: 28px; overflow: hidden; background: var(--plum); box-shadow: 0 50px 100px -50px rgb(34 6 28 / .7), 0 0 0 1px var(--line); }
+.frame { margin-top: 44px; border-radius: 28px; overflow: hidden; background: var(--plum); box-shadow: 0 50px 100px -50px rgb(34 6 28 / .7), 0 0 0 1px var(--line); }
 .frame video, .frame img { display: block; width: 100%; height: auto; }
 .film-wrap { position: relative; }
 .film-wrap video { aspect-ratio: 16 / 9; background: var(--plum); }
@@ -200,33 +232,38 @@ h1 em { position: relative; }
 .play span i { display: grid; place-items: center; width: 34px; height: 34px; border-radius: 50%; background: var(--ink); }
 .play span i::before { content: ""; margin-left: 3px; border-left: 11px solid #fff; border-block: 7px solid transparent; }
 .cap { margin-top: 14px; font-size: .84rem; color: var(--ink-3); text-align: center; }
-.split { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; margin-top: 48px; }
+.split { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; margin-top: 44px; }
 .split .frame { margin-top: 0; }
 
-/* send styles */
-.modes { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; margin-top: 48px; }
-.mode { padding: 26px 24px; border-radius: 22px; background: var(--card); border: 1px solid var(--line); transition: transform .35s var(--ease), border-color .35s; }
+/* send styles + interactive detail */
+.modes { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; margin-top: 44px; }
+.mode { text-align: left; font: inherit; color: inherit; cursor: pointer; padding: 24px 22px; border-radius: 22px; background: var(--card); border: 1px solid var(--line); transition: transform .3s var(--ease), border-color .25s, box-shadow .25s, background .25s; display: flex; flex-direction: column; align-items: flex-start; }
 .mode:hover { transform: translateY(-3px); border-color: var(--line-2); }
-.mode .ic { width: 44px; height: 44px; border-radius: 12px; display: grid; place-items: center; background: var(--paper-2); font: 1.15rem var(--sans); }
-.mode h3 { margin: 18px 0 0; font: 400 1.6rem/1.05 var(--serif); }
-.mode p { margin: 8px 0 0; font-size: .92rem; color: var(--ink-2); }
-.mode .tag { display: inline-block; margin-top: 14px; padding: 3px 10px; border-radius: 999px; background: #fbf1dc; color: var(--amber-deep); font: 500 .7rem var(--mono); }
-.cancel { margin-top: 26px; text-align: center; color: var(--ink-2); font-size: .98rem; }
+.mode[aria-pressed="true"] { border-color: var(--ink); background: #fffbf2; box-shadow: 0 24px 44px -30px rgb(34 6 28 / .55), 0 0 0 1px var(--ink); }
+.mode .ic { width: 42px; height: 42px; border-radius: 12px; display: grid; place-items: center; background: var(--paper-2); font: 1.1rem var(--sans); }
+.mode h3 { margin: 16px 0 0; font: 400 1.55rem/1.05 var(--serif); }
+.mode p { margin: 8px 0 0; font-size: .91rem; color: var(--ink-2); }
+.mode .tag { display: inline-block; margin-top: auto; padding: 3px 10px; border-radius: 999px; background: #fbf1dc; color: var(--amber-deep); font: 500 .7rem var(--mono); }
+.mode-stage-card { margin-top: 20px; display: grid; grid-template-columns: 1.05fr 1fr; gap: 22px; align-items: center; padding: 22px; border-radius: 24px; background: var(--card); border: 1px solid var(--line); }
+.mode-stage-card .frame { margin-top: 0; border-radius: 16px; }
+.mode-detail-copy h4 { margin: 8px 0 0; font: 400 1.8rem/1.08 var(--serif); }
+.mode-detail-copy p { margin: 8px 0 0; font-size: .94rem; color: var(--ink-2); }
+.cancel { margin-top: 24px; text-align: center; color: var(--ink-2); font-size: .96rem; }
 kbd { font: 500 .8em var(--mono); padding: .12em .5em; border-radius: 6px; border: 1px solid var(--line-2); border-bottom-width: 2px; background: var(--card); }
 
 /* dark band */
 .band { background: var(--plum); color: #f3ead9; border-radius: clamp(24px, 4vw, 48px); width: min(100% - 16px, 1400px); margin-inline: auto; position: relative; overflow: hidden; isolation: isolate; }
-.band::before { content: ""; position: absolute; inset: auto -10% -60% -10%; height: 90%; background: radial-gradient(closest-side, rgb(251 179 3 / .22), transparent 70%); z-index: -1; }
-.band .eyebrow { color: rgb(243 234 217 / .7); }
-.band .lead { color: rgb(243 234 217 / .78); }
+.band::before { content: ""; position: absolute; inset: auto -10% -60% -10%; height: 90%; background: radial-gradient(closest-side at var(--mx) 65%, rgb(251 179 3 / .22), transparent 70%); z-index: -1; }
+.band .eyebrow { color: rgb(243 234 217 / .72); }
+.band .lead { color: rgb(243 234 217 / .8); }
 .band h2 em { color: var(--amber); }
-.pillars { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1px; margin-top: 56px; background: rgb(243 234 217 / .14); border-radius: 22px; overflow: hidden; }
-.pillar { padding: 30px 28px; background: var(--plum); }
-.pillar h3 { margin: 0; font: 400 1.7rem var(--serif); color: #fff; }
-.pillar p { margin: 10px 0 0; font-size: .94rem; color: rgb(243 234 217 / .72); }
+.pillars { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1px; margin-top: 48px; background: rgb(243 234 217 / .14); border-radius: 22px; overflow: hidden; }
+.pillar { padding: 28px 26px; background: var(--plum); }
+.pillar h3 { margin: 0; font: 400 1.65rem var(--serif); color: #fff; }
+.pillar p { margin: 10px 0 0; font-size: .93rem; color: rgb(243 234 217 / .74); }
 .band .frame { box-shadow: 0 0 0 1px rgb(243 234 217 / .14); }
-.band .cap { color: rgb(243 234 217 / .55); }
-.warn { margin-top: 36px; padding: 18px 22px; border-radius: 18px; border: 1px dashed rgb(243 234 217 / .3); font-size: .92rem; color: rgb(243 234 217 / .8); }
+.band .cap { color: rgb(243 234 217 / .58); }
+.warn { margin-top: 32px; padding: 18px 22px; border-radius: 18px; border: 1px dashed rgb(243 234 217 / .32); font-size: .92rem; color: rgb(243 234 217 / .82); }
 .warn b { color: #fff; }
 
 /* who */
@@ -237,61 +274,70 @@ kbd { font: 500 .8em var(--mono); padding: .12em .5em; border-radius: 6px; borde
 .bar span:nth-child(2) { transition-delay: .15s; } .bar span:nth-child(3) { transition-delay: .3s; } .bar span:nth-child(4) { transition-delay: .45s; }
 .legend { display: flex; flex-wrap: wrap; gap: 8px 22px; list-style: none; padding: 0; margin: 14px 0 0; font-size: .9rem; color: var(--ink-2); }
 .legend i { display: inline-block; width: 10px; height: 10px; margin-right: 8px; border-radius: 50%; vertical-align: -1px; }
-.who-grid { display: grid; grid-template-columns: 1.3fr 1fr; gap: clamp(28px, 5vw, 70px); align-items: center; margin-top: 48px; }
+.who-grid { display: grid; grid-template-columns: 1.3fr 1fr; gap: clamp(28px, 5vw, 70px); align-items: center; margin-top: 44px; }
 .who-grid .frame { margin-top: 0; }
 
 /* numbers */
-.nums { display: grid; grid-template-columns: repeat(4, 1fr); margin: 56px 0 0; border-top: 1px solid var(--line-2); }
-.nums div { padding: 28px 20px 0 0; }
-.nums dt { font: 400 clamp(2.8rem, 5vw, 4rem)/1 var(--serif); letter-spacing: -.02em; font-variant-numeric: tabular-nums; }
+.nums { display: grid; grid-template-columns: repeat(4, 1fr); margin: 48px 0 0; border-top: 1px solid var(--line-2); }
+.nums div { padding: 26px 20px 0 0; }
+.nums dt { font: 400 clamp(2.7rem, 5vw, 3.9rem)/1 var(--serif); letter-spacing: -.02em; font-variant-numeric: tabular-nums; }
 .nums dt small { font-size: .4em; }
 .nums dd { margin: 12px 0 0; font-size: .9rem; color: var(--ink-2); }
-.caveat { margin-top: 40px; max-width: 46rem; font-size: .88rem; color: var(--ink-3); }
+.caveat { margin-top: 34px; max-width: 48rem; font-size: .88rem; color: var(--ink-3); }
 
-/* install */
-.ways { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-top: 48px; text-align: left; }
-.way { display: flex; flex-direction: column; padding: 28px 26px; border-radius: 24px; background: var(--card); border: 1px solid var(--line); min-width: 0; }
+/* install + faq */
+.ways { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; margin-top: 44px; text-align: left; }
+.way { display: flex; flex-direction: column; padding: 26px 24px; border-radius: 24px; background: var(--card); border: 1px solid var(--line); min-width: 0; max-width: 100%; }
 .way .n { font: 500 .72rem var(--mono); letter-spacing: .1em; color: var(--ink-3); }
 .way h3 { margin: 8px 0 0; font: 400 1.8rem var(--serif); }
-.way p { margin: 8px 0 0; font-size: .93rem; color: var(--ink-2); }
+.way p { margin: 8px 0 0; font-size: .92rem; color: var(--ink-2); }
 .way .btns { display: flex; flex-wrap: wrap; gap: 8px; margin-top: auto; padding-top: 20px; }
-.code { position: relative; margin-top: 16px; }
-.code pre { margin: 0; padding: 14px 16px; border-radius: 14px; background: var(--plum); color: #f3ead9; font: .78rem/1.65 var(--mono); overflow-x: auto; white-space: pre; }
+.code { position: relative; margin-top: 14px; width: 100%; max-width: 100%; min-width: 0; }
+.code pre { margin: 0; padding: 13px 14px; border-radius: 14px; background: var(--plum); color: #f3ead9; font: .76rem/1.6 var(--mono); overflow-x: auto; white-space: pre; width: 100%; max-width: 100%; }
 .code pre code { background: none; padding: 0; font: inherit; }
-.copy { position: absolute; top: 8px; right: 8px; padding: 4px 10px; border-radius: 8px; border: 1px solid rgb(243 234 217 / .25); background: rgb(42 8 35 / .9); color: #f3ead9; font: 500 .7rem var(--sans); cursor: pointer; }
+.copy { position: absolute; top: 8px; right: 8px; padding: 4px 10px; border-radius: 8px; border: 1px solid rgb(243 234 217 / .25); background: rgb(42 8 35 / .92); color: #f3ead9; font: 500 .7rem var(--sans); cursor: pointer; }
 .copy:hover { background: #4a1242; }
+
+.faq-grid { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 14px; margin-top: 36px; text-align: left; }
+.faq-item { border-radius: 18px; background: var(--card); border: 1px solid var(--line); padding: 18px 20px; }
+.faq-item summary { font: 500 .96rem var(--sans); cursor: pointer; list-style: none; display: flex; justify-content: space-between; align-items: center; gap: 12px; }
+.faq-item summary::-webkit-details-marker { display: none; }
+.faq-item summary::after { content: "+"; font: 400 1.2rem var(--mono); color: var(--ink-3); transition: transform .2s; }
+.faq-item[open] summary::after { transform: rotate(45deg); color: var(--ink); }
+.faq-item p { margin: 12px 0 0; font-size: .9rem; color: var(--ink-2); }
 
 /* final */
 .final { text-align: center; }
-.final h2 { font-size: clamp(3rem, 9vw, 7rem); }
+.final h2 { font-size: clamp(3rem, 9vw, 6.8rem); }
 footer { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 14px 28px; padding-block: 36px 52px; border-top: 1px solid var(--line); font-size: .88rem; color: var(--ink-3); }
 footer nav { display: flex; flex-wrap: wrap; gap: 8px 22px; }
 footer a { color: var(--ink-2); text-decoration: none; } footer a:hover { color: var(--ink); }
 
 /* reveal */
-.js .rv { opacity: 0; transform: translateY(26px); filter: blur(6px); transition: opacity .9s var(--ease), transform .9s var(--ease), filter .9s var(--ease); transition-delay: var(--d, 0ms); }
+.js .rv { opacity: 0; transform: translateY(24px); filter: blur(5px); transition: opacity .85s var(--ease), transform .85s var(--ease), filter .85s var(--ease); transition-delay: var(--d, 0ms); }
 .js .rv.in { opacity: 1; transform: none; filter: none; }
-.js h1 .w { opacity: 0; transform: translateY(40%); filter: blur(8px); animation: rise 1s var(--ease) forwards; animation-delay: var(--d); }
+.js h1 .w { opacity: 0; transform: translateY(40%); filter: blur(8px); animation: rise .95s var(--ease) forwards; animation-delay: var(--d); }
 @keyframes rise { to { opacity: 1; transform: none; filter: none; } }
-.js .swash path { stroke-dashoffset: 520; animation: draw 1.1s var(--ease) 1s forwards; }
+.js .swash path { stroke-dashoffset: 520; animation: draw 1.05s var(--ease) .95s forwards; }
 @keyframes draw { to { stroke-dashoffset: 0; } }
 
 @media (max-width: 980px) {
-  .steps, .modes { grid-template-columns: 1fr 1fr; } .steps .step:last-child { grid-column: 1 / -1; }
-  .dev, .who-grid, .split { grid-template-columns: 1fr; }
-  .nums { grid-template-columns: 1fr 1fr; }
-  .ways, .pillars { grid-template-columns: 1fr; }
+  .steps, .modes { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); } .steps .step:last-child { grid-column: 1 / -1; }
+  .dev, .who-grid, .split, .loop-strip, .mode-stage-card, .faq-grid { grid-template-columns: minmax(0, 1fr); }
+  .nums { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); }
+  .ways, .pillars { grid-template-columns: minmax(0, 1fr); }
 }
 @media (max-width: 680px) {
   .nav-links a.opt, .brand small { display: none; }
-  .steps, .modes { grid-template-columns: 1fr; }
-  .scene { aspect-ratio: 4 / 5; }
-  .win { top: 13%; width: 88%; height: 48%; }
+  .steps, .modes, .nums { grid-template-columns: minmax(0, 1fr); }
+  .scene { aspect-ratio: 4 / 5.2; }
+  .win { top: 12%; width: 88%; height: 47%; }
   .badge { font-size: .76rem; } .badge .long { display: none; }
-  .said { bottom: 31%; } .preview { width: 86%; bottom: 16%; }
+  .said { bottom: 32%; font-size: 1rem; }
+  .preview { width: 88%; bottom: 16%; }
   .ctas .btn { width: 100%; }
-  .row { grid-template-columns: 1fr; gap: 4px; } .rows-head { display: none; }
-  .nums div { padding-right: 12px; }
+  .row { grid-template-columns: minmax(0, 1fr); gap: 4px; } .rows-head { display: none; }
+  .nums div { padding-right: 0; }
 }
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }
@@ -308,38 +354,62 @@ footer a { color: var(--ink-2); text-decoration: none; } footer a:hover { color:
   <a class="brand" href="/"><img src="/shots/saywhen/icon.png" alt="" width="28" height="28">saywhen <small>by Mohamed Ansar</small></a>
   <nav class="nav-links" aria-label="Page">
     <a class="opt" href="#how">How it works</a>
+    <a class="opt" href="#modes">Send styles</a>
     <a class="opt" href="#safe">Privacy</a>
+    <a class="opt" href="#faq">FAQ</a>
     <a class="opt" href="https://github.com/ansarbuilds/saywhen">GitHub</a>
     <a class="btn dark sm" href="#install">Download</a>
   </nav>
+  <span class="scroll-meter" id="scroll-meter" aria-hidden="true"></span>
 </header>
 
 <main id="main">
   <div class="hero wrap">
-    <a class="badge" href="https://github.com/ansarbuilds/saywhen/releases/tag/v0.2.0"><b>BETA</b> v0.2 for Mac and Windows<span class="long"> · open source</span></a>
+    <a class="badge" href="https://github.com/ansarbuilds/saywhen/releases/tag/v0.2.0"><b>BETA</b> v0.2.0 for Mac and Windows<span class="long"> · open source</span></a>
     <h1><span class="w" style="--d:.05s">Look.</span> <span class="w" style="--d:.2s">Talk.</span> <span class="w" style="--d:.35s"><em>Sent.<svg class="swash" viewBox="0 0 300 30" preserveAspectRatio="none" aria-hidden="true"><path d="M4 22 C 70 6, 150 4, 296 14"/></svg></em></span></h1>
     <p class="lead">Hands-free voice for your terminal and coding agent. Look at the screen, say what you want, and saywhen types it after a preview you can cancel. No hotkey to hold.</p>
-    <div class="ctas">
-      <a class="btn dark" href="https://github.com/ansarbuilds/saywhen/releases/download/v0.2.0/saywhen_0.2.0_aarch64.dmg"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M16.4 12.6c0-2.5 2-3.6 2.1-3.7-1.2-1.7-3-1.9-3.6-2-1.5-.2-3 .9-3.8.9-.8 0-2-.9-3.3-.9-1.7 0-3.3 1-4.2 2.5-1.8 3.1-.5 7.7 1.3 10.2.9 1.2 1.9 2.6 3.2 2.6 1.3-.1 1.8-.8 3.3-.8 1.6 0 2 .8 3.3.8 1.4 0 2.3-1.3 3.1-2.5 1-1.4 1.4-2.8 1.4-2.9 0 0-2.8-1.1-2.8-4.2zM13.9 5.1c.7-.8 1.2-2 1-3.1-1 0-2.2.7-2.9 1.5-.6.7-1.2 1.9-1 3 1.1.1 2.2-.6 2.9-1.4z"/></svg>Download for Mac</a>
-      <a class="btn" href="https://github.com/ansarbuilds/saywhen/releases/download/v0.2.0/saywhen_0.2.0_x64-setup.exe"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M3 5.5 10.4 4.5v7H3zm0 13 7.4 1v-7H3zm8.4 1.1L21 21v-8.5h-9.6zm0-15.2v7.1H21V3z"/></svg>Download for Windows</a>
+    <div class="ctas" id="hero-ctas">
+      <a class="btn dark" id="cta-mac" href="https://github.com/ansarbuilds/saywhen/releases/download/v0.2.0/saywhen_0.2.0_aarch64.dmg"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M16.4 12.6c0-2.5 2-3.6 2.1-3.7-1.2-1.7-3-1.9-3.6-2-1.5-.2-3 .9-3.8.9-.8 0-2-.9-3.3-.9-1.7 0-3.3 1-4.2 2.5-1.8 3.1-.5 7.7 1.3 10.2.9 1.2 1.9 2.6 3.2 2.6 1.3-.1 1.8-.8 3.3-.8 1.6 0 2 .8 3.3.8 1.4 0 2.3-1.3 3.1-2.5 1-1.4 1.4-2.8 1.4-2.9 0 0-2.8-1.1-2.8-4.2zM13.9 5.1c.7-.8 1.2-2 1-3.1-1 0-2.2.7-2.9 1.5-.6.7-1.2 1.9-1 3 1.1.1 2.2-.6 2.9-1.4z"/></svg>Download for Mac <span class="cta-tag" id="cta-mac-tag">Apple Silicon</span></a>
+      <a class="btn" id="cta-win" href="https://github.com/ansarbuilds/saywhen/releases/download/v0.2.0/saywhen_0.2.0_x64-setup.exe"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M3 5.5 10.4 4.5v7H3zm0 13 7.4 1v-7H3zm8.4 1.1L21 21v-8.5h-9.6zm0-15.2v7.1H21V3z"/></svg>Download for Windows <span class="cta-tag" id="cta-win-tag">64-bit</span></a>
     </div>
-    <p class="meta">Apple Silicon Macs and 64-bit Windows. Free, MIT licensed. <a href="#safe">Your camera and voice stay on your computer.</a></p>
+    <p class="meta">Apple Silicon Macs and 64-bit Windows (Intel Mac build from source). Free, MIT licensed. <a href="#safe">Your camera and voice stay on your computer.</a></p>
   </div>
 
-  <div class="scene" id="stage" role="img" aria-label="Illustration of one command. A camera tag lights up as the person faces the screen. The saywhen pill goes from Waiting to Listening, hears the words cargo test dash dash release, shows a preview of cargo test --release with a countdown, and types it into the terminal, where the tests pass.">
-    <div class="sun" aria-hidden="true"></div>
-    <div class="cam" id="cam" aria-hidden="true">Facing the screen</div>
-    <div class="win" aria-hidden="true">
-      <div class="win-bar"><i></i><i></i><i></i><span>Terminal · ~/saywhen</span></div>
-      <div class="win-body"><span class="d">Last login: Thu on ttys002</span>
+  <div class="scene-shell" id="try-it">
+    <div class="stage-tabs" role="group" aria-label="Try each send style in the live simulator">
+      <button type="button" class="stage-tab" data-stage-mode="pause" aria-pressed="true"><span class="tab-dot"></span>Just pause</button>
+      <button type="button" class="stage-tab" data-stage-mode="nod" aria-pressed="false"><span class="tab-dot"></span>Nod to send</button>
+      <button type="button" class="stage-tab" data-stage-mode="phrase" aria-pressed="false"><span class="tab-dot"></span>Say "send it"</button>
+      <button type="button" class="stage-tab" data-stage-mode="paste_only" aria-pressed="false"><span class="tab-dot"></span>Type only</button>
+      <button type="button" class="stage-tab stage-tab-replay" id="stage-replay" aria-label="Replay simulation">Replay</button>
+    </div>
+
+    <div class="scene" id="stage" role="region" aria-label="Interactive illustration of the saywhen loop. Switch between the four send styles above or press Cancel during the preview.">
+      <div class="sun" aria-hidden="true"></div>
+      <div class="cam" id="cam" aria-hidden="true">Facing the screen</div>
+      <div class="win" aria-hidden="true">
+        <div class="win-bar"><i></i><i></i><i></i><span id="win-title">Terminal · ~/saywhen</span></div>
+        <div class="win-body"><span class="d">Last login: Thu on ttys002</span>
 <span class="p">~/saywhen</span> $ <span id="t-cmd"></span><span class="caret"></span>
 <span id="t-out"></span></div>
+      </div>
+      <div class="said" id="said" aria-hidden="true"><span class="heard">You say</span><span id="said-t"></span></div>
+      <div class="preview" id="preview">
+        <div class="pv-top"><span id="pv-target">Paste + Enter into Terminal</span><b id="pv-s">1.8s</b></div>
+        <div class="pv-cmd" id="pv-cmd">cargo test --release</div>
+        <div class="pv-bar"><i id="pv-bar-fill"></i></div>
+        <div class="pv-foot">
+          <div class="pv-keys"><kbd>Esc</kbd> or shake to cancel · tap <strong style="color:#fff">Cancel</strong> to try</div>
+          <div class="pv-btns">
+            <button type="button" class="pv-btn" id="pv-cancel-btn">Cancel</button>
+            <button type="button" class="pv-btn pv-btn-send" id="pv-send-btn">Send now</button>
+          </div>
+        </div>
+      </div>
+      <div class="pill" id="pill" data-s="waiting" aria-live="polite"><img src="/shots/saywhen/icon.png" alt=""><span class="dot"></span><b id="p-state">Waiting</b><span class="eq"><i></i><i></i><i></i><i></i><i></i></span><span class="t" id="p-text">Look at the screen</span></div>
     </div>
-    <div class="said" id="said" aria-hidden="true"><span class="heard">You say</span><span id="said-t"></span></div>
-    <div class="preview" id="preview" aria-hidden="true"><div class="pv-top"><span>Paste + Enter into Terminal</span><b id="pv-s">1.8s</b></div><div class="pv-cmd">cargo test --release</div><div class="pv-bar"><i></i></div><div class="pv-keys"><kbd>Esc</kbd> or shake your head to cancel · nod to send now</div></div>
-    <div class="pill" id="pill" data-s="waiting" aria-hidden="true"><img src="/shots/saywhen/icon.png" alt=""><span class="dot"></span><b id="p-state">Waiting</b><span class="eq"><i></i><i></i><i></i><i></i><i></i></span><span class="t" id="p-text">Look at the screen</span></div>
+    <p class="scene-cap">Interactive preview: switch send modes above, or hit <strong>Cancel</strong> (or <kbd>Esc</kbd>) while a preview counts down. The real recording is <a href="#real">further down</a>.</p>
   </div>
-  <p class="scene-cap">A live illustration of the interface. The real recording is further down.</p>
 
   <div class="works">
     <p>Types into anything. Presses Enter only where you trust it.</p>
@@ -378,6 +448,15 @@ footer a { color: var(--ink-2); text-decoration: none; } footer a:hover { color:
         <div class="step-copy"><div class="n">03</div><h3>Check, then sent</h3><p>Read it in a short preview. Esc, a head shake, or talking again cancels. Otherwise it is typed in.</p></div>
       </article>
     </div>
+
+    <div class="loop-strip">
+      <div class="frame"><video class="auto" muted loop playsinline preload="metadata" poster="/p/saywhen/loops/five-states.webp" width="1280" height="400" aria-label="Animated state machine diagram: Waiting, Ready, Listening, Writing, and Check transitions."><source src="/p/saywhen/loops/five-states.mp4" type="video/mp4"></video></div>
+      <div>
+        <span class="eyebrow">Five states, zero hotkey</span>
+        <h4>Waiting -> Ready -> Listening -> Writing -> Check</h4>
+        <p>Gaze + lip motion arm the gate. Voice starts recording with a 500 ms audio pre-roll. An adaptive silence window finishes the turn and opens the cancelable preview. No camera? <strong>Option + Space</strong> (Mac) or <strong>Alt + Space</strong> (Windows) works any time.</p>
+      </div>
+    </div>
   </section>
 
   <section class="wrap" aria-labelledby="dev-title" style="padding-top:0">
@@ -385,17 +464,18 @@ footer a { color: var(--ink-2); text-decoration: none; } footer a:hover { color:
       <div>
         <span class="eyebrow">Speaks developer</span>
         <h2 id="dev-title">Whisper mishears. <em>saywhen fixes it.</em></h2>
-        <p class="lead">Speech models hear "Cubectal" when you say kubectl. A local clean-up pass turns what was heard into what you meant, and you can add your own words for project names.</p>
-        <p class="footnote">Each row is a real case from saywhen's test suite. 34 of 34 spoken commands came out exact in the clean-up benchmark.</p>
+        <p class="lead">Speech models hear "Cubectal" when you say <code>kubectl</code>. A local clean-up pass turns what was heard into what you meant, and you can add your own project words in Settings.</p>
+        <div class="dev-rule" id="dev-rule">CLI phonetic repair: "Cubectal Get Pods." -> "kubectl get pods"</div>
+        <p class="footnote">Click any row to inspect the rule. 34 of 34 spoken commands came out exact in the <a href="https://github.com/ansarbuilds/saywhen/blob/main/src-tauri/src/cleanup.rs"><code>cleanup.rs</code></a> benchmark.</p>
       </div>
       <div class="rows" id="rows">
         <div class="rows-head"><span>What was heard</span><span>What gets typed</span></div>
-        <div class="row"><span class="h">Cubectal Get Pods.</span><span class="c">kubectl get pods</span></div>
-        <div class="row"><span class="h">NTM RunBuild</span><span class="c">npm run build</span></div>
-        <div class="row"><span class="h">Get If Had.</span><span class="c">git diff head</span></div>
-        <div class="row"><span class="h">Get Stash Pot.</span><span class="c">git stash pop</span></div>
-        <div class="row"><span class="h">cargo test dash dash release</span><span class="c">cargo test --release</span></div>
-        <div class="row"><span class="h">Run Cargo Test. In the SRC Torrey folder</span><span class="c">Run cargo test in the src-tauri folder</span></div>
+        <button type="button" class="row hot" data-rule="Phonetic CLI repair: Cubectal -> kubectl + lowercased flags"><span class="h">Cubectal Get Pods.</span><span class="c">kubectl get pods</span></button>
+        <button type="button" class="row" data-rule="Phonetic CLI repair: NTM RunBuild -> npm run build"><span class="h">NTM RunBuild</span><span class="c">npm run build</span></button>
+        <button type="button" class="row" data-rule="Git homophone repair: Get If Had -> git diff head"><span class="h">Get If Had.</span><span class="c">git diff head</span></button>
+        <button type="button" class="row" data-rule="Git homophone repair: Get Stash Pot -> git stash pop"><span class="h">Get Stash Pot.</span><span class="c">git stash pop</span></button>
+        <button type="button" class="row" data-rule="Spoken punctuation: 'dash dash' -> -- with whitespace stripped"><span class="h">cargo test dash dash release</span><span class="c">cargo test --release</span></button>
+        <button type="button" class="row" data-rule="Path & repo repair: 'SRC Torrey' -> src-tauri + casing normalization"><span class="h">Run Cargo Test. In the SRC Torrey folder</span><span class="c">Run cargo test in the src-tauri folder</span></button>
       </div>
     </div>
   </section>
@@ -421,16 +501,24 @@ footer a { color: var(--ink-2); text-decoration: none; } footer a:hover { color:
     <p class="cap">An animation of the idea, not a screen recording.</p>
   </section>
 
-  <section class="wrap" aria-labelledby="modes-title" style="padding-top:0">
+  <section id="modes" class="wrap" aria-labelledby="modes-title" style="padding-top:0">
     <div class="center">
       <span class="eyebrow">You stay in control</span>
       <h2 id="modes-title">Four ways to send. <em>All cancelable.</em></h2>
     </div>
-    <div class="modes">
-      <div class="mode"><div class="ic" aria-hidden="true">⏸</div><h3>Just pause</h3><p>Stop talking. A short countdown runs, then it sends.</p><span class="tag">default</span></div>
-      <div class="mode"><div class="ic" aria-hidden="true">↓</div><h3>Nod to send</h3><p>Nothing goes until you nod. Shake your head to drop it.</p></div>
-      <div class="mode"><div class="ic" aria-hidden="true">“”</div><h3>Say "send it"</h3><p>End with "send it" to press Enter. Otherwise it is only typed.</p></div>
-      <div class="mode"><div class="ic" aria-hidden="true">⌨</div><h3>Type only</h3><p>Your words are typed and Enter is never pressed.</p><span class="tag">best first try</span></div>
+    <div class="modes" role="group" aria-label="Send mode details">
+      <button type="button" class="mode" data-mode="pause" aria-pressed="true"><div class="ic" aria-hidden="true">⏸</div><h3>Just pause</h3><p>Stop talking. A short countdown runs, then it sends.</p><span class="tag">default</span></button>
+      <button type="button" class="mode" data-mode="nod" aria-pressed="false"><div class="ic" aria-hidden="true">↓</div><h3>Nod to send</h3><p>Nothing goes until you nod. Shake your head to drop it.</p></button>
+      <button type="button" class="mode" data-mode="phrase" aria-pressed="false"><div class="ic" aria-hidden="true">“”</div><h3>Say "send it"</h3><p>End with "send it" to press Enter. Otherwise it is only typed.</p></button>
+      <button type="button" class="mode" data-mode="paste_only" aria-pressed="false"><div class="ic" aria-hidden="true">⌨</div><h3>Type only</h3><p>Your words are typed and Enter is never pressed.</p><span class="tag">best first try</span></button>
+    </div>
+    <div class="mode-stage-card">
+      <div class="frame"><video id="mode-video" class="auto" muted loop playsinline preload="metadata" poster="/p/saywhen/loops/send-styles.webp" width="1280" height="400" aria-label="Illustration of send modes and cancellation guards."><source id="mode-source" src="/p/saywhen/loops/send-styles.mp4" type="video/mp4"></video></div>
+      <div class="mode-detail-copy">
+        <span class="eyebrow" id="mode-kicker">Mode 01 · Just pause</span>
+        <h4 id="mode-heading">Counts down 1.8s, then presses Enter in allowlisted terminals.</h4>
+        <p id="mode-body">If you keep talking, shake your head, press Esc, or switch to another window mid-countdown, nothing is sent. In browsers, email, or chat apps, saywhen types without pressing Enter.</p>
+      </div>
     </div>
     <p class="cancel">Cancel any time with <kbd>Esc</kbd>, a head shake, or by talking again. Or say "scratch that".</p>
   </section>
@@ -477,7 +565,7 @@ footer a { color: var(--ink-2); text-decoration: none; } footer a:hover { color:
       <div><dt>12–15<small> ms</small></dt><dd>face tracking per camera frame on Apple Silicon.</dd></div>
       <div><dt>87–473<small> ms</small></dt><dd>to turn 1.5 s of speech into text with Whisper tiny.en on the GPU.</dd></div>
     </dl>
-    <p class="caveat">From prototype sessions on Apple Silicon. Replay clips are generated speech with simulated camera traces, not live users. Real-user accuracy, CPU and battery are not measured yet. The <a href="https://github.com/ansarbuilds/saywhen/blob/main/docs/LAUNCH_CHECKLIST.md">launch checklist</a> lists what is verified.</p>
+    <p class="caveat">From prototype sessions on Apple Silicon. Replay clips are generated speech with simulated camera traces, not live users. Real-user accuracy, CPU and battery are not measured yet. The <a href="https://github.com/ansarbuilds/saywhen/blob/main/docs/LAUNCH_CHECKLIST.md">launch checklist</a> and <a href="https://github.com/ansarbuilds/saywhen/blob/main/docs/MEASUREMENTS.md">measurements log</a> detail everything verified so far.</p>
   </section>
 
   <section id="install" class="wrap center" aria-labelledby="install-title" style="padding-top:0">
@@ -485,26 +573,46 @@ footer a { color: var(--ink-2); text-decoration: none; } footer a:hover { color:
     <h2 id="install-title">Three ways in.</h2>
     <div class="ways">
       <div class="way">
-        <div class="n">01</div><h3>Download</h3>
-        <p>Open the installer. On a Mac, if it says the app "is damaged", run <code>xattr -cr /Applications/saywhen.app</code> once. On Windows, click More info, then Run anyway.</p>
-        <div class="btns"><a class="btn dark sm" href="https://github.com/ansarbuilds/saywhen/releases/download/v0.2.0/saywhen_0.2.0_aarch64.dmg">Mac</a><a class="btn sm" href="https://github.com/ansarbuilds/saywhen/releases/download/v0.2.0/saywhen_0.2.0_x64-setup.exe">Windows</a></div>
+        <div class="n">01</div><h3>Download v0.2.0</h3>
+        <p>Open the installer. On a Mac, if macOS warns about the missing Apple signature, run the quarantine clear once:</p>
+        <div class="code"><pre><code>xattr -cr /Applications/saywhen.app</code></pre><button class="copy" type="button">Copy</button></div>
+        <div class="btns"><a class="btn dark sm" id="dl-mac" href="https://github.com/ansarbuilds/saywhen/releases/download/v0.2.0/saywhen_0.2.0_aarch64.dmg">Mac (.dmg)</a><a class="btn sm" id="dl-win" href="https://github.com/ansarbuilds/saywhen/releases/download/v0.2.0/saywhen_0.2.0_x64-setup.exe">Windows (.exe)</a><a class="btn sm" href="https://github.com/ansarbuilds/saywhen/releases/tag/v0.2.0">Release notes</a></div>
       </div>
       <div class="way">
         <div class="n">02</div><h3>Ask your agent</h3>
-        <p>Paste this into Claude Code or Cursor.</p>
+        <p>Paste this into Claude Code or Cursor for guided setup.</p>
         <div class="code"><pre><code>Clone https://github.com/ansarbuilds/saywhen
 and open that folder. Then follow
 INSTALL_WITH_AI.md from the top.
 Ask me before you install anything.</code></pre><button class="copy" type="button">Copy</button></div>
       </div>
       <div class="way">
-        <div class="n">03</div><h3>Build it</h3>
-        <p>You need Node.js 20+, Rust and CMake.</p>
+        <div class="n">03</div><h3>Build from source</h3>
+        <p>Requires Node.js 20+, Rust, and CMake (plus VS Build Tools on Windows).</p>
         <div class="code"><pre><code>git clone https://github.com/ansarbuilds/saywhen.git
 cd saywhen
 npm ci
 npx tauri dev</code></pre><button class="copy" type="button">Copy</button></div>
       </div>
+    </div>
+
+    <div id="faq" class="faq-grid" aria-label="Frequently asked questions">
+      <details class="faq-item" open>
+        <summary>What platforms are supported today?</summary>
+        <p>Pre-built beta installers cover Apple Silicon Macs (<code>aarch64.dmg</code>) and 64-bit Windows (<code>x64-setup.exe</code>). Automated tests run on both macOS and Windows; hands-on Windows hardware and Intel Mac checks are still open, though Intel Macs can build directly from source.</p>
+      </details>
+      <details class="faq-item" open>
+        <summary>Does anything leave my computer?</summary>
+        <p>Camera frames are read in memory for face, yaw, and lip movement, then dropped immediately. Speech recognition (Whisper) and voice activity detection (Silero VAD) run on-device. After downloading a speech model (~75 MB), saywhen works completely offline.</p>
+      </details>
+      <details class="faq-item">
+        <summary>What if I don't want it pressing Enter for me?</summary>
+        <p>Pick <strong>Type only</strong> on Home. It types the cleaned transcript and never sends Enter. Even in default pause mode, Enter is restricted to allowlisted terminals/editors, destructive commands are withheld, and every send shows a cancelable preview.</p>
+      </details>
+      <details class="faq-item">
+        <summary>Can I use it without a webcam or with an external monitor?</summary>
+        <p>Yes. Press <kbd>⌥ Space</kbd> (Mac) or <kbd>Alt Space</kbd> (Windows) for manual listening any time, or enable the opt-in wake word (<code>eevee</code> by default) and <strong>Side-camera mode</strong> for off-center laptop webcams.</p>
+      </details>
     </div>
   </section>
 
@@ -512,7 +620,7 @@ npx tauri dev</code></pre><button class="copy" type="button">Copy</button></div>
     <h2 id="final-title">Stop holding <em>a key.</em></h2>
     <p class="lead" style="margin-inline:auto">Free and open source. Start with Type only and nothing is ever sent for you.</p>
     <div class="ctas">
-      <a class="btn dark" href="https://github.com/ansarbuilds/saywhen/releases/download/v0.2.0/saywhen_0.2.0_aarch64.dmg">Download for Mac</a>
+      <a class="btn dark" id="final-primary-dl" href="https://github.com/ansarbuilds/saywhen/releases/download/v0.2.0/saywhen_0.2.0_aarch64.dmg">Download for Mac</a>
       <a class="btn" href="https://github.com/ansarbuilds/saywhen">Star on GitHub</a>
     </div>
   </section>
@@ -522,9 +630,11 @@ npx tauri dev</code></pre><button class="copy" type="button">Copy</button></div>
   <footer>
     <span>saywhen · MIT · Built with Tauri, Rust, MediaPipe, Silero VAD and Whisper.</span>
     <nav aria-label="More">
-      <a href="/#project/saywhen">Case study</a>
+      <a href="/#project/saywhen">Read the full case study</a>
       <a href="https://github.com/ansarbuilds/saywhen/blob/main/docs/HOW_IT_WORKS.md">How it works</a>
       <a href="https://github.com/ansarbuilds/saywhen/blob/main/docs/ARCHITECTURE.md">Architecture</a>
+      <a href="https://github.com/ansarbuilds/saywhen/blob/main/docs/CHANGELOG.md">Changelog</a>
+      <a href="https://github.com/ansarbuilds/saywhen/blob/main/docs/FAQ.md">FAQ</a>
       <a href="https://github.com/ansarbuilds/saywhen/issues/new/choose">Report an issue</a>
       <a href="/">ansarbuilds.dev</a>
     </nav>
@@ -539,70 +649,309 @@ npx tauri dev</code></pre><button class="copy" type="button">Copy</button></div>
   const wait = (ms) => new Promise((r) => setTimeout(r, ms));
   if (!still && io) document.documentElement.classList.add("js");
 
-  const nav = $("nav");
-  addEventListener("scroll", () => nav.classList.toggle("scrolled", scrollY > 20), { passive: true });
+  // OS detection: highlight matching primary download without hiding the other
+  const plat = ((navigator.userAgentData && navigator.userAgentData.platform) || navigator.platform || navigator.userAgent || "").toLowerCase();
+  const isWin = /win/.test(plat);
+  if (isWin) {
+    $("cta-mac")?.classList.remove("dark");
+    $("cta-win")?.classList.add("dark");
+    $("dl-mac")?.classList.remove("dark");
+    $("dl-win")?.classList.add("dark");
+    const fdl = $("final-primary-dl");
+    if (fdl) {
+      fdl.href = "https://github.com/ansarbuilds/saywhen/releases/download/v0.2.0/saywhen_0.2.0_x64-setup.exe";
+      fdl.textContent = "Download for Windows";
+    }
+  }
 
-  // hero scene
-  const pill = $("pill"), ps = $("p-state"), pt = $("p-text"), cam = $("cam"), said = $("said"), saidT = $("said-t"), pv = $("preview"), pvs = $("pv-s"), cmd = $("t-cmd"), out = $("t-out"), stage = $("stage");
-  const set = (s, a, b) => { pill.dataset.s = s; ps.textContent = a; pt.textContent = b; };
-  const result = '<span class="d">   Compiling saywhen v0.2.0</span>\n<span class="d">    Finished release profile in 4.2s</span>\n<span class="ok">test result: ok.</span> 46 passed; 0 failed';
-  if (still) { cam.classList.add("on"); set("sent", "Sent", "Typed into Terminal"); cmd.textContent = "cargo test --release"; out.innerHTML = result; }
-  else {
+  // Nav shadow + hairline scroll progress meter
+  const nav = $("nav"), meter = $("scroll-meter");
+  const updateScroll = () => {
+    nav.classList.toggle("scrolled", scrollY > 20);
+    if (meter) {
+      const max = Math.max(1, document.documentElement.scrollHeight - innerHeight);
+      meter.style.transform = "scaleX(" + Math.min(1, Math.max(0, scrollY / max)).toFixed(4) + ")";
+    }
+  };
+  addEventListener("scroll", updateScroll, { passive: true });
+  updateScroll();
+
+  // Subtle pointer-tracked ambient light
+  if (!still) {
+    let tx = 50, ty = 30, cx = 50, cy = 30, raf = 0;
+    const stepLight = () => {
+      cx += (tx - cx) * 0.08;
+      cy += (ty - cy) * 0.08;
+      document.documentElement.style.setProperty("--mx", cx.toFixed(1) + "%");
+      document.documentElement.style.setProperty("--my", cy.toFixed(1) + "%");
+      if (Math.abs(tx - cx) > 0.1 || Math.abs(ty - cy) > 0.1) raf = requestAnimationFrame(stepLight);
+      else raf = 0;
+    };
+    addEventListener("pointermove", (e) => {
+      tx = 25 + (e.clientX / Math.max(1, innerWidth)) * 50;
+      ty = 15 + (e.clientY / Math.max(1, innerHeight)) * 45;
+      if (!raf) raf = requestAnimationFrame(stepLight);
+    }, { passive: true });
+  }
+
+  // Interactive hero stage simulator across all 4 send styles + cancelable Esc
+  const pill = $("pill"), ps = $("p-state"), pt = $("p-text"), cam = $("cam"), said = $("said"), saidT = $("said-t");
+  const pv = $("preview"), pvs = $("pv-s"), pvTarget = $("pv-target"), pvCmd = $("pv-cmd"), pvBar = $("pv-bar-fill");
+  const cmd = $("t-cmd"), out = $("t-out"), winTitle = $("win-title"), stage = $("stage");
+  const pvCancel = $("pv-cancel-btn"), pvSend = $("pv-send-btn"), replayBtn = $("stage-replay");
+  const stageTabs = [...document.querySelectorAll("[data-stage-mode]")];
+
+  const SCENES = {
+    pause: {
+      win: "Terminal · ~/saywhen",
+      words: ["cargo", " test", " dash", " dash", " release"],
+      cleaned: "cargo test --release",
+      target: "Paste + Enter into Terminal",
+      enter: true,
+      out: '<span class="d">   Compiling saywhen v0.2.0</span>\n<span class="d">    Finished release profile in 4.2s</span>\n<span class="ok">test result: ok.</span> 47 passed; 0 failed',
+    },
+    nod: {
+      win: "Terminal · ~/api-service",
+      words: ["cubectal", " get", " pods", " dash", " n", " prod"],
+      cleaned: "kubectl get pods -n prod",
+      target: "Nod to send · Shake to cancel",
+      enter: true,
+      waitsForNod: true,
+      out: '<span class="ok">api-gateway-7f8b9d   1/1   Running</span>\n<span class="ok">worker-queue-4d91a   1/1   Running</span>',
+    },
+    phrase: {
+      win: "Claude Code · Workspace",
+      words: ["check", " get", " if", " had", " send it"],
+      cleaned: "check git diff head",
+      target: "\"send it\" heard · Paste + Enter",
+      enter: true,
+      out: '<span class="d">diff --git a/src-tauri/src/audio.rs</span>\n<span class="ok">2 files reviewed, ready for commit.</span>',
+    },
+    paste_only: {
+      win: "Terminal · Safety Check",
+      words: ["rm", " dash", " rf", " dist", " slash"],
+      cleaned: "rm -rf dist/",
+      target: "Type only (Enter never pressed)",
+      enter: false,
+      out: '<span class="warn-tx"># Typed only. Review before pressing Enter.</span>',
+    },
+  };
+
+  let currentStageMode = "pause";
+  let runToken = 0;
+  let previewResolve = null;
+
+  const setPill = (s, a, b) => { pill.dataset.s = s; ps.textContent = a; pt.textContent = b; };
+
+  function finishPreview(action) {
+    if (previewResolve) {
+      const fn = previewResolve;
+      previewResolve = null;
+      fn(action);
+    }
+  }
+
+  pvCancel.addEventListener("click", () => finishPreview("cancel"));
+  pvSend.addEventListener("click", () => finishPreview("send"));
+  addEventListener("keydown", (e) => {
+    if (e.key === "Escape" && previewResolve) {
+      e.preventDefault();
+      finishPreview("cancel");
+    }
+  });
+
+  function selectStageMode(mode) {
+    currentStageMode = SCENES[mode] ? mode : "pause";
+    stageTabs.forEach((b) => b.setAttribute("aria-pressed", String(b.dataset.stageMode === currentStageMode)));
+    runToken += 1;
+    finishPreview("restart");
+    if (still) {
+      const sc = SCENES[currentStageMode];
+      cam.classList.add("on");
+      winTitle.textContent = sc.win;
+      setPill("sent", "Sent", sc.enter ? "Typed into Terminal" : "Typed only");
+      cmd.textContent = sc.cleaned;
+      out.innerHTML = sc.out;
+    }
+  }
+
+  stageTabs.forEach((b) => b.addEventListener("click", () => selectStageMode(b.dataset.stageMode)));
+  replayBtn.addEventListener("click", () => selectStageMode(currentStageMode));
+
+  if (still) {
+    selectStageMode("pause");
+  } else {
     let visible = true;
     if (io) new IntersectionObserver(([e]) => { visible = e.isIntersecting; }).observe(stage);
     (async () => {
       for (;;) {
-        while (!visible || document.hidden) await wait(300);
-        cmd.textContent = ""; out.innerHTML = ""; saidT.textContent = ""; cam.classList.remove("on");
-        set("waiting", "Waiting", "Look at the screen"); await wait(1400);
-        cam.classList.add("on"); set("ready", "Ready", "Start talking"); await wait(1100);
-        set("listening", "Listening", "0:00.0"); said.classList.add("on");
-        const t0 = Date.now();
-        for (const w of ["cargo", " test", " dash", " dash", " release"]) { saidT.textContent += w; pt.textContent = "0:0" + ((Date.now() - t0) / 1000).toFixed(1); await wait(380); }
-        await wait(500);
-        set("writing", "Writing", "Writing it down…"); await wait(800);
+        while (!visible || document.hidden) await wait(250);
+        const token = ++runToken;
+        const sc = SCENES[currentStageMode];
+        pv.classList.remove("on", "canceled");
         said.classList.remove("on");
-        set("check", "Check", "Sending in 1.8s"); pv.classList.add("on");
-        for (let t = 18; t > 0; t--) { const s = (t / 10).toFixed(1) + "s"; pvs.textContent = s; pt.textContent = "Sending in " + s; await wait(100); }
-        pv.classList.remove("on"); set("sent", "Sent", "Typed into Terminal");
-        for (const ch of "cargo test --release") { cmd.textContent += ch; await wait(20); }
-        await wait(500); out.innerHTML = result; await wait(3800);
+        winTitle.textContent = sc.win;
+        cmd.textContent = ""; out.innerHTML = ""; saidT.textContent = ""; cam.classList.remove("on");
+        pvTarget.textContent = sc.target; pvCmd.textContent = sc.cleaned; pvBar.style.transform = "scaleX(1)";
+        setPill("waiting", "Waiting", "Look at the screen");
+        await wait(950); if (token !== runToken) continue;
+
+        cam.classList.add("on"); setPill("ready", "Ready", "Start talking");
+        await wait(750); if (token !== runToken) continue;
+
+        setPill("listening", "Listening", "0:00.0"); said.classList.add("on");
+        const t0 = Date.now();
+        for (const w of sc.words) {
+          if (token !== runToken) break;
+          saidT.textContent += w;
+          pt.textContent = "0:0" + ((Date.now() - t0) / 1000).toFixed(1);
+          await wait(330);
+        }
+        if (token !== runToken) continue;
+        await wait(360); if (token !== runToken) continue;
+
+        setPill("writing", "Writing", "Writing it down…");
+        await wait(650); if (token !== runToken) continue;
+        said.classList.remove("on");
+
+        const totalTicks = sc.waitsForNod ? 22 : 18;
+        pv.classList.add("on");
+        setPill("check", sc.waitsForNod ? "Nod?" : "Check", sc.waitsForNod ? "Waiting for nod" : "Sending in 1.8s");
+
+        const outcome = await new Promise((resolve) => {
+          previewResolve = resolve;
+          let tick = totalTicks;
+          const timer = setInterval(() => {
+            if (token !== runToken) { clearInterval(timer); resolve("restart"); return; }
+            tick -= 1;
+            const sec = (tick / 10).toFixed(1) + "s";
+            pvs.textContent = sc.waitsForNod ? "Nod?" : sec;
+            pt.textContent = sc.waitsForNod ? "Nod to confirm (" + sec + ")" : "Sending in " + sec;
+            pvBar.style.transform = "scaleX(" + Math.max(0, tick / totalTicks).toFixed(3) + ")";
+            if (tick <= 0) { clearInterval(timer); resolve("send"); }
+          }, 100);
+          const origResolve = previewResolve;
+          previewResolve = (act) => { clearInterval(timer); origResolve(act); };
+        });
+
+        if (outcome === "restart" || token !== runToken) continue;
+
+        if (outcome === "cancel") {
+          pv.classList.add("canceled");
+          setPill("canceled", "Canceled", "Nothing typed");
+          await wait(1100);
+          pv.classList.remove("on", "canceled");
+          await wait(1100);
+          continue;
+        }
+
+        pv.classList.remove("on");
+        setPill("sent", sc.enter ? "Sent" : "Typed", sc.enter ? "Typed + Enter" : "Paste only");
+        for (const ch of sc.cleaned) {
+          if (token !== runToken) break;
+          cmd.textContent += ch;
+          await wait(18);
+        }
+        if (token !== runToken) continue;
+        await wait(420); if (token !== runToken) continue;
+        out.innerHTML = sc.out;
+        await wait(3200);
       }
     })();
   }
 
-  // talk wave
+  // Talk wave bars
   const wave = $("wave");
   for (let i = 0; i < 26; i++) { const b = document.createElement("i"); b.style.animationDelay = (-Math.abs(Math.sin(i * 1.7)) * 1.1).toFixed(2) + "s"; b.style.animationDuration = (0.7 + (i % 5) * 0.12).toFixed(2) + "s"; b.style.height = (22 + Math.abs(Math.sin(i * 0.9)) * 78).toFixed(0) + "%"; wave.appendChild(b); }
 
-  // head angle readout
+  // Head angle readout
   if (!still) { const yaw = $("yaw"); let t = 0; setInterval(() => { t += 0.5; yaw.textContent = Math.round(3 + Math.sin(t) * 4) + "°"; }, 700); }
 
-  // heard-to-typed rows
+  // Interactive heard-to-typed rows
   const rows = [...document.querySelectorAll("#rows .row")];
-  if (!still) { let k = 0; rows[0].classList.add("hot"); setInterval(() => { rows[k].classList.remove("hot"); k = (k + 1) % rows.length; rows[k].classList.add("hot"); }, 1800); }
+  const devRule = $("dev-rule");
+  let rowIndex = 0, rowAuto = true;
+  const highlightRow = (idx) => {
+    rows.forEach((r, i) => r.classList.toggle("hot", i === idx));
+    if (devRule && rows[idx]) devRule.textContent = rows[idx].dataset.rule;
+    rowIndex = idx;
+  };
+  rows.forEach((r, i) => r.addEventListener("click", () => { rowAuto = false; highlightRow(i); }));
+  if (!still) setInterval(() => { if (rowAuto) highlightRow((rowIndex + 1) % rows.length); }, 2100);
 
-  // film
+  // Interactive send mode cards + synced loop viewer
+  const modeBtns = [...document.querySelectorAll(".mode[data-mode]")];
+  const modeKicker = $("mode-kicker"), modeHeading = $("mode-heading"), modeBody = $("mode-body");
+  const modeVideo = $("mode-video"), modeSource = $("mode-source");
+  const MODE_INFO = {
+    pause: {
+      kicker: "Mode 01 · Just pause",
+      heading: "Counts down 1.8s, then presses Enter in allowlisted terminals.",
+      body: "If you keep talking, shake your head, press Esc, or switch to another window mid-countdown, nothing is sent. In browsers, email, or chat apps, saywhen types without pressing Enter.",
+      src: "/p/saywhen/loops/send-styles.mp4", poster: "/p/saywhen/loops/send-styles.webp",
+    },
+    nod: {
+      kicker: "Mode 02 · Nod to send",
+      heading: "Waits up to 8 seconds for an intentional nod.",
+      body: "Useful when you dictate long multi-part prompts or think between sentences. Nothing enters your terminal unless you nod, and a head shake drops it cleanly.",
+      src: "/p/saywhen/loops/cancel.mp4", poster: "/p/saywhen/loops/cancel.webp",
+    },
+    phrase: {
+      kicker: "Mode 03 · Say \"send it\"",
+      heading: "Speak naturally, then add \"send it\" only when you mean Enter.",
+      body: "Every phrase without \"send it\" or \"submit it\" is typed cleanly at the prompt with Enter left untouched, so you can chain thoughts before running a command.",
+      src: "/p/saywhen/loops/send-styles.mp4", poster: "/p/saywhen/loops/send-styles.webp",
+    },
+    paste_only: {
+      kicker: "Mode 04 · Type only",
+      heading: "Types every word, never presses Enter.",
+      body: "The best first-run mode. Also automatically enforced whenever saywhen spots destructive patterns like rm -rf or git push --force.",
+      src: "/p/saywhen/loops/safety.mp4", poster: "/p/saywhen/loops/safety.webp",
+    },
+  };
+  modeBtns.forEach((btn) => btn.addEventListener("click", () => {
+    const key = btn.dataset.mode;
+    const info = MODE_INFO[key];
+    if (!info) return;
+    modeBtns.forEach((b) => b.setAttribute("aria-pressed", String(b === btn)));
+    modeKicker.textContent = info.kicker;
+    modeHeading.textContent = info.heading;
+    modeBody.textContent = info.body;
+    if (modeSource.getAttribute("src") !== info.src) {
+      modeSource.setAttribute("src", info.src);
+      modeVideo.setAttribute("poster", info.poster);
+      modeVideo.load();
+      modeVideo.play().catch(() => {});
+    }
+  }));
+
+  // 60s launch film
   const film = $("film"), play = $("play");
   play.addEventListener("click", () => { film.controls = true; film.preload = "auto"; film.play(); play.remove(); });
 
-  // copy buttons
+  // Copy buttons
   document.querySelectorAll(".copy").forEach((b) => b.addEventListener("click", async () => {
     try { await navigator.clipboard.writeText(b.previousElementSibling.textContent); b.textContent = "Copied"; } catch { b.textContent = "Select to copy"; }
     setTimeout(() => (b.textContent = "Copy"), 1600);
   }));
 
-  // loops play only while on screen
+  // Play video loops only while on screen
   const vids = document.querySelectorAll("video.auto");
   const saveData = navigator.connection && navigator.connection.saveData;
   if (still || saveData || !io) vids.forEach((v) => (v.controls = true));
-  else { const seen = new IntersectionObserver((es) => es.forEach(({ target, isIntersecting }) => { if (isIntersecting) target.play().catch(() => (target.controls = true)); else target.pause(); }), { threshold: 0.3 }); vids.forEach((v) => seen.observe(v)); }
+  else {
+    const seen = new IntersectionObserver((es) => es.forEach(({ target, isIntersecting }) => {
+      if (isIntersecting) target.play().catch(() => (target.controls = true));
+      else target.pause();
+    }), { threshold: 0.25 });
+    vids.forEach((v) => seen.observe(v));
+  }
 
-  // reveals
+  // Reveal observer
   if (!still && io) {
-    const rv = new IntersectionObserver((es) => es.forEach((e) => { if (e.isIntersecting) { e.target.classList.add("in"); rv.unobserve(e.target); } }), { threshold: 0.12, rootMargin: "0px 0px -8% 0px" });
-    document.querySelectorAll("section .center, section > .eyebrow, section > h2, .band .wrap > .eyebrow, .band .wrap > h2, .band .wrap > .lead, .dev > *, .frame, .cap, .cancel, .who-grid > *, .caveat, .final > *, .warn, .works").forEach((el) => { el.classList.add("rv"); rv.observe(el); });
-    document.querySelectorAll(".steps, .modes, .ways, .nums, .pillars").forEach((g) => [...g.children].forEach((c, i) => { c.classList.add("rv"); c.style.setProperty("--d", i * 110 + "ms"); rv.observe(c); }));
+    const rv = new IntersectionObserver((es) => es.forEach((e) => { if (e.isIntersecting) { e.target.classList.add("in"); rv.unobserve(e.target); } }), { threshold: 0.1, rootMargin: "0px 0px -6% 0px" });
+    document.querySelectorAll("section .center, section > .eyebrow, section > h2, .band .wrap > .eyebrow, .band .wrap > h2, .band .wrap > .lead, .dev > *, .frame, .cap, .cancel, .who-grid > *, .caveat, .final > *, .warn, .works, .loop-strip, .mode-stage-card, .faq-item").forEach((el) => { el.classList.add("rv"); rv.observe(el); });
+    document.querySelectorAll(".steps, .modes, .ways, .nums, .pillars").forEach((g) => [...g.children].forEach((c, i) => { c.classList.add("rv"); c.style.setProperty("--d", i * 95 + "ms"); rv.observe(c); }));
     rv.observe($("bar"));
   }
 })();
