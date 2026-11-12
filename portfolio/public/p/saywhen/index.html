@@ -72,6 +72,10 @@ h2 { margin: 10px 0 0; font: 400 clamp(2.1rem, 5vw, 3.4rem)/1.05 var(--serif); l
 code, kbd { font: .86em var(--mono); background: rgb(255 255 255 / .08); padding: .12em .42em; border-radius: 6px; }
 kbd { border: 1px solid var(--line); }
 
+.loop { margin: 32px 0 0; border: 1px solid var(--line); border-radius: 18px; overflow: hidden; background: var(--plum); }
+.loop video { display: block; width: 100%; height: auto; }
+.loops2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 14px; }
+.loops2 .loop { margin-top: 14px; }
 .shot { margin: 32px 0 0; border: 1px solid var(--line); border-radius: 18px; overflow: hidden; background: #fff; }
 .shot img { display: block; width: 100%; height: auto; }
 .cap { margin-top: 12px; font-size: .84rem; color: var(--muted); }
@@ -131,12 +135,15 @@ footer a { color: var(--silver); }
       <p class="kicker">How it works</p>
       <h2 id="how-title">Attention replaces the hotkey.</h2>
       <p class="sub">The webcam and the microphone have to agree before saywhen listens. Neither is enough alone: a camera cannot tell chewing from talking, and a microphone cannot tell who you are talking to.</p>
+      <div class="loop"><video muted loop playsinline preload="none" poster="/p/saywhen/loops/hero-loop.webp" width="1280" height="640" aria-label="The saywhen pill moves from Waiting to Check as spoken words become cargo test --release. The preview counts down and the command is sent to Terminal."><source src="/p/saywhen/loops/hero-loop.mp4" type="video/mp4"></video></div>
       <div class="grid g4">
         <div class="card"><p class="step">01 · LOOK</p><h3>Face the screen</h3><p>The camera notices you are facing the screen. It keeps a few numbers, such as head angle. Pictures are never saved or sent.</p></div>
         <div class="card"><p class="step">02 · TALK</p><h3>Just speak</h3><p>When your lips move and the microphone hears a voice, it starts listening. The last half second is kept, so the first word is not lost.</p></div>
         <div class="card"><p class="step">03 · CHECK</p><h3>See it first</h3><p>Speech becomes text on your computer. <code>dash dash release</code> becomes <code>--release</code>. A preview shows the result with a short countdown.</p></div>
         <div class="card"><p class="step">04 · SENT</p><h3>Then Enter</h3><p>The text is typed into the app in front. Enter is pressed only in apps you trust. Press <kbd>Esc</kbd>, shake your head, or keep talking to cancel.</p></div>
       </div>
+      <div class="loop"><video muted loop playsinline preload="none" poster="/p/saywhen/loops/five-states.webp" width="1280" height="400" aria-label="The five saywhen states light up in order: Waiting, Ready, Listening, Writing, and Check. A short line under each state says what the app is waiting for."><source src="/p/saywhen/loops/five-states.mp4" type="video/mp4"></video></div>
+      <div class="loop"><video muted loop playsinline preload="none" poster="/p/saywhen/loops/cleanup.webp" width="1280" height="400" aria-label="Two spoken phrases are crossed out as saywhen turns them into cargo test --release and kubectl get pods."><source src="/p/saywhen/loops/cleanup.mp4" type="video/mp4"></video></div>
       <div class="shot"><img src="/shots/saywhen/home-preview.webp" alt="The saywhen Home screen showing a preview card with a countdown, and the four send styles." width="1440" height="1040" loading="lazy"></div>
       <p class="cap">The app's Home screen, captured in its browser demo mode with demo data.</p>
     </section>
@@ -144,17 +151,21 @@ footer a { color: var(--silver); }
     <section aria-labelledby="send-title" style="padding-top:0">
       <p class="kicker">You stay in control</p>
       <h2 id="send-title">Four ways to send. All of them cancelable.</h2>
+      <div class="loop"><video muted loop playsinline preload="none" poster="/p/saywhen/loops/send-styles.webp" width="1280" height="560" aria-label="Four send cards show a countdown, a nod, the words send it, and typing without pressing Enter."><source src="/p/saywhen/loops/send-styles.mp4" type="video/mp4"></video></div>
       <div class="grid g4">
         <div class="card"><h3>Just pause</h3><p>Stop talking. A short countdown runs, then it sends. The default.</p></div>
         <div class="card"><h3>Nod to send</h3><p>Nothing is sent until you nod.</p></div>
         <div class="card"><h3>Say "send it"</h3><p>End with "send it" to press Enter. Otherwise the text is only typed.</p></div>
         <div class="card"><h3>Type only</h3><p>Your words are typed. Enter is never pressed. Best for a first try.</p></div>
       </div>
+      <div class="loops2"><div class="loop"><video muted loop playsinline preload="none" poster="/p/saywhen/loops/cancel.webp" width="1280" height="400" aria-label="Pressing Esc stops a preview countdown and shows Canceled. Nothing sent. The visual also shows that shaking your head or talking again can stop the countdown."><source src="/p/saywhen/loops/cancel.mp4" type="video/mp4"></video></div><div class="loop"><video muted loop playsinline preload="none" poster="/p/saywhen/loops/safety.webp" width="1280" height="400" aria-label="A warning marks rm -rf dist/ as paste only. The command sits at the terminal prompt with Enter still unpressed."><source src="/p/saywhen/loops/safety.mp4" type="video/mp4"></video></div></div>
       <div class="grid g3">
         <div class="card"><p class="step">TRUSTED APPS</p><h3>Enter only where it is safe</h3><p>Terminals and code editors are trusted by default. In chat, email and browsers, saywhen only types.</p></div>
         <div class="card"><p class="step">RISKY COMMANDS</p><h3>Never sent for you</h3><p>Commands such as <code>rm -rf</code> and <code>git push --force</code> are typed with a warning. You press Enter yourself. The check is a heuristic, not a guarantee.</p></div>
         <div class="card"><p class="step">PRIVATE</p><h3>It stays on your computer</h3><p>Camera frames live in memory for a moment. Audio is discarded after it becomes text. After the speech model is downloaded, it works offline.</p></div>
       </div>
+      <div class="loop"><video muted loop playsinline preload="none" poster="/p/saywhen/loops/privacy.webp" width="1280" height="400" aria-label="An illustrated camera frame produces readings for head angle, lips moving, and face present. The picture fades away and the readings remain."><source src="/p/saywhen/loops/privacy.mp4" type="video/mp4"></video></div>
+      <p class="cap">The short animations on this page are illustrations drawn from the app's interface. They are not screen recordings, and their timing is not a measurement.</p>
     </section>
 
     <section id="numbers" aria-labelledby="numbers-title" style="padding-top:0">
@@ -192,5 +203,17 @@ npx tauri dev</code></pre></div>
     <span><a href="/#project/saywhen">Case study</a> · <a href="https://github.com/kmsmohamedansar/saywhen">GitHub</a> · <a href="https://github.com/kmsmohamedansar/saywhen/issues/new/choose">Report a problem</a> · <a href="/">Portfolio home</a></span>
   </footer>
 </div>
+<script>
+(() => {
+  const loops = document.querySelectorAll(".loop video");
+  const still = matchMedia("(prefers-reduced-motion: reduce)").matches || (navigator.connection && navigator.connection.saveData);
+  if (still || !("IntersectionObserver" in window)) { loops.forEach((v) => { v.controls = true; }); return; }
+  const seen = new IntersectionObserver((entries) => entries.forEach(({ target, isIntersecting }) => {
+    if (isIntersecting) target.play().catch(() => { target.controls = true; });
+    else target.pause();
+  }), { threshold: 0.35 });
+  loops.forEach((v) => seen.observe(v));
+})();
+</script>
 </body>
 </html>
