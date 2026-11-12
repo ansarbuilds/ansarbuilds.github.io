@@ -20,13 +20,10 @@ const PROJECT_ALIASES = {
   "rea-study": ["rea", "reverse engineering", "decompiler"],
   "prh-jepa": ["prh", "jepa", "platonic", "lejepa", "dinov2", "lecun"],
   storyera: ["story era", "novel", "continuity"],
-  "site-recon": ["site recon", "recon"],
-  "authorized-web-exposure-audit": ["exposure audit", "web audit", "security audit"],
   "digital-double": ["digital double", "digital me", "3d head", "avatar"],
   reptrack: ["rep track", "workout app", "gym app", "fitness app"],
   jarvis: ["personal agent", "job agent", "personal assistant"],
   haloscript: ["halo script", "handwriting", "ipad app"],
-  sitescout: ["site scout", "scout"],
   "sql-playground": ["sql playground", "sandbox"],
 };
 
@@ -363,7 +360,7 @@ const ROUTE_SUGGESTIONS = {
   experience: ["Where has he worked?", "What is his data experience?", "Is he open to work?", "How can I contact him?"],
   about: ["What does he know?", "Does he know Snowflake?", "Where is he based?", "What has he built?"],
   contact: ["How can I contact him?", "Is he open to work?", "Can I see his resume?", "What has he built?"],
-  ai: ["What are his AI projects?", "What is My Take on Jev?", "What is Site Recon?", "How can I contact him?"],
+  ai: ["What are his AI projects?", "What is My Take on Jev?", "What is Agent Flight Recorder?", "How can I contact him?"],
   projects: ["What is RepTrack?", "What is Haloscript?", "What are his AI projects?", "How can I contact him?"],
 };
 

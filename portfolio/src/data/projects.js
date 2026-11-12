@@ -138,7 +138,6 @@ export const PROJECTS = [
       { label: "Read the technical report", href: "/p/decision-models/report.html", external: true, primary: true },
       { label: "Download the PDF", href: "/p/decision-models/report.pdf", external: true },
       { label: "Code, data and every run", href: "https://github.com/kmsmohamedansar/decision-models", external: true },
-      { label: "The fast-then-slow idea it grew from", href: "#project/catalogue-checker" },
     ],
   },
   {
@@ -615,6 +614,7 @@ export const PROJECTS = [
   },
   {
     slug: "site-recon",
+    hidden: true,
     featured: true,
     spotlightGroup: "open-source",
     spotlightCategory: "skills",
@@ -701,6 +701,7 @@ export const PROJECTS = [
   },
   {
     slug: "authorized-web-exposure-audit",
+    hidden: true,
     featured: true,
     spotlightGroup: "open-source",
     spotlightCategory: "skills",
@@ -879,6 +880,7 @@ export const PROJECTS = [
   /* ───────────── spotlight: two-column grid ───────────── */
   {
     slug: "sitescout",
+    hidden: true,
     featured: true,
     grid: true,
     theme: { title: "condensed" },
@@ -963,6 +965,7 @@ export const PROJECTS = [
   },
   {
     slug: "integration",
+    hidden: true,
     featured: true,
     grid: true,
     theme: { title: "mono" },
@@ -1056,6 +1059,7 @@ export const PROJECTS = [
   },
   {
     slug: "analytics-assistant",
+    hidden: true,
     featured: true,
     grid: true,
     theme: { title: "serif" },
@@ -1245,6 +1249,7 @@ export const PROJECTS = [
   /* ───────────── more projects ───────────── */
   {
     slug: "data-delivery",
+    hidden: true,
     featured: true,
     grid: true,
     theme: { title: "condensed" },
@@ -1317,6 +1322,7 @@ export const PROJECTS = [
   },
   {
     slug: "catalogue-checker",
+    hidden: true,
     featured: true,
     grid: true,
     theme: { title: "display" },
@@ -1407,7 +1413,7 @@ export const PROJECTS = [
     story: [
       "MCP is a standard way for an AI assistant to use other software. It turned the chat window from a place where you paste things into a toolbox. Instead of me copying an answer out of an internal system and pasting it into the chat, the AI uses a tool directly, gets tidy data back, and carries on.",
       "My team's analytics app can be used that way. I connected it to Cursor, the AI coding assistant I use, and now I can ask about a product or a group of products and watch the AI look up the right names, pull in background information and run a data quality check before it sums up.",
-      "Another team built the internal connection. Using it taught me what makes tools easy or hard for an AI to use, so I built my own small version with sample data, linked below, to work through the same idea from start to finish.",
+      "Another team built the internal connection. Using it taught me what makes tools easy or hard for an AI to use, so I built my own small version with sample data to work through the same idea from start to finish.",
     ],
     how: [
       "A thin translation layer: the AI speaks MCP, and the layer passes requests on to the analytics app's existing connections.",
@@ -1429,8 +1435,7 @@ export const PROJECTS = [
       ],
     },
     links: [
-      { label: "The public, measured version: Analytics assistant", href: "#project/analytics-assistant", primary: true },
-      { label: "My public MCP stub", href: "https://github.com/kmsmohamedansar/mcp-analytics-stub", external: true },
+      { label: "My public MCP stub", href: "https://github.com/kmsmohamedansar/mcp-analytics-stub", external: true, primary: true },
       { label: "Chrome side panel starter", href: "https://github.com/kmsmohamedansar/mv3-sidepanel-starter", external: true },
     ],
   },
@@ -1477,7 +1482,6 @@ export const PROJECTS = [
       ],
     },
     links: [
-      { label: "See the public version: Integration-in-a-box", href: "#project/integration", primary: true },
       { label: "Private work tool. Mock-data demo on request.", href: "#contact", locked: true },
     ],
   },
@@ -1525,7 +1529,6 @@ export const PROJECTS = [
       ],
     },
     links: [
-      { label: "The public, measured version: Analytics assistant", href: "#project/analytics-assistant", primary: true },
       { label: "Prototype. Local demo on request.", href: "#contact", locked: true },
     ],
   },
@@ -1550,7 +1553,6 @@ export const PROJECTS = [
       "It's called Sidecar because it rides alongside the page you're on, in a panel on the side of Chrome. It doesn't replace the weekly run. It sits next to it and gets you the answer when you need it.",
       "It started as a handful of separate small browser add-ons, one per website, each with its own quirks. I combined them into one side panel with a website menu at the top. Pick a website and you get the steps built for it: a category or a list of brands for one, postal codes plus a brand for another, a store finder for a third. For each website I worked out where its product data actually comes from behind the scenes, so the tool reads it reliably rather than copying what's drawn on screen.",
       "It only runs in the team's testing environment, by design. Anyone on an internal engineering team can install it and get answers whenever they need them, with no risk to the live systems or the weekly run. Every run ends the same way: a spreadsheet file with a small, consistent set of columns. If you stop a run early you still get what it found so far, which turned out to matter more than I expected.",
-      "Because the tool itself is private, I rebuilt its ideas in public on a different subject. That's Sitescout, linked below, with screenshots, diagrams and tests.",
     ],
     how: [
       "Runs whenever someone needs it, completely separate from the weekly process, so it can't get in its way.",
@@ -1575,7 +1577,6 @@ export const PROJECTS = [
     },
 
     links: [
-      { label: "See the public re-creation: Sitescout", href: "#project/sitescout", primary: true },
       { label: "Private work tool. Walkthrough on request.", href: "#contact", locked: true },
     ],
   },
@@ -1723,8 +1724,7 @@ export const PROJECTS = [
       ],
     },
     links: [
-      { label: "The scaled-up, measured version: Catalogue checker", href: "#project/catalogue-checker", primary: true },
-      { label: "GitHub repo", href: "https://github.com/kmsmohamedansar/NLP-Project-Smart-Category", external: true },
+      { label: "GitHub repo", href: "https://github.com/kmsmohamedansar/NLP-Project-Smart-Category", external: true, primary: true },
     ],
   },
   {

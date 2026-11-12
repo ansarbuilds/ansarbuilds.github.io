@@ -5,7 +5,7 @@
 //
 // House style: plain words, short sentences, no em dashes.
 
-// The seven flagship case studies, in order. `visual` is the optional second
+// The six flagship case studies, in order. `visual` is the optional second
 // image that floats over the cover art: a real screenshot or figure ("shot"),
 // or a short illustrated terminal ("terminal") for tools that have no screen
 // of their own. Leave it out and the cover fills the frame on its own.
@@ -80,28 +80,6 @@ export const FLAGSHIPS = [
     stats: [["12", "approaches tried"], ["13 s", "of phone video"], ["$0", "spent on tools"]],
     stack: ["Claude Code", "Blender", "MCP", "three.js"],
   },
-  {
-    slug: "site-recon",
-    eyebrow: "Open-source agent skill",
-    badge: "Open source",
-    headline: "Point an agent at any website. Get back how it is built and how it moves.",
-    copy: "Site Recon inspects a public page on desktop, mobile and reduced-motion profiles, saves the exact animation values the browser sees, keeps facts apart from guesses, and helps rebuild the technique with original code.",
-    stats: [["3", "browser profiles per run"], ["4", "evidence files per extraction"], ["2", "agent hosts supported"]],
-    stack: ["Playwright", "Node.js", "Agent Skills", "Claude Code"],
-    visual: {
-      type: "terminal",
-      title: "site-recon · inspect",
-      lines: [
-        ["dim", "profile     desktop · mobile · reduced motion"],
-        ["dim", "capture     DOM, motion, assets"],
-        ["good", "fact        hero fades in over 600 ms"],
-        ["warn", "guess       likely a scroll-linked timeline"],
-        ["dim", "saved       4 evidence files"],
-        ["good", "next        rebuild with original code"],
-      ],
-      caption: "Illustration of an inspection",
-    },
-  },
 ];
 
 // The rest of the shipped work, as image cards. `metric` is optional.
@@ -109,12 +87,6 @@ export const MORE_WORK = [
   { slug: "decision-models", metric: "+16", unit: "points over a larger AI", line: "The best small model routed support tickets better than a larger one, and ran 5× faster on the same laptop." },
   { slug: "rea-study", metric: "2.3×", unit: "the cost, no clear gain", line: "An independent test of a reverse-engineering tool for agents on 20 programs, with the null result published in full." },
   { slug: "storyera", metric: "53", unit: "chapters in the first audit", line: "An agent skill that checks a novel for continuity, cites every passage and leaves the author in control." },
-  { slug: "authorized-web-exposure-audit", metric: "7", unit: "findings, zero real targets", line: "A security audit skill that refuses to run without a written scope, proven on a safe local fixture." },
-  { slug: "analytics-assistant", metric: "30", unit: "questions, both scored", line: "Hand-written rules against a local LLM on the same six MCP tools, measured side by side." },
-  { slug: "catalogue-checker", metric: "50", unit: "planted errors to catch", line: "Three ways to spot misfiled products, from embeddings to zero-shot, each scored against hidden mistakes." },
-  { slug: "integration", metric: "10", unit: "failures, each with a fix", line: "OAuth and OpenID Connect between two systems, broken on purpose ten ways and documented like production." },
-  { slug: "data-delivery", line: "A dbt and Dagster pipeline that merges messy weekly files and refuses to ship unless every check passes." },
-  { slug: "sitescout", line: "A Chrome side-panel extension that collects market data for any ticker and exports one clean file." },
   { slug: "reptrack", line: "A fast workout log for the gym floor. Native Swift, live on the App Store." },
 ];
 
@@ -122,11 +94,11 @@ export const MORE_WORK = [
 export const CAPABILITIES = [
   {
     id: "agents",
-    count: "4",
-    unit: "open-source agent tools",
+    count: "3",
+    unit: "agent tools",
     title: "Agents & tooling",
     copy: "Agents that can run on their own and still be trusted: memory, spend limits, test suites and a full record of what they did.",
-    proof: ["jarvis", "agent-flight-recorder", "site-recon", "storyera"],
+    proof: ["jarvis", "agent-flight-recorder", "storyera"],
   },
   {
     id: "evals",
@@ -141,8 +113,8 @@ export const CAPABILITIES = [
     count: "2",
     unit: "apps live on the App Store",
     title: "Product & shipping",
-    copy: "From idea to release: native Swift apps, browser extensions, data pipelines and 3D on the web, designed and shipped end to end.",
-    proof: ["haloscript", "reptrack", "digital-double", "data-delivery"],
+    copy: "From idea to release: native apps on the App Store, and 3D on the web, designed and shipped end to end.",
+    proof: ["haloscript", "reptrack", "digital-double"],
   },
 ];
 

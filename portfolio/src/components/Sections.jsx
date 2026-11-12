@@ -278,7 +278,7 @@ export function ProjectsSection() {
   return <section id="projects" className="ed-projects ed-light ed-section" data-palette="bloom">
     <div className="ed-section-watermark" aria-hidden="true">WORK</div>
     <div className="ed-wrap">
-      <Enter className="ed-section-heading sc-stage-heading"><div><IndexLabel number="02">Selected work</IndexLabel><h2>Don’t read about it. <em>Try it.</em></h2></div><div className="ed-heading-aside"><p>Seven builds, each one live on this page: watch the film, run the agent, replay the failure, flip the finding, switch the device.</p></div></Enter>
+      <Enter className="ed-section-heading sc-stage-heading"><div><IndexLabel number="02">Selected work</IndexLabel><h2>Don’t read about it. <em>Try it.</em></h2></div><div className="ed-heading-aside"><p>Six builds, each one live on this page: watch the film, run the agent, replay the failure, flip the finding, switch the device.</p></div></Enter>
       <WorkStage />
     </div>
   </section>;
@@ -323,7 +323,7 @@ const ALSO_BUILT = LISTED_PROJECTS.filter((project) => !SHOWN.has(project.slug))
 
 export function MoreWorkSection() {
   return <section id="more" className="sc-more ed-light ed-section" data-palette="lumora"><div className="ed-wrap">
-    <Enter className="ed-section-heading"><div><IndexLabel number="04">More shipped work</IndexLabel><h2>And plenty<br /><em>more shipped.</em></h2></div><p className="ed-heading-aside">Studies, agent skills, data pipelines and apps. Every card opens a full write-up.</p></Enter>
+    <Enter className="ed-section-heading"><div><IndexLabel number="04">More shipped work</IndexLabel><h2>And plenty<br /><em>more shipped.</em></h2></div><p className="ed-heading-aside">Studies, an agent skill and apps. Every card opens a full write-up.</p></Enter>
     <div className="sc-card-grid">{MORE_WORK.map((item, i) => <WorkCard key={item.slug} item={item} index={i} />)}</div>
     {ALSO_BUILT.length > 0 && <details className="sc-also">
       <summary><span>Also built</span><small>{ALSO_BUILT.length} more, from internal tools to early experiments</small></summary>

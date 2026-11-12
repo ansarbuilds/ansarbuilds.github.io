@@ -28,8 +28,8 @@ const SCRIPT = [
   { text: "What do you want to know?\n", cls: "opacity-40", speed: 22 },
 ];
 
-const EMPHASIS = /\b(Ansar|Datasembly|Amazon Prime Video|RepTrack|Haloscript|Sitescout|Snowflake|SQL|SwiftUI|App Store|LinkedIn|GitHub)\b/g;
-const EMPHASIS_ONLY = /^(Ansar|Datasembly|Amazon Prime Video|RepTrack|Haloscript|Sitescout|Snowflake|SQL|SwiftUI|App Store|LinkedIn|GitHub)$/;
+const EMPHASIS = /\b(Ansar|Datasembly|Amazon Prime Video|RepTrack|Haloscript|Snowflake|SQL|SwiftUI|App Store|LinkedIn|GitHub)\b/g;
+const EMPHASIS_ONLY = /^(Ansar|Datasembly|Amazon Prime Video|RepTrack|Haloscript|Snowflake|SQL|SwiftUI|App Store|LinkedIn|GitHub)$/;
 const SHORTCUT_QUESTIONS = ["What is his current job?", "Where has he worked?", "What has he built?", "How do I contact him?"];
 
 // The shared knowledge layer returns plain text because the edge chat is a

@@ -9,15 +9,14 @@ import Count from "./Count";
 import { usePageVisible } from "../lib/usePageVisible";
 import "../stage.css";
 
-/* The flagship work as one stage instead of seven long sections: pick a
+/* The flagship work as one stage instead of long sections: pick a
    project along the top and try it on the left, read the short version on
    the right. It moves on by itself until the visitor takes over. On small
    screens the tabs drop away and every project is simply stacked.
 
    Each demo is either the real thing (saywhen plays its launch film; Jarvis runs its sample-data demo in a
    frame; Haloscript shows its own screenshots; PRH-JEPA shows a figure from
-   the report) or an illustration that says so (the Flight Recorder replay
-   and the Site Recon terminal). */
+   the report) or an illustration that says so (the Flight Recorder replay). */
 
 const coverOf = (project) => project.spotlightArt || project.cardArt || project.cardShot || project.shots?.[0];
 const outboundLink = (project) => project.links?.find((link) => link.external && !link.locked);
@@ -168,18 +167,6 @@ function DigitalDemo({ project }) {
   </div>;
 }
 
-/* Site Recon: an illustrated inspection that prints itself. */
-function ReconDemo({ flag, active }) {
-  const lines = flag.visual?.lines || [];
-  return <Frame title="site-recon · inspect" className={`is-term ${active ? "is-running" : ""}`}>
-    <ol className="st-term">{lines.map(([tone, text], i) => {
-      const [key, ...rest] = text.split(/\s{2,}/);
-      return <li key={text} className={`is-${tone}`} style={{ "--i": i }}><b>{key}</b><span>{rest.join(" ")}</span></li>;
-    })}<li className="st-caret" style={{ "--i": lines.length }} aria-hidden="true" /></ol>
-    <div className="st-demo-foot"><span>Illustrative inspection</span></div>
-  </Frame>;
-}
-
 const DEMOS = {
   saywhen: SaywhenDemo,
   jarvis: JarvisDemo,
@@ -187,10 +174,9 @@ const DEMOS = {
   "prh-jepa": PrhDemo,
   haloscript: HaloDemo,
   "digital-double": DigitalDemo,
-  "site-recon": ReconDemo,
 };
 
-// Tab labels have to fit seven across, so two titles get a short form.
+// Tab labels have to fit six across, so two titles get a short form.
 const TAB_TITLE = { "agent-flight-recorder": "Flight Recorder", "prh-jepa": "PRH-JEPA" };
 const STAGE = FLAGSHIPS.map((flag) => ({ flag, project: getProject(flag.slug) })).filter((item) => item.project);
 

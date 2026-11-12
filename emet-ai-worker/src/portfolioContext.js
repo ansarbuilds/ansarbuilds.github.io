@@ -15,13 +15,11 @@ EXPERIENCE
 SELECTED PROJECTS
 - RepTrack: a SwiftUI and SwiftData workout log for iPhone and iPad, available on the App Store.
 - Haloscript: a SwiftUI writing app in testing that combines a novel editor, corkboard, notes and an Apple Pencil whiteboard.
-- Sitescout: a Manifest V3 Chrome extension that collects public company information into repeatable cards and spreadsheet exports.
 - Digital Me: an interactive Three.js model of Ansar's head, created from phone photos and video through a documented series of experiments.
 - Decision Models study: compared three small local models with a larger chat-style model on 250 fictional support messages. The best small model routed 80% of held-out messages correctly and was five times faster.
 - My Take on REA: an independent test of an AI reverse-engineering tool across 20 programs. The study found no clear accuracy improvement on those programs; directed REA use took more time and steps.
 - StoryEra: an open-source skill for Codex and Claude Code that tracks facts, audits novel continuity, cites passages and suggests repairs without editing the author's manuscript.
-- Site Recon: an open-source skill and Playwright inspector for Codex and Claude Code. It identifies browser-visible stack evidence and animation behavior, compares desktop, mobile and reduced motion, exports exact public keyframes and helps rebuild techniques with original code.
-- Other public work includes data pipelines, analytics assistants, catalogue checking and integration demonstrations using public or sample data.
+- saywhen: an open-source desktop app for hands-free voice input. It types a spoken command into a terminal or coding assistant after a preview the person can cancel.
 
 WORKING STYLE
 - Ansar prefers tests, reproducible evidence and honest limitations over inflated claims.

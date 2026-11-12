@@ -65,7 +65,7 @@ test("representative questions reach the right entry", () => {
     ["who are you?", "identity"],
     ["what's RepTrack?", "project:reptrack"],
     ["tell me about Haloscript", "project:haloscript"],
-    ["what is Site Recon?", "project:site-recon"],
+    ["what is saywhen?", "project:saywhen"],
     ["what was the Jev study about?", "project:decision-models"],
     ["does he know Snowflake?", "tool:Snowflake"],
     ["has he used SwiftUI?", "tool:SwiftUI"],

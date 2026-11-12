@@ -14,7 +14,7 @@ export const HERO = {
 // Quick proof, right under the intro, before anyone reads a paragraph.
 export const RECEIPTS = [
   { value: "PROJECTS", label: "shipped projects with code, write-ups or live demos", accent: "green" },
-  { value: "4", label: "open-source agent tools and skills, one on PyPI", accent: "cyan" },
+  { value: "2", label: "open-source agent tools and skills, one on PyPI", accent: "cyan" },
   { value: "3", label: "independent AI studies with full technical reports", accent: "rose" },
   { value: "2", label: "native apps live on the App Store", accent: "amber" },
 ];
@@ -171,7 +171,7 @@ export const EMET_TOPICS = [
       { text: "three independent AI studies", cls: "font-bold" },
       {
         text:
-          " with full technical reports, open-source agent skills, and data tools that test themselves. Most have a live demo or a write-up.",
+          " with full technical reports, and open-source agent skills. Most have a live demo or a write-up.",
       },
     ],
   },
@@ -200,7 +200,7 @@ export const CONTACT = {
 };
 
 export const COMMAND_ITEMS = [
-  { label: "Selected work · seven flagship builds", go: "#projects", group: "Sections" },
+  { label: "Selected work · six flagship builds", go: "#projects", group: "Sections" },
   { label: "What I bring · agents, evals, shipping", go: "#capabilities", group: "Sections" },
   { label: "More shipped work", go: "#more", group: "Sections" },
   { label: "Playground · interactive experiments", go: "#ai", group: "Sections" },
@@ -211,8 +211,6 @@ export const COMMAND_ITEMS = [
   { label: "My Take on REA, project page", go: "#project/rea-study", group: "Projects" },
   { label: "My Take on PRH-JEPA, project page", go: "#project/prh-jepa", group: "Projects" },
   { label: "StoryEra, novel continuity skill", go: "#project/storyera", group: "Projects" },
-  { label: "Site Recon, website inspection skill", go: "#project/site-recon", group: "Projects" },
-  { label: "Exposure Audit, authorized website review skill", go: "#project/authorized-web-exposure-audit", group: "Projects" },
   { label: "Haloscript, project page", go: "#project/haloscript", group: "Projects" },
   { label: "EMET · ask the terminal", go: "#emet", group: "Fun" },
   { label: "Solar system explorer", go: "#explore", group: "Fun" },
@@ -221,8 +219,6 @@ export const COMMAND_ITEMS = [
   { label: "My Take on Jev, technical report", href: "/p/decision-models/report.html", group: "Links" },
   { label: "My Take on REA, technical report", href: "/p/rea-study/report.html", group: "Links" },
   { label: "My Take on PRH-JEPA, technical report", href: "/p/prh-jepa/report.html", group: "Links" },
-  { label: "Site Recon on GitHub", href: "https://github.com/kmsmohamedansar/site-recon", group: "Links" },
-  { label: "Exposure Audit on GitHub", href: "https://github.com/kmsmohamedansar/authorized-web-exposure-audit", group: "Links" },
   { label: "GitHub", href: CONTACT.github, group: "Links" },
   { label: "LinkedIn", href: CONTACT.linkedin, group: "Links" },
   { label: "Email · " + CONTACT.email, href: "mailto:" + CONTACT.email, group: "Links" },

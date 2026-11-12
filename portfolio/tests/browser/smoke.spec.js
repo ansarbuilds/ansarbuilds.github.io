@@ -15,8 +15,6 @@ test('share pages open their matching case studies', async ({ page }) => {
   const projects = [
     ['agent-flight-recorder', 'Agent Flight Recorder'],
     ['storyera', 'StoryEra'],
-    ['site-recon', 'Site Recon'],
-    ['authorized-web-exposure-audit', 'Exposure Audit'],
     ['reptrack', 'RepTrack'],
     ['saywhen', 'saywhen'],
   ];
