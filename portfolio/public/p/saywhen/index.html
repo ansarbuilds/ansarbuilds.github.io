@@ -109,6 +109,51 @@ pre code { background: none; padding: 0; font: inherit; }
 
 footer { padding-block: 36px 56px; border-top: 1px solid var(--line); font-size: .88rem; color: var(--muted); display: flex; flex-wrap: wrap; gap: 8px 24px; justify-content: space-between; }
 footer a { color: var(--silver); }
+
+/* motion layer */
+body::after { content: ""; position: fixed; z-index: -1; width: 70vmax; height: 70vmax; left: -20vmax; top: 10vh; border-radius: 50%; background: radial-gradient(closest-side, rgb(251 179 3 / .13), transparent 70%); filter: blur(40px); animation: drift 26s ease-in-out infinite alternate; pointer-events: none; }
+@keyframes drift { to { transform: translate(60vw, 30vh) scale(1.25); } }
+header.top { position: sticky; top: 10px; z-index: 6; margin-top: 10px; padding: 10px 18px; border: 1px solid var(--line); border-radius: 999px; background: rgb(34 6 28 / .62); -webkit-backdrop-filter: blur(16px) saturate(1.4); backdrop-filter: blur(16px) saturate(1.4); }
+h1 em { background: linear-gradient(100deg, #fbb303 20%, #ffe7a6 45%, #fbb303 70%); background-size: 220% 100%; -webkit-background-clip: text; background-clip: text; color: transparent; animation: sheen 7s linear infinite; }
+@keyframes sheen { to { background-position: -220% 0; } }
+.btn.primary { box-shadow: 0 10px 40px -10px rgb(251 179 3 / .7); }
+.btn.primary:hover { box-shadow: 0 14px 50px -8px rgb(251 179 3 / .9); }
+.card { position: relative; overflow: hidden; transition: transform .35s cubic-bezier(.2,.7,.2,1), border-color .35s; }
+.card::after { content: ""; position: absolute; inset: 0; pointer-events: none; opacity: 0; transition: opacity .3s; background: radial-gradient(260px circle at var(--mx, 50%) var(--my, 0%), rgb(251 179 3 / .16), transparent 65%); }
+.card:hover { transform: translateY(-3px); border-color: rgb(251 179 3 / .45); } .card:hover::after { opacity: 1; }
+.js-motion .rv { opacity: 0; transform: translateY(22px); transition: opacity .8s cubic-bezier(.2,.7,.2,1), transform .8s cubic-bezier(.2,.7,.2,1); transition-delay: var(--d, 0ms); }
+.js-motion .rv.in { opacity: 1; transform: none; }
+
+.stage { position: relative; margin: clamp(28px, 5vw, 56px) auto 0; max-width: 880px; perspective: 1600px; }
+.stage::before { content: ""; position: absolute; inset: 12% 8% -6%; background: radial-gradient(closest-side, rgb(251 179 3 / .38), transparent 72%); filter: blur(50px); z-index: -1; }
+.term { border: 1px solid rgb(223 229 236 / .2); border-radius: 18px; overflow: hidden; background: linear-gradient(180deg, #1b0417, #120210); box-shadow: 0 50px 110px -30px rgb(0 0 0 / .85), inset 0 1px 0 rgb(255 255 255 / .08); transform: rotateX(var(--rx, 4deg)) rotateY(var(--ry, 0deg)); transition: transform .5s cubic-bezier(.2,.7,.2,1); text-align: left; }
+.term-bar { display: flex; align-items: center; gap: 7px; padding: 12px 16px; border-bottom: 1px solid var(--line); font: 500 .78rem var(--mono); color: var(--muted); background: rgb(255 255 255 / .03); }
+.term-bar i { width: 11px; height: 11px; border-radius: 50%; background: rgb(223 229 236 / .22); } .term-bar span { margin-left: 8px; }
+.term-body { margin: 0; border: 0; border-radius: 0; background: none; min-height: clamp(230px, 34vw, 320px); padding: 20px 22px 110px; font: clamp(.82rem, 1.5vw, 1rem)/1.75 var(--mono); color: #f1e9d2; white-space: pre-wrap; }
+.term-body .ok { color: #9fe3b0; } .term-body .dim { color: #9a8a98; }
+.caret { display: inline-block; width: .55em; height: 1.1em; margin-left: 2px; vertical-align: -3px; background: var(--amber); animation: blink 1s steps(2) infinite; }
+@keyframes blink { 50% { opacity: 0; } }
+.hud { position: absolute; left: 0; right: 0; bottom: 18px; display: flex; flex-direction: column; align-items: center; gap: 10px; pointer-events: none; }
+.pcard { width: min(88%, 470px); padding: 14px 16px; border-radius: 16px; text-align: left; background: rgb(46 11 39 / .92); border: 1px solid rgb(251 179 3 / .4); box-shadow: 0 24px 60px -18px #000; -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px); opacity: 0; transform: translateY(14px) scale(.97); transition: opacity .35s, transform .45s cubic-bezier(.2,.9,.2,1.2); }
+.pcard.on { opacity: 1; transform: none; }
+.pc-top { display: flex; justify-content: space-between; font-size: .72rem; color: var(--muted); } .pc-top b { font: 400 1rem var(--serif); color: var(--amber); }
+.pc-text { margin-top: 6px; font: 500 clamp(.9rem, 1.7vw, 1.08rem) var(--mono); color: #fff; }
+.pc-bar { height: 3px; margin-top: 10px; border-radius: 3px; background: rgb(255 255 255 / .12); overflow: hidden; } .pc-bar i { display: block; height: 100%; width: 100%; background: var(--amber); transform-origin: left; }
+.pcard.on .pc-bar i { animation: count 1.8s linear forwards; } @keyframes count { to { transform: scaleX(0); } }
+.pc-hint { margin-top: 8px; font: .68rem var(--mono); color: var(--muted); }
+.pill { display: inline-flex; align-items: center; gap: 9px; max-width: 92%; padding: 8px 16px 8px 9px; border-radius: 999px; background: rgb(34 6 28 / .94); border: 1px solid rgb(223 229 236 / .3); box-shadow: 0 14px 40px -12px #000; font-size: .84rem; color: var(--silver); white-space: nowrap; transition: border-color .3s, box-shadow .3s; }
+.pill img { width: 22px; height: 22px; border-radius: 6px; } .pill b { font-weight: 600; } .pill .txt { color: var(--muted); overflow: hidden; text-overflow: ellipsis; }
+.pill .dot { width: 9px; height: 9px; border-radius: 50%; background: #8d7f8b; transition: background .3s; }
+.pill[data-s="ready"] .dot { background: #dfe5ec; box-shadow: 0 0 0 4px rgb(223 229 236 / .15); }
+.pill[data-s="listening"], .pill[data-s="check"] { border-color: var(--amber); box-shadow: 0 0 34px -6px rgb(251 179 3 / .7), 0 14px 40px -12px #000; }
+.pill[data-s="listening"] .dot, .pill[data-s="check"] .dot, .pill[data-s="writing"] .dot { background: var(--amber); } .pill[data-s="listening"] b, .pill[data-s="check"] b { color: var(--amber); }
+.pill[data-s="sent"] .dot { background: #7fd69a; } .pill[data-s="sent"] { border-color: rgb(127 214 154 / .6); }
+.bars { display: none; align-items: center; gap: 2px; height: 16px; } .pill[data-s="listening"] .bars { display: inline-flex; }
+.bars i { width: 3px; height: 100%; border-radius: 2px; background: var(--amber); animation: eq .7s ease-in-out infinite alternate; transform-origin: center; }
+.bars i:nth-child(2) { animation-delay: -.5s; } .bars i:nth-child(3) { animation-delay: -.2s; } .bars i:nth-child(4) { animation-delay: -.6s; } .bars i:nth-child(5) { animation-delay: -.35s; }
+@keyframes eq { from { transform: scaleY(.25); } to { transform: scaleY(1); } }
+.stage-cap { margin-top: 16px; text-align: center; font-size: .84rem; color: var(--muted); }
+@media (prefers-reduced-motion: reduce) { body::after, h1 em, .bars i, .caret { animation: none; } .card, .term { transition: none; } }
 @media (max-width: 560px) { .top nav a.opt, .brand .who { display: none; } .top nav { flex-wrap: nowrap; } .btn { width: 100%; justify-content: center; } }
 @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } .btn { transition: none; } }
 </style>
@@ -133,11 +178,25 @@ footer a { color: var(--silver); }
       <h1>Look. Talk. <em>Sent.</em></h1>
       <p class="lede">saywhen is hands-free voice input for terminals and coding assistants. Look at the screen and say what you want. It types it, shows you a short preview you can cancel, and then presses Enter. No hotkey to hold.</p>
       <div class="ctas">
-        <a class="btn primary" href="https://github.com/ansarbuilds/saywhen">Get it on GitHub</a>
-        <a class="btn" href="https://github.com/ansarbuilds/saywhen/releases/tag/v0.2.0">Download the beta</a>
-        <a class="btn" href="/#project/saywhen">Read the full case study</a>
+        <a class="btn primary" href="https://github.com/ansarbuilds/saywhen/releases/download/v0.2.0/saywhen_0.2.0_aarch64.dmg">Download for Mac</a>
+        <a class="btn" href="https://github.com/ansarbuilds/saywhen/releases/download/v0.2.0/saywhen_0.2.0_x64-setup.exe">Download for Windows</a>
+        <a class="btn" href="https://github.com/ansarbuilds/saywhen">View on GitHub</a>
+        </div>
+      <p class="note">Beta for Apple Silicon Macs and 64-bit Windows. Free and open source. Your voice and camera stay on your computer. For a first try, choose Type only, and Enter is never pressed. <a href="#safe">Why that is safe</a>.</p>
+    </div>
+
+
+    <div class="stage" id="stage">
+      <div class="term" role="img" aria-label="An illustration of one command. The saywhen pill goes from Waiting to Ready to Listening, hears the words cargo test dash dash release, shows a preview of cargo test --release with a countdown, and types it into a terminal, where the tests pass.">
+        <div class="term-bar" aria-hidden="true"><i></i><i></i><i></i><span>Terminal</span></div>
+        <pre class="term-body" aria-hidden="true"><span class="dim">~/saywhen</span> $ <span id="t-cmd"></span><span class="caret"></span>
+<span id="t-out"></span></pre>
+        <div class="hud" aria-hidden="true">
+          <div class="pcard" id="pcard"><div class="pc-top"><span>Paste + Enter into Terminal</span><b id="pc-s">1.8s</b></div><div class="pc-text">cargo test --release</div><div class="pc-bar"><i></i></div><div class="pc-hint">Esc or shake your head to cancel. Nod to send now.</div></div>
+          <div class="pill" id="pill" data-s="waiting"><img src="/shots/saywhen/icon.png" alt=""><span class="dot"></span><b id="p-state">Waiting</b><span class="bars"><i></i><i></i><i></i><i></i><i></i></span><span class="txt" id="p-text">Look at the screen to start</span></div>
+        </div>
       </div>
-      <p class="note">Free and open source. Your voice and camera stay on your computer. For a first try, choose Type only, and Enter is never pressed. <a href="#safe">Why that is safe</a>.</p>
+      <p class="stage-cap">One command, start to finish. A live illustration of the interface, not a recording.</p>
     </div>
 
     <figure class="film" style="margin-inline:0">
@@ -275,6 +334,50 @@ npx tauri dev</code></pre></div>
     else target.pause();
   }), { threshold: 0.35 });
   loops.forEach((v) => seen.observe(v));
+})();
+</script>
+<script>
+(() => {
+  const still = matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const $ = (id) => document.getElementById(id);
+  const pill = $("pill"), state = $("p-state"), text = $("p-text"), card = $("pcard"), cmd = $("t-cmd"), out = $("t-out"), secs = $("pc-s"), stage = $("stage");
+  if (!pill) return;
+  const set = (s, label, t) => { pill.dataset.s = s; state.textContent = label; text.textContent = t; };
+  const done = '<span class="dim">   Compiling saywhen v0.2.0</span>\n<span class="dim">    Finished `release` profile in 4.2s</span>\n<span class="ok">test result: ok.</span> 46 passed; 0 failed';
+  if (still) { set("sent", "Sent", "Typed into Terminal"); cmd.textContent = "cargo test --release"; out.innerHTML = done; }
+  else {
+    let visible = true;
+    if ("IntersectionObserver" in window) new IntersectionObserver(([e]) => { visible = e.isIntersecting; }).observe(stage);
+    const wait = (ms) => new Promise((r) => setTimeout(r, ms));
+    const type = async (el, str, ms) => { for (const ch of str) { el.textContent += ch; await wait(ms); } };
+    (async () => {
+      for (;;) {
+        while (!visible || document.hidden) await wait(400);
+        cmd.textContent = ""; out.innerHTML = ""; card.classList.remove("on");
+        set("waiting", "Waiting", "Look at the screen to start"); await wait(1500);
+        set("ready", "Ready", "Ready. Start talking"); await wait(1300);
+        set("listening", "Listening", "");
+        for (const w of ["“cargo", " test", " dash", " dash", " release”"]) { text.textContent += w; await wait(420); }
+        await wait(500);
+        set("writing", "Writing", "Writing it down…"); await wait(900);
+        set("check", "Check", "Sending in 1.8s"); card.classList.add("on");
+        for (let t = 18; t > 0; t--) { secs.textContent = (t / 10).toFixed(1) + "s"; text.textContent = "Sending in " + (t / 10).toFixed(1) + "s"; await wait(100); }
+        card.classList.remove("on"); set("sent", "Sent", "Typed into Terminal");
+        await type(cmd, "cargo test --release", 22); await wait(450);
+        out.innerHTML = done; await wait(3600);
+      }
+    })();
+    const term = stage.querySelector(".term");
+    stage.addEventListener("pointermove", (e) => { const r = stage.getBoundingClientRect(); term.style.setProperty("--ry", ((e.clientX - r.left) / r.width - .5) * 7 + "deg"); term.style.setProperty("--rx", (.5 - (e.clientY - r.top) / r.height) * 6 + 2 + "deg"); });
+    stage.addEventListener("pointerleave", () => { term.style.removeProperty("--ry"); term.style.removeProperty("--rx"); });
+  }
+  document.querySelectorAll(".card").forEach((c) => c.addEventListener("pointermove", (e) => { const r = c.getBoundingClientRect(); c.style.setProperty("--mx", e.clientX - r.left + "px"); c.style.setProperty("--my", e.clientY - r.top + "px"); }));
+  if (!still && "IntersectionObserver" in window) {
+    document.documentElement.classList.add("js-motion");
+    const io = new IntersectionObserver((es) => es.forEach((e) => { if (e.isIntersecting) { e.target.classList.add("in"); io.unobserve(e.target); } }), { threshold: 0.12, rootMargin: "0px 0px -6% 0px" });
+    document.querySelectorAll("main section > *, main > figure, .stage").forEach((el) => { el.classList.add("rv"); io.observe(el); });
+    document.querySelectorAll(".grid, .install, .nums").forEach((g) => [...g.children].forEach((c, i) => { c.classList.add("rv"); c.style.setProperty("--d", i * 90 + "ms"); io.observe(c); }));
+  }
 })();
 </script>
 </body>
