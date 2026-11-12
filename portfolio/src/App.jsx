@@ -1,5 +1,4 @@
 import { Component, createRef, lazy, Suspense, useCallback, useContext, useEffect, useMemo, useRef, useState } from "react";
-import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import EmetSection from "./components/EmetSection";
 import { Hero, ProjectsSection, CapabilitiesSection, MoreWorkSection, ExperimentsSection, ContactSection } from "./components/Sections";
 import ProjectPage from "./components/ProjectPage";
@@ -7,11 +6,10 @@ import ProjectWorkPage from "./components/ProjectWorkPage";
 import SandboxStubs from "./components/SandboxStubs";
 import CommandPalette from "./components/CommandPalette";
 import { MatrixBackground } from "./components/RouteBackgrounds";
-import IntroCurtain from "./components/IntroCurtain";
 import PaletteSwatch from "./components/PaletteSwatch";
 import Cursor from "./components/Cursor";
 import { shouldPlayIntro } from "./lib/intro";
-import { EASE_OUT } from "./lib/motion";
+import { runRouteChange } from "./lib/routeTransition";
 import { titleForRoute } from "./lib/routeTitle";
 import { CONTACT } from "./data/content";
 import { applyPalette, clearPalette, paletteForRoute, pickPalette } from "./lib/palettes";
@@ -80,11 +78,22 @@ function RouteProvider({ children }) {
   // from the top of the page the visitor just opened.
   const first = useRef(true);
 
+  // The route the page is showing, readable from the hashchange handler
+  // without re-subscribing it on every change.
+  const shownRoute = useRef(route);
+  const leavingHeading = useRef(null);
   useEffect(() => {
     function onHashChange() {
       const h = window.location.hash.replace(/^#/, "");
       const next = parseRoute(h);
-      setRoute(next);
+      const from = shownRoute.current;
+      shownRoute.current = next;
+      // Remember the heading being left. The swap below is synchronous, so
+      // by the time the focus effect runs only the new page is in the DOM.
+      leavingHeading.current = document.querySelector("main h1, main h2");
+      // Home to a project page and back travel as one move; every other
+      // change just swaps (see lib/routeTransition.js).
+      runRouteChange({ from, to: next, apply: () => setRoute(next) });
       if (h && next === "main") scrollToSection(h);
     }
     window.addEventListener("hashchange", onHashChange);
@@ -107,12 +116,11 @@ function RouteProvider({ children }) {
     document.title = titleForRoute(route);
     if (first.current) { first.current = false; return; }
     if (route === "main") return;
-    // AnimatePresence keeps the outgoing view mounted until its exit
-    // animation finishes, so both it and <main> still hold the old content
-    // for a few hundred milliseconds. Focusing either one now would announce
-    // the page being left. Wait for a heading that is a different node from
-    // the one on screen at the moment the route changed.
-    const outgoing = document.querySelector("main h1, main h2");
+    // This effect can run while the outgoing view is still in the document
+    // (a view transition, or a lazy route that has not arrived). Focusing a
+    // heading now could announce the page being left, so wait for one that
+    // is a different node from the one on screen when the route changed.
+    const outgoing = leavingHeading.current;
     let cancelled = false;
     let tries = 120;
     const focusIncoming = () => {
@@ -187,7 +195,7 @@ function SandboxProvider({ children }) {
 }
 
 // A consistent paper navigation anchors the alternating editorial sections.
-function Nav() {
+function Nav({ booting = false }) {
   const { route, navigate } = useRoute();
   const editorial = route === "main";
   // While the dark hero is behind it, the nav goes dark glass to match.
@@ -227,7 +235,7 @@ function Nav() {
     document.addEventListener("keydown", close);
     return () => { document.removeEventListener("pointerdown", close); document.removeEventListener("keydown", close); };
   }, [menuOpen]);
-  return <nav className={`ed-nav ${overHero ? "is-over-hero" : ""}`} aria-label="Main navigation"><div className="ed-nav-inner">
+  return <nav className={`ed-nav ${overHero ? "is-over-hero" : ""} ${booting ? "is-booting" : ""}`} aria-label="Main navigation"><div className="ed-nav-inner">
     <button onClick={() => navigate("deck")} className="ed-wordmark" aria-label="Mohamed Ansar, home"><span className="ed-wordmark-symbol" aria-hidden="true">ma</span><span>mohamed ansar</span></button>
     <div className="ed-nav-links">{editorial ? <><a href="#projects" className="ed-nav-wide">Work</a><a href="#capabilities" className="ed-nav-wide">Capabilities</a><a href="#ai" className="ed-nav-wide">Playground</a><a href={CONTACT.github} className="ed-nav-wide" target="_blank" rel="noopener noreferrer">GitHub</a><span ref={menuRef} className="ed-nav-menu"><button type="button" aria-expanded={menuOpen} aria-controls="nav-menu" onClick={() => setMenuOpen((open) => !open)}>Menu</button>{menuOpen && <span id="nav-menu" className="ed-nav-menu-list" onClick={() => setMenuOpen(false)}><a href="#projects">Work</a><a href="#capabilities">Capabilities</a><a href="#more">More work</a><a href="#ai">Playground</a><a href={CONTACT.github} target="_blank" rel="noopener noreferrer">GitHub ↗</a></span>}</span><a href="#contact" className="ed-nav-contact">Get in touch ↗</a></> : <button onClick={() => navigate("deck")}>← Home</button>}
       <button onClick={openPalette} className="ed-nav-command" aria-label="Open command palette">⌘ K</button>
@@ -324,12 +332,12 @@ function useRoutePalette(route) {
   }, [route]);
 }
 
-function MainDocument({ bootDone }) {
+function MainDocument({ bootDone, onBoot }) {
   const scrollContainerRef = useContext(ScrollContext);
   useSectionPalette(scrollContainerRef);
   return (
     <>
-      <Hero ready={bootDone} scrollContainerRef={scrollContainerRef} />
+      <Hero ready={bootDone} onReady={onBoot} />
       <ProjectsSection />
       <CapabilitiesSection />
       <MoreWorkSection />
@@ -339,12 +347,37 @@ function MainDocument({ bootDone }) {
   );
 }
 
-function Stage({ bootDone }) {
+// What each route shows. Takeover views fill the stage; the home page and
+// the project pages scroll.
+function RouteView({ route, bootDone, onBoot }) {
+  if (route === "emet") return <EmetSection />;
+  if (route === "explore") return <Suspense fallback={<RouteLoader label="Loading solar system" />}><SolarSystemExplorer /></Suspense>;
+  if (route === "work") return <ProjectWorkPage />;
+  if (route === "project/digital-double") return <Suspense fallback={<RouteLoader label="Loading 3D project" />}><DigitalDouble /></Suspense>;
+  if (route === "project/haloscript") return <Suspense fallback={<RouteLoader label="Loading project" />}><HaloscriptPage /></Suspense>;
+  if (route.startsWith("project/")) return <ProjectPage slug={route.slice("project/".length)} />;
+  if (route === "lineage-demo") return <Suspense fallback={<RouteLoader label="Loading data explorer" />}><DataLineageExplorer /></Suspense>;
+  if (route === "infinity") return <Suspense fallback={<RouteLoader label="Loading particle scene" />}><InfinityPage /></Suspense>;
+  if (route === "digital-double") return <Suspense fallback={<RouteLoader label="Loading 3D project" />}><DigitalDouble /></Suspense>;
+  return <MainDocument bootDone={bootDone} onBoot={onBoot} />;
+}
+
+/* The one scene change for every route. The incoming view fades in (project
+   pages also rise a little); the outgoing one is simply replaced, so a route
+   swap is a single synchronous step, which is what lets a view transition
+   wrap it. The motion itself is CSS (.rt in showcase.css): it switches off
+   during a view transition, which brings its own, and for reduced motion. */
+const FULL_HEIGHT = new Set(["emet", "explore", "lineage-demo", "infinity", "digital-double"]);
+function RouteTransition({ route, children }) {
+  const kind = route === "main" ? "home" : route.startsWith("project/") || route === "work" ? "page" : "takeover";
+  return <div key={route} className={`rt rt-${kind} ${FULL_HEIGHT.has(route) ? "h-full" : ""}`}>{children}</div>;
+}
+
+function Stage({ bootDone, onBoot }) {
   const { route } = useRoute();
   useRoutePalette(route);
   const { devMode, toggleDevMode } = useSandbox();
   const scrollContainerRef = useContext(ScrollContext);
-  const reduced = useReducedMotion();
 
   useEffect(() => {
     if (route !== "main" && scrollContainerRef?.current) scrollContainerRef.current.scrollTop = 0;
@@ -352,113 +385,7 @@ function Stage({ bootDone }) {
 
   return (
     <main id="main-content" tabIndex={-1} ref={scrollContainerRef} className="relative flex-1 min-h-0 overflow-y-auto mono-scroll">
-      <div className="ed-paper-grain" aria-hidden="true" />
-      <AnimatePresence mode="wait">
-        {route === "emet" ? (
-          <motion.div
-            key="emet"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.14, ease: EASE_OUT }}
-            className="h-full"
-          >
-            <EmetSection />
-          </motion.div>
-        ) : route === "explore" ? (
-          <motion.div
-            key="explore"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.14, ease: EASE_OUT }}
-            className="h-full"
-          >
-            <Suspense fallback={<RouteLoader label="Loading solar system" />}>
-              <SolarSystemExplorer />
-            </Suspense>
-          </motion.div>
-        ) : route === "work" ? (
-          <motion.div
-            key="work"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.12, ease: EASE_OUT }}
-          >
-            <ProjectWorkPage />
-          </motion.div>
-        ) : route.startsWith("project/") ? (
-          <motion.div
-            key={route}
-            initial={reduced ? { opacity: 0 } : { opacity: 0, y: 14 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={reduced ? { opacity: 0 } : { opacity: 0, y: -10 }}
-            transition={{ duration: reduced ? 0.12 : 0.3, ease: EASE_OUT }}
-          >
-            {route === "project/digital-double" ? (
-              <Suspense fallback={<RouteLoader label="Loading 3D project" />}>
-                <DigitalDouble />
-              </Suspense>
-            ) : route === "project/haloscript" ? (
-              <Suspense fallback={<RouteLoader label="Loading project" />}>
-                <HaloscriptPage />
-              </Suspense>
-            ) : (
-              <ProjectPage slug={route.slice("project/".length)} />
-            )}
-          </motion.div>
-        ) : route === "lineage-demo" ? (
-          <motion.div
-            key="lineage-demo"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.14, ease: EASE_OUT }}
-            className="h-full"
-          >
-            <Suspense fallback={<RouteLoader label="Loading data explorer" />}>
-              <DataLineageExplorer />
-            </Suspense>
-          </motion.div>
-        ) : route === "infinity" ? (
-          <motion.div
-            key="infinity"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.14, ease: EASE_OUT }}
-            className="h-full"
-          >
-            <Suspense fallback={<RouteLoader label="Loading particle scene" />}>
-              <InfinityPage />
-            </Suspense>
-          </motion.div>
-        ) : route === "digital-double" ? (
-          <motion.div
-            key="digital-double"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.14, ease: EASE_OUT }}
-            className="h-full"
-          >
-            <Suspense fallback={<RouteLoader label="Loading 3D project" />}>
-              <DigitalDouble />
-            </Suspense>
-          </motion.div>
-        ) : (
-          <motion.div
-            key="main"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.14, ease: EASE_OUT }}
-          >
-            <MainDocument bootDone={bootDone} />
-          </motion.div>
-        )}
-      </AnimatePresence>
+      <RouteTransition route={route}><RouteView route={route} bootDone={bootDone} onBoot={onBoot} /></RouteTransition>
       {devMode && <SandboxStubs onClose={toggleDevMode} />}
     </main>
   );
@@ -519,7 +446,7 @@ function useIdleAfterFirstInput(ready) {
   return idle;
 }
 
-function AppShell({ bootDone }) {
+function AppShell({ bootDone, onBoot }) {
   const scrollContainerRef = useRef(null);
   const companionReady = useIdleAfterFirstInput(bootDone);
   return (
@@ -529,7 +456,7 @@ function AppShell({ bootDone }) {
           <Backdrop />
           <div className="relative z-10 h-full flex flex-col">
             <a className="skip-link" href="#main-content" onClick={(event) => { event.preventDefault(); document.getElementById("main-content")?.focus(); }}>Skip to main content</a>
-            <Nav />
+            <Nav booting={!bootDone} />
             <ScrollProgress />
             <PaletteSwatch />
             <HomeCursor />
@@ -540,7 +467,7 @@ function AppShell({ bootDone }) {
                 anywhere in the tree, breaking their viewport-relative
                 positioning. Each 3D component (deck cards, emet's chassis,
                 project cards) establishes its own local perspective instead. */}
-            <Stage bootDone={bootDone} />
+            <Stage bootDone={bootDone} onBoot={onBoot} />
             <CommandPalette />
           </div>
         </div>
@@ -601,19 +528,17 @@ class ErrorBoundary extends Component {
 }
 
 export default function App() {
-  // The hero's entrance (the oval opening, the label wiping in) waits for
-  // this, so on a first visit it plays as the intro curtain lifts rather
-  // than unseen underneath it.
-  const [intro, setIntro] = useState(shouldPlayIntro);
-  const [bootDone, setBootDone] = useState(() => !intro);
-  const reveal = useCallback(() => setBootDone(true), []);
-  const gone = useCallback(() => setIntro(false), []);
+  // On a first visit to the home page the hero plays its intro: the name
+  // sets large in the middle of the screen, then travels to its place as
+  // the rest arrives (see Hero). Until that hands over, `bootDone` is false:
+  // the nav stays out of the way and the companion does not load.
+  const [bootDone, setBootDone] = useState(() => !(shouldPlayIntro() && readRoute() === "main"));
+  const onBoot = useCallback(() => setBootDone(true), []);
   return (
     <ErrorBoundary>
-      {intro && <IntroCurtain onReveal={reveal} onGone={gone} />}
       <ThemeProvider>
         <SandboxProvider>
-          <AppShell bootDone={bootDone} />
+          <AppShell bootDone={bootDone} onBoot={onBoot} />
         </SandboxProvider>
       </ThemeProvider>
     </ErrorBoundary>

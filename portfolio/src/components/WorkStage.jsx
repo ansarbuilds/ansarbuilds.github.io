@@ -1,10 +1,11 @@
 import { useEffect, useRef, useState } from "react";
-import { animate, useInView, useReducedMotion } from "framer-motion";
+import { motion, useInView, useReducedMotion } from "framer-motion";
 import { ArrowUpRight, ExternalLink, Play, RotateCcw } from "lucide-react";
 import { FLAGSHIPS } from "../data/showcase";
 import { getProject } from "../data/projects";
 import { media } from "../lib/media";
-import { EASE_OUT } from "../lib/motion";
+import { spring } from "../lib/motion";
+import Count from "./Count";
 import { usePageVisible } from "../lib/usePageVisible";
 import "../stage.css";
 
@@ -48,32 +49,6 @@ function useAutoStep(count, run, ms, loop = true) {
   const pick = (n) => { setHeld(true); setStep(n); };
   const replay = () => { setHeld(false); setStep(0); };
   return [step, pick, replay, held || (!loop && step === count - 1)];
-}
-
-/* A stat that counts from zero to its real value in 600ms, once, the first
-   time its panel is on stage. Values with no number in them, and reduced
-   motion, print as they are. Screen readers always get the final value. */
-function StatValue({ value, run }) {
-  const reduced = useReducedMotion();
-  const ref = useRef(null);
-  const done = useRef(false);
-  const [, prefix = "", digits = "", suffix = ""] = String(value).match(/^(\D*)(\d+)(.*)$/) || [];
-  const target = Number(digits);
-  const counts = !!digits && target > 0 && !reduced;
-  useEffect(() => {
-    const el = ref.current;
-    if (!counts || !run || done.current || !el) return undefined;
-    done.current = true;
-    const controls = animate(0, target, {
-      duration: 0.6,
-      ease: EASE_OUT,
-      onUpdate: (v) => { el.textContent = `${prefix}${Math.round(v)}${suffix}`; },
-    });
-    // Leaving mid-count (a tab switch) settles on the real value.
-    return () => { controls.stop(); el.textContent = value; };
-  }, [counts, run, target, prefix, suffix, value]);
-  if (!counts) return value;
-  return <><span ref={ref} aria-hidden="true">{value}</span><span className="sr-only">{value}</span></>;
 }
 
 function Frame({ title, children, className = "" }) {
@@ -142,7 +117,7 @@ const HALO_SHOTS = [
   { device: "iPhone", src: "/shots/haloscript/home_iphone.jpg", alt: "Haloscript home screen on an iPhone" },
 ];
 function HaloDemo({ active }) {
-  const [shot, pick] = useAutoStep(HALO_SHOTS.length, active, 3200);
+  const [shot, pick] = useAutoStep(HALO_SHOTS.length, active, 3200, false);
   return <div className="st-devices">
     <div className="st-shells">
       {HALO_SHOTS.map((item, i) => <div key={item.device} className={`st-shell is-${item.device.toLowerCase()} ${i === shot ? "is-shown" : ""}`} aria-hidden={i === shot ? undefined : "true"}>
@@ -193,19 +168,22 @@ export default function WorkStage() {
   const inView = useInView(ref, { amount: 0.35 });
   const pageVisible = usePageVisible();
   const live = inView && pageVisible;
-  const [active, setActive] = useState(0);
+  // Which project is on stage, and which way the stage last moved (1 is
+  // forward), so the incoming copy can slide in from that side.
+  const [{ active, dir }, setStage] = useState({ active: 0, dir: 1 });
+  const goTo = (index) => setStage((now) => ({ active: index, dir: index >= now.active ? 1 : -1 }));
   // Once the visitor picks a project, the stage stops moving on by itself.
   const [held, setHeld] = useState(false);
   const [hover, setHover] = useState(false);
 
-  const choose = (index) => { setHeld(true); setActive(index); };
+  const choose = (index) => { setHeld(true); goTo(index); };
 
   // Links to #card-<slug> (the project pages' back links, the command
   // palette) select that project.
   useEffect(() => {
     const onHash = () => {
       const index = STAGE.findIndex(({ flag }) => window.location.hash === `#card-${flag.slug}`);
-      if (index >= 0) { setHeld(true); setActive(index); }
+      if (index >= 0) { setHeld(true); setStage((now) => ({ active: index, dir: index >= now.active ? 1 : -1 })); }
     };
     onHash();
     window.addEventListener("hashchange", onHash);
@@ -222,13 +200,15 @@ export default function WorkStage() {
   };
 
   const auto = desktop && live && !held && !reduced;
-  return <div ref={ref} className={`st ${auto && !hover ? "" : "is-paused"} ${held ? "is-held" : ""} ${live ? "" : "is-resting"}`} onPointerEnter={() => setHover(true)} onPointerLeave={() => setHover(false)}>
+  return <div ref={ref} className={`st ${auto && !hover ? "" : "is-paused"} ${held ? "is-held" : ""} ${live ? "" : "is-resting"}`} style={{ "--dir": dir }} onPointerEnter={() => setHover(true)} onPointerLeave={() => setHover(false)}>
     <div className="st-tabs" role="tablist" aria-label="Flagship projects" onKeyDown={onKey}>
       {STAGE.map(({ flag, project }, i) => <button key={flag.slug} type="button" role="tab" id={`st-tab-${flag.slug}`} aria-selected={i === active} aria-controls={`card-${flag.slug}`} tabIndex={i === active ? 0 : -1} className={`st-tab ${i === active ? "is-active" : ""}`} onClick={() => choose(i)}>
         <span className="st-tab-num">{String(i + 1).padStart(2, "0")}</span>
         <strong>{TAB_TITLE[flag.slug] || project.title}</strong>
         <small>{flag.eyebrow}</small>
-        <span className="st-tab-bar" aria-hidden="true">{i === active && <i onAnimationEnd={() => setActive((n) => (n + 1) % STAGE.length)} />}</span>
+        <span className="st-tab-bar" aria-hidden="true">{i === active && <i onAnimationEnd={() => setStage((now) => ({ active: (now.active + 1) % STAGE.length, dir: 1 }))} />}</span>
+        {/* One highlight shared by all six tabs: it slides to the active one. */}
+        {i === active && <motion.span layoutId="st-tab-active" className="st-tab-active" aria-hidden="true" transition={reduced ? { duration: 0 } : spring("light")} />}
       </button>)}
     </div>
     <div className="st-panels">
@@ -243,7 +223,7 @@ export default function WorkStage() {
             <h3><a href={`#project/${project.slug}`}>{project.title}</a></h3>
             <p className="st-headline">{flag.headline}</p>
             <p className="st-copy">{flag.copy}</p>
-            <dl className="st-stats">{flag.stats.map(([value, label]) => <div key={label}><dt><StatValue value={value} run={shown && live} /></dt><dd>{label}</dd></div>)}</dl>
+            <dl className="st-stats">{flag.stats.map(([value, label]) => <div key={label}><dt><Count value={value} run={shown && live} /></dt><dd>{label}</dd></div>)}</dl>
             <ul className="st-stack" aria-label="Built with">{flag.stack.map((tool) => <li key={tool}>{tool}</li>)}</ul>
             <div className="st-ctas">
               <a className="sc-btn" href={`#project/${project.slug}`}>Read the case study<ArrowUpRight size={18} aria-hidden="true" /></a>

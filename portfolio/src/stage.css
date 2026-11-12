@@ -9,10 +9,12 @@
 
 /* Tabs */
 .st-tabs { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); border-bottom: 1px solid var(--st-line); }
-.st-tab { position: relative; display: grid; grid-template-columns: auto minmax(0, 1fr); column-gap: 10px; row-gap: 3px; align-items: baseline; padding: 20px 18px 22px; text-align: left; border-left: 1px solid var(--st-line); opacity: .5; transition: opacity .3s, background .3s; }
+.st-tab { position: relative; display: grid; grid-template-columns: auto minmax(0, 1fr); column-gap: 10px; row-gap: 3px; align-items: baseline; padding: 20px 18px 22px; text-align: left; border-left: 1px solid var(--st-line); opacity: .5; transition: opacity var(--dur-base), background var(--dur-base); }
 .st-tab:first-child { border-left: none; }
 .st-tab:hover { opacity: .85; background: color-mix(in srgb, var(--ed-blue) 3%, transparent); }
-.st-tab.is-active { opacity: 1; background: color-mix(in srgb, var(--st-accent) 7%, transparent); }
+.st-tab.is-active { opacity: 1; }
+.st-tab { isolation: isolate; }
+.st-tab-active { position: absolute; inset: 0; z-index: -1; background: color-mix(in srgb, var(--st-accent) 8%, transparent); }
 .st-tab:focus-visible { outline: 2px solid var(--st-accent); outline-offset: -3px; }
 .st-tab-num { font: .56rem var(--font-mono); color: var(--st-accent); }
 .st-tab strong { font: 600 .86rem/1.2 var(--font-body); letter-spacing: -.02em; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
@@ -25,8 +27,8 @@
 
 /* Panels: all stacked in one cell, only the active one visible. */
 .st-panels { display: grid; }
-.st-panel { grid-area: 1 / 1; display: grid; grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr); gap: clamp(28px, 4vw, 56px); align-items: center; padding: clamp(24px, 3.2vw, 44px); opacity: 0; visibility: hidden; transform: translateY(14px); transition: opacity .35s, transform .6s var(--ease-out), visibility 0s .35s; scroll-margin-top: 170px; }
-.st-panel.is-active { opacity: 1; visibility: visible; transform: none; transition: opacity .5s .1s, transform .7s var(--ease-out) .1s, visibility 0s; }
+.st-panel { grid-area: 1 / 1; display: grid; grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr); gap: clamp(28px, 4vw, 56px); align-items: center; padding: clamp(24px, 3.2vw, 44px); opacity: 0; visibility: hidden; transform: translateY(14px); transition: opacity var(--dur-base), transform var(--dur-slow) var(--ease-out), visibility 0s .35s; scroll-margin-top: 170px; }
+.st-panel.is-active { opacity: 1; visibility: visible; transform: none; transition: opacity var(--dur-slow) .1s, transform var(--dur-slow) var(--ease-out) .1s, visibility 0s; }
 
 /* Info */
 .st-eyebrow { display: flex; align-items: center; gap: 16px; font: 500 .58rem var(--font-mono); text-transform: uppercase; letter-spacing: .12em; }
@@ -57,14 +59,13 @@
 .st-frame-bar span { margin-left: 10px; font: .56rem var(--font-mono); color: #8a8f9c; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .st-frame-body { position: relative; flex: 1; min-height: 0; display: flex; }
 .st-frame.is-browser img, .st-frame.is-browser iframe { width: 100%; height: 100%; object-fit: cover; object-position: top left; border: 0; background: #fff; }
-.st-launch { position: absolute; left: 50%; bottom: 22px; translate: -50% 0; display: inline-flex; align-items: center; gap: 10px; min-height: 46px; padding: 0 20px; border-radius: 999px; background: #ff8a5f; color: #160b06; font: 700 .78rem var(--font-body); white-space: nowrap; box-shadow: 0 12px 40px -6px rgb(255 138 95 / .7), 0 0 0 6px rgb(255 138 95 / .16); transition: scale .25s var(--ease-out), box-shadow .25s; animation: st-beckon 2.6s ease-in-out infinite; }
+.st-launch { position: absolute; left: 50%; bottom: 22px; translate: -50% 0; display: inline-flex; align-items: center; gap: 10px; min-height: 46px; padding: 0 20px; border-radius: 999px; background: #ff8a5f; color: #160b06; font: 700 .78rem var(--font-body); white-space: nowrap; box-shadow: 0 12px 40px -6px rgb(255 138 95 / .7), 0 0 0 6px rgb(255 138 95 / .16); transition: scale var(--dur-fast) var(--ease-out), box-shadow var(--dur-fast); }
 .st-launch:hover { scale: 1.05; }
-@keyframes st-beckon { 50% { box-shadow: 0 12px 40px -6px rgb(255 138 95 / .7), 0 0 0 12px rgb(255 138 95 / 0); } }
 
 /* Flight Recorder replay */
 .st-frame.is-flight .st-frame-body { display: grid; grid-template-columns: minmax(0, .95fr) minmax(0, 1.25fr); }
 .st-flight-steps { padding: 12px 10px; border-right: 1px solid rgb(255 255 255 / .08); display: flex; flex-direction: column; gap: 3px; position: relative; }
-.st-flight-steps button { width: 100%; display: grid; grid-template-columns: 5.2em minmax(0, 1fr); gap: 8px; align-items: baseline; padding: 7px 10px; border-radius: 8px; border: 1px solid transparent; text-align: left; font: .62rem/1.4 var(--font-mono); color: #717787; transition: background .25s, color .25s, border-color .25s; }
+.st-flight-steps button { width: 100%; display: grid; grid-template-columns: 5.2em minmax(0, 1fr); gap: 8px; align-items: baseline; padding: 7px 10px; border-radius: 8px; border: 1px solid transparent; text-align: left; font: .62rem/1.4 var(--font-mono); color: #717787; transition: background var(--dur-fast), color var(--dur-fast), border-color var(--dur-fast); }
 .st-flight-steps button span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .st-flight-steps button.is-past { color: #a6acba; }
 .st-flight-steps button.is-on { background: rgb(255 255 255 / .07); color: #f2f4f8; border-color: rgb(255 255 255 / .12); }
@@ -87,8 +88,8 @@
 .st-frame.is-paper img { flex: 1; min-height: 0; width: 100%; object-fit: contain; padding: 14px 16px 6px; }
 .st-clip { display: grid; grid-template-columns: auto minmax(0, 1fr) auto; align-items: center; gap: 16px; padding: 12px 16px; background: #0b0c0f; border-top: 1px solid rgb(255 255 255 / .08); }
 .st-clip button { display: inline-flex; align-items: center; gap: 10px; min-height: 32px; font: .58rem var(--font-mono); text-transform: uppercase; letter-spacing: .06em; color: #c4c9d4; }
-.st-clip button i { position: relative; width: 34px; height: 18px; border-radius: 999px; background: #3a3d45; transition: background .3s; }
-.st-clip button i::after { content: ""; position: absolute; top: 2px; left: 2px; width: 14px; height: 14px; border-radius: 50%; background: #fff; transition: translate .3s var(--ease-out); }
+.st-clip button i { position: relative; width: 34px; height: 18px; border-radius: 999px; background: #3a3d45; transition: background var(--dur-base); }
+.st-clip button i::after { content: ""; position: absolute; top: 2px; left: 2px; width: 14px; height: 14px; border-radius: 50%; background: #fff; transition: translate var(--dur-base) var(--ease-out); }
 .st-clip button.is-on i { background: #ff8a5f; }
 .st-clip button.is-on i::after { translate: 16px 0; }
 .st-clip-bar { height: 8px; border-radius: 999px; background: rgb(255 255 255 / .08); overflow: hidden; }
@@ -98,7 +99,7 @@
 /* Haloscript devices */
 .st-devices { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 16px; min-height: 0; }
 .st-device-tabs { display: inline-flex; padding: 4px; border: 1px solid var(--st-line); border-radius: 999px; }
-.st-device-tabs button { min-height: 30px; padding: 0 16px; border-radius: 999px; font: 600 .66rem var(--font-body); opacity: .65; transition: background .25s, color .25s, opacity .25s; }
+.st-device-tabs button { min-height: 30px; padding: 0 16px; border-radius: 999px; font: 600 .66rem var(--font-body); opacity: .65; transition: background var(--dur-fast), color var(--dur-fast), opacity var(--dur-fast); }
 .st-device-tabs button.is-on { background: var(--ed-blue); color: var(--ed-ivory); opacity: 1; }
 
 /* Cover-only demos */
@@ -115,8 +116,8 @@
 .st-term .is-good b, .st-term .is-good span { color: #56d364; }
 .st-term .is-warn b, .st-term .is-warn span { color: #e3b341; }
 .st-term .is-bad b, .st-term .is-bad span { color: #ff7b72; }
-.st-frame.is-running .st-term li { animation: st-line .35s var(--ease-out) forwards; animation-delay: calc(var(--i) * 420ms + 300ms); }
-.st-caret::after { content: ""; display: inline-block; width: .55em; height: 1.05em; background: #d6dae3; animation: sc-blink 1s steps(1) infinite; }
+.st-frame.is-running .st-term li { animation: st-line var(--dur-base) var(--ease-out) forwards; animation-delay: calc(var(--i) * 420ms + 300ms); }
+.st-caret::after { content: ""; display: inline-block; width: .55em; height: 1.05em; background: #d6dae3; animation: sc-blink var(--dur-scene) steps(1) infinite; }
 .st-frame.is-term .st-demo-foot { padding: 10px 16px; border-top: 1px solid rgb(255 255 255 / .08); }
 @keyframes st-line { to { opacity: 1; transform: none; } }
 
@@ -159,14 +160,18 @@
 .st-ctas { margin-top: 16px; }
 .st-demo { aspect-ratio: 16 / 10.4; }
 
-/* One panel leaves (fade, 16px up) before the next arrives (fade, settle
-   from 16px below): 180ms out, then 270ms in, so two demos never overlap. */
-.st-panel { opacity: 0; visibility: hidden; transform: translateY(-16px); transition: opacity .18s ease-in, transform .18s ease-in, visibility 0s .18s; }
-.st-panel.is-active { opacity: 1; visibility: visible; transform: none; transition: none; animation: st-enter .27s var(--ease-out) .18s both; }
-@keyframes st-enter { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: none; } }
+/* A tab change is one move: the two panels cross-fade (so the media
+   dissolves from one demo to the next), and the copy slides in from the side
+   the stage moved toward (--dir is 1 going forward, -1 going back). */
+.st-panel { opacity: 0; visibility: hidden; transform: none; transition: opacity var(--dur-base) var(--ease-standard), visibility 0s var(--dur-base); }
+.st-panel.is-active { opacity: 1; visibility: visible; transition: opacity var(--dur-base) var(--ease-standard); }
+.st-panel .st-info { opacity: 0; transform: translateX(calc(var(--dir, 1) * -28px)); transition: opacity var(--dur-instant) var(--ease-exit), transform var(--dur-base) var(--ease-exit); }
+/* The old copy clears first, so two blocks of text are never read at once. */
+.st-panel.is-active .st-info { opacity: 1; transform: none; transition: none; animation: st-info-in var(--dur-slow) var(--ease-out) var(--dur-instant) both; }
+@keyframes st-info-in { from { opacity: 0; transform: translateX(calc(var(--dir, 1) * 28px)); } }
 
 /* Jarvis: the frame settles as the live demo takes the screenshot's place. */
-.st-frame.is-live { animation: st-settle .45s var(--ease-out) both; }
+.st-frame.is-live { animation: st-settle var(--dur-base) var(--ease-out) both; }
 @keyframes st-settle { from { transform: scale(.98); opacity: .7; } to { transform: none; opacity: 1; } }
 
 /* Flight Recorder: a playhead rides down the steps, and each diff line
@@ -175,22 +180,22 @@
 .st-flight-steps { --row: 37px; }
 .st-flight-steps > li:not(.st-playhead) { height: 34px; }
 .st-flight-steps button { height: 100%; align-items: center; }
-.st-playhead { position: absolute; left: 4px; top: 12px; width: 3px; height: 34px; border-radius: 2px; background: #ff8a5f; box-shadow: 0 0 12px rgb(255 138 95 / .8); transform: translateY(calc(var(--step) * var(--row))); transition: transform .45s var(--ease-out); pointer-events: none; }
-.st-flight-detail pre code { opacity: 0; transform: translateX(-6px); animation: st-codeline .3s var(--ease-out) forwards; animation-delay: calc(var(--i) * 90ms + 120ms); }
+.st-playhead { position: absolute; left: 4px; top: 12px; width: 3px; height: 34px; border-radius: 2px; background: #ff8a5f; box-shadow: 0 0 12px rgb(255 138 95 / .8); transform: translateY(calc(var(--step) * var(--row))); transition: transform var(--dur-base) var(--ease-out); pointer-events: none; }
+.st-flight-detail pre code { opacity: 0; transform: translateX(-6px); animation: st-codeline var(--dur-base) var(--ease-out) forwards; animation-delay: calc(var(--i) * 90ms + 120ms); }
 @keyframes st-codeline { to { opacity: 1; transform: none; } }
 
 /* PRH-JEPA: the bar scales, the caption cross-fades. */
-.st-clip-bar span { width: 100%; transform-origin: left center; transition: transform .6s var(--ease-out); }
+.st-clip-bar span { width: 100%; transform-origin: left center; transition: transform var(--dur-slow) var(--ease-out); }
 .st-clip-caption { position: relative; display: grid; }
-.st-clip-caption span { grid-area: 1 / 1; opacity: 0; transition: opacity .3s; }
+.st-clip-caption span { grid-area: 1 / 1; opacity: 0; transition: opacity var(--dur-base); }
 .st-clip-caption span.is-shown { opacity: 1; }
 
 /* Haloscript: three shells drawn in CSS, cross-faded, the incoming one
    tilting 6 degrees and settling. The screenshots inside are the real app. */
 .st-devices { height: 100%; min-height: 0; overflow: hidden; }
 .st-shells { position: relative; flex: 1 1 0; height: 0; min-height: 0; width: 100%; display: grid; place-items: center; perspective: 1400px; }
-.st-shell { position: absolute; top: 50%; left: 50%; translate: -50% -50%; opacity: 0; pointer-events: none; transition: opacity .3s; background: #1a1b1f; box-shadow: 0 40px 80px -30px rgb(0 0 0 / .85), inset 0 0 0 1px rgb(255 255 255 / .14); }
-.st-shell.is-shown { opacity: 1; pointer-events: auto; animation: st-tilt .55s var(--ease-out) both; }
+.st-shell { position: absolute; top: 50%; left: 50%; translate: -50% -50%; opacity: 0; pointer-events: none; transition: opacity var(--dur-base); background: #1a1b1f; box-shadow: 0 40px 80px -30px rgb(0 0 0 / .85), inset 0 0 0 1px rgb(255 255 255 / .14); }
+.st-shell.is-shown { opacity: 1; pointer-events: auto; animation: st-tilt var(--dur-slow) var(--ease-out) both; }
 @keyframes st-tilt { from { transform: rotateY(6deg) translateY(8px); } to { transform: none; } }
 .st-shell-screen { position: relative; overflow: hidden; width: 100%; height: 100%; background: #000; }
 .st-shell-screen img { width: 100%; height: 100%; object-fit: cover; object-position: top; display: block; }
@@ -208,7 +213,7 @@
 .st-shell.is-iphone::before { content: ""; position: absolute; z-index: 1; top: 3.2%; left: 50%; width: 26%; height: 2.6%; translate: -50% 0; border-radius: 999px; background: #000; }
 
 /* Digital Me: a slow push in on the cover while it is on stage. */
-.st-panel.is-active .st-cover img { animation: st-kenburns 12s ease-in-out infinite alternate; }
+.st-panel.is-active .st-cover img { animation: st-kenburns 12s var(--ease-standard) forwards; }
 @keyframes st-kenburns { from { transform: scale(1); } to { transform: scale(1.06); } }
 
 /* Site Recon: lines print 90ms apart while the panel is on stage, then hold. */
@@ -221,6 +226,7 @@
 
 @media (max-width: 999px) {
   .st-panel, .st-panel.is-active { opacity: 1; visibility: visible; transform: none; transition: none; animation: none; }
+  .st-panel .st-info, .st-panel.is-active .st-info { opacity: 1; transform: none; transition: none; animation: none; }
   .st-playhead { display: none; }
   .st-flight-steps > li:not(.st-playhead) { height: auto; }
   .st-demo:has(.st-devices) { aspect-ratio: 4 / 3.6; }
@@ -229,8 +235,7 @@
 @media (prefers-reduced-motion: reduce) {
   .st-panel, .st-panel.is-active, .st-frame.is-live, .st-shell, .st-shell.is-shown, .st-panel.is-active .st-cover img { animation: none; transition: none; transform: none; }
   .st-panel.is-active { opacity: 1; }
+  .st-panel .st-info, .st-panel.is-active .st-info { opacity: 1; transform: none; transition: none; animation: none; }
   .st-playhead, .st-clip-bar span, .st-clip-caption span { transition: none; }
   .st-flight-detail pre code { opacity: 1; transform: none; animation: none; }
 }
-/* The launch button holds still; its glow is enough. */
-.st-launch { animation: none; }

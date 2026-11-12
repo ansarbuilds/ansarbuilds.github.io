@@ -25,3 +25,7 @@ playwright-report/
 *.njsproj
 *.sln
 *.sw?
+
+# Motion audit recordings (large; regenerate with motion-audit/record.mjs)
+motion-audit/before/
+motion-audit/after/

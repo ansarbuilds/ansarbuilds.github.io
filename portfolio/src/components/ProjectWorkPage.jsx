@@ -1,7 +1,7 @@
 import { motion } from "framer-motion";
 import { ArrowUpRight } from "lucide-react";
 import { ACCENTS, EARLIER_PROJECTS, FEATURED, FEATURED_GRID, MORE_PROJECTS, OPEN_SOURCE_PROJECTS } from "../data/projects";
-import { EASE_OUT } from "../lib/motion";
+import { DUR, EASE } from "../lib/motion";
 
 // Every listed project on one page, as a plain index. Each row opens the
 // project's own page at #project/<slug>. Hidden projects stay out, same as
@@ -32,7 +32,7 @@ export default function ProjectWorkPage() {
                   key={p.slug}
                   initial={{ opacity: 0, y: 8 }}
                   animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.3, delay: Math.min(i * 0.03, 0.3), ease: EASE_OUT }}
+                  transition={{ duration: DUR.base, delay: Math.min(i * 0.03, 0.3), ease: EASE.out }}
                   className="border-b border-blue/10"
                 >
                   <a href={`#project/${p.slug}`} className="group grid grid-cols-[1fr_auto] items-center gap-4 py-5 sm:grid-cols-[minmax(0,16rem)_1fr_auto] sm:gap-8">
