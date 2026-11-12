@@ -392,6 +392,7 @@ export const PROJECTS = [
       "The app is a Tauri shell with a Rust engine. It keeps the last half second of sound so the first word is not lost, turns speech into text with Whisper on the graphics chip, and then tidies developer speech, so \"cargo test dash dash release\" becomes `cargo test --release`.",
       "Sending is the risky part, so most of the work went there. Every send goes through a short preview that I can cancel with Esc, a head shake, or by talking again. Enter is only pressed in apps I trust, such as terminals and editors. Commands that look destructive are typed with a warning and never sent for me. If I switch apps during the countdown, nothing is typed.",
       "It is a beta. The numbers come from my own prototype sessions and a replay test built from generated speech, not from a user study. Real-device checks on Windows, Intel Macs and signed Mac builds are still open, and the launch checklist in the repository says so.",
+      "If the camera and the Enter key make you pause, that is the right instinct. Frames are thrown away at once and are never uploaded. Speech becomes text on the computer, and the optional cloud clean-up stays off until you turn it on. Every send waits on a preview, and Type only never presses Enter. The beta installers are unsigned, so Mac and Windows show a warning about the missing signature. The same app can be built from the public source.",
     ],
     how: [
       "The camera loop turns each frame into a few numbers: is a face there, which way is the head turned, how much are the lips moving. The picture itself is thrown away at once.",
@@ -428,7 +429,7 @@ export const PROJECTS = [
       kicker: "Open source · film and docs",
       title: "Watch it, then try it",
       text: "The project page has the 60-second launch film with sound. The repository has installers for Mac and Windows, a plain-language guide to how it works, and the launch checklist that lists what has and has not been verified.",
-      contents: ["The 60-second launch film", "How the camera and microphone agree", "Four ways to send, all cancelable", "What is measured and what is not", "Install on Mac or Windows"],
+      contents: ["The 60-second launch film", "How the camera and microphone agree", "Four ways to send, all cancelable", "Why it is safe to try", "What is measured and what is not", "Install on Mac or Windows"],
       links: [
         { label: "Watch the film", href: "/p/saywhen/", primary: true },
         { label: "Code and installers", href: "https://github.com/kmsmohamedansar/saywhen", external: true },
