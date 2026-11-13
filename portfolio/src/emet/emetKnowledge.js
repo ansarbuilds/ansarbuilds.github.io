@@ -7,7 +7,7 @@
 //
 // House style: plain words, short sentences, no em dashes.
 
-import { ABOUT, CONTACT, ROLES } from "../data/content.js";
+import { ABOUT, CONTACT } from "../data/content.js";
 import { FEATURED, FEATURED_GRID, LISTED_PROJECTS, OPEN_SOURCE_PROJECTS } from "../data/projects.js";
 import { TOOL_INFO } from "../data/tools.js";
 import { createMatcher, normalize, tokenize } from "./emetMatcher.js";
@@ -96,8 +96,6 @@ function toolEntries() {
 
 /* ── the parts no data file holds ─────────────────────────── */
 
-const currentRole = ROLES.find((role) => role.current) || ROLES[0];
-
 const INTENT_ENTRIES = [
   {
     id: "greeting",
@@ -136,13 +134,13 @@ const INTENT_ENTRIES = [
     id: "experience",
     label: "His experience",
     group: "intent",
-    destination: "experience",
-    answer: `${currentRole.title} at ${currentRole.company}, ${currentRole.when.split("·")[0].trim()}. ${currentRole.summary} Before that: ${list(ROLES.slice(1).map((role) => `${role.company} (${role.title})`), 4)}.`,
+    destination: "projects",
+    answer: "This site does not list employers or job titles. It is about the projects, the studies and the tools. Ask about one by name.",
     phrases: [
       "where has he worked", "work history", "his career", "how long", "how many years",
       "years of experience", "current job", "where does he work", "what is his job",
     ],
-    strong: ["experience", "career", "job", "employment", "role", "resume", "cv", "history", "employer", "company", "amazon", "datasembly", "spongelii"],
+    strong: ["experience", "career", "job", "employment", "resume", "cv", "history", "employer", "company"],
     weak: ["worked", "working", "senior", "year"],
   },
   {
@@ -159,8 +157,8 @@ const INTENT_ENTRIES = [
     id: "data",
     label: "His data work",
     group: "intent",
-    destination: "experience",
-    answer: `Data is the day job. He works on retail pricing data with SQL and Snowflake, and builds the reports and checks around it. ${list(ABOUT.groups[0].items, 6)} are the tools he reaches for.`,
+    destination: "capabilities",
+    answer: `He builds data systems and writes them up. ${list(ABOUT.groups[0].items, 6)} are the tools he reaches for.`,
     phrases: ["data experience", "data work", "data engineering", "retail data", "pricing data"],
     strong: ["data", "warehouse", "pipeline", "etl", "analytics", "reporting", "dashboard"],
     weak: ["query", "table", "report"],
@@ -200,7 +198,7 @@ const INTENT_ENTRIES = [
     label: "Whether he's available",
     group: "intent",
     destination: "contact",
-    answer: `Ansar isn't open to work right now. He's working full time as ${currentRole.title} at ${currentRole.company} and isn't looking for new roles, freelance or contract work. He is always happy to talk about interesting problems, though. Email ${EMAIL}.`,
+    answer: `This site is not a job listing. He is happy to talk about a project. Email ${EMAIL}.`,
     phrases: ["is he available", "is he looking", "open to work", "open to new roles", "open to opportunities", "looking for a job", "looking for work", "for hire", "can i hire him", "freelance work", "contract work", "job opportunity", "new role"],
     strong: ["available", "availability", "hire", "hiring", "freelance", "contract", "consulting", "recruiter", "opportunity", "vacancy"],
     weak: ["open", "looking"],
@@ -209,8 +207,8 @@ const INTENT_ENTRIES = [
     id: "resume",
     label: "His resume",
     group: "intent",
-    destination: "experience",
-    answer: `There's no resume here. This site is about the builds. His jobs are listed in one line at the bottom of the page, and the code is on GitHub. For anything else, email ${EMAIL}.`,
+    destination: "contact",
+    answer: `There's no resume on this site. It is about the builds. The code is on GitHub. For anything else, email ${EMAIL}.`,
     phrases: ["his resume", "his cv", "download resume", "send me his resume"],
     strong: ["resume", "cv", "curriculum"],
     weak: ["pdf", "download"],
@@ -219,8 +217,8 @@ const INTENT_ENTRIES = [
     id: "location",
     label: "Where he is",
     group: "intent",
-    destination: "experience",
-    answer: `He's based in Canada. He works remotely from Canada, and worked in India before that.`,
+    destination: "contact",
+    answer: "He's based in Canada.",
     phrases: ["where is he", "where does he live", "what timezone", "is he remote", "based in"],
     strong: ["location", "canada", "remote", "timezone", "country", "city", "live", "based"],
     weak: ["where"],
@@ -268,7 +266,6 @@ function destinationAction(entry) {
     capabilities: "Open what I bring",
     ai: "Open the playground",
     contact: "Open contact",
-    experience: "Open day jobs",
     projects: "Open selected work",
   };
   return labels[entry.destination] || "Open section";
@@ -337,13 +334,12 @@ export function answerLocally(question, { contextEntryId = null } = {}) {
 
 const DEFAULT_SUGGESTIONS = [
   "What has Ansar built?",
-  "What is his data experience?",
+  "What tools does he use?",
   "Does he know Snowflake?",
   "How can I contact him?",
 ];
 
 const ROUTE_SUGGESTIONS = {
-  experience: ["Where has he worked?", "What is his data experience?", "Is he open to work?", "How can I contact him?"],
   about: ["What does he know?", "Does he know Snowflake?", "Where is he based?", "What has he built?"],
   contact: ["How can I contact him?", "Is he open to work?", "Can I see his resume?", "What has he built?"],
   ai: ["What are his AI projects?", "What is My Take on Jev?", "What is Agent Flight Recorder?", "How can I contact him?"],

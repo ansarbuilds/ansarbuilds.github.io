@@ -12,7 +12,7 @@ export default function EmetChatPanel({ initialQuestion = "", panelSide = "right
   const contextEntryIdRef = useRef(null);
   const [question, setQuestion] = useState("");
   const [messages, setMessages] = useState([
-    { id: "welcome", role: "assistant", text: "Ask me about Ansar’s work, projects, or experience." },
+    { id: "welcome", role: "assistant", text: "Ask me about Ansar's projects, studies, or how to reach him." },
   ]);
   const [followUps, setFollowUps] = useState(suggestions);
   const [loading, setLoading] = useState(false);

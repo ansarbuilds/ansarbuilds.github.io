@@ -3,7 +3,7 @@ import { animate, motion, useAnimationFrame, useInView, useMotionValue, useReduc
 import { ArrowDown, ArrowRight, ArrowUpRight, ExternalLink } from "lucide-react";
 import SignalField from "./SignalField";
 import WorkStage from "./WorkStage";
-import { CODE, CONTACT, HERO, RECEIPTS, ROLES } from "../data/content";
+import { CODE, CONTACT, HERO, RECEIPTS } from "../data/content";
 import { EXPERIMENTS, LISTED_PROJECTS, getProject } from "../data/projects";
 import { CAPABILITIES, FLAGSHIPS, MORE_WORK, STACK_MARQUEE } from "../data/showcase";
 import { EASE, STAGGER, tween } from "../lib/motion";
@@ -347,8 +347,7 @@ export function ExperimentsSection() {
 
 /* The last shot: the address itself is the biggest thing in the section,
    and the network behind it sends its signals in to that address once,
-   then goes quiet. The jobs are a footnote on purpose: title and company,
-   one quiet line under everything else. */
+   then goes quiet. */
 export function ContactSection() {
   const { navigate } = useRoute();
   return <section id="contact" className="ed-contact sc-contact" data-palette="blueBloom"><SignalField className="sc-contact-field" quiet gatherTo=".sc-email" /><div className="ed-wrap">
@@ -356,6 +355,5 @@ export function ContactSection() {
     <h2>Building something <em>ambitious?</em></h2>
     <a href={`mailto:${CONTACT.email}`} className="sc-email" data-cursor="Write">{CONTACT.email}</a>
     <div className="ed-contact-bottom"><MagneticLink href={`mailto:${CONTACT.email}`} className="ed-contact-email">Email me<ArrowUpRight aria-hidden="true" /></MagneticLink><div><p>I like the hard part: agents that have to be trusted, evals that have to be honest, and products that have to ship. If that sounds like your problem, write to me.</p><div className="ed-socials"><a href={CONTACT.github} target="_blank" rel="noopener noreferrer">GitHub<ExternalLink size={14} /></a><a href={CONTACT.linkedin} target="_blank" rel="noopener noreferrer">LinkedIn<ExternalLink size={14} /></a></div></div></div>
-    <div id="experience" className="bd-dayjobs"><span>Day jobs</span><ul>{ROLES.map((role) => <li key={role.company + role.title}>{role.title} at {role.company}</li>)}</ul></div>
     <footer className="ed-footer"><span>© {new Date().getFullYear()}</span><span>Designed and built by me, with AI as the pair programmer.</span><button onClick={() => navigate("deck")} aria-label="Back to top">Back to top ↑</button></footer></div></section>;
 }

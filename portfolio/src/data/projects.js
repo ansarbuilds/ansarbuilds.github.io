@@ -1449,7 +1449,7 @@ export const PROJECTS = [
     accent: "cyan",
     status: "Internal tool, in use",
     hook: "One screen for a weekly team review: this week's most important work items, and which customer accounts each problem affects.",
-    role: "Lead. I built the first version while on the support team, who still use it. I've since moved to a solutions engineering role and still help with some of their work.",
+    role: "I built the first version. The people who review the work each week still use it.",
     tags: ["Next.js", "TypeScript", "Internal tools", "Cursor"],
     stack: ["Next.js (App Router)", "React", "TypeScript", "Tailwind CSS", "Vitest", "Cursor"],
     stackUsage: {
@@ -1463,7 +1463,7 @@ export const PROJECTS = [
     story: [
       "A regular meeting about the health of our product collections needed two things on one page: the headline numbers, with highlights and risks, and the list of work that matters most right now. People were juggling exported files and the work-tracking tool side by side.",
       "So I built both halves. The work queue pulls items straight from the work-tracking tool, filtered by week and priority, and keeps the high-priority ones front and centre in a table you can sort and filter, each row linking to its item. Each problem is also linked to the customer accounts it affects, using data from our central database, so the meeting can see who is affected, not just what is broken. The summary reads saved weekly snapshots, and you can reopen any past meeting.",
-      "I built the first version for the support team I was part of. They still use it in their weekly reviews, and they've carried it on from there.",
+      "I built the first version for that weekly review. The team still uses it.",
       "I kept all the passwords and access keys on the server. The browser only talks to the app itself, and a practice mode with fake data lets the whole thing run on a laptop with no keys at all.",
     ],
     how: [

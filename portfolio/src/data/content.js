@@ -1,4 +1,4 @@
-// Site-wide copy: the hero, experience, skills, EMET's answers, contact
+// Site-wide copy: the hero, skills, EMET's answers, contact
 // details and command palette. Projects live in projects.js.
 //
 // House style: plain words, short sentences, first person, no em dashes.
@@ -83,77 +83,29 @@ export const ABOUT = {
   ],
 };
 
-export const ROLES = [
-  {
-    company: "Datasembly",
-    title: "Solutions Engineer",
-    when: "Jan 2026 to now · Remote, Canada",
-    current: true,
-    accent: "cyan",
-    summary: "Turning a client's question into data work that holds up, on a big retail pricing dataset.",
-  },
-  {
-    company: "Datasembly",
-    title: "Technical Support",
-    when: "Aug 2024 to Dec 2025 · Remote, Canada",
-    accent: "violet",
-    summary: "Helped clients and coworkers get reliable answers from retail pricing data.",
-  },
-  {
-    company: "Spongelii",
-    compact: true,
-    title: "Business Analyst Intern",
-    when: "Jan to Apr 2024 · Remote, Canada",
-    accent: "amber",
-    summary: "Used data tools to turn business questions into reports and dashboards.",
-  },
-  {
-    company: "Amazon Prime Video",
-    title: "Business Analyst II, Quality Auditing",
-    compact: true,
-    when: "Oct 2021 to Aug 2022 · Hybrid, India",
-    accent: "rose",
-    summary: "Auditing how content operations worked, and fixing the gaps I found.",
-  },
-  {
-    company: "Amazon Prime Video",
-    title: "Business Analyst I, Digital Content",
-    compact: true,
-    when: "Aug 2019 to Sep 2021 · Hybrid, India",
-    accent: "green",
-    summary: "Keeping a large digital catalogue accurate and ready to publish.",
-  },
-];
-
 // EMET answers as me, right in the terminal. `keywords` lets free text
-// match a topic ("sql", "amazon"), and `go` is an optional "see more" link.
+// match a topic ("sql", "snowflake"), and `go` is an optional "see more" link.
 export const EMET_TOPICS = [
   {
     n: 1,
     label: "What do you do now?",
-    go: "#experience",
-    keywords: ["now", "current", "today", "sql", "snowflake", "datasembly", "job", "role"],
+    go: "#projects",
+    keywords: ["now", "current", "today", "build", "agents"],
     answer: [
-      { text: "I'm a solutions engineer at " },
-      { text: "Datasembly", cls: "font-bold" },
       {
-        text:
-          ", since January 2026. I use SQL and Snowflake to work with retail pricing data, and help clients turn their questions into reports or tools they can rely on.",
+        text: "I build agents, test AI claims in public, and ship small products. The code, the numbers and the failures are on this site.",
       },
     ],
   },
   {
     n: 2,
-    label: "Where have you worked?",
-    go: "#experience",
-    keywords: ["before", "worked", "history", "amazon", "spongelii", "experience", "past"],
+    label: "What tools do you use?",
+    go: "#capabilities",
+    keywords: ["tools", "skills", "sql", "snowflake", "stack"],
     answer: [
-      { text: "Datasembly", cls: "font-bold" },
-      { text: " (solutions engineer, and tech support before that), " },
-      { text: "Spongelii", cls: "font-bold" },
-      { text: " (business analysis), and " },
-      { text: "Amazon Prime Video", cls: "font-bold" },
-      { text: " (quality auditing) before all of it. Each stop gave me a bit more technical ownership." },
+      {
+        text: "SQL, Snowflake, Python and DuckDB for data. Swift and TypeScript for products. Claude Code and MCP for agents.",
+      },
     ],
   },
   {

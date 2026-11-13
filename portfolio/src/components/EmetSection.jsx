@@ -21,16 +21,16 @@ const SCRIPT = [
   { text: "Hi, I'm Emet.\n\n", cls: "", speed: 20 },
   {
     text:
-      "I can answer questions about Ansar's work. He's a solutions engineer who works with retail data and builds apps, tools and AI studies.\n\n",
+      "I can answer questions about Ansar's work: the agents, the studies and the apps.\n\n",
     cls: "",
     speed: 15,
   },
   { text: "What do you want to know?\n", cls: "opacity-40", speed: 22 },
 ];
 
-const EMPHASIS = /\b(Ansar|Datasembly|Amazon Prime Video|RepTrack|Haloscript|Snowflake|SQL|SwiftUI|App Store|LinkedIn|GitHub)\b/g;
-const EMPHASIS_ONLY = /^(Ansar|Datasembly|Amazon Prime Video|RepTrack|Haloscript|Snowflake|SQL|SwiftUI|App Store|LinkedIn|GitHub)$/;
-const SHORTCUT_QUESTIONS = ["What is his current job?", "Where has he worked?", "What has he built?", "How do I contact him?"];
+const EMPHASIS = /\b(Ansar|RepTrack|Haloscript|Snowflake|SQL|SwiftUI|App Store|LinkedIn|GitHub)\b/g;
+const EMPHASIS_ONLY = /^(Ansar|RepTrack|Haloscript|Snowflake|SQL|SwiftUI|App Store|LinkedIn|GitHub)$/;
+const SHORTCUT_QUESTIONS = ["What does he do?", "What does he know?", "What has he built?", "How do I contact him?"];
 
 // The shared knowledge layer returns plain text because the edge chat is a
 // normal conversation. The terminal renders styled segments, so adapt that

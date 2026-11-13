@@ -1,6 +1,6 @@
 # ansarbuilds.github.io
 
-Live portfolio for **Mohamed Ansar** — Solutions Engineer building reliable data systems, evidence-backed AI tools, and apps.
+Live portfolio for **Mohamed Ansar**. Reliable data systems, evidence-backed AI tools, and apps.
 
 **Live site:** [ansarbuilds.dev](https://ansarbuilds.dev)
 

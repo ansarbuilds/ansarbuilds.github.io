@@ -15,7 +15,7 @@ A portfolio of agents, AI studies and shipped apps, with the proof for each. One
 4. **What I bring** (`#capabilities`): agents and tooling, evaluation and research, product and shipping, each with the projects that prove it.
 5. **More shipped work** (`#more`): image cards with one highlight each, then an "Also built" toggle for internal tools and early experiments.
 6. **The playground** (`#ai`): the EMET terminal, solar system, and infinity loop.
-7. **Contact** (`#contact`): email first, then GitHub and LinkedIn. Day jobs sit underneath as one quiet line (title and company only, `#experience`).
+7. **Contact** (`#contact`): email first, then GitHub and LinkedIn.
 
 The whole site is one dark theme: carbon surfaces and bone text. Each later
 section tints that base a few points toward its own accent

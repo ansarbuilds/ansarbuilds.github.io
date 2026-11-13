@@ -373,10 +373,3 @@ a:hover .ed-experiment-image img { transform: scale(1.04); }
  .ed-swatch-toggle { padding: 8px 10px; }
 }
 @media (prefers-reduced-motion: reduce) { .ed-swatch-chips b { transition: none; } }
-
-/* The day jobs: one quiet line above the footer, never a section. */
-.bd-dayjobs { display: flex; gap: 22px; align-items: baseline; padding-block: 22px; border-top: 1px solid color-mix(in srgb, var(--ed-ivory) 18%, transparent); font: .55rem/1.8 var(--font-mono); opacity: .62; scroll-margin-top: 120px; }
-.bd-dayjobs > span { text-transform: uppercase; letter-spacing: .12em; white-space: nowrap; }
-.bd-dayjobs ul { display: flex; flex-wrap: wrap; gap: 0 10px; }
-.bd-dayjobs li + li::before { content: "·"; margin-right: 10px; }
-@media (max-width: 640px) { .bd-dayjobs { flex-direction: column; gap: 6px; } }

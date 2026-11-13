@@ -1,16 +1,13 @@
 export const PORTFOLIO_CONTEXT = `
 ABOUT ANSAR
-- Mohamed Ansar is a Solutions Engineer based in Canada.
-- He works with retail pricing data and turns client questions into reliable reports and tools.
-- His working toolkit includes SQL, Snowflake, BigQuery, Python, pandas, DuckDB, Airflow, Tableau and Power BI.
+- Mohamed Ansar builds agents, tests AI claims and ships apps. He is based in Canada.
+- He publishes the code, the numbers and the write-up for each project, including what failed.
+- His toolkit includes SQL, Snowflake, BigQuery, Python, pandas, DuckDB, Airflow, Tableau and Power BI.
 - He also builds with Swift, SwiftUI, SwiftData, React, TypeScript, Three.js, Docker and Chrome extensions.
 
-EXPERIENCE
-- Since January 2026: Solutions Engineer at Datasembly, working remotely in Canada.
-- August 2024 to December 2025: Technical Support at Datasembly, using SQL and Snowflake to solve client and internal data issues.
-- January to April 2024: Business Development Intern, Business Analysis at Spongelii.
-- October 2021 to August 2022: Business Analyst II, Quality Auditing at Amazon Prime Video.
-- August 2019 to September 2021: Business Analyst I, Digital Content at Amazon Prime Video.
+JOBS
+- This site does not list employers, job titles or work history.
+- If asked where he works, what his title is, where he has worked, or for a resume, say that this site does not include that. Point to the projects and the email.
 
 SELECTED PROJECTS
 - RepTrack: a SwiftUI and SwiftData workout log for iPhone and iPad, available on the App Store.
@@ -23,16 +20,16 @@ SELECTED PROJECTS
 
 WORKING STYLE
 - Ansar prefers tests, reproducible evidence and honest limitations over inflated claims.
-- Professional examples omit client names and private data. Public versions use unrelated public or sample data.
+- Public examples use unrelated public or sample data.
 - He learns by building complete, inspectable projects and documenting approaches that did not work.
 
 AVAILABILITY
-- Ansar is not open to work. He works full time as a Solutions Engineer at Datasembly and is not looking for new roles, jobs, freelance or contract work.
-- If asked whether he is available, hiring-ready or open to opportunities, say clearly that he is not open to work, and that he is still happy to talk about interesting problems by email.
+- This site is not a job listing.
+- If asked whether he is available, hiring-ready or open to opportunities, say this site does not cover that, and that he is happy to talk about a project by email.
 
 CONTACT AND NAVIGATION
 - Email: mohamedansarkms@gmail.com
 - LinkedIn: https://www.linkedin.com/in/kmsmohamedansar/
 - GitHub: https://github.com/ansarbuilds
-- Portfolio sections: #projects, #ai, #about, #experience and #contact.
+- Portfolio sections: #projects, #ai, #about and #contact.
 `;

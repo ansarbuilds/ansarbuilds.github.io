@@ -250,7 +250,7 @@
 .sc-cap:hover { background: color-mix(in srgb, var(--ed-blue) 3%, transparent); }
 .sc-cap li a:hover { color: var(--ed-coral-ink); }
 .ed-contact { border-top-color: var(--ed-rule); }
-.ed-contact .ed-footer, .bd-dayjobs { border-top-color: var(--ed-rule); }
+.ed-contact .ed-footer { border-top-color: var(--ed-rule); }
 .ed-contact-email { color: #160b06; }
 .sc-marquee { border-block-color: var(--ed-rule); background: color-mix(in srgb, var(--ed-blue) 5%, var(--ed-ivory)); color: var(--ed-blue); }
 .sc-marquee li span { color: var(--ed-coral-ink); }

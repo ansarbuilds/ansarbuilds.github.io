@@ -24,13 +24,6 @@ export const EMET_READING_CONTEXTS = [
     question: "Can you briefly summarize Ansar's background and skills?",
   },
   {
-    id: "experience",
-    selector: "#experience",
-    message: "Still reading? I can turn this timeline into a quick summary.",
-    actionLabel: "Summarize",
-    question: "Can you summarize Ansar's professional experience?",
-  },
-  {
     id: "contact",
     selector: "#contact",
     message: "Need help finding the best way to reach Ansar?",
