@@ -3,7 +3,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { Search, CornerDownLeft, ArrowUp, ArrowDown, X, Hash, Link2, Terminal } from "lucide-react";
 import { COMMAND_ITEMS } from "../data/content";
-import { useSandbox } from "../appContexts";
+import { useRoute, useSandbox } from "../appContexts";
 
 const GROUP_ICONS = { Sections: Hash, Projects: Hash, Fun: Terminal, Links: Link2, System: Terminal };
 
@@ -18,6 +18,7 @@ export default function CommandPalette() {
   const [activeIndex, setActiveIndex] = useState(0);
   const inputRef = useRef(null);
   const { toggleDevMode } = useSandbox();
+  const { navigate } = useRoute();
 
   const results = useMemo(() => {
     const q = query.trim().toLowerCase();
@@ -60,7 +61,7 @@ export default function CommandPalette() {
     if (item.action === "toggle-sandbox") {
       toggleDevMode();
     } else if (item.go) {
-      window.location.hash = item.go.replace(/^#/, "");
+      navigate(item.go);
     } else if (item.href) {
       window.open(item.href, item.href.startsWith("mailto:") ? "_self" : "_blank", "noopener,noreferrer");
     }

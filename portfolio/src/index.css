@@ -103,7 +103,6 @@
      It is not a control, so a ring around it only looks like a stray box. */
   :where(h1, h2)[tabindex="-1"]:focus-visible { outline: none; }
   html {
-    scroll-behavior: smooth;
     font-size: 18px;
   }
   body {
@@ -343,14 +342,17 @@
 }
 
 /* Thin scrollbar for terminal-style scroll areas */
-.mono-scroll::-webkit-scrollbar {
+.mono-scroll::-webkit-scrollbar,
+html::-webkit-scrollbar {
   width: 6px;
 }
-.mono-scroll::-webkit-scrollbar-thumb {
+.mono-scroll::-webkit-scrollbar-thumb,
+html::-webkit-scrollbar-thumb {
   background: rgba(140, 168, 214, 0.25);
   border-radius: 999px;
 }
-.mono-scroll::-webkit-scrollbar-track {
+.mono-scroll::-webkit-scrollbar-track,
+html::-webkit-scrollbar-track {
   background: transparent;
 }
 

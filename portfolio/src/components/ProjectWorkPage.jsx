@@ -4,7 +4,7 @@ import { ACCENTS, EARLIER_PROJECTS, FEATURED, FEATURED_GRID, MORE_PROJECTS, OPEN
 import { DUR, EASE } from "../lib/motion";
 
 // Every listed project on one page, as a plain index. Each row opens the
-// project's own page at #project/<slug>. Hidden projects stay out, same as
+// project's own page at /work/<slug>/. Hidden projects stay out, same as
 // on the main page.
 const GROUPS = [
   { label: "Studies, skills & plugins", projects: OPEN_SOURCE_PROJECTS },
@@ -35,7 +35,7 @@ export default function ProjectWorkPage() {
                   transition={{ duration: DUR.base, delay: Math.min(i * 0.03, 0.3), ease: EASE.out }}
                   className="border-b border-blue/10"
                 >
-                  <a href={`#project/${p.slug}`} className="group grid grid-cols-[1fr_auto] items-center gap-4 py-5 sm:grid-cols-[minmax(0,16rem)_1fr_auto] sm:gap-8">
+                  <a href={`/work/${p.slug}/`} className="group grid grid-cols-[1fr_auto] items-center gap-4 py-5 sm:grid-cols-[minmax(0,16rem)_1fr_auto] sm:gap-8">
                     <span>
                       <span className="block text-lg font-medium text-[color:var(--ink-100)] transition-colors group-hover:text-[color:var(--a)]" style={{ "--a": a.hex }}>
                         {p.title}
