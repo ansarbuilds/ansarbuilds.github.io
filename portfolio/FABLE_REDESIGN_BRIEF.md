@@ -1,0 +1,170 @@
+# Portfolio audit + redesign brief (for Fable 5.2)
+
+Repo: `ansarbuilds/ansarbuilds.github.io`, folder `portfolio/` → ansarbuilds.dev (GitHub Pages via `.github/workflows/deploy-portfolio.yml`).
+Audited 2026-11-16 at `main` HEAD. Build passes (`vite build`, 1.4s), `oxlint` clean.
+
+---
+
+## 1. What exists today
+
+| Area | State |
+| --- | --- |
+| Stack | React 19, Vite 8, Tailwind v4, Framer Motion 13, three.js 0.185, lucide-react |
+| Size | ~17k lines in `src/` (projects.js alone 2,175) |
+| Routing | Hash routes (`#project/<slug>`) inside `App.jsx` (545 lines, 8 hand-rolled route `motion.div`s) |
+| Home | Hero (`SignalField.jsx` canvas graph) → short version → `WorkStage` (7 tabbed projects) → capabilities → more work → playground (EMET terminal, solar system, infinity loop) → contact |
+| 3D | Solar system, InfinityLoop, DigitalDouble (GLB), BB-8 companion (roaming robot), all lazy-loaded |
+| Motion system | Tokens in `src/lib/motion.js` + CSS vars; rules in `MOTION.md`; measurements in `motion-audit/AUDIT.md` |
+| Theme | Single dark theme; per-section palette swaps (`lib/palettes.js`) with AA tests |
+| Tests | node tests for EMET/BB-8/palettes, Playwright smoke + axe |
+
+**Keep:** the content (`data/projects.js`, `showcase.js`, `content.js`), the motion token idea, the reduced-motion discipline, palette contrast tests, EMET knowledge + worker, lazy-loading of 3D.
+
+---
+
+## 2. Findings (ranked)
+
+### Performance / payload
+1. **Media weight: 31 MB in `public/p/saywhen/`** (`demo.mp4` 23 MB, `who-its-for.mp4` 4.3 MB). Re-encode to H.264/AV1 at ~2–4 MB, add `poster`, `preload="none"`, serve a WebM/AV1 + MP4 pair.
+2. **`digital_double.glb` is 7.9 MB.** Run `gltf-transform optimize --compress meshopt --texture-compress webp` → expect ~1 MB. Load with `MeshoptDecoder`.
+3. **`public/shots/` is 12 MB.** `lineage.png`, `digital-double.jpg` should be AVIF/WebP with `srcset` sizes.
+4. **JS shipped up front: ~333 KB gzip** (index 109 + react 57 + motion 47 + css 25; three 163 KB loads when a 3D piece mounts). The main chunk is 328 KB raw because every section and `projects.js` is eager. Code-split project pages and the playground; move project copy to JSON fetched per route.
+5. **Six Google font families** (Outfit, Bricolage, Plus Jakarta, Instrument Serif, Anton, JetBrains Mono), only ~4 CSS roles use them. Cut to 2–3, self-host as variable woff2, preload the display face.
+6. Framer Motion (47 KB gz) duplicates what CSS + a tiny scroll lib could do. Fine to keep if the redesign leans on layout animations; otherwise replace with `motion` mini or GSAP.
+
+### Code health
+7. **~300 lines of dead CSS** (`.sc-flag`, `.sc-split`, `.ed-feature`, etc.) and 8 dead keyframes, already listed in `motion-audit/AUDIT.md`. `.sc-card-media` defined 4× in `showcase.css`.
+8. **Four global stylesheets** (`index`, `editorial`, `showcase`, `stage` = 1,450 lines, 132 KB built) layered on top of Tailwind. Two systems fighting. Pick one: Tailwind + tokens, or CSS modules.
+9. `NameParticles.jsx` (362 lines) is unused; README says so. Delete.
+10. `App.jsx` does routing, transitions, palettes, sandbox, scroll context. Split into a router + layout shell.
+11. Page scrolls inside `<main>` instead of the document: breaks IntersectionObserver margins (AUDIT #2), native scroll restoration, and smooth-scroll libs. **Fix this before adding any scroll-driven motion.**
+12. Hash routing hurts SEO/share previews per project. Pre-render static routes (`/work/<slug>/`) at build time.
+
+### Design / motion (from the existing motion audit, still open)
+13. 67 distinct durations, 14 easings in CSS; tokens exist but aren't enforced.
+14. Intro curtain (510 ms) reads as a glitch; nothing carries into the hero.
+15. Route transitions are 0.12 s opacity fades, no shared element card → page.
+16. `DecodeLine` calls `setState` every rAF frame.
+17. Cursor lerp is frame-rate dependent; magnetic buttons feel rubbery.
+18. Playground CTAs ~1.1:1 contrast (`editorial.css:150`, `--ed-ivory` became dark).
+19. BB-8 can roam over the footer/"Back to top".
+
+---
+
+## 3. Redesign brief for Fable 5.2
+
+Paste this section to Fable as the task.
+
+> Redesign `portfolio/` in this repo into a studio-grade site. Keep all copy and facts from `src/data/*` (house style: plain words, first person, no em dashes, no employer names). Keep GitHub Pages deploy, Vite, React 19.
+>
+> **Phase 0 – foundation (no visuals yet)**
+> - Document-level scrolling (remove `<main>` scroller). Add Lenis for smooth scroll.
+> - Real routes `/`, `/work/:slug`, `/playground` with static pre-render (vite-ssg or a prerender plugin) so each project has its own OG tags.
+> - One styling system: Tailwind v4 + design tokens (`@theme`). Delete `editorial.css`, `showcase.css`, `stage.css`, `NameParticles.jsx`, dead keyframes.
+> - Self-host 2 fonts: one display (variable, e.g. a grotesk with optical size) + one mono.
+> - Media pipeline: AVIF/WebP + srcset, videos ≤4 MB with posters, GLB via gltf-transform + meshopt.
+> - Budgets enforced in CI: initial JS ≤150 KB gz, LCP ≤2.0 s on Moto G4 / 4G, CLS ≤0.05, 60 fps scroll at 4× CPU throttle.
+>
+> **Phase 1 – the signature hero (WebGL)**
+> - One persistent full-screen `<canvas>` (react-three-fiber + drei) behind the DOM, shared across routes so scenes morph instead of reload.
+> - Hero: a GPU particle / instanced "agent graph" (evolve `SignalField` concept) built with custom GLSL: curl-noise flow, pointer-reactive attraction, bloom + film grain + chromatic aberration via `postprocessing`. Name set in large display type, split per character, revealed with masked staggers on one GSAP timeline.
+> - Fallback: static poster image for `prefers-reduced-motion`, low-power, and no-WebGL.
+>
+> **Phase 2 – scroll choreography**
+> - GSAP ScrollTrigger (or Framer `useScroll`) pinned sections: work stage becomes a horizontal pinned reel; each project card is a WebGL plane with a distortion shader on hover/scroll velocity.
+> - Shared-element transition card → project page (View Transitions API with Framer fallback).
+> - Section palette shifts kept (`lib/palettes.js`) but driven by the same scroll timeline and fed into the WebGL scene's uniforms.
+>
+> **Phase 3 – playground as a showpiece**
+> - Solar system, infinity loop, digital double, BB-8 rendered in the shared canvas as switchable "scenes", with HDRI lighting, PBR materials, soft shadows.
+> - EMET terminal stays DOM, styled as a glass panel over the scene.
+>
+> **Phase 4 – polish**
+> - Custom cursor with frame-rate-independent damping (`1 - exp(-k*dt)`), magnetic CTAs via springs.
+> - Sound design optional, off by default.
+> - Motion tokens enforced: lint rule or test that rejects raw durations/cubic-beziers outside `lib/motion.js`.
+> - Accessibility: axe clean, full keyboard nav, focus rings, reduced-motion respected everywhere, AA contrast tests kept.
+>
+> **Deliver per phase as separate PRs**, with Playwright before/after videos (reuse `motion-audit/record.mjs`) and Lighthouse numbers in each PR description.
+
+### Suggested dependencies
+`@react-three/fiber`, `@react-three/drei`, `@react-three/postprocessing`, `gsap` (+ ScrollTrigger, SplitText — free since 2025), `lenis`, `@gltf-transform/cli` (dev), `vite-plugin-image-optimizer` or `sharp` (dev), a prerender plugin.
+
+### Reference bar
+Award-site tier (Awwwards SOTD style): one bold WebGL idea, restrained typography, choreographed scroll, fast. Polish and performance sell "100k", not more effects.
+
+---
+
+# 4. CINEMATIC DIRECTION (this replaces the "Phase 1–4" visuals above; Phase 0 still applies)
+
+> Fable: this is not a portfolio template. Treat the site as a **feature film the visitor directs by scrolling**. Every section is a scene, every transition is a cut, every hover is a performance. Budget is unlimited; the only constraints are 60 fps, accessibility, and the facts in `src/data/*`.
+
+## 4.1 The concept: "Signal"
+One continuous world. The visitor starts in darkness and follows a single point of light (the "signal", already the hero idea in `SignalField.jsx`) as it grows into a network, a machine, a universe. Every project is a place the signal visits. The camera never stops; there are no page loads, only camera moves.
+
+- **One persistent WebGL world** (react-three-fiber), one camera, one timeline. DOM text is composited over it like film titles.
+- **Scroll = playhead.** A master GSAP timeline mapped to scroll (Lenis smoothing). Scenes are acts on that timeline, not separate components.
+- **Visual language:** anamorphic. 2.39:1 letterbox bars that open and close between acts, lens flares on bright nodes, film grain, slight chromatic aberration at frame edges, depth of field that racks focus between text and 3D, cinematic color grade via a 3D LUT per act.
+- **Typography as title design:** one huge display face, kinetic. Titles are built like opening credits (Saul Bass / Se7en / modern Marvel-style main-on-ends): letters assembled from particles, masked by light, extruded in 3D when the camera passes them.
+
+## 4.2 Storyboard (shot list)
+
+**COLD OPEN — 0:00 to 0:08 (plays on load, skippable, once per visit)**
+1. Black. A soft low hum (audio off by default; a "sound on" pill in the corner, like a trailer).
+2. A single pixel of light ignites center frame. Lens flare blooms. Letterbox bars visible.
+3. The point pulses with a heartbeat; each beat spawns faint lines, the first nodes of a graph.
+4. Camera pulls back fast (dolly-out with motion blur) revealing thousands of nodes: an agent network shaped like a nebula.
+5. Signals race along edges and converge; particles assemble into the name **MOHAMED ANSAR** in 3D type, lit from behind (god rays).
+6. Hard cut to silence. Subtitle types in mono: "I build agents, studies and apps. With proof."
+7. Letterbox bars slide away, the frame opens to full screen = the hero. The nav fades in. Total ≤8 s; second visit: 1.5 s version.
+
+**ACT I — THE SHORT VERSION**
+- Camera flies *through* the name into the network. The four counts are physical objects in space: numbers made of instanced glowing cubes that count up as the camera passes. Lines-of-code band = a data river flowing under the camera.
+- Tool logos orbit like satellites; hovering one pulls it toward camera with a spring.
+
+**ACT II — SELECTED WORK (the 7 flagships, each a mini-film, ~1 viewport of scroll each, pinned)**
+Each project gets its own *set*, lighting and grade; the camera travels between sets along the signal path. Title card per project in the credits style, then the real demo media composited onto a 3D screen inside the scene.
+- **saywhen** — a dark room, a floating monitor. A face-shaped point cloud turns toward it; a waveform rises from the "mouth" and becomes text that types onto the screen. The launch film plays on that monitor.
+- **Jarvis** — a control room at night. Holographic panels of the dashboard orbit a core; a budget gauge ("20 calls/day") glows like a reactor limit.
+- **Agent Flight Recorder** — an aircraft black box in an orange spotlight, slowly exploding into its layers (tool calls, edits, failure); the "suspect edit" layer flashes red and flies to camera.
+- **PRH-JEPA** — two point clouds (images, text) drifting apart, then snapping into alignment with a single rotation; the hidden "−35%" is revealed by a light sweeping across, like a forensic scene.
+- **Haloscript / others** — devices (Mac, iPad, iPhone) as real PBR models with screens playing the actual screenshots, rotating on a turntable with studio lighting.
+- Transition between projects: the signal streaks across as a light-speed tunnel (radial blur, 0.6 s), never a fade.
+
+**ACT III — WHAT I BRING**
+- Three pillars rise from the ground as monoliths (agents, research, shipping). Camera orbits each; project names are etched and light up when relevant.
+
+**ACT IV — THE PLAYGROUND (the "VFX reel")**
+- The network collapses into a star. Camera passes into the solar system (existing explorer, upgraded with HDRI, atmospheric scattering, bloom). The infinity loop is a ribbon of light the camera rides. The digital double stands in a volumetric spotlight. BB-8 rolls into frame as a *character* who reacts to the cursor.
+- EMET terminal: a glass HUD over the scene, voice-of-the-film narrator.
+
+**FINALE — CONTACT**
+- Everything the visitor saw recedes into a single point again (bookend to the cold open). Black. "Let's build something." in the title face. Email button glows like the original signal. Credits-style footer rolling up: stack, tools, "Directed by Mohamed Ansar".
+
+**PROJECT PAGES**
+- Click a card: camera dives *into* that project's set (shared-element: the 3D screen becomes the page header). Back: camera pulls back out to the exact spot on the timeline.
+
+## 4.3 Production pipeline (how a "Hollywood" result is actually made)
+1. **Pre-vis first.** Before code, produce a storyboard page (`/storyboard`, dev only) with one frame per shot and timing. Get approval, then build.
+2. **3D assets without Blender.** Build sets procedurally in code (three.js geometry, instancing, SDF/raymarched shapes, shaders) and use CC0 glTF models (Poly Haven, Kenney, Sketchfab CC0) plus Poly Haven HDRIs. Bake AO/lighting at runtime where needed; compress glTF with gltf-transform (meshopt + KTX2). Target ≤3 MB total 3D on first act; stream later acts.
+3. **Shaders:** custom GLSL for particles (GPGPU / FBO simulation, 250k+ particles on desktop, 30k on mobile), curl noise, volumetric light, raymarched nebula, light-speed tunnel.
+4. **Post stack:** `postprocessing` — bloom, DOF, chromatic aberration, noise, vignette, LUT, motion blur, SMAA.
+5. **Sound design:** layered ambient score + whooshes on cuts + UI ticks via WebAudio, muted until opted in, ducked on reduced motion.
+6. **Camera:** spline camera paths authored in Theatre.js (`@theatre/core` + `@theatre/r3f`) so shots are keyframed like a film editor, not hand-coded. Export the state JSON; scroll drives the sequence position.
+7. **Quality tiers:** detect GPU (`detect-gpu`) → Ultra / High / Mobile / Static. Static tier = pre-rendered video loops and posters so phones still feel cinematic.
+8. **Accessibility:** "Skip intro", "Reduce motion" = cuts instead of camera moves, all copy available as real DOM text, keyboard path through every act.
+
+## 4.4 Extra dependencies for this direction
+`@theatre/core`, `@theatre/r3f`, `@theatre/studio` (dev), `detect-gpu`, `maath`, `three-stdlib`, `troika-three-text` (3D type), `howler` or raw WebAudio, `@react-three/postprocessing`, `gsap` (ScrollTrigger, SplitText), `lenis`.
+
+## 4.5 How to run this with Fable
+Do not give it all at once. One session per step, in order, each ending in a PR with a recorded video:
+1. Phase 0 foundation (section 3).
+2. Pre-vis storyboard page + Theatre.js camera rig + empty world.
+3. Cold open.
+4. Act I.
+5. Act II, one project per PR (7 PRs).
+6. Acts III–IV, finale, project-page dives.
+7. Sound, quality tiers, accessibility, performance pass.
+
+Review each video before approving the next step; that is the "director's" job.
