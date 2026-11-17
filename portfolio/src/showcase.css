@@ -21,12 +21,6 @@
 
 
 /* The cover opens like an aperture the first time it scrolls in. */
-
-
-
-
-.sc-term-bar i:first-child { background: #ff5f57; } .sc-term-bar i:nth-child(2) { background: #febc2e; } .sc-term-bar i:nth-child(3) { background: #28c840; }
-@keyframes sc-blink { 50% { opacity: 0; } }
 /* Lines print one by one once the spread is in view. */
 
 .sc-btn { display: inline-flex; align-items: center; gap: 22px; min-height: 52px; padding: 0 22px; background: var(--ed-blue); color: var(--ed-ivory); font: 650 .8rem var(--font-body); transition: gap var(--dur-fast), background var(--dur-fast); }
@@ -107,7 +101,7 @@
   .sc-marquee-track { width: auto; }
   .sc-marquee ul + ul { display: none; }
   .sc-marquee ul { flex-wrap: wrap; }
-  .sc-art img, .sc-card-media img, .sc-btn, .sc-cap, .sc-cap li a { transition: none; }
+  .sc-card-media img, .sc-btn, .sc-cap, .sc-cap li a { transition: none; }
 }
 
 /* Contact: keep the button label on one line. */
@@ -149,7 +143,6 @@
 .sc-feed-metric { font: .56rem/1.4 var(--font-mono); text-transform: uppercase; letter-spacing: .05em; color: rgb(239 230 216 / .62); }
 .sc-feed-metric b { display: block; margin-bottom: 5px; font: 400 1.75rem/1 var(--font-serif); letter-spacing: -.03em; text-transform: none; color: #efe6d8; transition: color var(--dur-slow); }
 .sc-feed-card:hover .sc-feed-metric b, .sc-feed-card:focus-visible .sc-feed-metric b { color: #ff8a5f; }
-.sc-feed-card.is-active .sc-feed-scan { animation: sc-scan 1.5s var(--ease-out); }
 
 @media (max-width: 760px) {
   .sc-hero { min-height: 0; padding: 112px 20px 28px; }
@@ -180,7 +173,6 @@
 .sc-hero-hint { opacity: 0; transition: opacity var(--dur-slow) var(--ease-out); display: inline-flex; align-items: center; gap: 10px; margin-left: 6px; font: .54rem var(--font-mono); text-transform: uppercase; letter-spacing: .14em; color: rgb(239 230 216 / .45); }
 .sc-hero-hint::before { content: ""; width: 26px; height: 1px; background: currentColor; }
 /* The lit feed card shows how long until the next one takes over. */
-.sc-feed-card.is-active .sc-feed-timer { animation: sc-timer 2.6s linear forwards; }
 
 
 /* Flagship visuals lean toward the pointer, the floating card lifting most. */
@@ -195,7 +187,7 @@
 
 @media (max-width: 1000px) { .sc-contact-field { opacity: .28; mask-image: none; } }
 @media (prefers-reduced-motion: reduce) {
-  .ed-nav, .sc-flag .sc-art, .sc-float { transition: none; transform: none; rotate: none; translate: none; }
+  .ed-nav { transition: none; transform: none; rotate: none; translate: none; }
 }
 @media (max-width: 760px), (pointer: coarse) { .sc-hero-hint { display: none; } }
 

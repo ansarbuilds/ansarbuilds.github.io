@@ -146,12 +146,6 @@
     background: rgba(21, 63, 96, 0.95);
     border: 1px solid rgba(255, 255, 255, 0.06);
   }
-  .text-glow-cyan {
-    text-shadow: 0 0 6px rgba(34, 211, 238, 0.32);
-  }
-  .text-glow-amber {
-    text-shadow: 0 0 6px rgba(251, 191, 36, 0.28);
-  }
   .text-glow-green {
     text-shadow: 0 0 6px rgba(52, 211, 153, 0.36);
   }
@@ -272,10 +266,6 @@
 
 /* About: each word's opacity follows the paragraph's scroll progress
    (--p, 0-1) against its own index (--i) out of the word count (--n). */
-.word-reveal {
-  opacity: calc(0.26 + 0.74 * clamp(0, var(--p, 1) * var(--n, 1) - var(--i, 0), 1));
-  transition: opacity var(--dur-fast) linear;
-}
 
 /* SpinBadge: rotates only while its card is hovered or focused. */
 @keyframes badge-spin {
@@ -307,37 +297,6 @@
   }
   50% {
     opacity: 0;
-  }
-}
-
-@keyframes float-y {
-  0%,
-  100% {
-    transform: translateY(0);
-  }
-  50% {
-    transform: translateY(-8px);
-  }
-}
-.float-y {
-  animation: float-y 2.6s var(--ease-standard) infinite;
-}
-@keyframes glow-pulse {
-  0%,
-  100% {
-    filter: drop-shadow(0 0 6px rgba(34, 211, 238, 0.35));
-  }
-  50% {
-    filter: drop-shadow(0 0 16px rgba(34, 211, 238, 0.65));
-  }
-}
-.glow-pulse {
-  animation: glow-pulse 3.2s var(--ease-standard) infinite;
-}
-@media (prefers-reduced-motion: reduce) {
-  .float-y,
-  .glow-pulse {
-    animation: none;
   }
 }
 

@@ -110,18 +110,7 @@
 
 /* Site Recon terminal */
 .st-frame.is-term .st-frame-body { flex-direction: column; }
-.st-term { flex: 1; padding: 18px 20px; font: .68rem/1.6 var(--font-mono); }
-.st-term li { display: grid; grid-template-columns: 1.2em 6.6em minmax(0, 1fr); padding-block: 4px; opacity: 0; transform: translateY(4px); }
-.st-term li::before { content: "›"; color: #555b68; }
-.st-term li b { font-weight: 500; color: #8a90a0; }
-.st-term li span { color: #c4c9d4; }
-.st-term .is-good b, .st-term .is-good span { color: #56d364; }
-.st-term .is-warn b, .st-term .is-warn span { color: #e3b341; }
-.st-term .is-bad b, .st-term .is-bad span { color: #ff7b72; }
-.st-frame.is-running .st-term li { animation: st-line var(--dur-base) var(--ease-out) forwards; animation-delay: calc(var(--i) * 420ms + 300ms); }
-.st-caret::after { content: ""; display: inline-block; width: .55em; height: 1.05em; background: #d6dae3; animation: sc-blink var(--dur-scene) steps(1) infinite; }
 .st-frame.is-term .st-demo-foot { padding: 10px 16px; border-top: 1px solid rgb(255 255 255 / .08); }
-@keyframes st-line { to { opacity: 1; transform: none; } }
 
 /* Small screens: no tabs, every project stacked. */
 @media (max-width: 999px) {
@@ -139,9 +128,8 @@
   .st-launch { font-size: .7rem; padding: 0 16px; }
 }
 @media (prefers-reduced-motion: reduce) {
-  .st-tab-bar i, .st-launch, .st-caret::after { animation: none; }
+  .st-tab-bar i, .st-launch { animation: none; }
   .st-panel, .st-clip-bar span { transition: none; }
-  .st-term li { opacity: 1; transform: none; animation: none !important; }
 }
 
 /* ============================================================
@@ -219,12 +207,10 @@
 @keyframes st-kenburns { from { transform: scale(1); } to { transform: scale(1.06); } }
 
 /* Site Recon: lines print 90ms apart while the panel is on stage, then hold. */
-.st-frame.is-running .st-term li { animation-delay: calc(var(--i) * 90ms + 220ms); }
 
 /* Rest: off screen or in a hidden tab, nothing keeps animating. */
 /* Only the things that loop or play out over time; a panel that is
    arriving still has to finish arriving. */
-.st.is-resting :is(.st-cover img, .st-tab-bar i, .st-term li, .st-flight-detail pre code), .st.is-resting .st-caret::after { animation-play-state: paused !important; }
 
 @media (max-width: 999px) {
   .st-panel, .st-panel.is-active { opacity: 1; visibility: visible; transform: none; transition: none; animation: none; }
