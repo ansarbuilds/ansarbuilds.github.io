@@ -40,9 +40,9 @@ test('data saver visitors choose whether to load the 3D model', async ({ page })
   let modelRequested = false;
   page.on('request', (request) => { if (request.url().includes('digital_double.glb')) modelRequested = true; });
   await page.goto('/#digital-double');
-  await expect(page.getByRole('button', { name: 'Load the 3D model (about 8 MB)' })).toBeVisible();
+  await expect(page.getByRole('button', { name: 'Load the 3D model (about 3 MB)' })).toBeVisible();
   expect(modelRequested).toBe(false);
-  await page.getByRole('button', { name: 'Load the 3D model (about 8 MB)' }).click();
+  await page.getByRole('button', { name: 'Load the 3D model (about 3 MB)' }).click();
   await expect.poll(() => modelRequested).toBe(true);
 });
 
