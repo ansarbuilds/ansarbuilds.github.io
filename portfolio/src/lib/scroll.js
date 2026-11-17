@@ -39,6 +39,32 @@ export function scrollToTop({ instant = false } = {}) {
 export function scrollToElement(el, { center = false } = {}) {
   const box = el.getBoundingClientRect();
   const jump = reducedMotion() || farAway(box.top);
-  if (lenis && !center) lenis.scrollTo(el, { immediate: jump, force: true });
-  else el.scrollIntoView({ behavior: jump ? "auto" : "smooth", block: center ? "center" : "start", inline: "nearest" });
+  const move = () => {
+    if (lenis && !center) lenis.scrollTo(el, { immediate: jump, force: true });
+    else el.scrollIntoView({ behavior: jump ? "auto" : "smooth", block: center ? "center" : "start", inline: "nearest" });
+  };
+  move();
+  if (jump && !center) holdOn(el, move);
+}
+
+/* After a long jump the page above the target is seen for the first time:
+   images load and sections lay themselves out, and the target slides away
+   from where the jump landed. For a moment afterwards, jump again whenever
+   it has drifted. The visitor's own scrolling ends that at once. */
+function holdOn(el, move) {
+  let frame = 0;
+  const until = performance.now() + 1500;
+  const events = ["wheel", "touchstart", "keydown", "pointerdown"];
+  const stop = () => {
+    cancelAnimationFrame(frame);
+    events.forEach((name) => window.removeEventListener(name, stop));
+  };
+  const check = () => {
+    if (performance.now() > until || !el.isConnected) { stop(); return; }
+    const atBottom = window.scrollY + window.innerHeight >= document.documentElement.scrollHeight - 2;
+    if (Math.abs(el.getBoundingClientRect().top) > 4 && !atBottom) move();
+    frame = requestAnimationFrame(check);
+  };
+  events.forEach((name) => window.addEventListener(name, stop, { passive: true, once: true }));
+  frame = requestAnimationFrame(check);
 }
