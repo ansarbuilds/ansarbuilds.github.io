@@ -15,9 +15,12 @@ const VIEWPORTS = {
 };
 const wait = (page, ms) => page.waitForTimeout(ms);
 const skipIntro = (context) => context.addInitScript(() => { try { localStorage.setItem("intro-played", "1"); } catch { /* private mode */ } });
-// Scrolls the page's own scroller (<main>) at a steady reading pace.
+// Scrolls the page at a steady reading pace. The page scrolls the document;
+// before the Phase 0 pass it scrolled <main>, so pick whichever one moves and
+// the same script can record both sides of a comparison.
 const scrollMain = (page, { to = "end", pxPerSecond = 900 } = {}) => page.evaluate(async ({ to, pxPerSecond }) => {
-  const main = document.querySelector("main");
+  const inner = document.querySelector("main");
+  const main = getComputedStyle(inner).overflowY === "visible" ? document.scrollingElement : inner;
   const target = to === "end" ? main.scrollHeight - main.clientHeight : to;
   const step = pxPerSecond / 60;
   while (Math.abs(main.scrollTop - target) > step) {
@@ -27,7 +30,8 @@ const scrollMain = (page, { to = "end", pxPerSecond = 900 } = {}) => page.evalua
   main.scrollTop = target;
 }, { to, pxPerSecond });
 const scrollTo = (page, selector, offset = 110) => page.evaluate(({ selector, offset }) => {
-  const main = document.querySelector("main"), el = document.querySelector(selector);
+  const inner = document.querySelector("main"), el = document.querySelector(selector);
+  const main = getComputedStyle(inner).overflowY === "visible" ? document.scrollingElement : inner;
   main.scrollTop += el.getBoundingClientRect().top - offset;
 }, { selector, offset });
 

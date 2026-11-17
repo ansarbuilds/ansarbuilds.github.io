@@ -168,3 +168,26 @@ Do not give it all at once. One session per step, in order, each ending in a PR 
 7. Sound, quality tiers, accessibility, performance pass.
 
 Review each video before approving the next step; that is the "director's" job.
+
+---
+
+# 5. Status
+
+## Phase 0, foundation: done in the `phase-0-foundation` PR
+
+| Item | Result |
+| --- | --- |
+| Document scrolling + Lenis | Done. `src/lib/scroll.js`. Full-screen views are not smoothed. |
+| Real routes, pre-rendered | Done. `/work/<slug>/`, `/work/`, `/playground/<id>/`; 41 pages written by `scripts/prerender-routes.mjs`, plus `404.html`. Old hash links redirect. |
+| Media | `demo.mp4` 24.1 → 6.4 MB, `digital_double.glb` 8.3 → 3.1 MB, unused `who-its-for.mp4` removed. `public/` 54 → 27 MB. |
+| Fonts | Self-hosted, 6 families → 5 (Bricolage dropped). No request to Google Fonts. |
+| Dead code | 31 unused CSS classes, 4 keyframes and `NameParticles.jsx` removed. |
+| First-load JS | 219 → 191 kB gzip (project pages, Emet and the sandbox load on demand). |
+| CI budgets | `npm run check:budget` in `checks.yml`. |
+
+## Left for later steps, on purpose
+
+- **One styling system and two fonts.** The four stylesheets and five families are the current look. Porting them to Tailwind or cutting to two fonts now would mean redesigning the site before the new design exists, so they are replaced act by act as the cinematic build lands.
+- **First-load JS at 150 kB.** Needs `data/projects.js` (178 kB raw) split into a small index for the home page and per-project detail, and Framer Motion (47 kB) retired as GSAP takes over.
+- **The film at 4 MB.** A 60-second 1080p film with sound does not get there without visible loss. It only loads on play, so it does not affect page load.
+- **AVIF and srcset.** Images are already mostly WebP and small (largest 464 kB); a responsive image pipeline belongs with the new project scenes.

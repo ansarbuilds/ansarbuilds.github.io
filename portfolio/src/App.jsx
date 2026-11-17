@@ -1,9 +1,5 @@
 import { Component, createRef, lazy, Suspense, useCallback, useEffect, useMemo, useRef, useState } from "react";
-import EmetSection from "./components/EmetSection";
 import { Hero, ProjectsSection, CapabilitiesSection, MoreWorkSection, ContactSection } from "./components/Sections";
-import ProjectPage from "./components/ProjectPage";
-import ProjectWorkPage from "./components/ProjectWorkPage";
-import SandboxStubs from "./components/SandboxStubs";
 import CommandPalette from "./components/CommandPalette";
 import { MatrixBackground } from "./components/RouteBackgrounds";
 import PaletteSwatch from "./components/PaletteSwatch";
@@ -18,6 +14,12 @@ import { OPEN_SOURCE_PROJECTS } from "./data/projects";
 import { RouteContext, SandboxContext, ThemeContext, useRoute, useSandbox } from "./appContexts";
 import { scrollToElement, scrollToTop, setSmoothScroll } from "./lib/scroll";
 
+// Only the home page ships in the first load; every other view arrives
+// when it is opened.
+const EmetSection = lazy(() => import("./components/EmetSection"));
+const ProjectPage = lazy(() => import("./components/ProjectPage"));
+const ProjectWorkPage = lazy(() => import("./components/ProjectWorkPage"));
+const SandboxStubs = lazy(() => import("./components/SandboxStubs"));
 const SolarSystemExplorer = lazy(() => import("./components/SolarSystemExplorer"));
 const DataLineageExplorer = lazy(() => import("./components/DataLineageExplorer"));
 const DigitalDouble = lazy(() => import("./components/DigitalDouble"));
@@ -384,12 +386,12 @@ function MainDocument({ bootDone, onBoot }) {
 // What each route shows. Takeover views fill the stage; the home page and
 // the project pages scroll.
 function RouteView({ route, bootDone, onBoot }) {
-  if (route === "emet") return <EmetSection />;
+  if (route === "emet") return <Suspense fallback={<RouteLoader label="Loading Emet" />}><EmetSection /></Suspense>;
   if (route === "explore") return <Suspense fallback={<RouteLoader label="Loading solar system" />}><SolarSystemExplorer /></Suspense>;
-  if (route === "work") return <ProjectWorkPage />;
+  if (route === "work") return <Suspense fallback={<RouteLoader label="Loading work" />}><ProjectWorkPage /></Suspense>;
   if (route === "project/digital-double") return <Suspense fallback={<RouteLoader label="Loading 3D project" />}><DigitalDouble /></Suspense>;
   if (route === "project/haloscript") return <Suspense fallback={<RouteLoader label="Loading project" />}><HaloscriptPage /></Suspense>;
-  if (route.startsWith("project/")) return <ProjectPage slug={route.slice("project/".length)} />;
+  if (route.startsWith("project/")) return <Suspense fallback={<RouteLoader label="Loading project" />}><ProjectPage slug={route.slice("project/".length)} /></Suspense>;
   if (route === "lineage-demo") return <Suspense fallback={<RouteLoader label="Loading data explorer" />}><DataLineageExplorer /></Suspense>;
   if (route === "infinity") return <Suspense fallback={<RouteLoader label="Loading particle scene" />}><InfinityPage /></Suspense>;
   if (route === "digital-double") return <Suspense fallback={<RouteLoader label="Loading 3D project" />}><DigitalDouble /></Suspense>;
@@ -422,7 +424,7 @@ function Stage({ bootDone, onBoot }) {
   return (
     <main id="main-content" tabIndex={-1} className="relative min-h-[100dvh]">
       <RouteTransition route={route}><RouteView route={route} bootDone={bootDone} onBoot={onBoot} /></RouteTransition>
-      {devMode && <SandboxStubs onClose={toggleDevMode} />}
+      {devMode && <Suspense fallback={null}><SandboxStubs onClose={toggleDevMode} /></Suspense>}
     </main>
   );
 }
