@@ -13,6 +13,11 @@
 
 export const PLAYGROUND = ["emet", "explore", "lineage-demo", "digital-double", "infinity"];
 
+// The film's pre-vis pages (storyboard, moving pre-vis). They exist only on
+// the dev server: a production build has no such routes, so the URLs fall
+// through to the home page. (`import.meta.env` is absent under plain Node.)
+export const PREVIS = import.meta.env?.DEV ? ["storyboard", "previs"] : [];
+
 // A view id from the old hash scheme, or "main" for a section id.
 export function routeFromLegacyHash(id) {
   if (PLAYGROUND.includes(id) || id === "work") return id;
@@ -28,6 +33,7 @@ export function routeFromPath(pathname) {
   if (extra !== undefined) return null;
   if (first === "work") return second ? `project/${second}` : "work";
   if (first === "playground" && PLAYGROUND.includes(second)) return second;
+  if (PREVIS.includes(first) && second === undefined) return first;
   return null;
 }
 
@@ -35,6 +41,7 @@ export function pathForRoute(route) {
   if (route === "work") return "/work/";
   if (route.startsWith("project/")) return `/work/${route.slice("project/".length)}/`;
   if (PLAYGROUND.includes(route)) return `/playground/${route}/`;
+  if (PREVIS.includes(route)) return `/${route}/`;
   return "/";
 }
 

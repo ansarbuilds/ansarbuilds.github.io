@@ -44,6 +44,15 @@ Clicking a project opens `/work/<slug>/`: the story, a flow diagram, what I took
 
 `FABLE_REDESIGN_BRIEF.md` is the audit and the plan for the redesign this groundwork is for.
 
+## The film (pre-vis)
+
+The redesign treats the site as one film the visitor plays by scrolling. `src/film/` holds its pre-production, and none of it is in a production build:
+
+- `shots.js` is the film, shot by shot: order, timing, camera, what happens, sound. It is the single source for the two pages below.
+- `/storyboard/` (dev server only) draws one frame per shot with its notes. This is the page to mark up: refer to shots by code, such as `A2-03b`.
+- `/previs/` (dev server only) flies the real camera path through a grey-box world. The scrollbar is the playhead; Space plays it at real speed and the arrow keys step through shots.
+- `rig.js` turns the shot list into a camera pose for any moment. It is plain maths with tests (`rig.test.mjs`), and it is the piece the real film reuses.
+
 ## Where things live
 
 ```

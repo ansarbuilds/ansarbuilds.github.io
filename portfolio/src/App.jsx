@@ -6,7 +6,7 @@ import PaletteSwatch from "./components/PaletteSwatch";
 import Cursor from "./components/Cursor";
 import { shouldPlayIntro } from "./lib/intro";
 import { isRouteTransitioning, runRouteChange } from "./lib/routeTransition";
-import { parseTarget, pathForRoute, readLocation, urlForTarget } from "./lib/routes";
+import { PREVIS, parseTarget, pathForRoute, readLocation, urlForTarget } from "./lib/routes";
 import { titleForRoute } from "./lib/routeTitle";
 import { CONTACT } from "./data/content";
 import { applyPalette, clearPalette, paletteForRoute, pickPalette } from "./lib/palettes";
@@ -26,6 +26,10 @@ const DigitalDouble = lazy(() => import("./components/DigitalDouble"));
 const HaloscriptPage = lazy(() => import("./components/HaloscriptPage"));
 const InfinityPage = lazy(() => import("./components/InfinityPage"));
 const BB8Companion = lazy(() => import("./components/BB8Companion"));
+// The film's pre-vis pages. Development only: a production build drops both
+// the routes and these chunks.
+const Storyboard = import.meta.env.DEV ? lazy(() => import("./film/Storyboard")) : null;
+const Previs = import.meta.env.DEV ? lazy(() => import("./film/Previs")) : null;
 
 /* ============================================================
    ROUTER: every view has its own URL (see lib/routes.js). "main" is the
@@ -386,6 +390,8 @@ function MainDocument({ bootDone, onBoot }) {
 // What each route shows. Takeover views fill the stage; the home page and
 // the project pages scroll.
 function RouteView({ route, bootDone, onBoot }) {
+  if (Storyboard && route === "storyboard") return <Suspense fallback={<RouteLoader label="Loading storyboard" />}><Storyboard /></Suspense>;
+  if (Previs && route === "previs") return <Suspense fallback={<RouteLoader label="Loading pre-vis" />}><Previs /></Suspense>;
   if (route === "emet") return <Suspense fallback={<RouteLoader label="Loading Emet" />}><EmetSection /></Suspense>;
   if (route === "explore") return <Suspense fallback={<RouteLoader label="Loading solar system" />}><SolarSystemExplorer /></Suspense>;
   if (route === "work") return <Suspense fallback={<RouteLoader label="Loading work" />}><ProjectWorkPage /></Suspense>;
@@ -484,6 +490,14 @@ function useIdleAfterFirstInput(ready) {
   return idle;
 }
 
+// The droid stays off the pre-vis pages: they are a work surface, and it
+// would sit on top of the frame being judged.
+function Companion() {
+  const { route } = useRoute();
+  if (PREVIS.includes(route)) return null;
+  return <Suspense fallback={null}><BB8Companion /></Suspense>;
+}
+
 function AppShell({ bootDone, onBoot }) {
   const companionReady = useIdleAfterFirstInput(bootDone);
   return (
@@ -496,7 +510,7 @@ function AppShell({ bootDone, onBoot }) {
             <ScrollProgress />
             <PaletteSwatch />
             <HomeCursor />
-            {companionReady && <Suspense fallback={null}><BB8Companion /></Suspense>}
+            {companionReady && <Companion />}
             {/* No page-level `perspective` here on purpose: setting it on an
                 ancestor this high up turns it into the CSS containing block
                 for every `position: fixed` descendant (modals, overlays)

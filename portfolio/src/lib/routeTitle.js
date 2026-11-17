@@ -14,6 +14,8 @@ const VIEW_TITLES = {
   "digital-double": "A 3D model of me, made with AI",
   infinity: "Infinity loop",
   work: "Selected work",
+  storyboard: "Storyboard",
+  previs: "Pre-vis",
 };
 
 export function titleForRoute(route) {

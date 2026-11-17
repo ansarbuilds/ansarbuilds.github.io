@@ -1,6 +1,7 @@
 import { test, expect } from '@playwright/test';
 import AxeBuilder from '@axe-core/playwright';
 import { INTRO_SESSION_KEY } from '../../src/lib/intro.js';
+import { SHOTS } from '../../src/film/shots.js';
 
 test('homepage and project navigation work', async ({ page }) => {
   await page.goto('/');
@@ -114,4 +115,26 @@ test('scrolling over the work grid moves the page, not a box inside it', async (
   const before = await page.evaluate(() => window.scrollY);
   await page.mouse.wheel(0, 1200);
   await expect.poll(() => page.evaluate(() => window.scrollY)).toBeGreaterThan(before + 600);
+});
+
+// The film's pre-vis pages only exist on the dev server, which is what these
+// tests run against.
+test('the storyboard lists every shot and links each to the moving pre-vis', async ({ page }) => {
+  await page.goto('/storyboard/');
+  await expect(page.getByRole('heading', { name: 'Signal', level: 1 })).toBeVisible();
+  await expect(page.locator('.sb-shot')).toHaveCount(SHOTS.length);
+  await expect(page.locator('.sb-shot svg')).toHaveCount(SHOTS.length);
+  await page.locator('#A2-02b a.sb-frame-link').click();
+  await expect(page).toHaveURL(/\/previs\/#A2-02b$/);
+  await expect(page.locator('.pv-hud h1')).toContainText('A2-02b');
+});
+
+test('the pre-vis follows the scrollbar from the first shot to the last', async ({ page }) => {
+  await page.goto('/previs/');
+  await expect(page.locator('.pv-hud h1')).toContainText('CO-01');
+  await page.keyboard.press('ArrowRight');
+  await expect(page.locator('.pv-hud h1')).toContainText('CO-02');
+  await page.evaluate(() => window.scrollTo(0, document.documentElement.scrollHeight));
+  await expect(page.locator('.pv-hud h1')).toContainText('FN-03');
+  await expect(page.locator('.pv-clock strong')).toHaveText(/^01:3\d\.\d$/);
 });

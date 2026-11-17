@@ -191,3 +191,16 @@ Review each video before approving the next step; that is the "director's" job.
 - **First-load JS at 150 kB.** Needs `data/projects.js` (178 kB raw) split into a small index for the home page and per-project detail, and Framer Motion (47 kB) retired as GSAP takes over.
 - **The film at 4 MB.** A 60-second 1080p film with sound does not get there without visible loss. It only loads on play, so it does not affect page load.
 - **AVIF and srcset.** Images are already mostly WebP and small (largest 464 kB); a responsive image pipeline belongs with the new project scenes.
+
+## Step 2, storyboard and camera rig: done in the `step-2-storyboard-previs` PR
+
+- `src/film/shots.js`: 33 shots across the cold open, four acts, the finale and the project-page dive. 1 min 35 s at playing speed, 19.3 screens of scrolling.
+- `/storyboard/` and `/previs/`, on the dev server only. A production build has neither the routes nor the code.
+- `src/film/rig.js`: the camera rig, with tests.
+- React Three Fiber 9 is in, and only loads with the pre-vis for now.
+
+**Change from the plan: no Theatre.js.** Its React bindings need React 18 and React Three Fiber 8, and it has had no release since May 2024; this site is on React 19. The camera is keyframed in `shots.js` instead, which also keeps the storyboard and the camera on one source.
+
+**Act II has six sets, not seven.** The home page has six flagship projects; the brief miscounted.
+
+**Before step 3 (the cold open):** review the storyboard and say which shots to change.
