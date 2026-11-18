@@ -138,3 +138,26 @@ test('the pre-vis follows the scrollbar from the first shot to the last', async 
   await expect(page.locator('.pv-hud h1')).toContainText('FN-03');
   await expect(page.locator('.pv-clock strong')).toHaveText(/^01:3\d\.\d$/);
 });
+
+test('the cold open plays over the home page, hands over to the hero, and can be skipped', async ({ page }) => {
+  await page.goto('/?coldopen=full');
+  await expect(page.locator('.co')).toBeVisible();
+  await expect(page.locator('.ed-nav')).toHaveCSS('opacity', '0');
+  await page.waitForTimeout(800);
+  await page.getByRole('button', { name: 'Skip intro' }).click();
+  await expect(page.locator('.co, .co-veil')).toHaveCount(0, { timeout: 4000 });
+  await expect(page.getByRole('heading', { name: 'Mohamed Ansar', level: 1 })).toBeVisible();
+  await expect(page.locator('.ed-nav')).toHaveCSS('opacity', '1');
+});
+
+test('the cold open does not play for reduced motion, a section link, or a second page view', async ({ page }) => {
+  await page.emulateMedia({ reducedMotion: 'reduce' });
+  await page.goto('/');
+  await expect(page.locator('.co, .co-veil')).toHaveCount(0);
+  await page.emulateMedia({ reducedMotion: 'no-preference' });
+  await page.goto('/#contact');
+  await expect(page.locator('.co, .co-veil')).toHaveCount(0);
+  await page.evaluate(() => sessionStorage.setItem('cold-open-played', '1'));
+  await page.goto('/');
+  await expect(page.locator('.co, .co-veil')).toHaveCount(0);
+});

@@ -50,7 +50,7 @@ a.sb-frame-link:hover { border-color: var(--film-signal); }
 .pv-nowebgl { position: absolute; inset: 0; display: grid; place-items: center; padding: 24px; text-align: center; color: var(--film-dim); }
 /* 2.39:1 letterbox. The bars are as tall as it takes to leave that shape,
    and never thinner than a visible band. */
-.pv-bars span { position: absolute; left: 0; right: 0; height: max(7vh, calc((100vh - 100vw / 2.39) / 2)); background: #000; transition: transform var(--dur-slow) var(--ease-out); }
+.pv-bars span { position: absolute; left: 0; right: 0; height: max(7vh, calc((100vh - max(100vw / 2.39, 46vh)) / 2)); background: #000; transition: transform var(--dur-slow) var(--ease-out); }
 .pv-bars span:first-child { top: 0; transform: translateY(-101%); }
 .pv-bars span:last-child { bottom: 0; transform: translateY(101%); }
 .pv-bars.is-closed span { transform: none; }
