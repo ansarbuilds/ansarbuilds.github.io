@@ -204,7 +204,7 @@ function buildNumbers(receipts) {
     group.add(caption);
     // Each cube rises out of the river from its own depth.
     const seeds = Float32Array.from({ length: most }, () => Math.random());
-    return { value, group, mesh, caption, layouts, seeds, shown: null, progress: -1, opacity: 0, captionOpacity: 0 };
+    return { value, group, mesh, caption, layouts, seeds, shown: null, progress: -1, opacity: 0, captionOpacity: 0, baseY: LAYOUT.numbers[index][1] };
   });
   return { numbers, dispose: () => { cube.dispose(); numbers.forEach((n) => { n.mesh.material.dispose(); n.caption.material.map.dispose(); n.caption.material.dispose(); }); } };
 }
@@ -302,9 +302,12 @@ export function createActOne(canvas, { receipts, tools, getProgress, onFrame }) 
     name.points.scale.setScalar(Math.min(1, (visible * 0.86) / LAYOUT.name.width));
     numbers.forEach((number, i) => {
       const [x, y, z] = LAYOUT.numbers[i];
-      // On a phone the frame is too narrow to keep them beside the path:
-      // they stand almost on it, smaller, and fade before the camera arrives.
-      number.group.position.set(x * (fit < 0.6 ? 0.2 : fit), y, z);
+      // On a phone the frame is too narrow to keep them beside the path, but
+      // tall: they stand almost on it, smaller, alternately high and low, and
+      // fade before the camera arrives.
+      const phone = fit < 0.6;
+      number.baseY = phone ? (i % 2 ? -1.7 : 2.3) : y;
+      number.group.position.set(x * (phone ? 0.12 : fit), number.baseY, z);
       number.group.scale.setScalar(fit < 0.6 ? 0.45 : fit);
     });
     toolOrbit.group.scale.setScalar(Math.max(0.6, fit));
@@ -349,7 +352,7 @@ export function createActOne(canvas, { receipts, tools, getProgress, onFrame }) 
     for (const number of numbers) {
       const progress = numberProgress(camera.position.z, number.group.position.z);
       if (progress !== number.progress || progress < 1) { drawNumber(number, progress, clock); number.progress = progress; }
-      number.group.position.y = LAYOUT.numbers[numbers.indexOf(number)][1] + Math.sin(clock * 0.8 + number.group.position.z) * 0.15;
+      number.group.position.y = number.baseY + Math.sin(clock * 0.8 + number.group.position.z) * 0.15;
       // Gone before the camera reaches it, so it never fills the lens.
       const near = Math.min(1, Math.max(0, (camera.position.z - number.group.position.z - 5) / 12));
       number.mesh.material.opacity = number.opacity * near;
