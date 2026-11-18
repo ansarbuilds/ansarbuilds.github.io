@@ -52,6 +52,17 @@ export const SETS = {
   point: { label: "The signal, again", at: [0, 0, -1080] },
 };
 
+// Act I's props, along the first stretch of the path. The camera passes the
+// numbers during A1-02 and ends A1-03 looking at the tools. Values and
+// labels come from the page's own data (content.js), not from here.
+export const ACT_ONE = {
+  // The name stands where the cold open left it, across the origin.
+  name: { at: [0, 0, 0], width: 40 },
+  numbers: [[11, 0, -80], [-11, 0, -94], [11, 0, -108], [-11, 0, -120]],
+  river: { y: -7, from: 60, to: -210, width: 46 },
+  tools: { at: [-12, 1, -168], rings: [6, 10, 14] },
+};
+
 const near = ([x, y, z], dx, dy, dz) => [x + dx, y + dy, z + dz];
 // A project's two beats: arrive wide on the set, then push in on its screen.
 function projectShots(n, slug, { title, action, push, sound, frame }) {

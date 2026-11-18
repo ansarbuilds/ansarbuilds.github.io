@@ -161,3 +161,23 @@ test('the cold open does not play for reduced motion, a section link, or a secon
   await page.goto('/');
   await expect(page.locator('.co, .co-veil')).toHaveCount(0);
 });
+
+test('Act I pins its stage, keeps its words as real text, and loads its scene near the screen', async ({ page }) => {
+  await page.addInitScript((key) => { sessionStorage.setItem(key, '1'); sessionStorage.setItem('cold-open-played', '1'); }, INTRO_SESSION_KEY);
+  await page.goto('/');
+  const act = page.locator('section.act1');
+  await expect(act).toHaveCount(1);
+  await expect(act.getByText('Most AI demos stop at the demo.')).toBeAttached();
+  await expect(act.locator('dl dt')).toHaveCount(4);
+  await act.evaluate((node) => window.scrollTo(0, node.getBoundingClientRect().top + window.scrollY + window.innerHeight));
+  await expect(act).toHaveClass(/is-live/, { timeout: 8000 });
+  const stage = await page.locator('.act1-stage').boundingBox();
+  expect(Math.abs(stage.y)).toBeLessThan(2);
+});
+
+test('with reduced motion the short version is the plain section', async ({ page }) => {
+  await page.emulateMedia({ reducedMotion: 'reduce' });
+  await page.goto('/');
+  await expect(page.locator('section.act1')).toHaveCount(0);
+  await expect(page.locator('.sc-receipts dt')).toHaveCount(4);
+});
