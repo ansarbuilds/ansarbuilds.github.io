@@ -297,13 +297,13 @@ function Sheet({ children }) {
 const coverOf = (project) => project.spotlightArt || project.cardArt || project.cardShot || project.shots?.[0];
 // What each set's screens are, said on its card: nothing in the film
 // passes for more than it is.
-const FILM_NOTES = { saywhen: "Screen: the launch animation", jarvis: "Screens: the real dashboard, sample data", "agent-flight-recorder": "Illustration of a recorded run", "prh-jepa": "Illustration of the finding" };
+const FILM_NOTES = { saywhen: "Screen: the launch animation", jarvis: "Screens: the real dashboard, sample data", "agent-flight-recorder": "Illustration of a recorded run", "prh-jepa": "Illustration of the finding", haloscript: "Screens: the real app" };
 
 // The projects Act II has sets for, with what their cards say.
 const FILM_PROJECTS = FILM_SETS.map((slug) => {
   const flag = FLAGSHIPS.find((item) => item.slug === slug);
   const project = getProject(slug);
-  return { slug, name: project.title, eyebrow: flag.eyebrow, headline: flag.headline, stats: flag.stats, note: FILM_NOTES[slug], links: project.links.filter((link) => !link.locked).slice(0, 2) };
+  return { slug, name: project.title, eyebrow: flag.eyebrow, headline: flag.headline, stats: flag.stats, note: FILM_NOTES[slug], links: project.links.filter((link) => !link.locked && link.href !== `/work/${slug}/`).slice(0, 2) };
 });
 
 export function ProjectsSection() {

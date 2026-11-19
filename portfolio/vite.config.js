@@ -6,6 +6,25 @@ import react from '@vitejs/plugin-react'
 export default defineConfig({
   plugins: [react()],
   base: '/',
+  // The film's scenes import these lazily. Listed here so the dev server
+  // prepares them at start, instead of finding them on first use and
+  // reloading every open page (which also made browser tests flaky).
+  optimizeDeps: {
+    include: [
+      'three',
+      'lenis',
+      '@react-three/fiber',
+      'three/examples/jsm/postprocessing/EffectComposer.js',
+      'three/examples/jsm/postprocessing/RenderPass.js',
+      'three/examples/jsm/postprocessing/UnrealBloomPass.js',
+      'three/examples/jsm/postprocessing/ShaderPass.js',
+      'three/examples/jsm/postprocessing/OutputPass.js',
+      'three/examples/jsm/loaders/GLTFLoader.js',
+      'three/examples/jsm/libs/meshopt_decoder.module.js',
+      'three/examples/jsm/geometries/RoundedBoxGeometry.js',
+      'three/examples/jsm/environments/RoomEnvironment.js',
+    ],
+  },
   build: {
     outDir: 'dist',
     // Three.js is intentionally isolated below; its minified core is about
