@@ -69,7 +69,7 @@ export default function ActThree({ capabilities, fallback }) {
 
   if (failed) return fallback;
   return <section ref={section} id="capabilities" className="act3" aria-labelledby="act3-title" data-palette="field" style={{ "--act-screens": SCREENS }}>
-    <div className="act3-stage">
+    <div className="act3-stage" data-film-stage="act3">
       <canvas ref={canvas} className="act3-canvas" aria-hidden="true" />
       <div ref={title} className="act3-title">
         <p className="act3-kicker">03 · What I bring</p>

@@ -12,6 +12,7 @@ import ActOne from "../film/ActOne";
 import ActTwo from "../film/ActTwo";
 import ActThree from "../film/ActThree";
 import ActFour from "../film/ActFour";
+import Finale from "../film/Finale";
 import { BUILT as FILM_SETS } from "../film/actTwo/built";
 import { media } from "../lib/media";
 import Count from "./Count";
@@ -408,7 +409,25 @@ export function ExperimentsSection() {
 /* The last shot: the address itself is the biggest thing in the section,
    and the network behind it sends its signals in to that address once,
    then goes quiet. */
+const PITCH = "I like the hard part: agents that have to be trusted, evals that have to be honest, and products that have to ship. If that sounds like your problem, write to me.";
+// The credits are true to how the site was made.
+const CREDITS = [
+  ["Directed, designed and built by", "Mohamed Ansar"],
+  ["Pair programmer", "AI"],
+  ["Built with", "React · three.js · GLSL · Vite · Lenis"],
+  ["Type", "Anton · Outfit · Instrument Serif · Plus Jakarta Sans · JetBrains Mono"],
+];
+
+// Contact: the film's finale where it can play; the plain section otherwise
+// (and if the finale fails to start).
 export function ContactSection() {
+  const [film] = useState(filmEnabled);
+  const { navigate } = useRoute();
+  const plain = <PlainContact />;
+  return film ? <Finale contact={CONTACT} pitch={PITCH} credits={CREDITS} onTop={() => navigate("deck")} fallback={plain} /> : plain;
+}
+
+function PlainContact() {
   const { navigate } = useRoute();
   return <section id="contact" className="ed-contact sc-contact" data-palette="blueBloom"><SignalField className="sc-contact-field" quiet gatherTo=".sc-email" /><div className="ed-wrap">
     <IndexLabel number="05">Contact</IndexLabel>

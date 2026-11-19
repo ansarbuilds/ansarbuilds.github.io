@@ -77,7 +77,7 @@ export default function ActTwo({ projects }) {
 
   if (failed) return null;
   return <section ref={section} className="act2" aria-label="Selected work, the film" data-palette="bloom" style={{ "--act-screens": SCREENS }}>
-    <div className="act2-stage">
+    <div className="act2-stage" data-film-stage="act2">
       <canvas ref={canvas} className="act2-canvas" aria-hidden="true" />
       <div ref={bars} className="act2-bars is-closed" aria-hidden="true"><span /><span /></div>
       {projects.map((project, i) => <p key={project.slug} ref={(node) => { titles.current[i] = node; }} className="act2-title" aria-hidden="true">{project.name}</p>)}

@@ -5,7 +5,7 @@ import { MatrixBackground } from "./components/RouteBackgrounds";
 import PaletteSwatch from "./components/PaletteSwatch";
 import Cursor from "./components/Cursor";
 import { COLD_OPEN_SESSION_KEY, coldOpenForced, coldOpenMode, shouldPlayIntro } from "./lib/intro";
-import { isRouteTransitioning, runRouteChange } from "./lib/routeTransition";
+import { isRouteTransitioning, noteSource, runRouteChange } from "./lib/routeTransition";
 import { PREVIS, parseTarget, pathForRoute, readLocation, urlForTarget } from "./lib/routes";
 import { titleForRoute } from "./lib/routeTitle";
 import { CONTACT } from "./data/content";
@@ -134,6 +134,7 @@ function RouteProvider({ children }) {
       const href = link.getAttribute("href");
       if (!parseTarget(href)) return;
       event.preventDefault();
+      noteSource(link);
       go(href);
     };
     window.addEventListener("popstate", onPop);
