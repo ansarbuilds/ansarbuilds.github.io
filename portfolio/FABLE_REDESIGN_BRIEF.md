@@ -224,7 +224,7 @@ Review each video before approving the next step; that is the "director's" job.
 
 - The Act II framework: per project, a cut into a light-speed streak, the arrival (title card, letterbox), and the scene with a card of real text and links. It sits above the interactive work stage, which stays as the hands-on version.
 - The saywhen set: a dark room, a monitor playing the real app loop, the digital double's head as 8,000 points turning to it, a voice waveform from its mouth to the screen, and `cargo test --release` typed and sent.
-- Next: one PR per remaining set, in order: Jarvis (done in `step-5b-act-two-jarvis`), Flight Recorder (done in `step-5c-act-two-flight-recorder`), PRH-JEPA (done in `step-5d-act-two-prh-jepa`), Haloscript (done in `step-5e-act-two-haloscript`), Digital double.
+- Next: one PR per remaining set, in order: Jarvis (done in `step-5b-act-two-jarvis`), Flight Recorder (done in `step-5c-act-two-flight-recorder`), PRH-JEPA (done in `step-5d-act-two-prh-jepa`), Haloscript (done in `step-5e-act-two-haloscript`), Digital double (done in `step-5f-act-two-digital-double`). Act II is complete.
 - Open question for when all six are in: keep the work stage below the film, or fold it into the cards.
 
 ## Step 5b, the Jarvis set: done in the `step-5b-act-two-jarvis` PR
@@ -246,3 +246,38 @@ Review each video before approving the next step; that is the "director's" job.
 - A MacBook, an iPad and an iPhone, modelled in code with metal reflections from a studio environment map, on a turntable under a key light and a violet rim. Their screens are the real app and move through it together: the manuscript, the whiteboard, the corkboard.
 - The screenshots (about 1 MB) load while the PRH-JEPA set is on screen, not with the rest of the act.
 - The dev server now prepares the film's lazily loaded three.js modules at start (`optimizeDeps` in `vite.config.js`). Finding one on first use reloaded every open page, which made browser tests flaky.
+
+## Step 5f, the Digital double set: done in the `step-5f-act-two-digital-double` PR
+
+- The real model (3 MB, fetched while Haloscript plays) stands in a cone of light and looks at the visitor: the head leans toward the pointer and the eyes aim at it, wandering when there is no pointer. On phones the same head as points (56 kB). Its build stages hang behind it as a contact sheet with their verdicts; the shipped stage lights.
+- Fix across every set: cards, panels and labels now face the camera from its world position (`faceCamera` in `kit.js`). Before, they were aimed at a point in the set's local space and only faced the camera roughly.
+- The stages list moved to `src/data/digitalDouble.js`, shared by the model's page and the film.
+
+**Act II is complete.** Decision: the hands-on work stage stays below the film as the "try it" part (tabs, the live Jarvis demo, the saywhen film with sound).
+
+## Step 6, Act III: done in the `step-6-act-three` PR
+
+- "What I bring" becomes three monoliths of carved stone, one per capability (agents, research, shipping), each cut with its number, title and proof projects. They rise out of the ground under the title card; the camera then circles them on a true arc between the storyboard's two cameras, and each one's carving glows as it turns to face the camera, with a card of its real text and links.
+- The section keeps `id="capabilities"`, so the nav link still lands on it. Where the film is off, or the scene fails, the plain section is shown.
+- Storyboard change: A3-02 ends further back (radius 40, higher), so the last monolith's carving stays in frame.
+
+## Step 7, Act IV: done in the `step-7-act-four` PR
+
+- The playground returns to the home page as a reel between More work and Contact (`id="ai"`): the network collapses into a star that becomes the sun, the planets come in on their real orbits, an infinity ribbon of light with a bright head running round it, and Emet's terminal answering "who are you?" in its own words. Each scene's card opens the real experiment. Without the film the home page has no playground section, as before.
+- Storyboard change: A4-04 is Emet's terminal, not "the head and BB-8": the head has its scene in Act II, and Emet is the droid that already roams the page. A4-01 now happens at the solar system's sun.
+- Performance, all acts: no backdrop blur on cards over a moving canvas, and an act that has finished (or not started) draws a quarter of the frames. Both cut dropped frames to about none where two scenes are on screen at once.
+
+## Step 8, finale and project-page dive: done in the `step-8-finale` PR
+
+- The Contact section becomes the finale: everything recedes into one point of light, drawn with the cold open's own flare shader; then "Let's build something." with the email, GitHub and LinkedIn; then the credits roll into the footer. `#contact` lands on the contact beat. Without the film, the plain section.
+- The project-page dive: a film card's "Read the case study" turns the scene's current frame into the project page's header (the existing view transition), and Back returns to the same moment of the film.
+- Known limit: the home page is rebuilt on the way back, so the act restarts its scene, and its frame is dark for a moment.
+- Budget note: first-load JS is 195.8 kB of 200 kB. The finishing pass needs to win some back.
+
+## Step 9, the finishing pass: done in the `step-9-finishing` PR
+
+- First-load JS 195.8 kB down to 154.6 kB (target 150): the home page reads a generated slim project index; the full stories load with a project page. CI budget tightened to 165 kB.
+- Adaptive quality in every scene: resolution steps down, then the glow goes, if frames are slow.
+- Sound, off by default, generated in the browser; a switch in the nav, remembered.
+- Accessibility: serious and critical axe checks clean on desktop and mobile (two nav labels, two low-contrast greys in the work stage); a "Skip the film" link at the start of Act II. Lighthouse accessibility 100.
+- The redesign in the brief is complete.

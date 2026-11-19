@@ -1,5 +1,6 @@
 import * as THREE from "three";
 import { BONE, SIGNAL, canvasCard, floor, glow, points, ramp, smooth } from "../kit.js";
+import { loadHead } from "./headPoints.js";
 
 /* saywhen (shots A2-01a and A2-01b): a dark room and a floating monitor
    playing the real app. A head made of points (the digital double's) turns
@@ -13,25 +14,6 @@ const COMMAND = "cargo test --release";
 // The app's window inside the loop's frame (the left of the frame is a title).
 const APP = { x: 530 / 1280, y: 75 / 640, w: 701 / 1280, h: 485 / 640 };
 
-async function loadHead(url) {
-  const buffer = await (await fetch(url)).arrayBuffer();
-  const view = new DataView(buffer);
-  const count = view.getUint32(0, true);
-  const min = [0, 1, 2].map((k) => view.getFloat32(4 + k * 4, true));
-  const max = [0, 1, 2].map((k) => view.getFloat32(16 + k * 4, true));
-  const positions = new Float32Array(count * 3), colors = new Float32Array(count * 3);
-  const skin = BONE.clone().multiplyScalar(0.4), hair = new THREE.Color(0.3, 0.22, 0.19), eye = SIGNAL.clone().multiplyScalar(1.3);
-  for (let i = 0; i < count; i++) {
-    const at = 28 + i * 7;
-    for (let k = 0; k < 3; k++) {
-      const q = (view.getInt16(at + k * 2, true) + 32767) / 65534;
-      // Centred on the box, so the head turns about its own middle.
-      positions[i * 3 + k] = min[k] + q * (max[k] - min[k]) - (min[k] + max[k]) / 2;
-    }
-    [skin, hair, eye][view.getUint8(at + 6)].toArray(colors, i * 3);
-  }
-  return { positions, colors, size: max.map((v, k) => v - min[k]), centre: max.map((v, k) => (v + min[k]) / 2) };
-}
 
 export function buildSaywhen({ group, media }) {
   const disposers = [];
@@ -104,6 +86,7 @@ export function buildSaywhen({ group, media }) {
   const mouth = new THREE.Object3D();
   head.add(mouth);
   let headPoints = null;
+  let headDone = false;
   loadHead(media("/film/head-points.bin")).then((data) => {
     const scale = 4.2 / data.size[1];
     headPoints = points(data.positions, data.colors, 0.05, { opacity: 1, wobble: 0.012 / scale });
@@ -111,7 +94,8 @@ export function buildSaywhen({ group, media }) {
     head.add(headPoints.mesh);
     // The mouth, in the model's own units: just under the nose, at the front.
     mouth.position.set(0, (-0.047 - data.centre[1]) * scale, (0.072 - data.centre[2]) * scale);
-  }).catch(() => {});
+    headDone = true;
+  }).catch(() => { headDone = true; });
   disposers.push(() => headPoints?.dispose());
 
   // The voice: points running from the mouth to the screen on a wave.
@@ -127,6 +111,7 @@ export function buildSaywhen({ group, media }) {
 
   const TURN = 1.15;
   return {
+    ready: () => headDone,
     setPlaying(on) {
       if (on) video.play().catch(() => {});
       else video.pause();

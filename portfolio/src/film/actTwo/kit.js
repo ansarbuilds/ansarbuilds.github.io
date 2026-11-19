@@ -56,6 +56,16 @@ export function canvasCard(width, height, pixelsWide, draw) {
   };
 }
 
+// Turn an object to face the camera. lookAt wants a world position, so this
+// reads both in world space; `upright` keeps it turning about its own axis.
+const at = new THREE.Vector3(), to = new THREE.Vector3();
+export function faceCamera(object, camera, { upright = false } = {}) {
+  object.getWorldPosition(at);
+  to.copy(camera.position);
+  if (upright) to.y = at.y;
+  object.lookAt(to);
+}
+
 export const clamp01 = (value) => Math.min(1, Math.max(0, value));
 export const ramp = (t, from, to) => clamp01((t - from) / (to - from));
 export const smooth = (u) => u * u * (3 - 2 * u);

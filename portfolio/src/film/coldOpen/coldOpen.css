@@ -1,6 +1,8 @@
-/* The cold open: a full-screen layer over the home page. `.co-veil` is the
-   plain black shown from the first paint while the scene's code loads. */
-.co, .co-veil { position: fixed; inset: 0; z-index: 9000; background: #000; }
+/* The cold open: a full-screen layer over the home page. While its code
+   loads there is no layer at all: the hero's name is what the visitor sees.
+   The layer itself stays invisible until the scene has drawn its first real
+   frame (ColdOpen.jsx sets its opacity from then on). */
+.co { position: fixed; inset: 0; z-index: 9000; background: #000; opacity: 0; }
 .co { overflow: hidden; color: #efe6d8; cursor: default; }
 /* Once it has handed over, clicks go to the page underneath. */
 .co.is-leaving { pointer-events: none; }

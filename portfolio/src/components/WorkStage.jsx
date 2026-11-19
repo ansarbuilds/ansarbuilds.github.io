@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { motion, useInView, useReducedMotion } from "framer-motion";
 import { ArrowUpRight, ExternalLink, Play, RotateCcw } from "lucide-react";
 import { FLAGSHIPS } from "../data/showcase";
-import { getProject } from "../data/projects";
+import { getProject } from "../data/projectIndex";
 import { media } from "../lib/media";
 import { spring } from "../lib/motion";
 import Count from "./Count";

@@ -35,6 +35,20 @@ function tag(card) {
   if (title) { title.style.viewTransitionName = "vt-title"; title.setAttribute(TAGGED, ""); }
   return true;
 }
+// The film's cards (Acts II and III) open their project from inside a pinned
+// stage. The stage's current frame becomes the page's header, and Back
+// returns to the same moment of the film, not to the project's card
+// further down the page.
+let source = null;
+let filmReturn = null;
+export function noteSource(element) { source = element; }
+function tagFilm(stage, title) {
+  if (!stage) return false;
+  stage.style.viewTransitionName = "vt-frame"; stage.setAttribute(TAGGED, "");
+  if (title) { title.style.viewTransitionName = "vt-title"; title.setAttribute(TAGGED, ""); }
+  return true;
+}
+
 function untag() {
   document.querySelectorAll(`[${TAGGED}]`).forEach((el) => { el.style.viewTransitionName = ""; el.removeAttribute(TAGGED); });
 }
@@ -50,7 +64,17 @@ export function runRouteChange({ from, to, apply }) {
   const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
   if (!slug || !(opening || closing) || !document.startViewTransition || reduced) { apply(); return; }
 
-  if (opening) tag(document.getElementById(`card-${slug}`));
+  if (opening) {
+    const stage = source?.closest?.("[data-film-stage]");
+    if (stage) {
+      tagFilm(stage, source.closest("article")?.querySelector("h3"));
+      filmReturn = { slug, stage: stage.getAttribute("data-film-stage"), scroll: window.scrollY };
+    } else {
+      filmReturn = null;
+      tag(document.getElementById(`card-${slug}`));
+    }
+  }
+  source = null;
   active = true;
   document.documentElement.classList.add("is-vt");
   const transition = document.startViewTransition(() => {
@@ -58,7 +82,11 @@ export function runRouteChange({ from, to, apply }) {
     // page (which carries the same names) is rendered.
     untag();
     flushSync(apply);
-    if (closing) {
+    if (closing && filmReturn?.slug === slug) {
+      // Back into the film, at the moment the visitor left it.
+      window.scrollTo({ top: filmReturn.scroll, behavior: "instant" });
+      tagFilm(document.querySelector(`[data-film-stage="${filmReturn.stage}"]`));
+    } else if (closing) {
       // Back on the home page: bring the card the visitor left from into
       // view, and let the page's header settle into it.
       const card = document.getElementById(`card-${slug}`);
