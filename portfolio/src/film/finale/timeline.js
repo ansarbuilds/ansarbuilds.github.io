@@ -25,7 +25,9 @@ export function moments(t) {
     // Everything the visitor passed falls back into the point.
     recede: pull,
     // The point: faint at first, then the first signal again.
-    core: 0.25 + 0.75 * smooth(ramp(t, recede.t1 - 1, recede.t1 + 0.4)),
+    // The point dims as the credits roll, so it never glares through the
+    // links just above it.
+    core: (0.25 + 0.75 * smooth(ramp(t, recede.t1 - 1, recede.t1 + 0.4))) * (1 - 0.55 * smooth(ramp(t, credits.t0, credits.t1))),
     flare: smooth(ramp(t, recede.t1 - 0.6, recede.t1 + 0.6)) * (1 - 0.5 * smooth(ramp(t, credits.t0, credits.t1))),
     contact: smooth(ramp(t, contact.t0 + 0.3, contact.t0 + 1.3)),
     // The credits roll up from below as the last shot plays.
