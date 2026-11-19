@@ -105,7 +105,7 @@ export const lineFragment = /* glsl */ `
    cinema lens throws across a bright light, and a ring for each heartbeat. */
 export const flareVertex = /* glsl */ `
   varying vec2 vUv;
-  void main() { vUv = uv * 2. - 1.; gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.); }
+  void main() { vUv = (uv * 2. - 1.) * 1.5; gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.); }
 `;
 export const flareFragment = /* glsl */ `
   uniform float uCore, uFlare, uBeat1, uBeat2, uAspect;

@@ -212,12 +212,16 @@ export function createColdOpen(canvas, { mode, waited = 0, holdAt = null, onVeil
     const f = film.flareUniforms;
     f.uCore.value = now.core; f.uFlare.value = now.flare; f.uBeat1.value = now.beat1; f.uBeat2.value = now.beat2; f.uAspect.value = aspect;
     const r = film.raysUniforms;
-    r.uTime.value = t; r.uRays.value = now.rays; r.uAspect.value = aspect;
+    // On a tall phone screen the rays fill the whole frame behind the name
+    // and wash it out: they shine at about half strength there.
+    r.uTime.value = t; r.uRays.value = now.rays * (0.5 + 0.5 * Math.min(1, aspect / 1.4)); r.uAspect.value = aspect;
     // Keep both cards filling the frame, whatever the camera does.
     for (const mesh of [film.flare, film.rays]) {
       const distance = camera.position.distanceTo(mesh.position);
       mesh.quaternion.copy(camera.quaternion);
-      mesh.scale.set(distance * half * aspect, distance * half, 1);
+      // Half again bigger than the frame: the rays card is centred on the
+      // name, not the screen, so at exact size it stops short of an edge.
+      mesh.scale.set(distance * half * aspect * 1.5, distance * half * 1.5, 1);
     }
     bloom.strength = now.bloom;
     finish.uniforms.uTime.value = t;
