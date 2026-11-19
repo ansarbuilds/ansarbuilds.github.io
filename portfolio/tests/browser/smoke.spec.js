@@ -139,103 +139,71 @@ test('the pre-vis follows the scrollbar from the first shot to the last', async 
   await expect(page.locator('.pv-clock strong')).toHaveText(/^01:3\d\.\d$/);
 });
 
-// The hero is the first frame: no veil, no cold open, nothing on top of it.
-async function expectUncovered(page, locator) {
-  await expect(locator).toBeVisible();
-  const box = await locator.boundingBox();
-  expect(box.y).toBeGreaterThanOrEqual(0);
-  expect(box.y + box.height).toBeLessThanOrEqual(page.viewportSize().height);
-  const onTop = await locator.evaluate((node) => {
-    const r = node.getBoundingClientRect();
-    const hit = document.elementFromPoint(r.left + r.width / 2, r.top + r.height / 2);
-    return !!hit && (node === hit || node.contains(hit));
-  });
-  expect(onTop).toBe(true);
-}
+test('the cold open plays over the home page, hands over to the hero, and can be skipped', async ({ page }) => {
+  test.setTimeout(90000);
+  await page.goto('/?coldopen=full');
+  // Its code can take a while on a dev server that has just rebuilt three.js.
+  await expect(page.locator('.co')).toBeVisible({ timeout: 20000 });
+  await expect(page.locator('.ed-nav')).toHaveCSS('opacity', '0');
+  await page.waitForTimeout(800);
+  await page.getByRole('button', { name: 'Skip intro' }).click();
+  await expect(page.locator('.co, .co-veil')).toHaveCount(0, { timeout: 4000 });
+  await expect(page.getByRole('heading', { name: 'Mohamed Ansar', level: 1 })).toBeVisible();
+  await expect(page.locator('.ed-nav')).toHaveCSS('opacity', '1');
+});
 
-test('the home page opens on the finished hero, with nothing over it', async ({ page }) => {
+test('the cold open does not play for reduced motion, a section link, or a second page view', async ({ page }) => {
+  await page.emulateMedia({ reducedMotion: 'reduce' });
   await page.goto('/');
-  const name = page.getByRole('heading', { name: 'Mohamed Ansar', level: 1 });
-  await expectUncovered(page, name);
-  await expect(page.locator('.co, .co-veil, .route-loader')).toHaveCount(0);
-  await expect(page.locator('.sc-feed-card')).toHaveCount(4);
-  await expect(page.locator('.sc-hero-next')).toBeVisible();
-});
-
-test('Work lands on the stage, and the home page has no film', async ({ page, isMobile }) => {
+  await expect(page.locator('.co, .co-veil')).toHaveCount(0);
+  await page.emulateMedia({ reducedMotion: 'no-preference' });
+  await page.goto('/#contact');
+  await expect(page.locator('.co, .co-veil')).toHaveCount(0);
+  await page.evaluate(() => sessionStorage.setItem('cold-open-played', '1'));
   await page.goto('/');
-  if (isMobile) await page.goto('/#projects');
-  else await page.locator('.ed-nav').getByRole('link', { name: 'Work', exact: true }).click();
-  const first = isMobile ? page.locator('#card-saywhen h3') : page.getByRole('tab', { name: /saywhen/ });
-  await expect(first).toBeInViewport();
-  await expect(page.locator('canvas.act2-canvas, section.act1, section.act2')).toHaveCount(0);
-  const scripts = await page.evaluate(() => performance.getEntriesByType('resource').map((entry) => entry.name).filter((name) => /\/film\//.test(name)));
-  expect(scripts).toEqual([]);
+  await expect(page.locator('.co, .co-veil')).toHaveCount(0);
 });
 
-test('a project page shows its title and first sentence at once, opened directly or from the stage', async ({ page, isMobile }) => {
-  await page.goto('/work/jarvis/');
-  await expectUncovered(page, page.getByRole('heading', { name: 'Jarvis', level: 1 }));
-  await expect(page.getByText('A personal AI agent that lives on my Mac.').first()).toBeAttached();
-  await expect(page.locator('.route-loader')).toHaveCount(0);
-  test.skip(isMobile, 'the stage stacks on phones; the direct load covers it');
-  await page.goto('/#projects');
-  await page.getByRole('tab', { name: /Jarvis/ }).click();
-  await page.locator('#card-jarvis h3 a').click();
-  await expect(page).toHaveURL(/\/work\/jarvis\/$/);
-  await expect(page.getByRole('heading', { name: 'Jarvis', level: 1 })).toBeVisible();
-});
-
-test('every stage project shows its headline and its numbers', async ({ page }) => {
-  await page.goto('/#projects');
-  for (const slug of ['saywhen', 'jarvis', 'agent-flight-recorder', 'prh-jepa', 'haloscript', 'digital-double']) {
-    const card = page.locator(`#card-${slug}`);
-    await expect(card.locator('.st-headline')).not.toBeEmpty();
-    expect(await card.locator('.st-stats dt').count()).toBeGreaterThan(0);
-  }
-});
-
-test('no palette control and no trailing cursor on the home page or a case study', async ({ page }) => {
-  for (const path of ['/', '/work/jarvis/']) {
-    await page.goto(path);
-    await expect(page.locator('main h1').first()).toBeVisible();
-    await expect(page.getByRole('button', { name: 'Colour palette' })).toHaveCount(0);
-    await expect(page.locator('.sc-cursor')).toHaveCount(0);
-  }
+test('Act I pins its stage, keeps its words as real text, and loads its scene near the screen', async ({ page }) => {
+  test.setTimeout(90000);
+  await page.addInitScript((key) => { sessionStorage.setItem(key, '1'); sessionStorage.setItem('cold-open-played', '1'); }, INTRO_SESSION_KEY);
+  await page.goto('/');
+  const act = page.locator('section.act1');
+  await expect(act).toHaveCount(1);
+  await expect(act.getByText('Most AI demos stop at the demo.')).toBeAttached();
+  await expect(act.locator('dl dt')).toHaveCount(4);
+  await act.evaluate((node) => window.scrollTo(0, node.getBoundingClientRect().top + window.scrollY + window.innerHeight));
+  await expect(act).toHaveClass(/is-live/, { timeout: 60000 });
+  const stage = await page.locator('.act1-stage').boundingBox();
+  expect(Math.abs(stage.y)).toBeLessThan(2);
 });
 
 test('with reduced motion the short version is the plain section', async ({ page }) => {
   await page.emulateMedia({ reducedMotion: 'reduce' });
   await page.goto('/');
+  await expect(page.locator('section.act1')).toHaveCount(0);
   await expect(page.locator('.sc-receipts dt')).toHaveCount(4);
-  await expect(page.locator('.co, section.act1')).toHaveCount(0);
 });
 
-test('the reel opens on its poster, and plays only where the film can run', async ({ page, isMobile }) => {
-  await page.goto('/reel/');
-  await expect(page.getByRole('heading', { level: 1 })).toContainText(/reel/i);
-  await expect(page.locator('.reel-still img')).toBeVisible();
-  await expect(page.getByRole('link', { name: 'Back to the work' })).toBeVisible();
-  await expect(page.locator('.reel-projects a')).toHaveCount(6);
-  await expect(page.locator('canvas')).toHaveCount(0);
-  if (isMobile) await expect(page.getByRole('button', { name: 'Play the film' })).toHaveCount(0);
-  await page.emulateMedia({ reducedMotion: 'reduce' });
-  await page.goto('/reel/');
-  await expect(page.getByRole('button', { name: 'Play the film' })).toHaveCount(0);
-});
-
-test('the reel plays the cold open with a Skip and a way out on every frame', async ({ page, isMobile }) => {
-  test.skip(isMobile, 'phones get the poster only');
+test('Act II plays above the work stage, with real links that are hidden until their card shows', async ({ page }) => {
   test.setTimeout(90000);
-  await page.goto('/reel/');
-  const play = page.getByRole('button', { name: 'Play the film' });
-  test.skip(await play.count() === 0, 'no WebGL 2 in this browser');
-  await play.click();
-  await expect(page.locator('.co')).toBeVisible({ timeout: 60000 });
-  await expect(page.getByRole('link', { name: 'Back to the work' })).toBeVisible();
-  await page.getByRole('button', { name: 'Skip' }).click();
-  await expect(page.locator('.co')).toHaveCount(0, { timeout: 4000 });
-  await expect(page.locator('section.act1')).toHaveCount(1);
-  await page.getByRole('link', { name: 'Back to the work' }).click();
-  await expect(page).toHaveURL(/\/#projects$/);
+  await page.addInitScript((key) => { sessionStorage.setItem(key, '1'); sessionStorage.setItem('cold-open-played', '1'); }, INTRO_SESSION_KEY);
+  await page.goto('/');
+  const act = page.locator('section.act2');
+  await expect(act).toHaveCount(1);
+  const card = act.locator('article.act2-card').first();
+  // Selected directly: while hidden, it is rightly out of the accessibility tree.
+  await expect(card.locator('a.act2-primary')).toHaveAttribute('href', '/work/saywhen/');
+  // Before the scene, the card is out of the way of the keyboard.
+  await act.evaluate((node) => window.scrollTo(0, node.getBoundingClientRect().top + window.scrollY));
+  await expect(act).toHaveClass(/is-live/, { timeout: 60000 });
+  await expect(card).toBeHidden();
+  // At the end of the act, the last project's card is there and usable,
+  // and the earlier ones have gone.
+  await act.evaluate((node) => window.scrollTo(0, node.getBoundingClientRect().top + window.scrollY + node.offsetHeight - window.innerHeight));
+  const last = act.locator('article.act2-card').last();
+  await expect(last).toBeVisible();
+  await expect(last.getByRole('link', { name: 'Read the case study' })).toBeVisible();
+  await expect(card).toBeHidden();
+  expect(await page.locator('#projects').evaluate((node) => node.getBoundingClientRect().top > 0)).toBe(true);
 });

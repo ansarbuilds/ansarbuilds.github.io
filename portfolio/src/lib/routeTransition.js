@@ -8,7 +8,7 @@ import { flushSync } from "react-dom";
    measure across a scroll reset. A view transition snapshots the old page,
    lets React swap the route in one synchronous step, and morphs the parts
    that share a name. Where the API is missing (or motion is reduced) the
-   route simply changes and the incoming page is there at once.
+   route simply changes and the incoming page fades in.
 
    Two parts travel: the card's image becomes the page's header panel
    ("vt-frame"), and the card's title becomes the page's h1 ("vt-title").
@@ -16,8 +16,8 @@ import { flushSync } from "react-dom";
    in time, because only one element per page may carry each name. */
 
 let active = false;
-// True while a view transition is running. Nothing may use it to hide the
-// incoming page's title: that is on screen from the first frame.
+// True while a view transition is running. Pages read it on mount to skip
+// their own entrance, which would fight the shared move.
 export const isRouteTransitioning = () => active;
 
 const slugOf = (route) => (route.startsWith("project/") ? route.slice("project/".length) : null);
@@ -50,9 +50,7 @@ export function runRouteChange({ from, to, apply }) {
   const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
   if (!slug || !(opening || closing) || !document.startViewTransition || reduced) { apply(); return; }
 
-  // Only a visible, measurable card may travel. Anything else and the page
-  // is simply there, with no transition at all.
-  if (opening && !tag(document.getElementById(`card-${slug}`))) { apply(); return; }
+  if (opening) tag(document.getElementById(`card-${slug}`));
   active = true;
   document.documentElement.classList.add("is-vt");
   const transition = document.startViewTransition(() => {

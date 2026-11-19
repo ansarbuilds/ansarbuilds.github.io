@@ -16,7 +16,6 @@ const escape = (text) => String(text).replace(/&/g, '&amp;').replace(/</g, '&lt;
 const exists = (file) => access(file).then(() => true, () => false);
 
 const VIEW_DESCRIPTIONS = {
-  reel: 'An optional short film about my work: the name, the numbers, then five of the six projects.',
   work: 'Every project on the site: agents, open-source tools, AI studies and apps, each with its code, numbers and write-up.',
   emet: 'Emet, a small terminal that answers questions about my work right in the page.',
   explore: 'An interactive 3D solar system with real orbital mechanics, built with three.js.',
@@ -64,7 +63,7 @@ for (const project of PROJECTS) {
     body: `<p>Mohamed Ansar / Selected work</p><h1>${escape(project.title)}</h1><p>${escape(project.hook)}</p><p><a href="/">Portfolio home</a></p>`,
   });
 }
-for (const route of ['work', 'reel', ...PLAYGROUND]) {
+for (const route of ['work', ...PLAYGROUND]) {
   const title = titleForRoute(route);
   pages.push({ route, listed: true, title, description: VIEW_DESCRIPTIONS[route], image: null, body: `<h1>${escape(title.split(' · ')[0])}</h1><p>${escape(VIEW_DESCRIPTIONS[route])}</p><p><a href="/">Portfolio home</a></p>` });
 }

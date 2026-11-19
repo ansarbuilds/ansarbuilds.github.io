@@ -10,7 +10,7 @@ import { usePageVisible } from "../lib/usePageVisible";
 import "../stage.css";
 
 /* The flagship work as one stage instead of long sections: pick a
-   project along the top and see it on the left, read the short version on
+   project along the top and try it on the left, read the short version on
    the right. It moves on by itself until the visitor takes over. On small
    screens the tabs drop away and every project is simply stacked.
 
@@ -92,12 +92,12 @@ function SaywhenDemo({ active, hold }) {
 /* Jarvis: the real demo, with made-up sample data, loaded on request. */
 function JarvisDemo() {
   const [live, setLive] = useState(false);
-  return <Frame title={live ? "jarvis · demo, sample data" : "jarvis · dashboard, sample data"} className={`is-browser ${live ? "is-live" : ""}`}>
+  return <Frame title={live ? "jarvis · live demo, sample data" : "jarvis · dashboard, sample data"} className={`is-browser ${live ? "is-live" : ""}`}>
     {live
       ? <iframe src={media("/p/jarvis/demo/index.html")} title="Jarvis demo with sample data" loading="lazy" />
       : <>
         <img className="ed-lazy-media" src={media("/shots/jarvis/dashboard.webp")} alt="Jarvis dashboard with sample data" loading="lazy" onLoad={reveal} />
-        <button type="button" className="st-launch" onClick={() => setLive(true)}><Play size={16} aria-hidden="true" />Run the sample-data demo here</button>
+        <button type="button" className="st-launch" onClick={() => setLive(true)}><Play size={16} aria-hidden="true" />Run the live demo here</button>
       </>}
   </Frame>;
 }

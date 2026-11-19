@@ -127,10 +127,6 @@
 .sc-hero-name .is-outline { color: transparent; -webkit-text-stroke: 1.5px #ff8a5f; text-shadow: none; }
 .sc-hero-line { margin-top: 30px; max-width: 32ch; font: 500 clamp(1.15rem, 1.9vw, 1.55rem)/1.4 var(--font-body); letter-spacing: -.02em; }
 .sc-hero-line em { font: italic 400 1.14em var(--font-serif); color: #ff8a5f; }
-.sc-hero-next { margin-top: 12px; max-width: 46ch; font: 400 clamp(.95rem, 1.2vw, 1.05rem)/1.5 var(--font-body); color: rgb(239 230 216 / .72); }
-/* The way into the optional film: a text link, not a billboard. */
-.sc-reel-link { display: inline-flex; align-items: center; gap: 6px; min-height: 44px; margin-top: 8px; font: 600 .8rem/1 var(--font-body); color: inherit; text-decoration: underline; text-underline-offset: 4px; transition: opacity var(--dur-fast) var(--ease-out); }
-@media (hover: hover) and (pointer: fine) { .sc-reel-link:hover { opacity: .7; } }
 .sc-hero-ctas { display: flex; flex-wrap: wrap; align-items: center; gap: 14px 28px; margin-top: 32px; }
 .sc-hero-btn { display: inline-flex; align-items: center; gap: 16px; min-height: 52px; padding: 0 24px; border-radius: 999px; background: #ff8a5f; color: #160b06; font: 700 .82rem var(--font-body); transition: transform var(--dur-fast), box-shadow var(--dur-fast); }
 .sc-hero-btn:hover, .sc-hero-btn:focus-visible { box-shadow: 0 12px 40px -8px rgb(255 138 95 / .65); }
@@ -364,11 +360,11 @@
 .ed-nav.is-booting { opacity: 0; pointer-events: none; }
 .ed-nav { transition: background var(--dur-base) var(--ease-out), color var(--dur-base) var(--ease-out), border-color var(--dur-base) var(--ease-out), opacity var(--dur-slow) var(--ease-out); }
 
-/* Routes: the home page and the project pages are there on their first
-   frame, so a visitor never waits on a blank one. Only the full-screen
-   rooms off the hall fade in. */
-.rt-takeover { animation: rt-fade var(--dur-base) var(--ease-out) both; }
+/* Routes: the incoming view fades in, pages rise a little. */
+.rt { animation: rt-fade var(--dur-base) var(--ease-out) both; }
+.rt-page { animation: rt-rise var(--dur-slow) var(--ease-out) both; }
 @keyframes rt-fade { from { opacity: 0; } }
+@keyframes rt-rise { from { opacity: 0; transform: translateY(16px); } }
 
 /* Card to project page (lib/routeTransition.js). The card's image becomes
    the page's header panel and its title becomes the h1; the rest of the page
@@ -381,15 +377,15 @@ html.is-vt .rt { animation: none; }
 ::view-transition-old(vt-frame), ::view-transition-new(vt-frame) { height: 100%; object-fit: cover; }
 ::view-transition-old(vt-title), ::view-transition-new(vt-title) { height: 100%; object-fit: contain; object-position: left center; }
 ::view-transition-old(root) { animation: vt-leave var(--dur-fast) var(--ease-exit) both; }
-/* The new page is underneath from the start; the old one fades off it. */
-::view-transition-new(root) { animation: none; }
+::view-transition-new(root) { animation: vt-arrive var(--dur-slow) var(--ease-out) both; }
 ::view-transition-old(vt-nav), ::view-transition-new(vt-nav) { animation: none; }
 @keyframes vt-leave { to { opacity: 0; } }
+@keyframes vt-arrive { from { opacity: 0; } }
 
 @media (max-width: 640px) { .sc-sheet > section { border-radius: 24px 24px 0 0; } }
 @media (prefers-reduced-motion: reduce) {
   .rv, .ed-section-heading .ed-label, .ed-section-heading h2, .ed-section-heading h2 em, .ed-section-heading .ed-heading-aside { opacity: 1; transform: none; clip-path: none; transition: none; }
-  .rt-takeover { animation: none; }
+  .rt, .rt-page { animation: none; }
   .ed-nav { transition: none; }
   ::view-transition-group(*), ::view-transition-old(*), ::view-transition-new(*) { animation: none !important; }
 }

@@ -6,7 +6,6 @@
      work                  /work/
      project/<slug>        /work/<slug>/
      emet, explore, …      /playground/<id>/
-     reel                  /reel/       (the optional film, poster first)
 
    The site used to keep the view in the hash (/#project/jarvis, /#emet).
    Those links are all over the web, so they still open the right view and
@@ -35,7 +34,6 @@ export function routeFromPath(pathname) {
   if (first === "work") return second ? `project/${second}` : "work";
   if (first === "playground" && PLAYGROUND.includes(second)) return second;
   if (PREVIS.includes(first) && second === undefined) return first;
-  if (first === "reel" && second === undefined) return "reel";
   return null;
 }
 
@@ -44,7 +42,6 @@ export function pathForRoute(route) {
   if (route.startsWith("project/")) return `/work/${route.slice("project/".length)}/`;
   if (PLAYGROUND.includes(route)) return `/playground/${route}/`;
   if (PREVIS.includes(route)) return `/${route}/`;
-  if (route === "reel") return "/reel/";
   return "/";
 }
 
