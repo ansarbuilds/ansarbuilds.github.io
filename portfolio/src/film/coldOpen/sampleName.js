@@ -14,8 +14,10 @@ export function sampleName(camera, count) {
   const lines = [...document.querySelectorAll("#hero-name .sc-name-line > span")];
   if (!lines.length) return null;
   const width = window.innerWidth, height = window.innerHeight;
-  // A smaller canvas is plenty: the points get a random offset inside each pixel.
-  const k = Math.min(1, 1500 / width);
+  // About 1500 pixels across is plenty on a wide screen (the points get a
+  // random offset inside each pixel). A phone is drawn at up to twice its
+  // size instead, or the thin outline of the second line comes out ragged.
+  const k = Math.min(2, 1500 / width);
   const canvas = document.createElement("canvas");
   canvas.width = Math.ceil(width * k);
   canvas.height = Math.ceil(height * k);
