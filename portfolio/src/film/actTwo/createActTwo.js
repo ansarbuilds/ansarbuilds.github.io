@@ -12,6 +12,7 @@ import { cardVertex, streakFragment } from "./shaders.js";
 import { BONE, SIGNAL, additive, points } from "./kit.js";
 import { buildSaywhen } from "./sets/saywhen.js";
 import { buildJarvis } from "./sets/jarvis.js";
+import { buildFlightRecorder } from "./sets/flightRecorder.js";
 
 /* Act II (the project sets) in plain three.js.
 
@@ -21,7 +22,7 @@ import { buildJarvis } from "./sets/jarvis.js";
    how far through its arrival and scene the film is. Only the set on screen
    plays its footage. */
 
-const BUILDERS = { saywhen: buildSaywhen, jarvis: buildJarvis };
+const BUILDERS = { saywhen: buildSaywhen, jarvis: buildJarvis, "agent-flight-recorder": buildFlightRecorder };
 
 function pickQuality() {
   const low = window.matchMedia("(max-width: 760px)").matches || (navigator.hardwareConcurrency || 8) <= 4;

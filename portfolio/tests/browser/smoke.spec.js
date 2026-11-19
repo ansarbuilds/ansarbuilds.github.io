@@ -141,7 +141,8 @@ test('the pre-vis follows the scrollbar from the first shot to the last', async 
 
 test('the cold open plays over the home page, hands over to the hero, and can be skipped', async ({ page }) => {
   await page.goto('/?coldopen=full');
-  await expect(page.locator('.co')).toBeVisible();
+  // Its code can take a while on a dev server that has just rebuilt three.js.
+  await expect(page.locator('.co')).toBeVisible({ timeout: 20000 });
   await expect(page.locator('.ed-nav')).toHaveCSS('opacity', '0');
   await page.waitForTimeout(800);
   await page.getByRole('button', { name: 'Skip intro' }).click();

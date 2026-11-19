@@ -44,8 +44,9 @@ export default function ColdOpen({ mode, since, onStart, onHandOver, onDone }) {
         onHandOver: () => { setHanded(true); onHandOver(); },
         onDone,
       });
-    } catch {
+    } catch (error) {
       // WebGL would not start. Show the page.
+      if (import.meta.env.DEV) console.warn("cold open: could not start", error);
       onHandOver();
       onDone();
       return undefined;

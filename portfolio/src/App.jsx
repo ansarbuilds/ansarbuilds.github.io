@@ -598,7 +598,7 @@ function ColdOpenLayer({ mode, onHandOver, onDone }) {
   const abandon = useCallback(() => { onHandOver(); onDone(); }, [onHandOver, onDone]);
   useEffect(() => {
     try { window.sessionStorage.setItem(COLD_OPEN_SESSION_KEY, "1"); } catch { /* coldOpenMode already said no */ }
-    const timer = setTimeout(() => { if (!started.current) abandon(); }, COLD_OPEN_PATIENCE_MS);
+    const timer = setTimeout(() => { if (!started.current) { if (import.meta.env.DEV) console.warn("cold open: gave up waiting for its code"); abandon(); } }, COLD_OPEN_PATIENCE_MS);
     return () => clearTimeout(timer);
   }, [abandon]);
   const onStart = useCallback(() => { started.current = true; }, []);
