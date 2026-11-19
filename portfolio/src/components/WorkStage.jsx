@@ -66,7 +66,10 @@ function SaywhenDemo({ active, hold }) {
   const video = useRef(null);
   const [sound, setSound] = useState(false);
   const saveData = typeof navigator !== "undefined" && navigator.connection?.saveData;
-  const autoplay = !reduced && !saveData;
+  // The film is 6 MB. It loops by itself only on the desktop stage; on a
+  // phone (often on cellular data) it waits on its poster for a tap.
+  const desktop = useDesktop();
+  const autoplay = !reduced && !saveData && desktop;
   useEffect(() => {
     const node = video.current;
     if (!node) return;
