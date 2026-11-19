@@ -505,7 +505,10 @@ function useIdleAfterFirstInput(ready) {
 // would sit on top of the frame being judged.
 function Companion() {
   const { route } = useRoute();
-  if (PREVIS.includes(route)) return null;
+  // On a phone there is no room beside the content: the droid and its
+  // speech bubble would sit on top of the headings and the film's cards.
+  const [narrow] = useState(() => window.matchMedia("(max-width: 760px)").matches);
+  if (PREVIS.includes(route) || narrow) return null;
   return <Suspense fallback={null}><BB8Companion /></Suspense>;
 }
 
