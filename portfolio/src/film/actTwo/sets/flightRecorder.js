@@ -1,6 +1,6 @@
 import * as THREE from "three";
 import { FLAGSHIPS } from "../../../data/showcase.js";
-import { canvasCard, floor, glow, ramp, smooth } from "../kit.js";
+import { canvasCard, faceCamera, floor, glow, ramp, smooth } from "../kit.js";
 
 /* Agent Flight Recorder (shots A2-03a and A2-03b): an aircraft black box in
    an orange spotlight. It comes apart into one layer per recorded step (the
@@ -120,7 +120,7 @@ export function buildFlightRecorder({ group }) {
   diff.mesh.material.opacity = 0;
   group.add(diff.mesh);
 
-  const toCamera = new THREE.Vector3(), forward = new THREE.Vector3(), up = new THREE.Vector3(), right = new THREE.Vector3(), target = new THREE.Vector3(), home = new THREE.Vector3();
+  const forward = new THREE.Vector3(), up = new THREE.Vector3(), right = new THREE.Vector3(), target = new THREE.Vector3(), home = new THREE.Vector3();
   return {
     setPlaying() {},
     update({ scene, clock, camera }) {
@@ -138,8 +138,6 @@ export function buildFlightRecorder({ group }) {
       const wide = Math.min(1, camera.aspect / 1.5);
       target.copy(camera.position).addScaledVector(forward, 12 + (1 - wide) * 7).addScaledVector(right, 2.6 * wide).addScaledVector(up, 1.4 + (1 - wide) * 2.4);
       group.worldToLocal(target);
-      toCamera.copy(camera.position);
-      group.worldToLocal(toCamera);
 
       slabs.forEach((slab, i) => {
         const centre = i - (LINES.length - 1) / 2;
@@ -148,7 +146,7 @@ export function buildFlightRecorder({ group }) {
         slab.mesh.rotation.set(0, (slab.seed - 0.5) * 0.5 * apart, (slab.seed - 0.5) * 0.08 * apart);
         if (i === SUSPECT) {
           slab.mesh.position.copy(home).lerp(target, fly);
-          slab.mesh.lookAt(toCamera.x, slab.mesh.position.y, toCamera.z);
+          faceCamera(slab.mesh, camera, { upright: true });
           slab.mesh.rotation.y += (1 - fly) * 0.3;
           slab.mesh.scale.setScalar(1 - fly * 0.3);
         } else {
@@ -162,7 +160,7 @@ export function buildFlightRecorder({ group }) {
         // Each layer's step, beside it, facing the lens.
         // (The suspect's rides just above it on the way in.)
         slab.tag.mesh.position.copy(slab.mesh.position).add(i === SUSPECT && fly > 0 ? ABOVE : BESIDE);
-        slab.tag.mesh.lookAt(toCamera);
+        faceCamera(slab.tag.mesh, camera);
         slab.tag.mesh.material.opacity = smooth(ramp(apart, 0.55, 1)) * (i === SUSPECT || fly < 0.5 ? 1 : 1 - (fly - 0.5) * 1.2);
       });
 
@@ -171,7 +169,7 @@ export function buildFlightRecorder({ group }) {
       face.visible = face.material.opacity > 0.01;
       const suspect = slabs[SUSPECT].mesh;
       diff.mesh.position.copy(suspect.position).sub(BELOW);
-      diff.mesh.lookAt(toCamera);
+      faceCamera(diff.mesh, camera);
       diff.mesh.material.opacity = smooth(ramp(scene, 0.8, 0.92));
       pool.mesh.material.uniforms.uTint.value.copy(ORANGE).lerp(RED, flash * 0.5);
       spot.intensity = 520 + flash * 160;

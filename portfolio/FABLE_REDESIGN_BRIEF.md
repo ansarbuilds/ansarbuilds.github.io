@@ -224,7 +224,7 @@ Review each video before approving the next step; that is the "director's" job.
 
 - The Act II framework: per project, a cut into a light-speed streak, the arrival (title card, letterbox), and the scene with a card of real text and links. It sits above the interactive work stage, which stays as the hands-on version.
 - The saywhen set: a dark room, a monitor playing the real app loop, the digital double's head as 8,000 points turning to it, a voice waveform from its mouth to the screen, and `cargo test --release` typed and sent.
-- Next: one PR per remaining set, in order: Jarvis (done in `step-5b-act-two-jarvis`), Flight Recorder (done in `step-5c-act-two-flight-recorder`), PRH-JEPA (done in `step-5d-act-two-prh-jepa`), Haloscript (done in `step-5e-act-two-haloscript`), Digital double.
+- Next: one PR per remaining set, in order: Jarvis (done in `step-5b-act-two-jarvis`), Flight Recorder (done in `step-5c-act-two-flight-recorder`), PRH-JEPA (done in `step-5d-act-two-prh-jepa`), Haloscript (done in `step-5e-act-two-haloscript`), Digital double (done in `step-5f-act-two-digital-double`). Act II is complete.
 - Open question for when all six are in: keep the work stage below the film, or fold it into the cards.
 
 ## Step 5b, the Jarvis set: done in the `step-5b-act-two-jarvis` PR
@@ -246,3 +246,11 @@ Review each video before approving the next step; that is the "director's" job.
 - A MacBook, an iPad and an iPhone, modelled in code with metal reflections from a studio environment map, on a turntable under a key light and a violet rim. Their screens are the real app and move through it together: the manuscript, the whiteboard, the corkboard.
 - The screenshots (about 1 MB) load while the PRH-JEPA set is on screen, not with the rest of the act.
 - The dev server now prepares the film's lazily loaded three.js modules at start (`optimizeDeps` in `vite.config.js`). Finding one on first use reloaded every open page, which made browser tests flaky.
+
+## Step 5f, the Digital double set: done in the `step-5f-act-two-digital-double` PR
+
+- The real model (3 MB, fetched while Haloscript plays) stands in a cone of light and looks at the visitor: the head leans toward the pointer and the eyes aim at it, wandering when there is no pointer. On phones the same head as points (56 kB). Its build stages hang behind it as a contact sheet with their verdicts; the shipped stage lights.
+- Fix across every set: cards, panels and labels now face the camera from its world position (`faceCamera` in `kit.js`). Before, they were aimed at a point in the set's local space and only faced the camera roughly.
+- The stages list moved to `src/data/digitalDouble.js`, shared by the model's page and the film.
+
+**Act II is complete.** Open question: keep the hands-on work stage below the film, or fold it into the cards.
