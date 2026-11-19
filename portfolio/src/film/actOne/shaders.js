@@ -5,7 +5,7 @@
 export const pointVertex = /* glsl */ `
   attribute vec3 aColor;
   attribute vec2 aSeed;
-  uniform float uTime, uScale, uSize, uPart, uOpacity, uFar;
+  uniform float uTime, uScale, uSize, uPart, uOpacity, uFar, uWobble;
   varying vec3 vColor;
   varying float vAlpha;
   void main() {
@@ -13,7 +13,8 @@ export const pointVertex = /* glsl */ `
     // The name parts for the camera: points move out from the middle as it comes through.
     p.xy += normalize(p.xy + vec2(0.001)) * uPart * (2. + aSeed.x * 7.);
     p.z += uPart * (aSeed.y - 0.5) * 6.;
-    p += 0.22 * vec3(sin(uTime * 0.6 + aSeed.x * 40.), cos(uTime * 0.5 + aSeed.y * 40.), sin(uTime * 0.4 + aSeed.x * 23.));
+    // A slow drift, in the points' own units (a scaled-up model passes less).
+    p += uWobble * vec3(sin(uTime * 0.6 + aSeed.x * 40.), cos(uTime * 0.5 + aSeed.y * 40.), sin(uTime * 0.4 + aSeed.x * 23.));
     vec4 view = modelViewMatrix * vec4(p, 1.);
     gl_Position = projectionMatrix * view;
     float depth = -view.z;

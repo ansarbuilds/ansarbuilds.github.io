@@ -43,7 +43,7 @@ function pointsFrom(positions, colors, size) {
   geometry.setAttribute("position", new THREE.BufferAttribute(positions, 3));
   geometry.setAttribute("aColor", new THREE.BufferAttribute(colors, 3));
   geometry.setAttribute("aSeed", new THREE.BufferAttribute(seeds, 2));
-  const uniforms = { uTime: { value: 0 }, uScale: { value: 1 }, uSize: { value: size }, uPart: { value: 0 }, uOpacity: { value: 1 }, uFar: { value: 170 } };
+  const uniforms = { uTime: { value: 0 }, uScale: { value: 1 }, uSize: { value: size }, uPart: { value: 0 }, uOpacity: { value: 1 }, uFar: { value: 170 }, uWobble: { value: 0.22 } };
   const points = new THREE.Points(geometry, additive({ uniforms, vertexShader: pointVertex, fragmentShader: pointFragment }));
   points.frustumCulled = false;
   return { points, uniforms };

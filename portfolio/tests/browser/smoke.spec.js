@@ -181,3 +181,22 @@ test('with reduced motion the short version is the plain section', async ({ page
   await expect(page.locator('section.act1')).toHaveCount(0);
   await expect(page.locator('.sc-receipts dt')).toHaveCount(4);
 });
+
+test('Act II plays above the work stage, with real links that are hidden until their card shows', async ({ page }) => {
+  await page.addInitScript((key) => { sessionStorage.setItem(key, '1'); sessionStorage.setItem('cold-open-played', '1'); }, INTRO_SESSION_KEY);
+  await page.goto('/');
+  const act = page.locator('section.act2');
+  await expect(act).toHaveCount(1);
+  const card = act.locator('article.act2-card').first();
+  // Selected directly: while hidden, it is rightly out of the accessibility tree.
+  await expect(card.locator('a.act2-primary')).toHaveAttribute('href', '/work/saywhen/');
+  // Before the scene, the card is out of the way of the keyboard.
+  await act.evaluate((node) => window.scrollTo(0, node.getBoundingClientRect().top + window.scrollY));
+  await expect(act).toHaveClass(/is-live/, { timeout: 8000 });
+  await expect(card).toBeHidden();
+  // At the end of the act, it is there and usable.
+  await act.evaluate((node) => window.scrollTo(0, node.getBoundingClientRect().top + window.scrollY + node.offsetHeight - window.innerHeight));
+  await expect(card).toBeVisible();
+  await expect(card.getByRole('link', { name: 'Read the case study' })).toBeVisible();
+  expect(await page.locator('#projects').evaluate((node) => node.getBoundingClientRect().top > 0)).toBe(true);
+});

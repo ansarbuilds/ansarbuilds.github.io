@@ -1,0 +1,32 @@
+/* Act II on the home page: a tall section with a pinned stage. */
+.act2 { position: relative; height: calc(var(--act-screens) * 100vh); overflow: clip; background: #050405; color: #efe6d8; }
+.act2-stage { position: sticky; top: 0; height: 100vh; overflow: hidden; }
+.act2-canvas { position: absolute; inset: 0; display: block; width: 100%; height: 100%; opacity: 0; transition: opacity var(--dur-scene) var(--ease-out); }
+.act2.is-live .act2-canvas { opacity: 1; }
+.act2-bars span { position: absolute; left: 0; right: 0; z-index: 1; height: max(7vh, calc((100vh - max(100vw / 2.39, 46vh)) / 2)); background: #000; transition: transform var(--dur-slow) var(--ease-out); }
+.act2-bars span:first-child { top: 0; transform: translateY(-101%); }
+.act2-bars span:last-child { bottom: 0; transform: translateY(101%); }
+.act2-bars.is-closed span { transform: none; }
+.act2-title, .act2-card { position: absolute; z-index: 2; opacity: 0; visibility: hidden; will-change: opacity, transform; }
+.act2-title { left: 0; right: 0; top: 50%; margin: -.5em 0 0; text-align: center; font: 400 clamp(3rem, 11vw, 9.5rem)/1 var(--font-condensed); text-transform: uppercase; letter-spacing: .02em; text-shadow: 0 4px 60px #000; pointer-events: none; }
+/* The card sits low on the left over a scrim, so the set keeps the frame. */
+.act2-card { left: max(20px, calc((100vw - 1200px) / 2)); bottom: clamp(20px, 7vh, 72px); width: min(30rem, calc(100vw - 40px)); padding: 22px 24px 20px; border: 1px solid rgb(239 230 216 / .12); border-radius: 18px; background: linear-gradient(160deg, rgb(12 10 12 / .82), rgb(8 7 9 / .66)); backdrop-filter: blur(14px); box-shadow: 0 30px 80px -30px #000; }
+.act2-eyebrow { font: 500 .58rem/1.4 var(--font-mono); letter-spacing: .14em; text-transform: uppercase; color: #ff8a5f; }
+.act2-card h3 { margin: 8px 0 4px; font: 400 clamp(2.2rem, 4vw, 3.2rem)/.95 var(--font-condensed); text-transform: uppercase; letter-spacing: .01em; }
+.act2-headline { font: 400 clamp(1.05rem, 1.6vw, 1.3rem)/1.3 var(--font-serif); color: rgb(239 230 216 / .86); }
+.act2-stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin: 16px 0 18px; padding: 14px 0 0; border-top: 1px solid rgb(239 230 216 / .1); }
+.act2-stats dt { font: 400 1.5rem/1 var(--font-condensed); color: #efe6d8; }
+.act2-stats dd { margin: 4px 0 0; font: .52rem/1.35 var(--font-mono); letter-spacing: .04em; text-transform: uppercase; color: #a39a8f; }
+.act2-links { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 16px; }
+.act2-links a { display: inline-flex; align-items: center; gap: 4px; min-height: 40px; font: 500 .8rem/1 var(--font-body); color: #efe6d8; border-bottom: 1px solid rgb(239 230 216 / .3); }
+.act2-links a:hover { border-color: #ff8a5f; color: #ff8a5f; }
+.act2-links .act2-primary { padding: 0 16px; border: 0; border-radius: 999px; background: #ff8a5f; color: #160a05; font-weight: 600; }
+.act2-links .act2-primary:hover { background: #ffa47f; color: #160a05; }
+@media (max-width: 760px) {
+  /* Clear of the palette swatch in the bottom-left corner. */
+  .act2-card { padding: 16px 18px; bottom: 76px; }
+  .act2-stats { margin: 12px 0 14px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .act2-bars span, .act2-canvas { transition: none; }
+}
