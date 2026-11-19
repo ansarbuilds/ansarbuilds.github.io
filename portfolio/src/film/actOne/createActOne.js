@@ -1,15 +1,9 @@
 import * as THREE from "three";
-import { EffectComposer } from "three/examples/jsm/postprocessing/EffectComposer.js";
-import { RenderPass } from "three/examples/jsm/postprocessing/RenderPass.js";
-import { UnrealBloomPass } from "three/examples/jsm/postprocessing/UnrealBloomPass.js";
-import { ShaderPass } from "three/examples/jsm/postprocessing/ShaderPass.js";
-import { OutputPass } from "three/examples/jsm/postprocessing/OutputPass.js";
 import { poseAt } from "../rig.js";
-import { finishShader } from "../coldOpen/shaders.js";
 import { ACT_ONE, LAYOUT, countAt, numberProgress, overlays, timeAtProgress } from "./timeline.js";
 import { pointFragment, pointVertex, riverFragment, riverVertex } from "./shaders.js";
 import { CODE_LINES } from "./codeLines.js";
-import { createAdaptive } from "../adaptive.js";
+import { attachFilm } from "../engine.js";
 
 /* Act I (storyboard A1-01 to A1-03) in plain three.js.
 
@@ -266,9 +260,10 @@ function buildTools(tools) {
 
 export function createActOne(canvas, { receipts, tools, getProgress, onFrame }) {
   const quality = pickQuality();
-  const renderer = new THREE.WebGLRenderer({ canvas, antialias: false, alpha: false, powerPreference: "high-performance" });
-  renderer.setPixelRatio(quality.dpr);
-  renderer.setClearColor(0x070605, 1);
+  // The shared renderer (see engine.js): this act draws into it, and its
+  // frames are copied onto this canvas.
+  const film = attachFilm(canvas, { clear: 0x070605, bloom: [0.42, 0.45, 0.55], grain: 0.016 });
+  const renderer = film.renderer;
   const scene = new THREE.Scene();
   const camera = new THREE.PerspectiveCamera(36, 1, 0.1, 600);
 
@@ -279,24 +274,12 @@ export function createActOne(canvas, { receipts, tools, getProgress, onFrame }) 
   const toolOrbit = buildTools(tools);
   scene.add(river.mesh, dust.points, name.points, toolOrbit.group, ...numbers.map((n) => n.group));
 
-  const composer = new EffectComposer(renderer);
-  const bloom = new UnrealBloomPass(new THREE.Vector2(1, 1), 0.42, 0.45, 0.55);
-  const finish = new ShaderPass(finishShader);
-  finish.uniforms.uGrain.value = 0.016;
-  composer.addPass(new RenderPass(scene, camera));
-  composer.addPass(bloom);
-  composer.addPass(finish);
-  composer.addPass(new OutputPass());
-  // Steps quality down if this device cannot keep up (see adaptive.js).
-  const adaptive = createAdaptive({ quality, bloom, apply: () => { renderer.setPixelRatio(quality.dpr); resize(); } });
 
   let width = 1, height = 1, fit = 1;
   const resize = () => {
     width = canvas.clientWidth || window.innerWidth;
     height = canvas.clientHeight || window.innerHeight;
-    renderer.setSize(width, height, false);
-    composer.setPixelRatio(quality.dpr);
-    composer.setSize(width, height);
+    film.resize();
     camera.aspect = width / height;
     camera.updateProjectionMatrix();
     // On a narrow screen everything beside the path comes in closer and smaller.
@@ -346,7 +329,7 @@ export function createActOne(canvas, { receipts, tools, getProgress, onFrame }) 
     if (camera.fov !== pose.fov) { camera.fov = pose.fov; camera.updateProjectionMatrix(); }
     camera.updateMatrixWorld();
     const show = overlays(t);
-    const scale = renderer.domElement.height / (2 * Math.tan(THREE.MathUtils.degToRad(camera.fov / 2)));
+    const scale = film.pixelHeight / (2 * Math.tan(THREE.MathUtils.degToRad(camera.fov / 2)));
 
     for (const { uniforms } of [name, dust]) { uniforms.uTime.value = clock; uniforms.uScale.value = scale; }
     name.uniforms.uPart.value = show.part;
@@ -387,8 +370,7 @@ export function createActOne(canvas, { receipts, tools, getProgress, onFrame }) 
     // the frames is enough there.
     if ((t <= 0 || t >= ACT_ONE.seconds) && settledFrames++ % 4) return;
     if (t > 0 && t < ACT_ONE.seconds) settledFrames = 0;
-    adaptive.frame(nowMs, t <= 0 || t >= ACT_ONE.seconds);
-    composer.render();
+    film.render(scene, camera, { now: nowMs, skip: t <= 0 || t >= ACT_ONE.seconds });
     onFrame?.(t, show);
   }
   // Scroll position is read every frame, not from scroll events, so the
@@ -413,8 +395,7 @@ export function createActOne(canvas, { receipts, tools, getProgress, onFrame }) 
       river.dispose();
       disposeNumbers();
       toolOrbit.dispose();
-      composer.dispose();
-      renderer.dispose();
+      film.release();
     },
   };
 }

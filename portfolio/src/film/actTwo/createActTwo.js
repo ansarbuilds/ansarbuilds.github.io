@@ -1,12 +1,6 @@
 import * as THREE from "three";
-import { EffectComposer } from "three/examples/jsm/postprocessing/EffectComposer.js";
-import { RenderPass } from "three/examples/jsm/postprocessing/RenderPass.js";
-import { UnrealBloomPass } from "three/examples/jsm/postprocessing/UnrealBloomPass.js";
-import { ShaderPass } from "three/examples/jsm/postprocessing/ShaderPass.js";
-import { OutputPass } from "three/examples/jsm/postprocessing/OutputPass.js";
 import { poseAt } from "../rig.js";
 import { SETS } from "../shots.js";
-import { finishShader } from "../coldOpen/shaders.js";
 import { ACT_TWO, BUILT, moments, shotsFor, timeAtProgress } from "./timeline.js";
 import { BONE, SIGNAL, points } from "./kit.js";
 import { buildSaywhen } from "./sets/saywhen.js";
@@ -15,7 +9,7 @@ import { buildFlightRecorder } from "./sets/flightRecorder.js";
 import { buildPrhJepa } from "./sets/prhJepa.js";
 import { buildHaloscript } from "./sets/haloscript.js";
 import { buildDigitalDouble } from "./sets/digitalDouble.js";
-import { createAdaptive } from "../adaptive.js";
+import { attachFilm } from "../engine.js";
 
 /* Act II (the project sets) in plain three.js.
 
@@ -51,9 +45,10 @@ function buildDust(count) {
 
 export function createActTwo(canvas, { getProgress, onFrame, media }) {
   const quality = pickQuality();
-  const renderer = new THREE.WebGLRenderer({ canvas, antialias: false, alpha: false, powerPreference: "high-performance" });
-  renderer.setPixelRatio(quality.dpr);
-  renderer.setClearColor(0x050405, 1);
+  // The shared renderer (see engine.js): this act draws into it, and its
+  // frames are copied onto this canvas.
+  const film = attachFilm(canvas, { clear: 0x050405, bloom: [0.42, 0.45, 0.6], grain: 0.016 });
+  const renderer = film.renderer;
   const scene = new THREE.Scene();
   const camera = new THREE.PerspectiveCamera(38, 1, 0.1, 800);
   scene.add(camera);
@@ -70,24 +65,13 @@ export function createActTwo(canvas, { getProgress, onFrame, media }) {
     return { slug, group, set: BUILDERS[slug]({ group, media, renderer }), playing: false };
   });
 
-  const composer = new EffectComposer(renderer);
-  const bloom = new UnrealBloomPass(new THREE.Vector2(1, 1), 0.42, 0.45, 0.6);
-  const finish = new ShaderPass(finishShader);
-  finish.uniforms.uGrain.value = 0.016;
-  composer.addPass(new RenderPass(scene, camera));
-  composer.addPass(bloom);
-  composer.addPass(finish);
-  composer.addPass(new OutputPass());
-  // Steps quality down if this device cannot keep up (see adaptive.js).
-  const adaptive = createAdaptive({ quality, bloom, apply: () => { renderer.setPixelRatio(quality.dpr); resize(); } });
+  const finish = film.finish;
 
   let width = 1, height = 1, fit = 1;
   const resize = () => {
     width = canvas.clientWidth || window.innerWidth;
     height = canvas.clientHeight || window.innerHeight;
-    renderer.setSize(width, height, false);
-    composer.setPixelRatio(quality.dpr);
-    composer.setSize(width, height);
+    film.resize();
     camera.aspect = width / height;
     camera.updateProjectionMatrix();
     fit = Math.min(1, Math.max(0.3, camera.aspect / 1.5));
@@ -119,7 +103,7 @@ export function createActTwo(canvas, { getProgress, onFrame, media }) {
     camera.lookAt(look);
     camera.updateMatrixWorld();
     const half = Math.tan(THREE.MathUtils.degToRad(camera.fov / 2));
-    const scale = renderer.domElement.height / (2 * half);
+    const scale = film.pixelHeight / (2 * half);
 
     const now = moments(t);
     dust.uniforms.uTime.value = clock;
@@ -145,8 +129,7 @@ export function createActTwo(canvas, { getProgress, onFrame, media }) {
     // finished frame: hold the last one drawn until it is. (Not drawing
     // leaves the canvas showing that frame.)
     if (drawn && sets.some((item) => item.group.visible && item.set.ready && !item.set.ready())) return;
-    adaptive.frame(nowMs, t <= 0 || t >= ACT_TWO.seconds);
-    composer.render();
+    film.render(scene, camera, { now: nowMs, skip: t <= 0 || t >= ACT_TWO.seconds });
     drawn = true;
     onFrame?.(t, now);
   }
@@ -167,8 +150,7 @@ export function createActTwo(canvas, { getProgress, onFrame, media }) {
       observer.disconnect();
       sets.forEach(({ set }) => set.dispose());
       dust.dispose();
-      composer.dispose();
-      renderer.dispose();
+      film.release();
     },
   };
 }
