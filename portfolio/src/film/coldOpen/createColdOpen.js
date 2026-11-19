@@ -9,6 +9,7 @@ import { COLD_OPEN, SHORT_START, SUBTITLE, T, score } from "./score.js";
 import { sampleName } from "./sampleName.js";
 import { finishShader, flareFragment, flareVertex, lineFragment, lineVertex, particleFragment, particleVertex, raysFragment } from "./shaders.js";
 import { createAdaptive } from "../adaptive.js";
+import { pickQuality } from "./quality.js";
 
 /* The cold open's scene and its frame loop, in plain three.js.
 
@@ -27,13 +28,12 @@ import { createAdaptive } from "../adaptive.js";
 const SKIP_FADE_MS = 320;
 const SHORT_SPEED = 1.6;
 
-// Fewer particles and pixels on phones and small machines.
-function pickQuality() {
-  const low = window.matchMedia("(max-width: 760px)").matches || (navigator.hardwareConcurrency || 8) <= 4;
-  return low
-    ? { name: 15000, dust: 9000, hubs: 320, dpr: Math.min(window.devicePixelRatio, 1.25) }
-    : { name: 40000, dust: 24000, hubs: 640, dpr: Math.min(window.devicePixelRatio, 1.75) };
-}
+const deviceQuality = () => pickQuality({
+  narrow: window.matchMedia("(max-width: 760px)").matches,
+  cores: navigator.hardwareConcurrency || 8,
+  memory: navigator.deviceMemory || 8,
+  dpr: window.devicePixelRatio || 1,
+});
 
 const additive = (options) => new THREE.ShaderMaterial({ blending: THREE.AdditiveBlending, depthTest: false, depthWrite: false, transparent: true, ...options });
 
@@ -111,7 +111,7 @@ function buildScene(quality) {
 }
 
 export function createColdOpen(canvas, { mode, waited = 0, holdAt = null, onVeil, onBars, onLine, onName, onHandOver, onDone }) {
-  const quality = pickQuality();
+  const quality = deviceQuality();
   const renderer = new THREE.WebGLRenderer({ canvas, antialias: false, alpha: false, powerPreference: "high-performance" });
   renderer.setPixelRatio(quality.dpr);
   renderer.setClearColor(0x000000, 1);
