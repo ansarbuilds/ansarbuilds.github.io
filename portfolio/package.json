@@ -13,7 +13,8 @@
     "preview": "vite preview",
     "check:budget": "node scripts/check-budget.mjs",
     "check:tools": "node scripts/check-tools.mjs",
-    "count:loc": "node scripts/count-loc.mjs"
+    "count:loc": "node scripts/count-loc.mjs",
+    "check:fps": "node scripts/check-fps.mjs"
   },
   "dependencies": {
     "@react-three/fiber": "^9.8.2",

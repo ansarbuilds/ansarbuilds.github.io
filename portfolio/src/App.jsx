@@ -3,6 +3,9 @@ import { Hero, ProjectsSection, CapabilitiesSection, MoreWorkSection, Playground
 import CommandPalette from "./components/CommandPalette";
 import { MatrixBackground } from "./components/RouteBackgrounds";
 import PaletteSwatch from "./components/PaletteSwatch";
+// The palette card is a tool for working on the site, not for visitors:
+// on the dev server, or with ?palette in the address.
+const SHOW_SWATCH = typeof window !== "undefined" && (import.meta.env.DEV || new URLSearchParams(window.location.search).has("palette"));
 import Cursor from "./components/Cursor";
 import { COLD_OPEN_SESSION_KEY, coldOpenForced, coldOpenMode, filmEnabled, shouldPlayIntro } from "./lib/intro";
 import SoundToggle from "./components/SoundToggle";
@@ -516,7 +519,7 @@ function AppShell({ bootDone, held, onBoot }) {
             <a className="skip-link" href="#main-content" onClick={(event) => { event.preventDefault(); document.getElementById("main-content")?.focus(); }}>Skip to main content</a>
             <Nav booting={!bootDone} />
             <ScrollProgress />
-            <PaletteSwatch />
+            {SHOW_SWATCH && <PaletteSwatch />}
             <HomeCursor />
             {companionReady && <Companion />}
             {/* No page-level `perspective` here on purpose: setting it on an

@@ -79,8 +79,10 @@ function useViewportHeight() {
 /* Copy that lights up word by word as it crosses the screen. Every word is
    in the page from the start, only dimmed, so nothing is hidden from
    readers, search or reduced motion (which gets it fully lit). */
+// Words not yet reached stay readable (about 3.5:1 on carbon, large text),
+// so the statement never reads as missing.
 function ScrubWord({ progress, range, children }) {
-  const opacity = useTransform(progress, range, [0.16, 1]);
+  const opacity = useTransform(progress, range, [0.45, 1]);
   return <motion.span style={{ opacity }}>{children} </motion.span>;
 }
 function ScrubText({ lead, rest, className }) {
