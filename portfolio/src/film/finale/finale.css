@@ -21,6 +21,9 @@
 .fin-credits { top: 58vh; }
 .fin-credits p { margin: 0 0 14px; font: 400 clamp(1rem, 2vw, 1.45rem)/1.2 var(--font-condensed); text-transform: uppercase; letter-spacing: .04em; }
 .fin-credits p span { display: block; margin-bottom: 4px; font: 500 .56rem/1 var(--font-mono); letter-spacing: .18em; color: #8a8075; }
+.fin-credits p .fin-credit-links { display: inline; margin: 0; font: inherit; letter-spacing: inherit; color: inherit; }
+.fin-credits p .fin-credit-links a { color: #efe6d8; border-bottom: 1px solid rgb(239 230 216 / .3); }
+.fin-credits p .fin-credit-links a:hover { color: #ff8a5f; border-color: #ff8a5f; }
 .fin-footer { display: flex; flex-wrap: wrap; justify-content: center; align-items: center; gap: 8px 26px; margin-top: 34px; padding: 0 20px; font: .72rem/1.5 var(--font-body); color: #a39a8f; }
 .fin-footer button { min-height: 40px; color: #efe6d8; border-bottom: 1px solid rgb(239 230 216 / .3); }
 @media (prefers-reduced-motion: reduce) { .fin-canvas { transition: none; } }

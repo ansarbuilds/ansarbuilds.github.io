@@ -1,5 +1,6 @@
 import "./actTwo/actTwo.css";
 import { useEffect, useRef, useState } from "react";
+import ActTitle from "./ActTitle";
 import { ArrowUpRight } from "lucide-react";
 import { ACT_TWO_SCREENS } from "./actTwo/screens";
 import { media } from "../lib/media";
@@ -89,6 +90,7 @@ const near = new IntersectionObserver(([entry]) => { if (entry.isIntersecting) {
     {/* Nine screens of film: a way past it for keyboards and screen readers. */}
     <a className="film-skip" href="#projects">Skip the film, go to the work</a>
     <div className="act2-stage" data-film-stage="act2">
+      <ActTitle section={section}>II. Six builds</ActTitle>
       <canvas ref={canvas} className="act2-canvas" aria-hidden="true" />
       <div ref={bars} className="act2-bars is-closed" aria-hidden="true"><span /><span /></div>
       {projects.map((project, i) => <p key={project.slug} ref={(node) => { titles.current[i] = node; }} className="act2-title" aria-hidden="true">{project.name}</p>)}

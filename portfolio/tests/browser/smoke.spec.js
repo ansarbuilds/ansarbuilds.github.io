@@ -295,3 +295,16 @@ test('Act II has a way past it for the keyboard', async ({ page }) => {
   await page.goto('/');
   await expect(page.locator('section.act2 a.film-skip')).toHaveAttribute('href', '#projects');
 });
+
+test('each act has its title card as real text, outside the keyboard order', async ({ page }) => {
+  await page.addInitScript((key) => { sessionStorage.setItem(key, '1'); sessionStorage.setItem('cold-open-played', '1'); }, INTRO_SESSION_KEY);
+  await page.goto('/');
+  const titles = page.locator('.film-act-title');
+  await expect(titles).toHaveText(['I. The receipts', 'II. Six builds', 'III. What I bring', 'IV. The playground', 'Finale']);
+  for (const title of await titles.all()) {
+    await expect(title).not.toHaveAttribute('tabindex');
+    await expect(title).not.toHaveAttribute('aria-hidden');
+    expect(await title.locator('a, button, [tabindex]').count()).toBe(0);
+  }
+  await expect(page.locator('.fin-credit-links a')).toHaveCount(6);
+});

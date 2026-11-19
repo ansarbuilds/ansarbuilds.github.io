@@ -1,5 +1,6 @@
 import "./actFour/actFour.css";
 import { useEffect, useRef, useState } from "react";
+import ActTitle from "./ActTitle";
 import { ArrowUpRight } from "lucide-react";
 import { ACT_FOUR_SCREENS } from "./actFour/screens";
 import { cueOnRise, showBed } from "../lib/sound";
@@ -72,6 +73,7 @@ const near = new IntersectionObserver(([entry]) => { if (entry.isIntersecting) {
   if (failed) return null;
   return <section ref={section} id="ai" className="act4" aria-labelledby="act4-title" data-palette="neon" style={{ "--act-screens": SCREENS }}>
     <div className="act4-stage">
+      <ActTitle section={section}>IV. The playground</ActTitle>
       <canvas ref={canvas} className="act4-canvas" aria-hidden="true" />
       <div ref={title} className="act4-title">
         <p className="act4-kicker">05 · The playground</p>

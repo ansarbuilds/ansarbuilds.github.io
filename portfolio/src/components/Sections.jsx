@@ -418,6 +418,8 @@ const CREDITS = [
   ["Pair programmer", "AI"],
   ["Built with", "React · three.js · GLSL · Vite · Lenis"],
   ["Type", "Anton · Outfit · Instrument Serif · Plus Jakarta Sans · JetBrains Mono"],
+  // The six builds the film plays, each a link to its page.
+  ["Featuring", FILM_SETS.map((slug) => ({ name: getProject(slug).title, href: `/work/${slug}/` }))],
 ];
 
 // Contact: the film's finale where it can play; the plain section otherwise
