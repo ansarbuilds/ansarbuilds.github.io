@@ -163,7 +163,7 @@ export function createColdOpen(canvas, { mode, waited = 0, holdAt = null, onVeil
     closing.updateMatrixWorld(true);
     const name = sampleName(closing, quality.name);
     // No name to build (the hero is not on screen): leave without a show.
-    if (!name) { skippedAt ??= performance.now(); return; }
+    if (!name) { if (import.meta.env?.DEV) console.warn("cold open: the hero name is not on the page"); skippedAt ??= performance.now(); return; }
     const { aTarget, aKind, aTint } = film.geometry.attributes;
     aTarget.array.set(name.positions);
     aKind.array.fill(1, 0, quality.name);
