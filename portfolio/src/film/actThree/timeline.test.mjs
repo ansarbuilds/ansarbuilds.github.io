@@ -57,3 +57,9 @@ test('the act opens on a held match cut: the middle monolith stands, framed as t
   assert.deepEqual(held.rise, [0, 1, 0]);
   assert.ok(MATCH_SHARE * ACT_THREE.entries[0].shot.scroll < ACT_THREE.entries[1].shot.scroll / 2);
 });
+
+test('the held match cut is flagged for its sound, only while it is held', () => {
+  const end = ACT_THREE.entries[0].t0 + (ACT_THREE.entries[0].t1 - ACT_THREE.entries[0].t0) * MATCH_SHARE;
+  assert.equal(moments(0).held, 1);
+  assert.equal(moments(end + 1e-6).held, 0);
+});

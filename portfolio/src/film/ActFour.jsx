@@ -2,7 +2,7 @@ import "./actFour/actFour.css";
 import { useEffect, useRef, useState } from "react";
 import { ArrowUpRight } from "lucide-react";
 import { ACT_FOUR_SCREENS } from "./actFour/screens";
-import { cueOnRise } from "../lib/sound";
+import { cueOnRise, showBed } from "../lib/sound";
 
 /* Act IV, the playground reel, on the home page between More work and
    Contact: the network collapses into a star, then the solar system, the
@@ -54,7 +54,8 @@ export default function ActFour({ experiments }) {
     // scroller never waits for a scene to arrive. (Fetched once; cached.)
     const warmNext = () => import("./finale/createFinale").catch(() => {});
 const near = new IntersectionObserver(([entry]) => { if (entry.isIntersecting) { near.disconnect(); load(); warmNext(); } }, { rootMargin: "0px 0px 150% 0px" });
-    const seen = new IntersectionObserver(([entry]) => { onScreen = entry.isIntersecting; run(); });
+    // The sound bed follows the act on screen (silent unless sound is on).
+    const seen = new IntersectionObserver(([entry]) => { onScreen = entry.isIntersecting; showBed("act4", onScreen); run(); });
     near.observe(el);
     seen.observe(el);
     document.addEventListener("visibilitychange", run);
@@ -62,6 +63,7 @@ const near = new IntersectionObserver(([entry]) => { if (entry.isIntersecting) {
       cancelled = true;
       near.disconnect();
       seen.disconnect();
+      showBed("act4", false);
       document.removeEventListener("visibilitychange", run);
       film?.dispose();
     };
