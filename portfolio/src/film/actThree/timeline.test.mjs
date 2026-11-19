@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { ACT_THREE, ACT_THREE_SHOTS, CENTRE, PILLARS, cameraAt, moments, timeAtProgress } from './timeline.js';
+import { ACT_THREE, ACT_THREE_SHOTS, CENTRE, MATCH, MATCH_SHARE, PILLARS, cameraAt, moments, timeAtProgress } from './timeline.js';
 import { ACT_THREE_SCREENS } from './screens.js';
 import { CAPABILITIES } from '../../data/showcase.js';
 
@@ -46,4 +46,14 @@ test('they rise before the orbit, and the title leaves before the first card', (
   const atOrbit = moments(ACT_THREE.entries[1].t0);
   atOrbit.rise.forEach((r) => assert.equal(r, 1));
   for (const t of steps) { const m = moments(t); if (m.card.some((c) => c > 0)) assert.equal(m.title, 0); }
+});
+
+test('the act opens on a held match cut: the middle monolith stands, framed as the head was', () => {
+  const end = ACT_THREE.entries[0].t0 + (ACT_THREE.entries[0].t1 - ACT_THREE.entries[0].t0) * MATCH_SHARE;
+  assert.ok(distance(cameraAt(0).pos, MATCH.pos) < 1e-9);
+  assert.ok(distance(cameraAt(end).pos, MATCH.pos) < 1e-9);
+  const open = moments(0), held = moments(end);
+  assert.deepEqual(open.rise, [0, 1, 0]);
+  assert.deepEqual(held.rise, [0, 1, 0]);
+  assert.ok(MATCH_SHARE * ACT_THREE.entries[0].shot.scroll < ACT_THREE.entries[1].shot.scroll / 2);
 });

@@ -8,6 +8,7 @@
    from the shot list. Pure maths, tested in timeline.test.mjs. */
 import { SETS, SHOTS } from "../shots.js";
 import { buildTimeline, timeAtScroll } from "../rig.js";
+import { BUILT, closingFraming } from "../actTwo/timeline.js";
 
 export const ACT_THREE_SHOTS = SHOTS.filter((shot) => shot.act === "A3");
 export const ACT_THREE = buildTimeline(ACT_THREE_SHOTS);
@@ -38,7 +39,35 @@ function polar(pos) {
 const START = polar(riseShot.camera.pos);
 const END = polar(orbitShot.camera.pos);
 
+/* The way in: a match back to the last thing Act II showed. The act opens
+   on a hard cut, held, with the middle monolith already standing exactly
+   where the digital double's head stood, the same size in frame. Then the
+   camera drops back to the low angle and the other two rise beside it. The
+   hold is a small share of the rise, so the join is shorter than the shots
+   it joins, and both its ends are finished frames. */
+export const MATCH_SHARE = 0.18;
+const MIDDLE = 1;
+// The middle monolith's centre takes the head's place. It is far bigger
+// than a head, so the head's framing is scaled up to keep the same size in
+// frame (the head, with its neck, is about 3.6 units tall).
+const FACE = [CENTRE[0] + PILLARS[MIDDLE].x, CENTRE[1] + PILLARS[MIDDLE].height * 0.5, CENTRE[2]];
+const SCALE = PILLARS[MIDDLE].height / 3.6;
+const yawTurn = ([x, y, z], yaw) => [x * Math.cos(yaw) + z * Math.sin(yaw), y, -x * Math.sin(yaw) + z * Math.cos(yaw)];
+// An offset in the monolith's own space (+z out of its carved face) to world.
+const onFace = (offset) => yawTurn(offset.map((v) => v * SCALE), PILLARS[MIDDLE].yaw).map((v, i) => v + FACE[i]);
+const framing = closingFraming(BUILT.at(-1));
+export const MATCH = { pos: onFace(framing.pos), look: onFace(framing.look), fov: framing.fov };
+const matchEnd = () => riseEntry.t0 + (riseEntry.t1 - riseEntry.t0) * MATCH_SHARE;
+const mix3 = (a, b, u) => a.map((v, i) => lerp(v, b[i], u));
+
 export function cameraAt(t) {
+  const base = baseCameraAt(t);
+  const away = smooth(ramp(t, matchEnd(), riseEntry.t1));
+  if (away >= 1) return base;
+  return { ...base, pos: mix3(MATCH.pos, base.pos, away), look: mix3(MATCH.look, base.look, away), fov: lerp(MATCH.fov, base.fov, away) };
+}
+
+function baseCameraAt(t) {
   const rise = smooth(ramp(t, riseEntry.t0, riseEntry.t1));
   const orbit = smooth(ramp(t, orbitEntry.t0, orbitEntry.t1));
   // Rising: low and a little further off, tilting up as they climb.
@@ -64,7 +93,9 @@ export function moments(t) {
   const best = faces.indexOf(Math.max(...faces));
   return {
     // Each rises in turn, out of the ground.
-    rise: PILLARS.map((_, i) => smooth(ramp(t, riseEntry.t0 + i * 0.35, riseEntry.t0 + 1.6 + i * 0.35))),
+    // The middle one is the match and already stands; the other two rise
+    // beside it once the held cut is over.
+    rise: PILLARS.map((_, i) => (i === MIDDLE ? 1 : smooth(ramp(t, matchEnd() + i * 0.2, matchEnd() + 1.4 + i * 0.2)))),
     // Carved names glow as their monolith faces the camera.
     glow: faces.map((face) => smooth(ramp(face, 0.55, 0.95)) * (orbiting ? 1 : 0.25)),
     title: smooth(ramp(t, riseEntry.t0 + 0.6, riseEntry.t0 + 1.3)) * (1 - smooth(ramp(t, orbitEntry.t0 - 0.2, orbitEntry.t0 + 0.4))),

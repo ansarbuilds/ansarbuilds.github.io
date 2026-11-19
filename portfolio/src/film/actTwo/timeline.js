@@ -56,6 +56,15 @@ export function openingCamera(slug) {
   return { pos: carry(last.camera.pos), look: carry(last.camera.look), fov: last.camera.fov, move: "Match cut on the subject, held" };
 }
 
+// How a set's closing shot frames its subject, in the set's own space: the
+// camera and the look as offsets from the subject. Act III opens by putting
+// a monolith where the last set's head stood (see actThree/timeline.js).
+export function closingFraming(slug) {
+  const [, last] = shotsFor(slug);
+  const local = (point) => turn(sub(point, subjectAt(slug)), -yawOf(slug));
+  return { pos: local(last.camera.pos), look: local(last.camera.look), fov: last.camera.fov };
+}
+
 export const ACT_TWO_SHOTS = BUILT.flatMap((slug) => {
   const [arrive, scene] = shotsFor(slug);
   return [
