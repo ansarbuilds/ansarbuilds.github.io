@@ -21,6 +21,8 @@ const SHOW_ALL = `
 
 for (const width of [375, 390]) {
   test(`no text overflows during the film at ${width} wide`, async ({ page }, info) => {
+    // It walks every act; a busy machine needs longer than the default.
+    test.setTimeout(90000);
     test.skip(info.project.name !== 'mobile', 'one phone run is enough');
     await page.setViewportSize({ width, height: 844 });
     await page.addInitScript(() => { sessionStorage.setItem('intro-played', '1'); sessionStorage.setItem('cold-open-played', '1'); });
