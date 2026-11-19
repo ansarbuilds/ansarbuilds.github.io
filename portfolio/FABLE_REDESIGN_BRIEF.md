@@ -253,4 +253,4 @@ Review each video before approving the next step; that is the "director's" job.
 - Fix across every set: cards, panels and labels now face the camera from its world position (`faceCamera` in `kit.js`). Before, they were aimed at a point in the set's local space and only faced the camera roughly.
 - The stages list moved to `src/data/digitalDouble.js`, shared by the model's page and the film.
 
-**Act II is complete.** Open question: keep the hands-on work stage below the film, or fold it into the cards.
+**Act II is complete.** Decision: the hands-on work stage stays below the film as the "try it" part (tabs, the live Jarvis demo, the saywhen film with sound).
