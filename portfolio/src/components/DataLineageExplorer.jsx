@@ -202,7 +202,7 @@ export default function DataLineageExplorer() {
           Hover a point to see what it connects to. Click one to pin the full downstream impact
           chain: everything that would break, go stale or need a re-run if that node changed.
         </p>
-        <p className="font-mono text-[.65rem] text-slate-500 mb-8">
+        <p className="font-mono text-[.65rem] text-slate-400 mb-8">
           Sample data only. This is a made-up retail pricing pipeline, built to show the idea.
         </p>
 
@@ -267,7 +267,7 @@ export default function DataLineageExplorer() {
             className="rounded-2xl border border-white/10 bg-black/30 p-5 h-fit"
           >
             {!selectedNode ? (
-              <p className="text-slate-500 text-sm">
+              <p className="text-slate-400 text-sm">
                 Hover a point to preview its connections. Click one to pin the full impact chain.
               </p>
             ) : (
