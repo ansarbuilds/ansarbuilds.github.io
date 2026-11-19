@@ -328,7 +328,7 @@ export function createActOne(canvas, { receipts, tools, getProgress, onFrame }) 
   canvas.addEventListener("pointerdown", onPointer);
   canvas.addEventListener("pointerleave", onLeave);
 
-  let active = false, frame = 0, last = performance.now(), clock = 0, disposed = false;
+  let active = false, frame = 0, last = performance.now(), clock = 0, disposed = false, settledFrames = 0;
   const toCamera = new THREE.Vector3(), orbit = new THREE.Vector3();
   function tick(nowMs) {
     if (!active || disposed) return;
@@ -379,6 +379,11 @@ export function createActOne(canvas, { receipts, tools, getProgress, onFrame }) 
     }
     toolOrbit.glow.material.opacity = 0.18 + show.tools * 0.3;
 
+    // Before the act starts or after it ends only ambient motion is left (dust,
+    // a caret), often while the next section plays beside it: a quarter of
+    // the frames is enough there.
+    if ((t <= 0 || t >= ACT_ONE.seconds) && settledFrames++ % 4) return;
+    if (t > 0 && t < ACT_ONE.seconds) settledFrames = 0;
     composer.render();
     onFrame?.(t, show);
   }

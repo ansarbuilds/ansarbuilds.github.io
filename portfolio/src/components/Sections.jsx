@@ -11,6 +11,7 @@ import { INTRO_SESSION_KEY, filmEnabled } from "../lib/intro";
 import ActOne from "../film/ActOne";
 import ActTwo from "../film/ActTwo";
 import ActThree from "../film/ActThree";
+import ActFour from "../film/ActFour";
 import { BUILT as FILM_SETS } from "../film/actTwo/built";
 import { media } from "../lib/media";
 import Count from "./Count";
@@ -385,6 +386,16 @@ export function MoreWorkSection() {
 function ExperimentImage({ experiment }) {
   const [artBroken, setArtBroken] = useState(false);
   return <img className="ed-lazy-media" src={media(!artBroken && experiment.cardArt ? experiment.cardArt : experiment.shot)} alt="" width={1200} height={900} loading="lazy" onLoad={revealImage} onError={() => setArtBroken(true)} />;
+}
+
+// The playground on the home page: Act IV where the film can play, ending on
+// a way into each experiment. Without the film the home page has no
+// playground section (the experiments are a click away in the command
+// palette and on their own pages), as before.
+const FILM_EXPERIMENTS = ["solar", "stars", "emet"].map((id) => EXPERIMENTS.find((e) => e.id === id)).filter(Boolean);
+export function PlaygroundSection() {
+  const [film] = useState(filmEnabled);
+  return film ? <ActFour experiments={FILM_EXPERIMENTS} /> : null;
 }
 
 export function ExperimentsSection() {

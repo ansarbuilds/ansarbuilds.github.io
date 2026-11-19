@@ -103,7 +103,7 @@ export function createActTwo(canvas, { getProgress, onFrame, media }) {
   const observer = new ResizeObserver(resize);
   observer.observe(canvas);
 
-  let active = false, frame = 0, last = performance.now(), clock = 0, disposed = false;
+  let active = false, frame = 0, last = performance.now(), clock = 0, disposed = false, settledFrames = 0;
   const look = new THREE.Vector3(), pos = new THREE.Vector3();
   function tick(nowMs) {
     if (!active || disposed) return;
@@ -147,6 +147,11 @@ export function createActTwo(canvas, { getProgress, onFrame, media }) {
     streakUniforms.uAspect.value = camera.aspect;
     finish.uniforms.uTime.value = clock;
     finish.uniforms.uAberration.value = 0.001 + rush * 0.006;
+    // Before the act starts or after it ends only ambient motion is left (dust,
+    // a caret), often while the next section plays beside it: a quarter of
+    // the frames is enough there.
+    if ((t <= 0 || t >= ACT_TWO.seconds) && settledFrames++ % 4) return;
+    if (t > 0 && t < ACT_TWO.seconds) settledFrames = 0;
     composer.render();
     onFrame?.(t, now);
   }
