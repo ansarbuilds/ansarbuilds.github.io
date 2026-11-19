@@ -26,6 +26,18 @@ const VIEW_DESCRIPTIONS = {
 
 const template = await readFile(resolve(DIST, 'index.html'), 'utf8');
 
+// A search result shows about 160 characters. A description is the opening
+// sentences of the project's own hook that fit, never a rewrite; a first
+// sentence longer than that is cut at a word.
+function summarize(text, limit = 160) {
+  const sentences = text.match(/[^.!?]+[.!?]+(\s|$)/g) || [text];
+  let out = '';
+  for (const sentence of sentences) { if ((out + sentence).trim().length > limit) break; out += sentence; }
+  out = out.trim();
+  if (out) return out;
+  return text.slice(0, limit - 1).replace(/\s+\S*$/, '') + '…';
+}
+
 function page({ route, title, description, image, body }) {
   const url = ORIGIN + pathForRoute(route);
   const meta = (html, pattern, value) => {
@@ -58,7 +70,7 @@ for (const project of PROJECTS) {
     route,
     listed: !project.hidden,
     title: titleForRoute(route),
-    description: project.hook,
+    description: summarize(project.hook),
     image: (await exists(resolve('public', `.${shareImage}`))) ? shareImage : null,
     body: `<p>Mohamed Ansar / Selected work</p><h1>${escape(project.title)}</h1><p>${escape(project.hook)}</p><p><a href="/">Portfolio home</a></p>`,
   });
