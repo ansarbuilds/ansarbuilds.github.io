@@ -65,6 +65,6 @@ export default function ColdOpen({ mode, since, onStart, onHandOver, onDone }) {
     <canvas ref={canvas} className="co-canvas" aria-hidden="true" />
     <div className={`co-bars ${bars ? "is-closed" : ""}`} aria-hidden="true"><span /><span /></div>
     <p ref={line} className="co-line" aria-hidden="true" />
-    <button type="button" className="co-skip">Skip intro</button>
+    <button type="button" className="co-skip">Skip</button>
   </div>;
 }

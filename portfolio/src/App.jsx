@@ -1,16 +1,16 @@
 import { Component, createRef, lazy, Suspense, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Hero, ProjectsSection, CapabilitiesSection, MoreWorkSection, ContactSection } from "./components/Sections";
 import CommandPalette from "./components/CommandPalette";
+// The reel's poster is small and must never open on a blank frame, so it
+// ships with the page; only its film is loaded later, after Play.
+import Reel from "./components/Reel";
 import { MatrixBackground } from "./components/RouteBackgrounds";
-import PaletteSwatch from "./components/PaletteSwatch";
-import Cursor from "./components/Cursor";
-import { COLD_OPEN_SESSION_KEY, coldOpenForced, coldOpenMode, shouldPlayIntro } from "./lib/intro";
 import { isRouteTransitioning, runRouteChange } from "./lib/routeTransition";
 import { PREVIS, parseTarget, pathForRoute, readLocation, urlForTarget } from "./lib/routes";
 import { titleForRoute } from "./lib/routeTitle";
 import { CONTACT } from "./data/content";
 import { applyPalette, clearPalette, paletteForRoute, pickPalette } from "./lib/palettes";
-import { OPEN_SOURCE_PROJECTS } from "./data/projects";
+import { OPEN_SOURCE_PROJECTS, PROJECTS as ALL_PROJECTS } from "./data/projects";
 import { RouteContext, SandboxContext, ThemeContext, useRoute, useSandbox } from "./appContexts";
 import { scrollToElement, scrollToTop, setSmoothScroll } from "./lib/scroll";
 
@@ -28,7 +28,6 @@ const InfinityPage = lazy(() => import("./components/InfinityPage"));
 const BB8Companion = lazy(() => import("./components/BB8Companion"));
 // The film's cold open. It brings three.js with it, so it loads on its own
 // and only for a visitor who is going to see it.
-const ColdOpen = lazy(() => import("./film/ColdOpen"));
 // The film's pre-vis pages. Development only: a production build drops both
 // the routes and these chunks.
 const Storyboard = import.meta.env.DEV ? lazy(() => import("./film/Storyboard")) : null;
@@ -283,7 +282,7 @@ function Nav({ booting = false }) {
   }, [menuOpen]);
   return <nav className={`ed-nav ${editorial && overHero ? "is-over-hero" : ""} ${booting ? "is-booting" : ""}`} aria-label="Main navigation"><div className="ed-nav-inner">
     <button onClick={() => navigate("deck")} className="ed-wordmark" aria-label="Mohamed Ansar, home"><span className="ed-wordmark-symbol" aria-hidden="true">ma</span><span>mohamed ansar</span></button>
-    <div className="ed-nav-links">{editorial ? <><a href="#projects" className="ed-nav-wide">Work</a><a href="#capabilities" className="ed-nav-wide">Capabilities</a><a href={CONTACT.github} className="ed-nav-wide" target="_blank" rel="noopener noreferrer">GitHub</a><span ref={menuRef} className="ed-nav-menu"><button type="button" aria-expanded={menuOpen} aria-controls="nav-menu" onClick={() => setMenuOpen((open) => !open)}>Menu</button>{menuOpen && <span id="nav-menu" className="ed-nav-menu-list" onClick={() => setMenuOpen(false)}><a href="#projects">Work</a><a href="#capabilities">Capabilities</a><a href="#more">More work</a><a href={CONTACT.github} target="_blank" rel="noopener noreferrer">GitHub ↗</a></span>}</span><a href="#contact" className="ed-nav-contact">Get in touch ↗</a></> : <button onClick={() => navigate("deck")}>← Home</button>}
+    <div className="ed-nav-links">{editorial ? <><a href="#projects">Work</a><a href="#capabilities" className="ed-nav-wide">Capabilities</a><a href={CONTACT.github} className="ed-nav-wide" target="_blank" rel="noopener noreferrer">GitHub</a><span ref={menuRef} className="ed-nav-menu"><button type="button" aria-expanded={menuOpen} aria-controls="nav-menu" onClick={() => setMenuOpen((open) => !open)}>Menu</button>{menuOpen && <span id="nav-menu" className="ed-nav-menu-list" onClick={() => setMenuOpen(false)}><a href="#capabilities">Capabilities</a><a href="#more">More work</a><a href={CONTACT.github} target="_blank" rel="noopener noreferrer">GitHub ↗</a></span>}</span><a href="#contact" className="ed-nav-contact">Get in touch ↗</a></> : <button onClick={() => navigate("deck")}>← Home</button>}
       <button onClick={openPalette} className="ed-nav-command" aria-label="Open command palette">⌘ K</button>
     </div>
   </div></nav>;
@@ -291,11 +290,6 @@ function Nav({ booting = false }) {
 
 // The trailing cursor belongs to the home page only: the takeover views
 // (terminal, 3D scenes) have their own pointer behaviour.
-function HomeCursor() {
-  const { route } = useRoute();
-  return route === "main" ? <Cursor /> : null;
-}
-
 function ScrollProgress() {
   const { route } = useRoute();
   const barRef = useRef(null);
@@ -325,6 +319,19 @@ function ScrollProgress() {
   }, [route]);
 
   return <div className="ed-scroll-progress" aria-hidden="true"><span ref={barRef} /></div>;
+}
+
+/* While a project page's code arrives, its title and first sentence are
+   already there, in the page's own frame. Never a black screen or a spinner. */
+function ProjectShell({ slug }) {
+  const project = ALL_PROJECTS.find((p) => p.slug === slug);
+  if (!project) return null;
+  return <div className="ed-case-study min-h-full"><article className="mx-auto w-full max-w-4xl px-5 pt-28 pb-24">
+    <header data-vt="frame" className="mt-16 rounded-3xl border border-black/15 p-6 sm:p-10">
+      <h1 data-vt="title" className="mt-4 text-[color:var(--ink-100)] leading-[.92] text-[clamp(3rem,8vw,6.5rem)] font-display">{project.title}</h1>
+      <p className="mt-5 text-lg leading-relaxed text-[color:var(--ink-100)]">{project.hook}</p>
+    </header>
+  </article></div>;
 }
 
 function RouteLoader({ label = "Loading interactive" }) {
@@ -395,12 +402,13 @@ function MainDocument({ bootDone, held, onBoot }) {
 function RouteView({ route, bootDone, held, onBoot }) {
   if (Storyboard && route === "storyboard") return <Suspense fallback={<RouteLoader label="Loading storyboard" />}><Storyboard /></Suspense>;
   if (Previs && route === "previs") return <Suspense fallback={<RouteLoader label="Loading pre-vis" />}><Previs /></Suspense>;
+  if (route === "reel") return <Reel />;
   if (route === "emet") return <Suspense fallback={<RouteLoader label="Loading Emet" />}><EmetSection /></Suspense>;
   if (route === "explore") return <Suspense fallback={<RouteLoader label="Loading solar system" />}><SolarSystemExplorer /></Suspense>;
   if (route === "work") return <Suspense fallback={<RouteLoader label="Loading work" />}><ProjectWorkPage /></Suspense>;
-  if (route === "project/digital-double") return <Suspense fallback={<RouteLoader label="Loading 3D project" />}><DigitalDouble /></Suspense>;
-  if (route === "project/haloscript") return <Suspense fallback={<RouteLoader label="Loading project" />}><HaloscriptPage /></Suspense>;
-  if (route.startsWith("project/")) return <Suspense fallback={<RouteLoader label="Loading project" />}><ProjectPage slug={route.slice("project/".length)} /></Suspense>;
+  if (route === "project/digital-double") return <Suspense fallback={<ProjectShell slug="digital-double" />}><DigitalDouble /></Suspense>;
+  if (route === "project/haloscript") return <Suspense fallback={<ProjectShell slug="haloscript" />}><HaloscriptPage /></Suspense>;
+  if (route.startsWith("project/")) return <Suspense fallback={<ProjectShell slug={route.slice("project/".length)} />}><ProjectPage slug={route.slice("project/".length)} /></Suspense>;
   if (route === "lineage-demo") return <Suspense fallback={<RouteLoader label="Loading data explorer" />}><DataLineageExplorer /></Suspense>;
   if (route === "infinity") return <Suspense fallback={<RouteLoader label="Loading particle scene" />}><InfinityPage /></Suspense>;
   if (route === "digital-double") return <Suspense fallback={<RouteLoader label="Loading 3D project" />}><DigitalDouble /></Suspense>;
@@ -511,8 +519,6 @@ function AppShell({ bootDone, held, onBoot }) {
             <a className="skip-link" href="#main-content" onClick={(event) => { event.preventDefault(); document.getElementById("main-content")?.focus(); }}>Skip to main content</a>
             <Nav booting={!bootDone} />
             <ScrollProgress />
-            <PaletteSwatch />
-            <HomeCursor />
             {companionReady && <Companion />}
             {/* No page-level `perspective` here on purpose: setting it on an
                 ancestor this high up turns it into the CSS containing block
@@ -579,59 +585,22 @@ class ErrorBoundary extends Component {
   }
 }
 
-/* The cold open's place in the app. Until its code arrives the screen is
-   plain black (which is also the film's first beat). If the code is slow or
-   fails, or WebGL gives up, the page is simply shown: the opening is a
-   flourish, never a gate. */
-// When it is forced on the dev server (tests, review) it waits longer, so a
-// busy machine still gets to see it.
-const COLD_OPEN_PATIENCE_MS = coldOpenForced() ? 15000 : 4500;
-class ColdOpenBoundary extends Component {
-  state = { failed: false };
-  static getDerivedStateFromError() { return { failed: true }; }
-  componentDidCatch() { this.props.onFail(); }
-  render() { return this.state.failed ? null : this.props.children; }
-}
-function ColdOpenLayer({ mode, onHandOver, onDone }) {
-  const [since] = useState(() => performance.now());
-  const started = useRef(false);
-  const abandon = useCallback(() => { onHandOver(); onDone(); }, [onHandOver, onDone]);
-  useEffect(() => {
-    try { window.sessionStorage.setItem(COLD_OPEN_SESSION_KEY, "1"); } catch { /* coldOpenMode already said no */ }
-    const timer = setTimeout(() => { if (!started.current) { if (import.meta.env.DEV) console.warn("cold open: gave up waiting for its code"); abandon(); } }, COLD_OPEN_PATIENCE_MS);
-    return () => clearTimeout(timer);
-  }, [abandon]);
-  const onStart = useCallback(() => { started.current = true; }, []);
-  return <ColdOpenBoundary onFail={abandon}>
-    <Suspense fallback={<div className="co-veil" aria-hidden="true" />}>
-      <ColdOpen mode={mode} since={since} onStart={onStart} onHandOver={onHandOver} onDone={onDone} />
-    </Suspense>
-  </ColdOpenBoundary>;
-}
-
 export default function App() {
-  // On a first visit to the home page the hero plays its intro: the name
-  // sets large in the middle of the screen, then travels to its place as
-  // the rest arrives (see Hero). Until that hands over, `bootDone` is false:
-  // the nav stays out of the way and the companion does not load.
-  // Before that, the film's cold open plays over the page (see ColdOpen).
-  // `held` keeps the hero's intro waiting underneath until it hands over.
-  // The cold open builds its name on top of the hero's name set mid-screen,
-  // so whenever it plays the hero's intro plays too, carrying the name from
-  // there to its place.
-  const [coldOpen] = useState(() => (readRoute() === "main" ? coldOpenMode() : null));
-  const [bootDone, setBootDone] = useState(() => coldOpen === null && !(shouldPlayIntro() && readRoute() === "main"));
-  const onBoot = useCallback(() => setBootDone(true), []);
-  const [held, setHeld] = useState(coldOpen !== null);
-  const [coldOpenUp, setColdOpenUp] = useState(coldOpen !== null);
-  const release = useCallback(() => setHeld(false), []);
-  const closeColdOpen = useCallback(() => setColdOpenUp(false), []);
+  // The home page opens on the finished hero: no cold open, no intro.
+  const bootDone = true, held = false;
+  const onBoot = useCallback(() => {}, []);
+  // Once the first page is up and the browser is idle, fetch the case-study
+  // code, so opening a project rarely needs its shell at all.
+  useEffect(() => {
+    const warm = () => { import("./components/ProjectPage"); };
+    const id = window.requestIdleCallback ? window.requestIdleCallback(warm, { timeout: 4000 }) : setTimeout(warm, 2500);
+    return () => (window.cancelIdleCallback ? window.cancelIdleCallback(id) : clearTimeout(id));
+  }, []);
   return (
     <ErrorBoundary>
       <ThemeProvider>
         <SandboxProvider>
           <AppShell bootDone={bootDone} held={held} onBoot={onBoot} />
-          {coldOpenUp && <ColdOpenLayer mode={coldOpen} onHandOver={release} onDone={closeColdOpen} />}
         </SandboxProvider>
       </ThemeProvider>
     </ErrorBoundary>
