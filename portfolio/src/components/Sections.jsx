@@ -9,6 +9,8 @@ import { CAPABILITIES, FLAGSHIPS, MORE_WORK, STACK_MARQUEE } from "../data/showc
 import { EASE, STAGGER, tween } from "../lib/motion";
 import { INTRO_SESSION_KEY, filmEnabled } from "../lib/intro";
 import ActOne from "../film/ActOne";
+import ActTwo from "../film/ActTwo";
+import { BUILT as FILM_SETS } from "../film/actTwo/built";
 import { media } from "../lib/media";
 import Count from "./Count";
 import MagneticLink from "./Magnetic";
@@ -293,14 +295,23 @@ function Sheet({ children }) {
 }
 
 const coverOf = (project) => project.spotlightArt || project.cardArt || project.cardShot || project.shots?.[0];
+// The projects Act II has sets for, with what their cards say.
+const FILM_PROJECTS = FILM_SETS.map((slug) => {
+  const flag = FLAGSHIPS.find((item) => item.slug === slug);
+  const project = getProject(slug);
+  return { slug, name: project.title, eyebrow: flag.eyebrow, headline: flag.headline, stats: flag.stats, links: project.links.filter((link) => !link.locked).slice(0, 2) };
+});
+
 export function ProjectsSection() {
-  return <section id="projects" className="ed-projects ed-light ed-section" data-palette="bloom">
+  // Act II plays above the hands-on stage where the film can play.
+  const [film] = useState(filmEnabled);
+  return <>{film && <ActTwo projects={FILM_PROJECTS} />}<section id="projects" className="ed-projects ed-light ed-section" data-palette="bloom">
     <div className="ed-section-watermark" aria-hidden="true">WORK</div>
     <div className="ed-wrap">
       <Enter className="ed-section-heading sc-stage-heading"><div><IndexLabel number="02">Selected work</IndexLabel><h2>Don’t read about it. <em>Try it.</em></h2></div><div className="ed-heading-aside"><p>Six builds, each one live on this page: watch the film, run the agent, replay the failure, flip the finding, switch the device.</p></div></Enter>
       <WorkStage />
     </div>
-  </section>;
+  </section></>;
 }
 
 export function CapabilitiesSection() {

@@ -53,7 +53,8 @@ export function scrollToElement(el, { center = false } = {}) {
    it has drifted. The visitor's own scrolling ends that at once. */
 function holdOn(el, move) {
   let frame = 0;
-  const until = performance.now() + 1500;
+  // Long enough for the images above it to arrive on a slow connection.
+  const until = performance.now() + 3000;
   const events = ["wheel", "touchstart", "keydown", "pointerdown"];
   const stop = () => {
     cancelAnimationFrame(frame);

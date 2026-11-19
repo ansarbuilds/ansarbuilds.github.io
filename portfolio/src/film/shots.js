@@ -70,7 +70,7 @@ function projectShots(n, slug, { title, action, push, sound, frame }) {
   const side = Math.sign(at[0]) || 1;
   const code = String(n).padStart(2, "0");
   return [
-    { id: `A2-${code}a`, act: "A2", slug, title: `${SETS[slug].label}: arrive`, seconds: 2.5, scroll: 0.5, camera: { pos: near(at, -side * 26, 5, 46), look: at, fov: 38, move: "Streak in, settle wide" }, action: `Light-speed streak ends on the set. Title card: ${title}.`, text: SETS[slug].label.toUpperCase(), sound: "Whoosh, then the room tone of this set", bars: true, frame: "tunnel" },
+    { id: `A2-${code}a`, act: "A2", slug, title: `${SETS[slug].label}: arrive`, seconds: 2.5, scroll: 0.5, camera: { pos: near(at, -side * 26, 5, 46), look: at, fov: 38, ease: "out", move: "Streak in, settle wide" }, action: `Light-speed streak ends on the set. Title card: ${title}.`, text: SETS[slug].label.toUpperCase(), sound: "Whoosh, then the room tone of this set", bars: true, frame: "tunnel" },
     { id: `A2-${code}b`, act: "A2", slug, title: `${SETS[slug].label}: the scene`, seconds: 5, scroll: 1, camera: { pos: near(at, -side * 7, 1.5, 15), look: near(at, 0, 0.5, 0), fov: 30, move: push }, action, sound, bars: false, frame },
   ];
 }

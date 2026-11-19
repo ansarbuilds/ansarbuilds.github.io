@@ -219,3 +219,10 @@ Review each video before approving the next step; that is the "director's" job.
 - The numbers land while still well in frame and fade before the camera reaches them. On phones they stand nearly on the path, smaller.
 - Statement, numbers and tools stay real text. Reduced motion, Save-Data, slow connections and no WebGL 2 get the plain section, as does a scene that fails to start.
 - 60 fps on an M4. The scene (6 kB plus three.js) loads as the sheet starts to slide up. First-load JS +0.8 kB.
+
+## Step 5a, Act II framework and saywhen: done in the `step-5-act-two-saywhen` PR
+
+- The Act II framework: per project, a cut into a light-speed streak, the arrival (title card, letterbox), and the scene with a card of real text and links. It sits above the interactive work stage, which stays as the hands-on version.
+- The saywhen set: a dark room, a monitor playing the real app loop, the digital double's head as 8,000 points turning to it, a voice waveform from its mouth to the screen, and `cargo test --release` typed and sent.
+- Next: one PR per remaining set, in order: Jarvis, Flight Recorder, PRH-JEPA, Haloscript, Digital double.
+- Open question for when all six are in: keep the work stage below the film, or fold it into the cards.
