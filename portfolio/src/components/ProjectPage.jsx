@@ -11,6 +11,11 @@ import ProjectMotionPreview from "./ProjectMotionPreview";
 import { DUR, EASE } from "../lib/motion";
 import { isRouteTransitioning } from "../lib/routeTransition";
 import { media } from "../lib/media";
+import { MORE_WORK } from "../data/showcase";
+
+// Projects with an evidence poster (scripts/make-more-art.mjs) show it here
+// too, in place of a conceptual illustration.
+const POSTERS = Object.fromEntries(MORE_WORK.filter((item) => item.art).map((item) => [item.slug, item.art]));
 
 // The accent is a CSS colour (the current palette's accent ink), so its
 // translucent tints are mixed rather than built by appending hex alpha.
@@ -89,7 +94,8 @@ function PageTitle({ project }) {
 }
 
 function SignatureArtwork({ project, reduced }) {
-  const art = project.heroArt || project.spotlightArt || project.cardArt;
+  const poster = POSTERS[project.slug];
+  const art = poster || project.heroArt || project.spotlightArt || project.cardArt;
   if (!art) return null;
   return (
     <motion.figure
@@ -100,10 +106,10 @@ function SignatureArtwork({ project, reduced }) {
       transition={{ duration: DUR.slow, ease: EASE.out }}
     >
       <div className="project-signature-frame">
-        <img src={media(art)} alt={project.heroAlt || `${project.title} conceptual artwork`} loading="eager" />
-        <ProjectMotionPreview project={project} active expanded />
+        <img src={media(art)} alt={poster ? `${project.title}: the evidence, drawn from the study's own numbers` : project.heroAlt || `${project.title} conceptual artwork`} loading="eager" />
+        {!poster && <ProjectMotionPreview project={project} active expanded />}
       </div>
-      <figcaption>{project.heroCaption || (project.slug === "site-recon" ? "A public page, separated into the evidence a browser can verify." : `${project.title} · project visual`)}</figcaption>
+      <figcaption>{poster ? `${project.title} · drawn from its own numbers` : project.heroCaption || (project.slug === "site-recon" ? "A public page, separated into the evidence a browser can verify." : `${project.title} · project visual`)}</figcaption>
     </motion.figure>
   );
 }
