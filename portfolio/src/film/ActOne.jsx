@@ -59,7 +59,10 @@ export default function ActOne({ receipts, tools, lead, rest, fallback }) {
       }
     };
 
-    const near = new IntersectionObserver(([entry]) => { if (entry.isIntersecting) { near.disconnect(); load(); } }, { rootMargin: NEAR });
+        // Once this act is on its way, fetch the next act's code too, so a fast
+    // scroller never waits for a scene to arrive. (Fetched once; cached.)
+    const warmNext = () => import("./actTwo/createActTwo").catch(() => {});
+const near = new IntersectionObserver(([entry]) => { if (entry.isIntersecting) { near.disconnect(); load(); warmNext(); } }, { rootMargin: NEAR });
     const seen = new IntersectionObserver(([entry]) => { onScreen = entry.isIntersecting; run(); });
     near.observe(el);
     seen.observe(el);

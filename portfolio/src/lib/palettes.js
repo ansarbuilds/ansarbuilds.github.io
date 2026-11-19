@@ -10,23 +10,24 @@
    accentInk accent for text on paper (>= 4.5:1 against paper)
    onDark    accent for text on ink (>= 4.5:1 against ink) */
 export const PALETTES = {
-  // One dark theme end to end. Each part of the page keeps the same carbon
-  // and bone, tinted a few points toward its own accent, so the page shifts
-  // mood as it scrolls without ever changing character.
+  // One dark theme end to end, with one accent: coral. Each part of the
+  // home page tints the carbon and bone a few points, so the page shifts
+  // mood as it scrolls without ever changing character. Only the
+  // playground (neon) and project pages that ask (choreo) differ.
   // Opening: coral.
   lumen: { paper: "#0c0a09", ink: "#efe6d8", accent: "#ff8a5f", accentInk: "#ff8a5f", onDark: "#74200d" },
-  // Selected work: sky blue.
-  bloom: { paper: "#090b10", ink: "#e8ecf4", accent: "#6aa8ff", accentInk: "#8fc1ff", onDark: "#1b4e76" },
-  // More work: teal.
-  lumora: { paper: "#070e0e", ink: "#e6efec", accent: "#19c2cf", accentInk: "#4fd8e2", onDark: "#00535b" },
+  // Selected work: a cooler carbon.
+  bloom: { paper: "#0a0a0c", ink: "#ece8e0", accent: "#ff8a5f", accentInk: "#ff8a5f", onDark: "#74200d" },
+  // More work: neutral carbon.
+  lumora: { paper: "#0b0a0a", ink: "#eee7dc", accent: "#ff8a5f", accentInk: "#ff8a5f", onDark: "#74200d" },
   // The playground: neon rose.
   neon: { paper: "#0d090c", ink: "#f1e9ee", accent: "#ff2d95", accentInk: "#ff6fb5", onDark: "#a8004f" },
   // Lavender (project pages that ask for it).
   choreo: { paper: "#0c0a10", ink: "#ece8f3", accent: "#a98be0", accentInk: "#cdb8e8", onDark: "#4b2f6b" },
-  // What I bring: amber.
-  field: { paper: "#0d0b08", ink: "#f0e8da", accent: "#d9a85a", accentInk: "#e3bd7c", onDark: "#5c4521" },
-  // Contact: cobalt with a red button.
-  blueBloom: { paper: "#070a16", ink: "#e8ecf8", accent: "#ff4d42", accentInk: "#8ea8ff", onDark: "#1d3fae" },
+  // What I bring: a warmer carbon.
+  field: { paper: "#0d0a08", ink: "#f0e7d9", accent: "#ff8a5f", accentInk: "#ff8a5f", onDark: "#74200d" },
+  // Contact: the opening carbon, deepened.
+  blueBloom: { paper: "#0b0909", ink: "#efe6d8", accent: "#ff8a5f", accentInk: "#ff8a5f", onDark: "#74200d" },
 };
 
 export const DEFAULT_PALETTE = "lumen";
@@ -35,12 +36,12 @@ export const DEFAULT_PALETTE = "lumen";
 // in the reels' style: a name, then each colour's name and hex.
 export const PALETTE_LABELS = {
   lumen: { title: "Ember", paper: "Carbon", ink: "Bone", accent: "Coral" },
-  bloom: { title: "Signal", paper: "Blue Carbon", ink: "Frost", accent: "Sky Blue" },
-  lumora: { title: "Lumora", paper: "Deep Teal", ink: "Mist", accent: "Electric Teal" },
+  bloom: { title: "Signal", paper: "Cool Carbon", ink: "Bone", accent: "Coral" },
+  lumora: { title: "Lumora", paper: "Carbon", ink: "Bone", accent: "Coral" },
   neon: { title: "Human Next", paper: "Plum Black", ink: "Blush White", accent: "Neon Rose" },
   choreo: { title: "Choreo", paper: "Violet Black", ink: "Pale Lavender", accent: "Lavender" },
-  field: { title: "Field / Form", paper: "Umber Black", ink: "Bone", accent: "Amber" },
-  blueBloom: { title: "Blue Bloom", paper: "Midnight", ink: "Ice White", accent: "Signal Red" },
+  field: { title: "Field / Form", paper: "Warm Carbon", ink: "Bone", accent: "Coral" },
+  blueBloom: { title: "Blue Bloom", paper: "Deep Carbon", ink: "Bone", accent: "Coral" },
 };
 
 // applyPalette and clearPalette announce the palette now showing, so

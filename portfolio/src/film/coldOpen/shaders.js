@@ -149,17 +149,27 @@ export const raysFragment = /* glsl */ `
 /* The film finish, over the whole frame: colour fringing toward the edges
    (stronger while the camera is moving fast), grain, and a vignette. */
 export const finishShader = {
-  uniforms: { tDiffuse: { value: null }, uTime: { value: 0 }, uAberration: { value: 0.0012 }, uGrain: { value: 0.028 } },
+  uniforms: { tDiffuse: { value: null }, uTime: { value: 0 }, uAberration: { value: 0.0012 }, uGrain: { value: 0.028 }, uGrade: { value: 1 } },
   vertexShader: /* glsl */ `varying vec2 vUv; void main() { vUv = uv; gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.); }`,
   fragmentShader: /* glsl */ `
     ${COMMON}
     uniform sampler2D tDiffuse;
-    uniform float uTime, uAberration, uGrain;
+    uniform float uTime, uAberration, uGrain, uGrade;
     varying vec2 vUv;
     void main() {
       vec2 fromCentre = vUv - 0.5;
       vec2 shift = fromCentre * dot(fromCentre, fromCentre) * uAberration * 40.;
       vec3 color = vec3(texture2D(tDiffuse, vUv + shift).r, texture2D(tDiffuse, vUv).g, texture2D(tDiffuse, vUv - shift).b);
+      // The film's one grade, the same in every act: blacks settle on the
+      // hero's carbon instead of pure black, shadows lean warm, highlights
+      // roll off toward bone instead of clipping to white, and a gentle
+      // S-curve holds the contrast. (Linear light: OutputPass converts.)
+      float luma = dot(color, vec3(0.2126, 0.7152, 0.0722));
+      color = mix(color, color * vec3(1.04, 1.0, 0.94), smoothstep(0.35, 0., luma) * uGrade);
+      color = mix(color, 1. - exp(-color * 1.35), uGrade);
+      color = mix(color, mix(color, vec3(0.86, 0.79, 0.69) * luma * 1.12, 0.18), smoothstep(0.45, 1., luma) * uGrade);
+      color = mix(color, color * color * (3. - 2. * color), 0.22 * uGrade);
+      color = max(color, vec3(0.0037, 0.0030, 0.0027) * uGrade);
       color *= 1. - 0.55 * smoothstep(0.35, 0.95, length(fromCentre) * 1.25);
       color += (hash2(vUv * 913. + fract(uTime) * 31.) - 0.5) * uGrain;
       gl_FragColor = vec4(color, 1.);

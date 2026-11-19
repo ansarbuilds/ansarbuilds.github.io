@@ -65,7 +65,10 @@ export default function ActTwo({ projects }) {
       }
     };
     // Load while the visitor is still in Act I, so the first set is ready.
-    const near = new IntersectionObserver(([entry]) => { if (entry.isIntersecting) { near.disconnect(); load(); } }, { rootMargin: "0px 0px 150% 0px" });
+        // Once this act is on its way, fetch the next act's code too, so a fast
+    // scroller never waits for a scene to arrive. (Fetched once; cached.)
+    const warmNext = () => import("./actThree/createActThree").catch(() => {});
+const near = new IntersectionObserver(([entry]) => { if (entry.isIntersecting) { near.disconnect(); load(); warmNext(); } }, { rootMargin: "0px 0px 150% 0px" });
     const seen = new IntersectionObserver(([entry]) => { onScreen = entry.isIntersecting; run(); });
     near.observe(el);
     seen.observe(el);
