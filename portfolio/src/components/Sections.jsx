@@ -242,7 +242,7 @@ export function Hero({ ready = true, hold = false, onReady }) {
           <span className="sc-name-line" aria-hidden="true"><motion.span {...line(0)}>MOHAMED</motion.span></span>
           <span className="sc-name-line" aria-hidden="true"><motion.span className="is-outline" {...line(1)}>ANSAR</motion.span></span>
         </motion.h1>
-        <motion.p className="sc-hero-line" {...appear(1)}>{HERO.title} <em>Here are {LISTED_PROJECTS.length} of them.</em></motion.p>
+        <motion.p className="sc-hero-line" {...appear(1)}>{HERO.title} <em className="sc-nowrap">Here are {LISTED_PROJECTS.length} of them.</em></motion.p>
         <motion.div className="sc-hero-ctas" {...appear(2)}>
           <MagneticLink href="#projects" className="sc-hero-btn">See the work<ArrowDown size={18} aria-hidden="true" /></MagneticLink>
           <a href="#contact" className="sc-hero-ghost">Get in touch<ArrowUpRight size={16} aria-hidden="true" /></a>
@@ -317,7 +317,7 @@ export function ProjectsSection() {
   return <>{film && <ActTwo projects={FILM_PROJECTS} />}<section id="projects" className="ed-projects ed-light ed-section" data-palette="bloom">
     <div className="ed-section-watermark" aria-hidden="true">WORK</div>
     <div className="ed-wrap">
-      <Enter className="ed-section-heading sc-stage-heading"><div><IndexLabel number="02">Selected work</IndexLabel><h2>Don’t read about it. <em>Try it.</em></h2></div><div className="ed-heading-aside"><p>Six builds, each one live on this page: watch the film, run the agent, replay the failure, flip the finding, switch the device.</p></div></Enter>
+      <Enter className="ed-section-heading sc-stage-heading"><div><IndexLabel number="02">Selected work</IndexLabel><h2>Six builds. <em>Each with its numbers.</em></h2></div><div className="ed-heading-aside"><p>Each one has the number, the picture and a way in. Some you can run, some you watch, some you read.</p></div></Enter>
       <WorkStage />
     </div>
   </section></>;
@@ -417,7 +417,6 @@ const CREDITS = [
   ["Directed, designed and built by", "Mohamed Ansar"],
   ["Pair programmer", "AI"],
   ["Built with", "React · three.js · GLSL · Vite · Lenis"],
-  ["Type", "Anton · Outfit · Instrument Serif · Plus Jakarta Sans · JetBrains Mono"],
   // The six builds the film plays, each a link to its page.
   ["Featuring", FILM_SETS.map((slug) => ({ name: getProject(slug).title, href: `/work/${slug}/` }))],
 ];
