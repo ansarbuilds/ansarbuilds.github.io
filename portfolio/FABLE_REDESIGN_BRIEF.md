@@ -224,7 +224,7 @@ Review each video before approving the next step; that is the "director's" job.
 
 - The Act II framework: per project, a cut into a light-speed streak, the arrival (title card, letterbox), and the scene with a card of real text and links. It sits above the interactive work stage, which stays as the hands-on version.
 - The saywhen set: a dark room, a monitor playing the real app loop, the digital double's head as 8,000 points turning to it, a voice waveform from its mouth to the screen, and `cargo test --release` typed and sent.
-- Next: one PR per remaining set, in order: Jarvis (done in `step-5b-act-two-jarvis`), Flight Recorder (done in `step-5c-act-two-flight-recorder`), PRH-JEPA (done in `step-5d-act-two-prh-jepa`), Haloscript, Digital double.
+- Next: one PR per remaining set, in order: Jarvis (done in `step-5b-act-two-jarvis`), Flight Recorder (done in `step-5c-act-two-flight-recorder`), PRH-JEPA (done in `step-5d-act-two-prh-jepa`), Haloscript (done in `step-5e-act-two-haloscript`), Digital double.
 - Open question for when all six are in: keep the work stage below the film, or fold it into the cards.
 
 ## Step 5b, the Jarvis set: done in the `step-5b-act-two-jarvis` PR
@@ -240,3 +240,9 @@ Review each video before approving the next step; that is the "director's" job.
 
 - Two clouds of points, images and text, drift apart with lines between matching points; one rotation snaps them together; a light sweeps across and turns exactly 35% of the points red, and "−35%" comes up: of the top score came from a hidden clip. The card says "Illustration of the finding".
 - On phones every Act II set now stands in the upper part of the frame, above its card.
+
+## Step 5e, the Haloscript set: done in the `step-5e-act-two-haloscript` PR
+
+- A MacBook, an iPad and an iPhone, modelled in code with metal reflections from a studio environment map, on a turntable under a key light and a violet rim. Their screens are the real app and move through it together: the manuscript, the whiteboard, the corkboard.
+- The screenshots (about 1 MB) load while the PRH-JEPA set is on screen, not with the rest of the act.
+- The dev server now prepares the film's lazily loaded three.js modules at start (`optimizeDeps` in `vite.config.js`). Finding one on first use reloaded every open page, which made browser tests flaky.

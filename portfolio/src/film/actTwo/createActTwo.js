@@ -14,6 +14,7 @@ import { buildSaywhen } from "./sets/saywhen.js";
 import { buildJarvis } from "./sets/jarvis.js";
 import { buildFlightRecorder } from "./sets/flightRecorder.js";
 import { buildPrhJepa } from "./sets/prhJepa.js";
+import { buildHaloscript } from "./sets/haloscript.js";
 
 /* Act II (the project sets) in plain three.js.
 
@@ -23,7 +24,7 @@ import { buildPrhJepa } from "./sets/prhJepa.js";
    how far through its arrival and scene the film is. Only the set on screen
    plays its footage. */
 
-const BUILDERS = { saywhen: buildSaywhen, jarvis: buildJarvis, "agent-flight-recorder": buildFlightRecorder, "prh-jepa": buildPrhJepa };
+const BUILDERS = { saywhen: buildSaywhen, jarvis: buildJarvis, "agent-flight-recorder": buildFlightRecorder, "prh-jepa": buildPrhJepa, haloscript: buildHaloscript };
 
 function pickQuality() {
   const low = window.matchMedia("(max-width: 760px)").matches || (navigator.hardwareConcurrency || 8) <= 4;
@@ -65,7 +66,7 @@ export function createActTwo(canvas, { getProgress, onFrame, media }) {
     const [, sceneShot] = shotsFor(slug);
     group.lookAt(sceneShot.camera.pos[0], SETS[slug].at[1], sceneShot.camera.pos[2]);
     scene.add(group);
-    return { slug, group, set: BUILDERS[slug]({ group, media }), playing: false };
+    return { slug, group, set: BUILDERS[slug]({ group, media, renderer }), playing: false };
   });
 
   // The streak, on a card held in front of the lens.
@@ -136,6 +137,8 @@ export function createActTwo(canvas, { getProgress, onFrame, media }) {
       item.group.visible = m.here || m.arrive > 0 && m.scene < 1;
       if (m.here !== item.playing) { item.playing = m.here; item.set.setPlaying(m.here); }
       if (item.group.visible) item.set.update({ arrive: m.arrive, scene: m.scene, clock, scale, camera });
+      // The next set may want to start loading its heavier pieces now.
+      if (m.here) sets[i + 1]?.set.prepare?.();
       rush = Math.max(rush, m.streak);
     });
     streakUniforms.uStreak.value = rush;
