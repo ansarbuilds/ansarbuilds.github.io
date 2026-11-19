@@ -102,7 +102,9 @@ export function createFinale(canvas, { getProgress, onFrame }) {
     const distance = camera.position.distanceTo(point);
     flare.position.copy(point);
     flare.quaternion.copy(camera.quaternion);
-    flare.scale.set(distance * half * camera.aspect, distance * half, 1);
+    // Half again the frame: the shared flare shader is drawn for a card
+    // that size (see coldOpen/shaders.js).
+    flare.scale.set(distance * half * camera.aspect * 1.5, distance * half * 1.5, 1);
     flareUniforms.uCore.value = m.core * (0.9 + 0.1 * Math.sin(clock * 2.2));
     flareUniforms.uFlare.value = m.flare;
     flareUniforms.uAspect.value = camera.aspect;

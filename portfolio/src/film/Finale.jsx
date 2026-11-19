@@ -27,6 +27,9 @@ export default function Finale({ contact, pitch, credits, onTop, fallback }) {
       return span > 0 ? Math.min(1, Math.max(0, -box.top / span)) : 0;
     };
     const tone = cueOnRise("tone");
+    // How far the headline lifts to make room for the credits: less on a
+    // phone, whose headline already sits high (see finale.css).
+    const lift = !window.matchMedia("(max-width: 760px)").matches ? 30 : window.matchMedia("(max-height: 720px)").matches ? 15 : 18;
     const onFrame = (t, m) => {
       tone(m.contact);
       if (block.current) {
@@ -34,7 +37,7 @@ export default function Finale({ contact, pitch, credits, onTop, fallback }) {
         block.current.style.visibility = m.contact > 0.02 ? "visible" : "hidden";
         // As the credits roll in, the contact rises to the top and keeps
         // only its line, the email and the links.
-        block.current.style.transform = `translateY(${(1 - m.contact) * 24 - m.credits * 30}vh)`;
+        block.current.style.transform = `translateY(${(1 - m.contact) * 24 - m.credits * lift}vh)`;
         block.current.style.setProperty("--fin-detail", 1 - m.credits);
       }
       if (roll.current) {
