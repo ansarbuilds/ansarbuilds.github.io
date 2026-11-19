@@ -1,6 +1,7 @@
 import "./actOne/actOne.css";
 import { useEffect, useRef, useState } from "react";
 import { ACT_ONE_SCREENS } from "./actOne/screens";
+import { showBed } from "../lib/sound";
 
 /* Act I (storyboard A1-01 to A1-03) as it sits on the home page: the sheet
    that slides up over the hero. It is as tall as the act's scrolling plus
@@ -63,7 +64,8 @@ export default function ActOne({ receipts, tools, lead, rest, fallback }) {
     // scroller never waits for a scene to arrive. (Fetched once; cached.)
     const warmNext = () => import("./actTwo/createActTwo").catch(() => {});
 const near = new IntersectionObserver(([entry]) => { if (entry.isIntersecting) { near.disconnect(); load(); warmNext(); } }, { rootMargin: NEAR });
-    const seen = new IntersectionObserver(([entry]) => { onScreen = entry.isIntersecting; run(); });
+    // The sound bed follows the act on screen (silent unless sound is on).
+    const seen = new IntersectionObserver(([entry]) => { onScreen = entry.isIntersecting; showBed("act1", onScreen); run(); });
     near.observe(el);
     seen.observe(el);
     document.addEventListener("visibilitychange", run);
@@ -71,6 +73,7 @@ const near = new IntersectionObserver(([entry]) => { if (entry.isIntersecting) {
       cancelled = true;
       near.disconnect();
       seen.disconnect();
+      showBed("act1", false);
       document.removeEventListener("visibilitychange", run);
       film?.dispose();
     };

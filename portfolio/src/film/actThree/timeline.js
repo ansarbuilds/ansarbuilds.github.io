@@ -92,6 +92,8 @@ export function moments(t) {
   const faces = PILLARS.map((pillar) => facing(angle, pillar));
   const best = faces.indexOf(Math.max(...faces));
   return {
+    // 1 while the opening match cut is held, for the sound of the cut.
+    held: t < matchEnd() ? 1 : 0,
     // Each rises in turn, out of the ground.
     // The middle one is the match and already stands; the other two rise
     // beside it once the held cut is over.

@@ -2,7 +2,7 @@ import "./finale/finale.css";
 import { useEffect, useRef, useState } from "react";
 import { ArrowUpRight, ExternalLink } from "lucide-react";
 import { FINALE_CONTACT_AT, FINALE_SCREENS } from "./finale/screens";
-import { cueOnRise } from "../lib/sound";
+import { cueOnRise, showBed } from "../lib/sound";
 
 /* The finale on the home page, in place of the Contact section: everything
    recedes into one point of light; then the contact line, the email and the
@@ -57,7 +57,8 @@ export default function Finale({ contact, pitch, credits, onTop, fallback }) {
       }
     };
     const near = new IntersectionObserver(([entry]) => { if (entry.isIntersecting) { near.disconnect(); load(); } }, { rootMargin: "0px 0px 150% 0px" });
-    const seen = new IntersectionObserver(([entry]) => { onScreen = entry.isIntersecting; run(); });
+    // The sound bed follows the act on screen (silent unless sound is on).
+    const seen = new IntersectionObserver(([entry]) => { onScreen = entry.isIntersecting; showBed("finale", onScreen); run(); });
     near.observe(el);
     seen.observe(el);
     document.addEventListener("visibilitychange", run);
@@ -65,6 +66,7 @@ export default function Finale({ contact, pitch, credits, onTop, fallback }) {
       cancelled = true;
       near.disconnect();
       seen.disconnect();
+      showBed("finale", false);
       document.removeEventListener("visibilitychange", run);
       film?.dispose();
     };

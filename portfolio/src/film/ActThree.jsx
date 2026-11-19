@@ -2,7 +2,7 @@ import "./actThree/actThree.css";
 import { useEffect, useRef, useState } from "react";
 import { ArrowUpRight } from "lucide-react";
 import { ACT_THREE_SCREENS } from "./actThree/screens";
-import { cueOnRise } from "../lib/sound";
+import { cueOnRise, showBed } from "../lib/sound";
 
 /* Act III ("What I bring") on the home page: three monoliths, one per
    capability, in a pinned stage the scrollbar drives. The title card, then
@@ -32,8 +32,10 @@ export default function ActThree({ capabilities, fallback }) {
       node.style.transform = `translateY(${(1 - amount) * rise}px)`;
       node.style.visibility = amount > 0.02 ? "visible" : "hidden";
     };
-    const chimes = capabilities.map(() => cueOnRise("chime"));
+    // A low tone as the act lands on its held match cut.
+    const cut = cueOnRise("tone", 0.9), chimes = capabilities.map(() => cueOnRise("chime"));
     const onFrame = (t, m) => {
+      cut(m.held);
       show(title.current, m.title, 16);
       m.card.forEach((amount, i) => { show(cards.current[i], amount, 22); chimes[i](amount); });
     };
@@ -59,7 +61,8 @@ export default function ActThree({ capabilities, fallback }) {
     // scroller never waits for a scene to arrive. (Fetched once; cached.)
     const warmNext = () => import("./actFour/createActFour").catch(() => {});
 const near = new IntersectionObserver(([entry]) => { if (entry.isIntersecting) { near.disconnect(); load(); warmNext(); } }, { rootMargin: "0px 0px 150% 0px" });
-    const seen = new IntersectionObserver(([entry]) => { onScreen = entry.isIntersecting; run(); });
+    // The sound bed follows the act on screen (silent unless sound is on).
+    const seen = new IntersectionObserver(([entry]) => { onScreen = entry.isIntersecting; showBed("act3", onScreen); run(); });
     near.observe(el);
     seen.observe(el);
     document.addEventListener("visibilitychange", run);
@@ -67,6 +70,7 @@ const near = new IntersectionObserver(([entry]) => { if (entry.isIntersecting) {
       cancelled = true;
       near.disconnect();
       seen.disconnect();
+      showBed("act3", false);
       document.removeEventListener("visibilitychange", run);
       film?.dispose();
     };

@@ -3,7 +3,7 @@ import { useEffect, useRef, useState } from "react";
 import { ArrowUpRight } from "lucide-react";
 import { ACT_TWO_SCREENS } from "./actTwo/screens";
 import { media } from "../lib/media";
-import { cueOnRise } from "../lib/sound";
+import { cueOnRise, showBed } from "../lib/sound";
 
 /* Act II (the project sets) as it sits on the home page, just above the
    interactive work stage. Like Act I: a section as tall as the act's
@@ -69,7 +69,8 @@ export default function ActTwo({ projects }) {
     // scroller never waits for a scene to arrive. (Fetched once; cached.)
     const warmNext = () => import("./actThree/createActThree").catch(() => {});
 const near = new IntersectionObserver(([entry]) => { if (entry.isIntersecting) { near.disconnect(); load(); warmNext(); } }, { rootMargin: "0px 0px 150% 0px" });
-    const seen = new IntersectionObserver(([entry]) => { onScreen = entry.isIntersecting; run(); });
+    // The sound bed follows the act on screen (silent unless sound is on).
+    const seen = new IntersectionObserver(([entry]) => { onScreen = entry.isIntersecting; showBed("act2", onScreen); run(); });
     near.observe(el);
     seen.observe(el);
     document.addEventListener("visibilitychange", run);
@@ -77,6 +78,7 @@ const near = new IntersectionObserver(([entry]) => { if (entry.isIntersecting) {
       cancelled = true;
       near.disconnect();
       seen.disconnect();
+      showBed("act2", false);
       document.removeEventListener("visibilitychange", run);
       film?.dispose();
     };
