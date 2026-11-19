@@ -22,12 +22,12 @@
 /* A phone's headline block is taller than the gap above the credits:
    lift it, and the credits sit clear underneath. */
 @media (max-width: 760px) {
-  .fin-block { top: 36%; }
+  .fin-block { top: 26%; }
   .fin-credits { top: 64vh; padding: 0 16px; }
 }
 /* A short phone has no room for the pitch under the links; the email
    button and links say the same thing. (The plain Contact section keeps it.) */
-@media (max-width: 760px) and (max-height: 720px) { .fin-pitch { display: none; } }
+@media (max-width: 760px) and (max-height: 720px) { .fin-pitch { display: none; } .fin-block { top: 23%; } }
 .fin-credits p { margin: 0 0 12px; font: 400 clamp(.82rem, 1.25vw, 1rem)/1.25 var(--font-condensed); text-transform: uppercase; letter-spacing: .04em; }
 .fin-credits p span { display: block; margin-bottom: 4px; font: 500 .56rem/1 var(--font-mono); letter-spacing: .18em; color: #8a8075; }
 .fin-credits p .fin-credit-links { display: inline; margin: 0; font: inherit; letter-spacing: inherit; color: inherit; }
