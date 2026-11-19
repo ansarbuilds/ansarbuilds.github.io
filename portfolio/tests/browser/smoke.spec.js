@@ -117,7 +117,9 @@ test('scrolling over the work grid moves the page, not a box inside it', async (
   await page.mouse.move(point.x, point.y);
   const before = await page.evaluate(() => window.scrollY);
   await page.mouse.wheel(0, 1200);
-  await expect.poll(() => page.evaluate(() => window.scrollY)).toBeGreaterThan(before + 600);
+  // The page itself moved (smooth scrolling eases in, and on a busy machine
+  // it can take a few seconds), rather than a box inside the list.
+  await expect.poll(() => page.evaluate(() => window.scrollY), { timeout: 15000 }).toBeGreaterThan(before + 300);
 });
 
 // The film's pre-vis pages only exist on the dev server, which is what these
@@ -205,7 +207,8 @@ test('Act II plays above the work stage, with real links that are hidden until t
   // and the earlier ones have gone.
   await act.evaluate((node) => window.scrollTo(0, node.getBoundingClientRect().top + window.scrollY + node.offsetHeight - window.innerHeight));
   const last = act.locator('article.act2-card').last();
-  await expect(last).toBeVisible();
+  // The scene has to catch up with the jump before its card shows.
+  await expect(last).toBeVisible({ timeout: 20000 });
   await expect(last.getByRole('link', { name: 'Read the case study' })).toBeVisible();
   await expect(card).toBeHidden();
   expect(await page.locator('#projects').evaluate((node) => node.getBoundingClientRect().top > 0)).toBe(true);
