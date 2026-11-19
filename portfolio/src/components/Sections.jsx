@@ -7,7 +7,8 @@ import { CODE, CONTACT, HERO, RECEIPTS } from "../data/content";
 import { EXPERIMENTS, LISTED_PROJECTS, getProject } from "../data/projects";
 import { CAPABILITIES, FLAGSHIPS, MORE_WORK, STACK_MARQUEE } from "../data/showcase";
 import { EASE, STAGGER, tween } from "../lib/motion";
-import { INTRO_SESSION_KEY } from "../lib/intro";
+import { INTRO_SESSION_KEY, filmEnabled } from "../lib/intro";
+import ActOne from "../film/ActOne";
 import { media } from "../lib/media";
 import Count from "./Count";
 import MagneticLink from "./Magnetic";
@@ -97,6 +98,9 @@ function ScrubText({ lead, rest, className }) {
    buttons, proof cards, and the network last. Any click, key or scroll
    skips straight to the end. A return visit plays the same entrance without
    the travel. */
+const STATEMENT = { lead: "Most AI demos stop at the demo.", rest: "Mine ship with tests, real numbers and a write-up, including the parts that failed." };
+const RECEIPT_VALUES = RECEIPTS.map((item) => ({ ...item, value: item.value === "PROJECTS" ? `${LISTED_PROJECTS.length}+` : item.value }));
+
 // Where the name's letters are. Across: the text itself, since its lines
 // are full-width blocks. Down: the heading's own box, because each line
 // starts its entrance pushed down out of view and the text would read low.
@@ -208,6 +212,16 @@ export function Hero({ ready = true, hold = false, onReady }) {
     animate: { y: "0%", skewY: 0 },
     transition: tween("slow", "out", i * STAGGER.loose),
   });
+  // The short version: Act I of the film where it can play, or the plain
+  // sheet (also its fallback).
+  const [film] = useState(filmEnabled);
+  const brief = <section className="ed-intro ed-light sc-brief" aria-label="The short version" data-palette="lumen">
+    <div className="ed-wrap">
+      <ScrubText className="sc-statement" lead={STATEMENT.lead} rest={STATEMENT.rest} />
+      <dl className="sc-receipts">{RECEIPT_VALUES.map((item) => <div key={item.label}><dt>{item.value}</dt><dd>{item.label}</dd></div>)}</dl>
+    </div>
+    <StackMarquee />
+  </section>;
   return <div className="sc-open">
     <section ref={heroRef} id="hero" aria-labelledby="hero-name" className="sc-hero" data-palette="lumen" onPointerDown={() => setHint(false)}>
       <motion.div className="sc-hero-stage" style={{ scale: fieldScale, opacity: fieldOpacity }}>
@@ -230,13 +244,7 @@ export function Hero({ ready = true, hold = false, onReady }) {
       </motion.div>
       <motion.div className="sc-hero-bottom" style={{ y: feedY, opacity: feedOpacity }}><HeroFeed appear={appear} from={3} /></motion.div>
     </section>
-    <section className="ed-intro ed-light sc-brief" aria-label="The short version" data-palette="lumen">
-      <div className="ed-wrap">
-        <ScrubText className="sc-statement" lead="Most AI demos stop at the demo." rest="Mine ship with tests, real numbers and a write-up, including the parts that failed." />
-        <dl className="sc-receipts">{RECEIPTS.map((item) => <div key={item.label}><dt>{item.value === "PROJECTS" ? `${LISTED_PROJECTS.length}+` : item.value}</dt><dd>{item.label}</dd></div>)}</dl>
-      </div>
-      <StackMarquee />
-    </section>
+    {film ? <ActOne receipts={RECEIPT_VALUES} tools={STACK_MARQUEE} lead={STATEMENT.lead} rest={STATEMENT.rest} fallback={brief} /> : brief}
   </div>;
 }
 

@@ -16,6 +16,21 @@ export function shouldPlayIntro() {
   }
 }
 
+/* Whether this visitor gets the film's 3D scenes at all: not with reduced
+   motion, on Save-Data or a 2G/3G connection, or without WebGL 2. The page
+   shows its plain version instead. */
+export function filmEnabled() {
+  if (typeof window === "undefined") return false;
+  if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return false;
+  const connection = navigator.connection;
+  if (connection?.saveData || /(^|-)(2g|3g)$/.test(connection?.effectiveType ?? "")) return false;
+  try {
+    return !!document.createElement("canvas").getContext("webgl2");
+  } catch {
+    return false;
+  }
+}
+
 export const COLD_OPEN_SESSION_KEY = "cold-open-played";
 
 /* Whether the film's cold open should play over the home page, and which
@@ -31,19 +46,11 @@ export function coldOpenMode() {
     const forced = new URLSearchParams(window.location.search).get("coldopen");
     if (forced === "full" || forced === "short") return forced;
   }
-  if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return null;
-  // On a slow connection the film would mostly be a wait for three.js.
-  const connection = navigator.connection;
-  if (window.location.hash || connection?.saveData || /(^|-)(2g|3g)$/.test(connection?.effectiveType ?? "")) return null;
+  if (window.location.hash || !filmEnabled()) return null;
   let seenBefore;
   try {
     if (window.sessionStorage.getItem(INTRO_SESSION_KEY) || window.sessionStorage.getItem(COLD_OPEN_SESSION_KEY)) return null;
     seenBefore = !!window.localStorage.getItem(INTRO_SESSION_KEY);
-  } catch {
-    return null;
-  }
-  try {
-    if (!document.createElement("canvas").getContext("webgl2")) return null;
   } catch {
     return null;
   }

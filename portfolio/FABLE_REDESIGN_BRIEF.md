@@ -212,3 +212,10 @@ Review each video before approving the next step; that is the "director's" job.
 - Plays once per session. A returning visitor gets a 1.5 s cut from the name onward. Skippable by any click, key, scroll or the Skip button.
 - 60 fps on an M4 at 1440x900 and on a phone-sized screen.
 - **Cost:** Lighthouse (first visit, slow phone and network) goes from 86 to 43 and 72 over two runs, and the hero name from 3.4 s to 5.1 s. three.js (171 kB) and the shaders load only for a visitor who sees the film.
+
+## Step 4, Act I: done in the `step-4-act-one` PR
+
+- Shots A1-01 to A1-03, scroll-driven, replacing the "short version" sheet: through the name (it parts for the camera), the four numbers counting up in cubes with their labels, a river of code under the path, and the tools orbiting; pointing at one pulls it toward the camera.
+- The numbers land while still well in frame and fade before the camera reaches them. On phones they stand nearly on the path, smaller.
+- Statement, numbers and tools stay real text. Reduced motion, Save-Data, slow connections and no WebGL 2 get the plain section, as does a scene that fails to start.
+- 60 fps on an M4. The scene (6 kB plus three.js) loads as the sheet starts to slide up. First-load JS +0.8 kB.

@@ -2,7 +2,7 @@ import "./film.css";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Canvas, useFrame } from "@react-three/fiber";
 import * as THREE from "three";
-import { ACTS, SETS, TIMELINE_SHOTS } from "./shots";
+import { ACT_ONE, ACTS, SETS, TIMELINE_SHOTS } from "./shots";
 import { buildTimeline, entryAtTime, poseAt, scrollAtTime, timeAtScroll, timecode } from "./rig";
 
 /* The moving pre-vis: the camera flies the real path through a grey-box
@@ -81,7 +81,7 @@ const DUST = scatter(5200, 11, (next) => { const angle = next() * Math.PI * 2, r
 const NETWORK = scatter(1800, 5, (next) => { const angle = next() * Math.PI * 2, tilt = Math.acos(2 * next() - 1), reach = 30 * Math.cbrt(next()); return [Math.sin(tilt) * Math.cos(angle) * reach * 1.5, Math.cos(tilt) * reach * 0.55, Math.sin(tilt) * Math.sin(angle) * reach]; });
 const NETWORK_LINKS = (() => { const lines = []; for (let i = 0; i < 520; i++) { const a = (i * 7) % 1800, b = (i * 13 + 5) % 1800; lines.push(NETWORK[a * 3], NETWORK[a * 3 + 1], NETWORK[a * 3 + 2], NETWORK[b * 3], NETWORK[b * 3 + 1], NETWORK[b * 3 + 2]); } return new Float32Array(lines); })();
 
-const NUMBERS = [["10+", [-9, 0, -78]], ["2", [8, 0, -98]], ["3", [-8, 0, -118]], ["2", [8, 0, -136]]];
+const NUMBERS = ["10+", "2", "3", "2"].map((text, i) => [text, ACT_ONE.numbers[i]]);
 const PROJECT_SLUGS = Object.keys(SETS).filter((key) => !["monoliths", "star", "solar", "ribbon", "head", "point"].includes(key));
 
 function Sets() {
@@ -105,6 +105,9 @@ function Sets() {
     <mesh position={at("head", 6, -1.6)}><sphereGeometry args={[1.4, 12, 8]} /><meshBasicMaterial color={SIGNAL} wireframe /></mesh>
     <Label text="HEAD + BB-8" position={at("head", 0, 7)} height={1.8} />
     <Glow position={at("point")} size={5} />
+    <Glow position={ACT_ONE.tools.at} size={8} />
+    {ACT_ONE.tools.rings.map((radius) => <mesh key={radius} position={ACT_ONE.tools.at} rotation={[Math.PI / 2 - 0.35, 0, 0]}><torusGeometry args={[radius, 0.04, 6, 96]} /><meshBasicMaterial color={BONE} transparent opacity={0.4} /></mesh>)}
+    <Label text="TOOLS" position={[ACT_ONE.tools.at[0], ACT_ONE.tools.at[1] + 6, ACT_ONE.tools.at[2]]} height={1.8} />
   </>;
 }
 
