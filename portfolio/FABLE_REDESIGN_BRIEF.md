@@ -266,3 +266,10 @@ Review each video before approving the next step; that is the "director's" job.
 - The playground returns to the home page as a reel between More work and Contact (`id="ai"`): the network collapses into a star that becomes the sun, the planets come in on their real orbits, an infinity ribbon of light with a bright head running round it, and Emet's terminal answering "who are you?" in its own words. Each scene's card opens the real experiment. Without the film the home page has no playground section, as before.
 - Storyboard change: A4-04 is Emet's terminal, not "the head and BB-8": the head has its scene in Act II, and Emet is the droid that already roams the page. A4-01 now happens at the solar system's sun.
 - Performance, all acts: no backdrop blur on cards over a moving canvas, and an act that has finished (or not started) draws a quarter of the frames. Both cut dropped frames to about none where two scenes are on screen at once.
+
+## Step 8, finale and project-page dive: done in the `step-8-finale` PR
+
+- The Contact section becomes the finale: everything recedes into one point of light, drawn with the cold open's own flare shader; then "Let's build something." with the email, GitHub and LinkedIn; then the credits roll into the footer. `#contact` lands on the contact beat. Without the film, the plain section.
+- The project-page dive: a film card's "Read the case study" turns the scene's current frame into the project page's header (the existing view transition), and Back returns to the same moment of the film.
+- Known limit: the home page is rebuilt on the way back, so the act restarts its scene, and its frame is dark for a moment.
+- Budget note: first-load JS is 195.8 kB of 200 kB. The finishing pass needs to win some back.
