@@ -1,5 +1,5 @@
 import * as THREE from "three";
-import { BONE, SIGNAL, additive, canvasCard, floor, glow, points, ramp, smooth } from "../kit.js";
+import { BONE, SIGNAL, additive, canvasCard, faceCamera, floor, glow, points, ramp, smooth } from "../kit.js";
 
 /* Jarvis (shots A2-02a and A2-02b): a control room at night. Panels of the
    real dashboard (sample data) orbit a glowing core, the agents circle it,
@@ -129,7 +129,7 @@ export function buildJarvis({ group, media }) {
   limit.mesh.position.set(CORE.x, -3.12, -1);
   group.add(limit.mesh);
 
-  const face = new THREE.Vector3(), local = new THREE.Vector3();
+  const local = new THREE.Vector3();
   return {
     setPlaying() {},
     update({ arrive, scene, clock, scale, camera }) {
@@ -146,9 +146,7 @@ export function buildJarvis({ group, media }) {
 
       // Cards and labels face the lens.
       group.updateMatrixWorld();
-      face.copy(camera.position);
-      group.worldToLocal(face);
-      heart.mesh.lookAt(face.x, face.y, face.z);
+      faceCamera(heart.mesh, camera);
 
       agents.forEach((agent) => {
         const a = clock * agent.speed + agent.phase;
@@ -164,7 +162,7 @@ export function buildJarvis({ group, media }) {
         const a = panel.angle + clock * 0.05 + scene * 0.9;
         const radius = 1.5 + 5.2 * open;
         panel.mesh.position.set(CORE.x + Math.cos(a) * radius, CORE.y + 0.2 + Math.sin(a * 2) * 0.4, CORE.z + Math.sin(a) * radius * 0.55 - 0.8);
-        panel.mesh.lookAt(face.x, panel.mesh.position.y, face.z);
+        faceCamera(panel.mesh, camera, { upright: true });
         // Dimmer when swung round behind.
         const front = 0.45 + 0.55 * (0.5 + 0.5 * Math.sin(a));
         panel.mesh.material.opacity = open * front;
@@ -172,7 +170,7 @@ export function buildJarvis({ group, media }) {
       });
 
       if (calls !== shown) { shown = calls; gauge.redraw(calls); }
-      gauge.mesh.lookAt(face.x, gauge.mesh.position.y, face.z);
+      faceCamera(gauge.mesh, camera, { upright: true });
       gauge.mesh.material.opacity = smooth(ramp(scene, 0.26, 0.36));
       limit.mesh.material.uniforms.uOpacity.value = full ? 0.35 + strain * 0.3 : 0;
     },

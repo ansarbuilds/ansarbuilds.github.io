@@ -31,7 +31,7 @@ export const ACTS = [
   { id: "A1", title: "Act I · The short version", note: "The camera goes through the name. The four numbers are objects it passes." },
   { id: "A2", title: "Act II · Selected work", note: "Six sets, one per project. Each is pinned for about a screen of scrolling. A light-speed streak joins them; nothing fades." },
   { id: "A3", title: "Act III · What I bring", note: "Three monoliths: agents, research, shipping." },
-  { id: "A4", title: "Act IV · The playground", note: "The effects reel: solar system, infinity ribbon, the 3D head, BB-8." },
+  { id: "A4", title: "Act IV · The playground", note: "The effects reel: the network collapses into a star, then the solar system, the infinity ribbon and Emet's terminal, each with a way in." },
   { id: "FN", title: "Finale · Contact", note: "Everything returns to one point. Bookend to the cold open." },
   { id: "PG", title: "Project pages", note: "Not on the main timeline. Plays when a project is opened or closed." },
 ];
@@ -45,10 +45,11 @@ export const SETS = {
   haloscript: { label: "Haloscript", at: [-34, 3, -510] },
   "digital-double": { label: "Digital double", at: [32, 0, -590] },
   monoliths: { label: "Three monoliths", at: [0, 0, -690] },
-  star: { label: "Star", at: [0, 0, -780] },
+  // The star the network collapses into is the solar system's sun.
+  star: { label: "Star", at: [0, 0, -860] },
   solar: { label: "Solar system", at: [0, 0, -860] },
   ribbon: { label: "Infinity ribbon", at: [26, 6, -930] },
-  head: { label: "3D head + BB-8", at: [-22, 0, -990] },
+  head: { label: "Emet", at: [-22, 0, -990] },
   point: { label: "The signal, again", at: [0, 0, -1080] },
 };
 
@@ -100,13 +101,13 @@ export const SHOTS = [
 
   // ---- Act III ----
   { id: "A3-01", act: "A3", title: "The monoliths rise", seconds: 3, scroll: 0.8, camera: { pos: [0, 10, -642], look: [0, 6, -690], fov: 36, move: "Low angle, tilt up" }, action: "Three monoliths rise out of the ground: agents, research, shipping.", text: "THREE THINGS, done properly.", sound: "Deep stone movement", bars: true, frame: "monoliths" },
-  { id: "A3-02", act: "A3", title: "Orbit", seconds: 5, scroll: 1.2, camera: { pos: [24, 7, -710], look: [0, 5, -690], fov: 34, move: "Orbit right around the three" }, action: "The camera circles them. Project names are etched in each face and light up as they turn toward the camera.", sound: "One note per name", bars: false, frame: "orbitstones" },
+  { id: "A3-02", act: "A3", title: "Orbit", seconds: 5, scroll: 1.2, camera: { pos: [31, 9, -716], look: [0, 7, -690], fov: 34, move: "Orbit right around the three" }, action: "The camera circles them. Project names are etched in each face and light up as they turn toward the camera.", sound: "One note per name", bars: false, frame: "orbitstones" },
 
   // ---- Act IV ----
-  { id: "A4-01", act: "A4", title: "Collapse into a star", seconds: 2.5, scroll: 0.6, camera: { pos: [0, 3, -748], look: [0, 0, -780], fov: 40, move: "Pull back as it collapses" }, action: "The whole network falls inward and becomes a star.", sound: "Everything drawn in, then a bloom", bars: true, frame: "star" },
+  { id: "A4-01", act: "A4", title: "Collapse into a star", seconds: 2.5, scroll: 0.6, camera: { pos: [0, 3, -828], look: [0, 0, -860], fov: 40, move: "Pull back as it collapses" }, action: "The whole network falls inward and becomes a star: the sun of the solar system that follows.", sound: "Everything drawn in, then a bloom", bars: true, frame: "star" },
   { id: "A4-02", act: "A4", title: "The solar system", seconds: 4, scroll: 1, camera: { pos: [10, 8, -825], look: [0, 0, -860], fov: 38, move: "Fly in over the ecliptic" }, action: "The camera passes into the solar system: real orbits, lit planets, haze on the horizon of each one.", sound: "Wide, slow pad", bars: false, frame: "solar" },
   { id: "A4-03", act: "A4", title: "The ribbon", seconds: 3, scroll: 0.8, camera: { pos: [14, 8, -905], look: [26, 6, -930], fov: 42, move: "Ride along the curve" }, action: "An infinity loop made of light. The camera rides along it like a track.", sound: "Rising glide", bars: false, frame: "ribbon" },
-  { id: "A4-04", act: "A4", title: "The head and BB-8", seconds: 4, scroll: 1, camera: { pos: [-14, 1.5, -966], look: [-22, 0.5, -990], fov: 32, move: "Slow push" }, action: "The 3D head in a cone of light. BB-8 rolls into frame and reacts to the pointer. The Emet terminal floats over the scene as a glass panel.", sound: "Droid chirp", bars: false, frame: "droid" },
+  { id: "A4-04", act: "A4", title: "Emet answers", seconds: 4, scroll: 1, camera: { pos: [-14, 1.5, -966], look: [-22, 0.5, -990], fov: 32, move: "Slow push" }, action: "Emet's terminal floats in the dark as a glass panel. A question types in, and Emet answers in its own words. (Emet is the droid that already roams the page, and the head has its scene in Act II.)", sound: "Key ticks, a soft chime", bars: false, frame: "droid" },
 
   // ---- Finale ----
   { id: "FN-01", act: "FN", title: "Everything recedes", seconds: 3, scroll: 0.8, camera: { pos: [0, 2, -1020], look: [0, 0, -1080], fov: 36, move: "Hold while the world pulls away" }, action: "Every set the visitor passed shrinks back toward one point of light.", sound: "The score thins to one tone", bars: true, frame: "recede" },

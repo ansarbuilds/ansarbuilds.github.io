@@ -1,5 +1,5 @@
 import * as THREE from "three";
-import { BONE, SIGNAL, additive, canvasCard, floor, glow, ramp, smooth } from "../kit.js";
+import { BONE, SIGNAL, additive, canvasCard, faceCamera, floor, glow, ramp, smooth } from "../kit.js";
 
 /* PRH-JEPA (shots A2-04a and A2-04b): two clouds of points, one for images
    and one for text, drift apart. One rotation snaps the text cloud onto the
@@ -157,7 +157,7 @@ export function buildPrhJepa({ group }) {
   // The text cloud's starting turn, fixed so every visit sees the same snap.
   const start = new THREE.Quaternion().setFromEuler(new THREE.Euler(0.9, -1.4, 0.5));
   const turn = new THREE.Quaternion(), wobble = new THREE.Quaternion(), identity = new THREE.Quaternion();
-  const toCamera = new THREE.Vector3(), point = new THREE.Vector3();
+  const point = new THREE.Vector3();
   const pick = Array.from({ length: PAIRS }, (_, i) => Math.floor((i / PAIRS) * COUNT));
   const sweepFrom = CENTRE.x - 3, sweepTo = CENTRE.x + 3;
 
@@ -166,8 +166,6 @@ export function buildPrhJepa({ group }) {
     update({ arrive, scene, clock, scale, camera }) {
       for (const item of [images, text]) { item.uniforms.uTime.value = clock; item.uniforms.uScale.value = scale; }
       group.updateMatrixWorld();
-      toCamera.copy(camera.position);
-      group.worldToLocal(toCamera);
 
       const wide = Math.min(1, camera.aspect / 1.5);
       const y = CENTRE.y;
@@ -204,15 +202,15 @@ export function buildPrhJepa({ group }) {
       const sweeping = scene > 0.6 && across < 1 ? 1 : 0;
       sweep.position.set(sweepX, y, CENTRE.z + 0.4);
       sweepGlow.mesh.position.copy(sweep.position);
-      sweep.lookAt(toCamera.x, sweep.position.y, toCamera.z);
-      sweepGlow.mesh.lookAt(toCamera.x, sweep.position.y, toCamera.z);
+      faceCamera(sweep, camera, { upright: true });
+      faceCamera(sweepGlow.mesh, camera, { upright: true });
       sweep.material.opacity = sweeping * 0.9;
       sweepGlow.mesh.material.uniforms.uOpacity.value = sweeping * 0.5;
       // The red follows the light across, in the image cloud's own space.
       images.uniforms.uShown.value = scene > 0.6 ? 1 : 0;
       images.uniforms.uSweep.value = (sweepX - images.mesh.position.x) * 1.2;
 
-      const place = (card, x, y, z, opacity) => { card.mesh.position.set(x, y, z); card.mesh.lookAt(toCamera); card.mesh.material.opacity = opacity; };
+      const place = (card, x, y, z, opacity) => { card.mesh.position.set(x, y, z); faceCamera(card.mesh, camera); card.mesh.material.opacity = opacity; };
       place(imagesLabel, CENTRE.x - gap, y - 2.9, CENTRE.z, smooth(ramp(scene, 0.04, 0.14)) * apart);
       place(textLabel, CENTRE.x + gap, y - 2.9, CENTRE.z, smooth(ramp(scene, 0.04, 0.14)) * apart);
       place(rotationLabel, CENTRE.x, y - 2.9, CENTRE.z, smooth(ramp(scene, 0.4, 0.5)) * (1 - smooth(ramp(scene, 0.6, 0.66))));

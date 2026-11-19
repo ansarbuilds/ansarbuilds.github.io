@@ -1,4 +1,4 @@
-import { getProject } from "../data/projects.js";
+import { getProject } from "../data/projectIndex.js";
 
 /* A hash route swaps the whole view, so it should read like a page: its own
    tab title, and focus moved to the new heading. Without this every project

@@ -4,12 +4,15 @@ import { ArrowDown, ArrowRight, ArrowUpRight, ExternalLink } from "lucide-react"
 import SignalField from "./SignalField";
 import WorkStage from "./WorkStage";
 import { CODE, CONTACT, HERO, RECEIPTS } from "../data/content";
-import { EXPERIMENTS, LISTED_PROJECTS, getProject } from "../data/projects";
+import { EXPERIMENTS, LISTED_PROJECTS, getProject } from "../data/projectIndex";
 import { CAPABILITIES, FLAGSHIPS, MORE_WORK, STACK_MARQUEE } from "../data/showcase";
 import { EASE, STAGGER, tween } from "../lib/motion";
 import { INTRO_SESSION_KEY, filmEnabled } from "../lib/intro";
 import ActOne from "../film/ActOne";
 import ActTwo from "../film/ActTwo";
+import ActThree from "../film/ActThree";
+import ActFour from "../film/ActFour";
+import Finale from "../film/Finale";
 import { BUILT as FILM_SETS } from "../film/actTwo/built";
 import { media } from "../lib/media";
 import Count from "./Count";
@@ -297,7 +300,7 @@ function Sheet({ children }) {
 const coverOf = (project) => project.spotlightArt || project.cardArt || project.cardShot || project.shots?.[0];
 // What each set's screens are, said on its card: nothing in the film
 // passes for more than it is.
-const FILM_NOTES = { saywhen: "Screen: the launch animation", jarvis: "Screens: the real dashboard, sample data", "agent-flight-recorder": "Illustration of a recorded run", "prh-jepa": "Illustration of the finding", haloscript: "Screens: the real app" };
+const FILM_NOTES = { saywhen: "Screen: the launch animation", jarvis: "Screens: the real dashboard, sample data", "agent-flight-recorder": "Illustration of a recorded run", "prh-jepa": "Illustration of the finding", haloscript: "Screens: the real app", "digital-double": "Made from the real model. It looks back at you" };
 
 // The projects Act II has sets for, with what their cards say.
 const FILM_PROJECTS = FILM_SETS.map((slug) => {
@@ -318,7 +321,21 @@ export function ProjectsSection() {
   </section></>;
 }
 
+// What Act III's monoliths and cards say: each capability, and the titles and
+// pages of the projects that prove it.
+const FILM_CAPABILITIES = CAPABILITIES.map((cap) => {
+  const projects = cap.proof.map(getProject).filter(Boolean);
+  return { ...cap, projects: projects.map((p) => p.title), links: projects.map((p) => ({ name: p.title, href: `/work/${p.slug}/` })) };
+});
+
 export function CapabilitiesSection() {
+  // Act III where the film can play; this plain section otherwise (and if it fails).
+  const [film] = useState(filmEnabled);
+  const plain = <PlainCapabilities />;
+  return film ? <ActThree capabilities={FILM_CAPABILITIES} fallback={plain} /> : plain;
+}
+
+function PlainCapabilities() {
   return <Sheet><section id="capabilities" className="sc-caps ed-section" data-palette="field"><div className="ed-wrap">
     <Enter className="ed-section-heading"><div><IndexLabel number="03">What I bring</IndexLabel><h2>Three things,<br /><em>done properly.</em></h2></div><p className="ed-heading-aside">The same loop on every build: make it work, measure it honestly, and ship it to real people.</p></Enter>
     <div className="sc-cap-grid">{CAPABILITIES.map((cap, i) => <Enter key={cap.id} index={i} className="sc-cap">
@@ -372,6 +389,16 @@ function ExperimentImage({ experiment }) {
   return <img className="ed-lazy-media" src={media(!artBroken && experiment.cardArt ? experiment.cardArt : experiment.shot)} alt="" width={1200} height={900} loading="lazy" onLoad={revealImage} onError={() => setArtBroken(true)} />;
 }
 
+// The playground on the home page: Act IV where the film can play, ending on
+// a way into each experiment. Without the film the home page has no
+// playground section (the experiments are a click away in the command
+// palette and on their own pages), as before.
+const FILM_EXPERIMENTS = ["solar", "stars", "emet"].map((id) => EXPERIMENTS.find((e) => e.id === id)).filter(Boolean);
+export function PlaygroundSection() {
+  const [film] = useState(filmEnabled);
+  return film ? <ActFour experiments={FILM_EXPERIMENTS} /> : null;
+}
+
 export function ExperimentsSection() {
   return <Sheet><section id="ai" className="ed-experiments ed-section" data-palette="neon"><div className="ed-wrap">
     <Enter className="ed-section-heading"><div><IndexLabel number="05">The playground</IndexLabel><h2>What if<br /><em>I tried this?</em></h2></div><p className="ed-heading-aside">Interactive experiments built with AI as a pair programmer. Open one and have a play.</p></Enter>
@@ -382,7 +409,25 @@ export function ExperimentsSection() {
 /* The last shot: the address itself is the biggest thing in the section,
    and the network behind it sends its signals in to that address once,
    then goes quiet. */
+const PITCH = "I like the hard part: agents that have to be trusted, evals that have to be honest, and products that have to ship. If that sounds like your problem, write to me.";
+// The credits are true to how the site was made.
+const CREDITS = [
+  ["Directed, designed and built by", "Mohamed Ansar"],
+  ["Pair programmer", "AI"],
+  ["Built with", "React · three.js · GLSL · Vite · Lenis"],
+  ["Type", "Anton · Outfit · Instrument Serif · Plus Jakarta Sans · JetBrains Mono"],
+];
+
+// Contact: the film's finale where it can play; the plain section otherwise
+// (and if the finale fails to start).
 export function ContactSection() {
+  const [film] = useState(filmEnabled);
+  const { navigate } = useRoute();
+  const plain = <PlainContact />;
+  return film ? <Finale contact={CONTACT} pitch={PITCH} credits={CREDITS} onTop={() => navigate("deck")} fallback={plain} /> : plain;
+}
+
+function PlainContact() {
   const { navigate } = useRoute();
   return <section id="contact" className="ed-contact sc-contact" data-palette="blueBloom"><SignalField className="sc-contact-field" quiet gatherTo=".sc-email" /><div className="ed-wrap">
     <IndexLabel number="05">Contact</IndexLabel>

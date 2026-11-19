@@ -15,6 +15,8 @@ import { buildJarvis } from "./sets/jarvis.js";
 import { buildFlightRecorder } from "./sets/flightRecorder.js";
 import { buildPrhJepa } from "./sets/prhJepa.js";
 import { buildHaloscript } from "./sets/haloscript.js";
+import { buildDigitalDouble } from "./sets/digitalDouble.js";
+import { createAdaptive } from "../adaptive.js";
 
 /* Act II (the project sets) in plain three.js.
 
@@ -24,7 +26,7 @@ import { buildHaloscript } from "./sets/haloscript.js";
    how far through its arrival and scene the film is. Only the set on screen
    plays its footage. */
 
-const BUILDERS = { saywhen: buildSaywhen, jarvis: buildJarvis, "agent-flight-recorder": buildFlightRecorder, "prh-jepa": buildPrhJepa, haloscript: buildHaloscript };
+const BUILDERS = { saywhen: buildSaywhen, jarvis: buildJarvis, "agent-flight-recorder": buildFlightRecorder, "prh-jepa": buildPrhJepa, haloscript: buildHaloscript, "digital-double": buildDigitalDouble };
 
 function pickQuality() {
   const low = window.matchMedia("(max-width: 760px)").matches || (navigator.hardwareConcurrency || 8) <= 4;
@@ -86,6 +88,8 @@ export function createActTwo(canvas, { getProgress, onFrame, media }) {
   composer.addPass(bloom);
   composer.addPass(finish);
   composer.addPass(new OutputPass());
+  // Steps quality down if this device cannot keep up (see adaptive.js).
+  const adaptive = createAdaptive({ quality, bloom, apply: () => { renderer.setPixelRatio(quality.dpr); resize(); } });
 
   let width = 1, height = 1, fit = 1;
   const resize = () => {
@@ -102,7 +106,7 @@ export function createActTwo(canvas, { getProgress, onFrame, media }) {
   const observer = new ResizeObserver(resize);
   observer.observe(canvas);
 
-  let active = false, frame = 0, last = performance.now(), clock = 0, disposed = false;
+  let active = false, frame = 0, last = performance.now(), clock = 0, disposed = false, settledFrames = 0;
   const look = new THREE.Vector3(), pos = new THREE.Vector3();
   function tick(nowMs) {
     if (!active || disposed) return;
@@ -146,6 +150,12 @@ export function createActTwo(canvas, { getProgress, onFrame, media }) {
     streakUniforms.uAspect.value = camera.aspect;
     finish.uniforms.uTime.value = clock;
     finish.uniforms.uAberration.value = 0.001 + rush * 0.006;
+    // Before the act starts or after it ends only ambient motion is left (dust,
+    // a caret), often while the next section plays beside it: a quarter of
+    // the frames is enough there.
+    if ((t <= 0 || t >= ACT_TWO.seconds) && settledFrames++ % 4) return;
+    if (t > 0 && t < ACT_TWO.seconds) settledFrames = 0;
+    adaptive.frame(nowMs, t <= 0 || t >= ACT_TWO.seconds);
     composer.render();
     onFrame?.(t, now);
   }
