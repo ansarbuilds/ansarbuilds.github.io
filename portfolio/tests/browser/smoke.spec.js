@@ -218,3 +218,16 @@ test('Act III replaces What I bring with the monoliths, keeping its links and it
   await expect(act.locator('article.act3-card').last()).toBeVisible();
   await expect(act.locator('article.act3-card').first()).toBeHidden();
 });
+
+test('Act IV plays between More work and Contact, and its cards open the experiments', async ({ page }) => {
+  await page.addInitScript((key) => { sessionStorage.setItem(key, '1'); sessionStorage.setItem('cold-open-played', '1'); }, INTRO_SESSION_KEY);
+  await page.goto('/');
+  const act = page.locator('section.act4');
+  await expect(act).toHaveId('ai');
+  expect(await page.evaluate(() => { const a = document.querySelector('#more'), b = document.querySelector('#ai'), c = document.querySelector('#contact'); return a.compareDocumentPosition(b) & 4 && b.compareDocumentPosition(c) & 4; })).toBeTruthy();
+  await expect(act.locator('a.act4-cta')).toHaveCount(3);
+  await expect(act.locator('a.act4-cta[href="/playground/emet/"]')).toHaveCount(1);
+  await act.evaluate((node) => window.scrollTo(0, node.getBoundingClientRect().top + window.scrollY + node.offsetHeight - window.innerHeight));
+  await expect(act).toHaveClass(/is-live/, { timeout: 15000 });
+  await expect(act.locator('article.act4-card').last()).toBeVisible();
+});

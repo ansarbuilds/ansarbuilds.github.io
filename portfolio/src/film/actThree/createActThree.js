@@ -6,7 +6,7 @@ import { ShaderPass } from "three/examples/jsm/postprocessing/ShaderPass.js";
 import { OutputPass } from "three/examples/jsm/postprocessing/OutputPass.js";
 import { finishShader } from "../coldOpen/shaders.js";
 import { BONE, SIGNAL, floor, glow, points } from "../actTwo/kit.js";
-import { CENTRE, PILLARS, cameraAt, moments, timeAtProgress } from "./timeline.js";
+import { ACT_THREE, CENTRE, PILLARS, cameraAt, moments, timeAtProgress } from "./timeline.js";
 
 /* Act III (A3-01, A3-02) in plain three.js: three monoliths of dark stone
    rise out of the ground, each carved with what it stands for and the
@@ -138,7 +138,7 @@ export function createActThree(canvas, { pillars, getProgress, onFrame }) {
   const observer = new ResizeObserver(resize);
   observer.observe(canvas);
 
-  let active = false, frame = 0, last = performance.now(), clock = 0, disposed = false;
+  let active = false, frame = 0, last = performance.now(), clock = 0, disposed = false, settledFrames = 0;
   const pos = new THREE.Vector3(), look = new THREE.Vector3();
   function tick(nowMs) {
     if (!active || disposed) return;
@@ -170,6 +170,11 @@ export function createActThree(canvas, { pillars, getProgress, onFrame }) {
     dust.uniforms.uTime.value = clock;
     dust.uniforms.uScale.value = renderer.domElement.height / (2 * Math.tan(THREE.MathUtils.degToRad(camera.fov / 2)));
     finish.uniforms.uTime.value = clock;
+    // Before the act starts or after it ends only ambient motion is left (dust,
+    // a caret), often while the next section plays beside it: a quarter of
+    // the frames is enough there.
+    if ((t <= 0 || t >= ACT_THREE.seconds) && settledFrames++ % 4) return;
+    if (t > 0 && t < ACT_THREE.seconds) settledFrames = 0;
     composer.render();
     onFrame?.(t, m);
   }

@@ -10,7 +10,7 @@
 .act2-title, .act2-card { position: absolute; z-index: 2; opacity: 0; visibility: hidden; will-change: opacity, transform; }
 .act2-title { left: 0; right: 0; top: 50%; margin: -.5em 0 0; text-align: center; font: 400 clamp(3rem, 11vw, 9.5rem)/1 var(--font-condensed); text-transform: uppercase; letter-spacing: .02em; text-shadow: 0 4px 60px #000; pointer-events: none; }
 /* The card sits low on the left over a scrim, so the set keeps the frame. */
-.act2-card { left: max(20px, calc((100vw - 1200px) / 2)); bottom: clamp(20px, 7vh, 72px); width: min(30rem, calc(100vw - 40px)); padding: 22px 24px 20px; border: 1px solid rgb(239 230 216 / .12); border-radius: 18px; background: linear-gradient(160deg, rgb(12 10 12 / .82), rgb(8 7 9 / .66)); backdrop-filter: blur(14px); box-shadow: 0 30px 80px -30px #000; }
+.act2-card { left: max(20px, calc((100vw - 1200px) / 2)); bottom: clamp(20px, 7vh, 72px); width: min(30rem, calc(100vw - 40px)); padding: 22px 24px 20px; border: 1px solid rgb(239 230 216 / .12); border-radius: 18px; background: linear-gradient(160deg, rgb(12 10 12 / .93), rgb(8 7 9 / .84)); /* No backdrop blur: over a canvas that changes every frame it costs dropped frames. */ box-shadow: 0 30px 80px -30px #000; }
 .act2-eyebrow { font: 500 .58rem/1.4 var(--font-mono); letter-spacing: .14em; text-transform: uppercase; color: #ff8a5f; }
 .act2-card h3 { margin: 8px 0 4px; font: 400 clamp(2.2rem, 4vw, 3.2rem)/.95 var(--font-condensed); text-transform: uppercase; letter-spacing: .01em; }
 .act2-headline { font: 400 clamp(1.05rem, 1.6vw, 1.3rem)/1.3 var(--font-serif); color: rgb(239 230 216 / .86); }

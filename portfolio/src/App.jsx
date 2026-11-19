@@ -1,5 +1,5 @@
 import { Component, createRef, lazy, Suspense, useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { Hero, ProjectsSection, CapabilitiesSection, MoreWorkSection, ContactSection } from "./components/Sections";
+import { Hero, ProjectsSection, CapabilitiesSection, MoreWorkSection, PlaygroundSection, ContactSection } from "./components/Sections";
 import CommandPalette from "./components/CommandPalette";
 import { MatrixBackground } from "./components/RouteBackgrounds";
 import PaletteSwatch from "./components/PaletteSwatch";
@@ -385,6 +385,7 @@ function MainDocument({ bootDone, held, onBoot }) {
       <ProjectsSection />
       <CapabilitiesSection />
       <MoreWorkSection />
+      <PlaygroundSection />
       <ContactSection />
     </>
   );

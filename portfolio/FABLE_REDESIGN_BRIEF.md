@@ -260,3 +260,9 @@ Review each video before approving the next step; that is the "director's" job.
 - "What I bring" becomes three monoliths of carved stone, one per capability (agents, research, shipping), each cut with its number, title and proof projects. They rise out of the ground under the title card; the camera then circles them on a true arc between the storyboard's two cameras, and each one's carving glows as it turns to face the camera, with a card of its real text and links.
 - The section keeps `id="capabilities"`, so the nav link still lands on it. Where the film is off, or the scene fails, the plain section is shown.
 - Storyboard change: A3-02 ends further back (radius 40, higher), so the last monolith's carving stays in frame.
+
+## Step 7, Act IV: done in the `step-7-act-four` PR
+
+- The playground returns to the home page as a reel between More work and Contact (`id="ai"`): the network collapses into a star that becomes the sun, the planets come in on their real orbits, an infinity ribbon of light with a bright head running round it, and Emet's terminal answering "who are you?" in its own words. Each scene's card opens the real experiment. Without the film the home page has no playground section, as before.
+- Storyboard change: A4-04 is Emet's terminal, not "the head and BB-8": the head has its scene in Act II, and Emet is the droid that already roams the page. A4-01 now happens at the solar system's sun.
+- Performance, all acts: no backdrop blur on cards over a moving canvas, and an act that has finished (or not started) draws a quarter of the frames. Both cut dropped frames to about none where two scenes are on screen at once.
