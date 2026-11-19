@@ -13,6 +13,7 @@ import { BONE, SIGNAL, additive, points } from "./kit.js";
 import { buildSaywhen } from "./sets/saywhen.js";
 import { buildJarvis } from "./sets/jarvis.js";
 import { buildFlightRecorder } from "./sets/flightRecorder.js";
+import { buildPrhJepa } from "./sets/prhJepa.js";
 
 /* Act II (the project sets) in plain three.js.
 
@@ -22,7 +23,7 @@ import { buildFlightRecorder } from "./sets/flightRecorder.js";
    how far through its arrival and scene the film is. Only the set on screen
    plays its footage. */
 
-const BUILDERS = { saywhen: buildSaywhen, jarvis: buildJarvis, "agent-flight-recorder": buildFlightRecorder };
+const BUILDERS = { saywhen: buildSaywhen, jarvis: buildJarvis, "agent-flight-recorder": buildFlightRecorder, "prh-jepa": buildPrhJepa };
 
 function pickQuality() {
   const low = window.matchMedia("(max-width: 760px)").matches || (navigator.hardwareConcurrency || 8) <= 4;
@@ -113,9 +114,14 @@ export function createActTwo(canvas, { getProgress, onFrame, media }) {
     look.fromArray(pose.look);
     // A narrow screen sees less across, so the camera stands further back.
     pos.fromArray(pose.pos).sub(look).divideScalar(fit).add(look);
+    if (camera.fov !== pose.fov) { camera.fov = pose.fov; camera.updateProjectionMatrix(); }
+    // On a narrow screen the card covers the lower half: pan the frame down
+    // so each set stands in the upper part, above it.
+    const pan = (1 - Math.min(1, camera.aspect / 1.5)) * 0.62 * pos.distanceTo(look) * Math.tan(THREE.MathUtils.degToRad(camera.fov / 2));
+    pos.y -= pan;
+    look.y -= pan;
     camera.position.copy(pos);
     camera.lookAt(look);
-    if (camera.fov !== pose.fov) { camera.fov = pose.fov; camera.updateProjectionMatrix(); }
     camera.updateMatrixWorld();
     const half = Math.tan(THREE.MathUtils.degToRad(camera.fov / 2));
     streak.scale.set(half * camera.aspect, half, 1);
