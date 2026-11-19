@@ -451,7 +451,7 @@ export default function ProjectPage({ slug }) {
         </div>
       </header>
 
-      {summary && <section aria-labelledby="case-summary-title" className="mt-6 rounded-3xl border border-black/15 bg-white/50 p-6 sm:p-8">
+      {summary && <section aria-labelledby="case-summary-title" className="mt-6 rounded-3xl border border-white/10 bg-white/[0.03] p-6 sm:p-8">
         <h2 id="case-summary-title" className="font-display text-2xl font-semibold text-[color:var(--ink-100)]">At a glance</h2>
         <dl className="mt-4 grid gap-4 sm:grid-cols-2">
           {[["Problem", summary.problem], ["My role", project.role], ["Outcome", summary.outcome], ["Proof", summary.proof], ["Limits", summary.limits], ["Status", project.status]].map(([label, value]) => <div key={label}><dt className="font-mono text-xs uppercase tracking-wide text-[color:var(--ink-300)]">{label}</dt><dd className="mt-1 text-sm leading-relaxed text-[color:var(--ink-100)]">{value}</dd></div>)}
