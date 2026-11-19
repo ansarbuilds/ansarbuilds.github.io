@@ -1,0 +1,20 @@
+/* Act III on the home page: a tall section with a pinned stage. */
+.act3 { position: relative; height: calc(var(--act-screens) * 100vh); overflow: clip; background: #060505; color: #efe6d8; }
+.act3-stage { position: sticky; top: 0; height: 100vh; overflow: hidden; }
+.act3-canvas { position: absolute; inset: 0; display: block; width: 100%; height: 100%; opacity: 0; transition: opacity var(--dur-scene) var(--ease-out); }
+.act3.is-live .act3-canvas { opacity: 1; }
+.act3-title, .act3-card { position: absolute; z-index: 2; opacity: 0; visibility: hidden; will-change: opacity, transform; }
+.act3-title { left: max(20px, calc((100vw - 1200px) / 2)); bottom: clamp(28px, 10vh, 110px); pointer-events: none; text-shadow: 0 4px 50px #000; }
+.act3-kicker { font: 500 .62rem/1 var(--font-mono); letter-spacing: .16em; text-transform: uppercase; color: #ff8a5f; }
+.act3-title h2 { margin-top: 12px; font: 400 clamp(3rem, 8vw, 7rem)/.9 var(--font-condensed); text-transform: uppercase; letter-spacing: .01em; }
+.act3-title h2 em { display: block; font: 400 .7em/1 var(--font-serif); font-style: italic; text-transform: none; letter-spacing: -.02em; color: #e8c98e; }
+.act3-card { left: max(20px, calc((100vw - 1200px) / 2)); bottom: clamp(20px, 7vh, 72px); width: min(28rem, calc(100vw - 40px)); padding: 22px 24px 18px; border: 1px solid rgb(239 230 216 / .12); border-radius: 18px; background: linear-gradient(160deg, rgb(12 10 9 / .84), rgb(8 7 6 / .68)); backdrop-filter: blur(14px); box-shadow: 0 30px 80px -30px #000; }
+.act3-count { font: 500 .6rem/1.4 var(--font-mono); letter-spacing: .12em; text-transform: uppercase; color: #a39a8f; }
+.act3-count strong { margin-right: 6px; font: 400 2rem/1 var(--font-condensed); color: #ff8a5f; vertical-align: -.2em; }
+.act3-card h3 { margin: 8px 0 6px; font: 400 clamp(1.8rem, 3.2vw, 2.5rem)/.95 var(--font-condensed); text-transform: uppercase; }
+.act3-copy { font-size: .86rem; line-height: 1.55; color: rgb(239 230 216 / .82); }
+.act3-card ul { display: flex; flex-wrap: wrap; gap: 6px 16px; margin: 14px 0 0; padding: 12px 0 0; border-top: 1px solid rgb(239 230 216 / .1); list-style: none; }
+.act3-card a { display: inline-flex; align-items: center; gap: 4px; min-height: 36px; font: 500 .8rem/1 var(--font-body); color: #efe6d8; border-bottom: 1px solid rgb(239 230 216 / .3); }
+.act3-card a:hover { color: #ff8a5f; border-color: #ff8a5f; }
+@media (max-width: 760px) { .act3-card { bottom: 76px; padding: 16px 18px; } .act3-title { bottom: 90px; } }
+@media (prefers-reduced-motion: reduce) { .act3-canvas { transition: none; } }
