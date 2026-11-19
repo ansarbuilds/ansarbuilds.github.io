@@ -62,11 +62,14 @@ test('share pages open their matching case studies', async ({ page }) => {
   }
 });
 
-test('homepage has no critical automated accessibility violations', async ({ page }) => {
+test('homepage has no critical or serious automated accessibility violations', async ({ page }) => {
   await page.goto('/');
   await expect(page.getByRole('main')).toBeVisible();
+  // Judge the settled page: text caught half faded in reads as low contrast.
+  await page.addStyleTag({ content: '*, *::before, *::after { animation-duration: 0s !important; animation-delay: 0s !important; transition: none !important; }' });
   const result = await new AxeBuilder({ page }).analyze();
-  expect(result.violations.filter((violation) => violation.impact === 'critical')).toEqual([]);
+  const bad = result.violations.filter((violation) => ['critical', 'serious'].includes(violation.impact));
+  expect(bad.map((v) => `${v.id}: ${v.nodes.map((n) => n.target.join(' ')).join(', ')}`)).toEqual([]);
 });
 
 test('data saver visitors choose whether to load the 3D model', async ({ page }) => {
@@ -266,4 +269,23 @@ test('the finale keeps the contact links real, and #contact lands on the contact
   await page.goto('/#contact');
   await expect(fin).toHaveClass(/is-live/, { timeout: 40000 });
   await expect(fin.locator('a.fin-email')).toBeVisible();
+});
+
+test('the film\'s sound is off until switched on, and the choice is remembered', async ({ page }) => {
+  await page.addInitScript((key) => sessionStorage.setItem(key, '1'), INTRO_SESSION_KEY);
+  await page.goto('/');
+  const sound = page.getByRole('button', { name: /film's sound/ });
+  await expect(sound).toHaveAttribute('aria-pressed', 'false');
+  await sound.click();
+  await expect(sound).toHaveAttribute('aria-pressed', 'true');
+  await page.reload();
+  await expect(page.getByRole('button', { name: /film's sound/ })).toHaveAttribute('aria-pressed', 'true');
+  await page.getByRole('button', { name: /film's sound/ }).click();
+  await expect(page.getByRole('button', { name: /film's sound/ })).toHaveAttribute('aria-pressed', 'false');
+});
+
+test('Act II has a way past it for the keyboard', async ({ page }) => {
+  await page.addInitScript((key) => sessionStorage.setItem(key, '1'), INTRO_SESSION_KEY);
+  await page.goto('/');
+  await expect(page.locator('section.act2 a.film-skip')).toHaveAttribute('href', '#projects');
 });

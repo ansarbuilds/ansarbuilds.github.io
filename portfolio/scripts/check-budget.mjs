@@ -2,9 +2,10 @@
 // budget. Run after `npm run build`. "First load" is what index.html asks
 // for before anything is clicked: its script, preloaded chunks and CSS.
 //
-// The brief's target for first-load JS is 150 kB gzipped. It is 193 kB today
-// (React 57, Framer Motion 47, the home page 78, the rest 11); the budget
-// below holds that line until the project data is split out of the home page.
+// The brief's target for first-load JS is 150 kB gzipped. It is about 153 kB
+// (React 57, Framer Motion 47, the home page 39, the rest 10) since the home
+// page reads a generated slim index (src/data/projectIndex.js) instead of every
+// project's full story. The budget holds that line with a little room.
 import { readFile, readdir, stat } from 'node:fs/promises';
 import { gzipSync } from 'node:zlib';
 import { join, resolve } from 'node:path';
@@ -12,7 +13,7 @@ import { join, resolve } from 'node:path';
 const KB = 1000;
 const MB = 1000 * KB;
 const BUDGET = {
-  'first-load JS (gzip)': 200 * KB,
+  'first-load JS (gzip)': 165 * KB,
   'first-load CSS (gzip)': 30 * KB,
   'preloaded fonts': 60 * KB,
   'largest file in dist': 7 * MB,

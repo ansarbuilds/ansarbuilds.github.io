@@ -3,6 +3,7 @@ import { useEffect, useRef, useState } from "react";
 import { ArrowUpRight } from "lucide-react";
 import { ACT_TWO_SCREENS } from "./actTwo/screens";
 import { media } from "../lib/media";
+import { cueOnRise } from "../lib/sound";
 
 /* Act II (the project sets) as it sits on the home page, just above the
    interactive work stage. Like Act I: a section as tall as the act's
@@ -37,9 +38,12 @@ export default function ActTwo({ projects }) {
       node.style.transform = `translateY(${(1 - amount) * rise}px)`;
       node.style.visibility = amount > 0.02 ? "visible" : "hidden";
     };
+    const rush = cueOnRise("whoosh", 0.9), chimes = projects.map(() => cueOnRise("chime"));
     const onFrame = (t, moments) => {
       let closed = false;
+      rush(Math.max(...moments.map((x) => x.streak)));
       moments.forEach((m, i) => {
+        chimes[i](m.card);
         show(titles.current[i], m.title, 10);
         show(cards.current[i], m.card, 22);
         closed ||= m.bars;
@@ -73,10 +77,12 @@ export default function ActTwo({ projects }) {
       document.removeEventListener("visibilitychange", run);
       film?.dispose();
     };
-  }, []);
+  }, [projects]);
 
   if (failed) return null;
   return <section ref={section} className="act2" aria-label="Selected work, the film" data-palette="bloom" style={{ "--act-screens": SCREENS }}>
+    {/* Nine screens of film: a way past it for keyboards and screen readers. */}
+    <a className="film-skip" href="#projects">Skip the film, go to the work</a>
     <div className="act2-stage" data-film-stage="act2">
       <canvas ref={canvas} className="act2-canvas" aria-hidden="true" />
       <div ref={bars} className="act2-bars is-closed" aria-hidden="true"><span /><span /></div>

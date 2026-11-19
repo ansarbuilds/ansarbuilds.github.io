@@ -67,7 +67,7 @@
 /* Flight Recorder replay */
 .st-frame.is-flight .st-frame-body { display: grid; grid-template-columns: minmax(0, .95fr) minmax(0, 1.25fr); }
 .st-flight-steps { padding: 12px 10px; border-right: 1px solid rgb(255 255 255 / .08); display: flex; flex-direction: column; gap: 3px; position: relative; }
-.st-flight-steps button { width: 100%; display: grid; grid-template-columns: 5.2em minmax(0, 1fr); gap: 8px; align-items: baseline; padding: 7px 10px; border-radius: 8px; border: 1px solid transparent; text-align: left; font: .62rem/1.4 var(--font-mono); color: #717787; transition: background var(--dur-fast), color var(--dur-fast), border-color var(--dur-fast); }
+.st-flight-steps button { width: 100%; display: grid; grid-template-columns: 5.2em minmax(0, 1fr); gap: 8px; align-items: baseline; padding: 7px 10px; border-radius: 8px; border: 1px solid transparent; text-align: left; font: .62rem/1.4 var(--font-mono); color: #868c9c; transition: background var(--dur-fast), color var(--dur-fast), border-color var(--dur-fast); }
 .st-flight-steps button span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .st-flight-steps button.is-past { color: #a6acba; }
 .st-flight-steps button.is-on { background: rgb(255 255 255 / .07); color: #f2f4f8; border-color: rgb(255 255 255 / .12); }
@@ -81,7 +81,7 @@
 .st-flight-detail code { display: block; color: #9aa1b0; }
 .st-flight-detail code.is-add { color: #56d364; background: rgb(86 211 100 / .08); }
 .st-flight-detail code.is-del { color: #ff7b72; background: rgb(255 123 114 / .09); }
-.st-demo-foot { display: flex; align-items: center; justify-content: space-between; gap: 12px; font: .5rem var(--font-mono); text-transform: uppercase; letter-spacing: .1em; color: #6b7180; }
+.st-demo-foot { display: flex; align-items: center; justify-content: space-between; gap: 12px; font: .5rem var(--font-mono); text-transform: uppercase; letter-spacing: .1em; color: #868c9c; }
 .st-demo-foot button { display: inline-flex; align-items: center; gap: 6px; min-height: 28px; padding: 0 10px; border: 1px solid rgb(255 255 255 / .14); border-radius: 999px; color: #c4c9d4; font: inherit; text-transform: inherit; letter-spacing: inherit; }
 .st-demo-foot button:hover { border-color: #ff8a5f; color: #ff8a5f; }
 

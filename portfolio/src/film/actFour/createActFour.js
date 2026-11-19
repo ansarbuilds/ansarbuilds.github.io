@@ -11,6 +11,7 @@ import { BONE, SIGNAL, canvasCard, faceCamera, glow, points, ramp, smooth } from
 import { PLANETS, buildOrbitPoints, displayRadius, planetPosition } from "../../three/orbitalMechanics.js";
 import { getEmetEntry } from "../../emet/emetKnowledge.js";
 import { ACT_FOUR, moments, timeAtProgress } from "./timeline.js";
+import { createAdaptive } from "../adaptive.js";
 
 /* Act IV (A4-01 to A4-04), the playground reel, in plain three.js:
    the network collapses into a star; the solar system, on its real orbits;
@@ -217,6 +218,8 @@ export function createActFour(canvas, { getProgress, onFrame }) {
   composer.addPass(bloom);
   composer.addPass(finish);
   composer.addPass(new OutputPass());
+  // Steps quality down if this device cannot keep up (see adaptive.js).
+  const adaptive = createAdaptive({ quality, bloom, apply: () => { renderer.setPixelRatio(quality.dpr); resize(); } });
 
   let fit = 1;
   const resize = () => {
@@ -285,6 +288,7 @@ export function createActFour(canvas, { getProgress, onFrame }) {
     // the frames is enough there.
     if ((t <= 0 || t >= ACT_FOUR.seconds) && settledFrames++ % 4) return;
     if (t > 0 && t < ACT_FOUR.seconds) settledFrames = 0;
+    adaptive.frame(nowMs, t <= 0 || t >= ACT_FOUR.seconds);
     composer.render();
     onFrame?.(t, m);
   }

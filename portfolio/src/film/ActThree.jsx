@@ -2,6 +2,7 @@ import "./actThree/actThree.css";
 import { useEffect, useRef, useState } from "react";
 import { ArrowUpRight } from "lucide-react";
 import { ACT_THREE_SCREENS } from "./actThree/screens";
+import { cueOnRise } from "../lib/sound";
 
 /* Act III ("What I bring") on the home page: three monoliths, one per
    capability, in a pinned stage the scrollbar drives. The title card, then
@@ -31,9 +32,10 @@ export default function ActThree({ capabilities, fallback }) {
       node.style.transform = `translateY(${(1 - amount) * rise}px)`;
       node.style.visibility = amount > 0.02 ? "visible" : "hidden";
     };
+    const chimes = capabilities.map(() => cueOnRise("chime"));
     const onFrame = (t, m) => {
       show(title.current, m.title, 16);
-      m.card.forEach((amount, i) => show(cards.current[i], amount, 22));
+      m.card.forEach((amount, i) => { show(cards.current[i], amount, 22); chimes[i](amount); });
     };
     const run = () => film?.setActive(onScreen && document.visibilityState === "visible");
     const load = async () => {

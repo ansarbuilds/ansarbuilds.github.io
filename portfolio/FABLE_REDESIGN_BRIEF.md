@@ -273,3 +273,11 @@ Review each video before approving the next step; that is the "director's" job.
 - The project-page dive: a film card's "Read the case study" turns the scene's current frame into the project page's header (the existing view transition), and Back returns to the same moment of the film.
 - Known limit: the home page is rebuilt on the way back, so the act restarts its scene, and its frame is dark for a moment.
 - Budget note: first-load JS is 195.8 kB of 200 kB. The finishing pass needs to win some back.
+
+## Step 9, the finishing pass: done in the `step-9-finishing` PR
+
+- First-load JS 195.8 kB down to 154.6 kB (target 150): the home page reads a generated slim project index; the full stories load with a project page. CI budget tightened to 165 kB.
+- Adaptive quality in every scene: resolution steps down, then the glow goes, if frames are slow.
+- Sound, off by default, generated in the browser; a switch in the nav, remembered.
+- Accessibility: serious and critical axe checks clean on desktop and mobile (two nav labels, two low-contrast greys in the work stage); a "Skip the film" link at the start of Act II. Lighthouse accessibility 100.
+- The redesign in the brief is complete.

@@ -16,6 +16,7 @@ import { buildFlightRecorder } from "./sets/flightRecorder.js";
 import { buildPrhJepa } from "./sets/prhJepa.js";
 import { buildHaloscript } from "./sets/haloscript.js";
 import { buildDigitalDouble } from "./sets/digitalDouble.js";
+import { createAdaptive } from "../adaptive.js";
 
 /* Act II (the project sets) in plain three.js.
 
@@ -87,6 +88,8 @@ export function createActTwo(canvas, { getProgress, onFrame, media }) {
   composer.addPass(bloom);
   composer.addPass(finish);
   composer.addPass(new OutputPass());
+  // Steps quality down if this device cannot keep up (see adaptive.js).
+  const adaptive = createAdaptive({ quality, bloom, apply: () => { renderer.setPixelRatio(quality.dpr); resize(); } });
 
   let width = 1, height = 1, fit = 1;
   const resize = () => {
@@ -152,6 +155,7 @@ export function createActTwo(canvas, { getProgress, onFrame, media }) {
     // the frames is enough there.
     if ((t <= 0 || t >= ACT_TWO.seconds) && settledFrames++ % 4) return;
     if (t > 0 && t < ACT_TWO.seconds) settledFrames = 0;
+    adaptive.frame(nowMs, t <= 0 || t >= ACT_TWO.seconds);
     composer.render();
     onFrame?.(t, now);
   }

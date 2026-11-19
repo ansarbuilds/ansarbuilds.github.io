@@ -8,6 +8,7 @@ import { poseAt } from "../rig.js";
 import { finishShader, flareFragment, flareVertex } from "../coldOpen/shaders.js";
 import { additive, points } from "../actTwo/kit.js";
 import { FINALE, POINT, moments, timeAtProgress } from "./timeline.js";
+import { createAdaptive } from "../adaptive.js";
 
 /* The finale (FN-01 to FN-03) in plain three.js: everything the visitor
    passed, as points in the colours of each act, falls back into one point
@@ -60,6 +61,8 @@ export function createFinale(canvas, { getProgress, onFrame }) {
   composer.addPass(bloom);
   composer.addPass(finish);
   composer.addPass(new OutputPass());
+  // Steps quality down if this device cannot keep up (see adaptive.js).
+  const adaptive = createAdaptive({ quality, bloom, apply: () => { renderer.setPixelRatio(quality.dpr); resize(); } });
 
   let width = 1, height = 1;
   const resize = () => {
@@ -123,6 +126,7 @@ export function createFinale(canvas, { getProgress, onFrame }) {
     if ((t <= 0 || t >= FINALE.seconds) && settledFrames++ % 4) return;
     if (t > 0 && t < FINALE.seconds) settledFrames = 0;
     finish.uniforms.uTime.value = clock;
+    adaptive.frame(nowMs, t <= 0 || t >= FINALE.seconds);
     composer.render();
     onFrame?.(t, m);
   }
