@@ -640,7 +640,7 @@ export default function ProjectPage({ slug }) {
       </div>
 
       <a
-        href={`#project/${next.slug}`}
+        href={`/work/${next.slug}/`}
        
         className="group panel mt-6 rounded-2xl p-5 flex items-center justify-between gap-4 transition-[border-color,transform] duration-200 hover:border-blue/30 active:scale-[.99]"
       >

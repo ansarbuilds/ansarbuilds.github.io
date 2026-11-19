@@ -163,7 +163,7 @@ function HaloDemo({ active }) {
 function DigitalDemo({ project }) {
   return <div className="st-cover">
     <img className="ed-lazy-media" src={media(coverOf(project))} alt="" loading="lazy" onLoad={reveal} />
-    <a href="#digital-double" className="st-launch"><Play size={16} aria-hidden="true" />Meet the live 3D model</a>
+    <a href="/playground/digital-double/" className="st-launch"><Play size={16} aria-hidden="true" />Meet the live 3D model</a>
   </div>;
 }
 
@@ -239,13 +239,13 @@ export default function WorkStage() {
           <div className="st-demo">{Demo ? <Demo flag={flag} project={project} active={shown && live} hold={() => setHeld(true)} /> : <div className="st-cover"><img className="ed-lazy-media" src={media(coverOf(project))} alt="" loading="lazy" onLoad={reveal} /></div>}</div>
           <div className="st-info">
             <p className="st-eyebrow"><span>{String(i + 1).padStart(2, "0")} / {String(STAGE.length).padStart(2, "0")}</span><em><i aria-hidden="true" />{flag.badge}</em></p>
-            <h3><a href={`#project/${project.slug}`}>{project.title}</a></h3>
+            <h3><a href={`/work/${project.slug}/`}>{project.title}</a></h3>
             <p className="st-headline">{flag.headline}</p>
             <p className="st-copy">{flag.copy}</p>
             <dl className="st-stats">{flag.stats.map(([value, label]) => <div key={label}><dt><Count value={value} run={shown && live} /></dt><dd>{label}</dd></div>)}</dl>
             <ul className="st-stack" aria-label="Built with">{flag.stack.map((tool) => <li key={tool}>{tool}</li>)}</ul>
             <div className="st-ctas">
-              <a className="sc-btn" href={`#project/${project.slug}`}>Read the case study<ArrowUpRight size={18} aria-hidden="true" /></a>
+              <a className="sc-btn" href={`/work/${project.slug}/`}>Read the case study<ArrowUpRight size={18} aria-hidden="true" /></a>
               {outbound && <a className="sc-btn-ghost" href={outbound.href} target="_blank" rel="noopener noreferrer">{outbound.label}<ExternalLink size={15} aria-hidden="true" /></a>}
             </div>
           </div>

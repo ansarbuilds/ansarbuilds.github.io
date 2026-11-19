@@ -3,6 +3,7 @@ import assert from 'node:assert/strict';
 import { readFile, access } from 'node:fs/promises';
 import { resolve } from 'node:path';
 import { PROJECTS } from '../src/data/projects.js';
+import { PLAYGROUND } from '../src/lib/routes.js';
 
 const slugs = ['agent-flight-recorder', 'storyera', 'reptrack', 'jarvis', 'saywhen'];
 
@@ -11,7 +12,7 @@ test('share pages have their own URLs, case-study links and existing images', as
   for (const slug of slugs) {
     const html = await readFile(`public/p/${slug}/index.html`, 'utf8');
     assert.ok(sitemap.includes(`https://ansarbuilds.dev/p/${slug}/`), `${slug} missing from sitemap`);
-    assert.ok(html.includes(`href="/#project/${slug}"`), `${slug} missing case study link`);
+    assert.ok(html.includes(`href="/work/${slug}/"`), `${slug} missing case study link`);
     assert.ok(html.includes(`rel="canonical" href="https://ansarbuilds.dev/p/${slug}/"`));
     const image = html.match(/property="og:image" content="https:\/\/ansarbuilds\.dev(\/[^"]+)"/);
     assert.ok(image, `${slug} missing image`);
@@ -31,8 +32,11 @@ test('project links point to existing case studies and local pages', async () =>
   }
   collect(PROJECTS);
   for (const href of links) {
-    if (href.startsWith('#project/')) {
-      assert.ok(slugs.has(href.slice('#project/'.length)), `unknown case study: ${href}`);
+    const caseStudy = href.match(/^\/work\/([^/]+)\/$/);
+    if (caseStudy) {
+      assert.ok(slugs.has(caseStudy[1]), `unknown case study: ${href}`);
+    } else if (href.startsWith('/playground/')) {
+      assert.ok(PLAYGROUND.includes(href.split('/')[2]), `unknown playground view: ${href}`);
     } else if (href.startsWith('/') && !href.startsWith('//')) {
       const pathname = new URL(href, 'https://ansarbuilds.dev').pathname;
       const file = resolve('public', `.${pathname}`);

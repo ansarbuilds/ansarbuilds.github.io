@@ -1,4 +1,4 @@
-import { useContext, useEffect, useLayoutEffect, useRef, useState } from "react";
+import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { animate, motion, useAnimationFrame, useInView, useMotionValue, useReducedMotion, useScroll, useSpring, useTransform, useVelocity } from "framer-motion";
 import { ArrowDown, ArrowRight, ArrowUpRight, ExternalLink } from "lucide-react";
 import SignalField from "./SignalField";
@@ -11,7 +11,7 @@ import { INTRO_SESSION_KEY } from "../lib/intro";
 import { media } from "../lib/media";
 import Count from "./Count";
 import MagneticLink from "./Magnetic";
-import { ScrollContext, useRoute } from "../appContexts";
+import { useRoute } from "../appContexts";
 import "../editorial.css";
 import "../showcase.css";
 
@@ -24,24 +24,22 @@ const revealImage = (event) => event.currentTarget.classList.add("is-loaded");
    reading order. Reduced motion is "in" from the first paint. */
 function Enter({ children, className = "", index = 0, style, ...rest }) {
   const reduced = useReducedMotion();
-  const scrollRef = useContext(ScrollContext);
   const ref = useRef(null);
   const [shown, setShown] = useState(false);
   useEffect(() => {
     const el = ref.current;
     if (!el || reduced) return undefined;
-    const root = scrollRef?.current || null;
-    const rootHeight = root?.clientHeight || window.innerHeight;
+    const rootHeight = window.innerHeight;
     // 30% of the element, or 30% of the screen for anything taller than it.
     const threshold = Math.min(0.3, (rootHeight * 0.3) / Math.max(1, el.offsetHeight));
     const observer = new IntersectionObserver(([entry]) => {
       if (!entry.isIntersecting) return;
       setShown(true);
       observer.disconnect();
-    }, { root, threshold });
+    }, { threshold });
     observer.observe(el);
     return () => observer.disconnect();
-  }, [reduced, scrollRef]);
+  }, [reduced]);
   return <div ref={ref} {...rest} style={{ "--i": index, ...style }} className={`rv ${className} ${shown || reduced ? "is-in" : ""}`}>{children}</div>;
 }
 function IndexLabel({ number, children }) {
@@ -53,7 +51,7 @@ const HERO_FEED = FLAGSHIPS.slice(0, 4);
 function HeroFeed({ appear, from }) {
   return <nav className="sc-feed" aria-label="Flagship projects">{HERO_FEED.map((flag, i) => {
     const project = getProject(flag.slug);
-    return project && <motion.a key={flag.slug} href={`#project/${project.slug}`} className="sc-feed-card" data-cursor="Open" {...appear(from + i * (STAGGER.base / STAGGER.loose))}>
+    return project && <motion.a key={flag.slug} href={`/work/${project.slug}/`} className="sc-feed-card" data-cursor="Open" {...appear(from + i * (STAGGER.base / STAGGER.loose))}>
       <span className="sc-feed-status"><i aria-hidden="true" />{flag.badge}</span>
       <strong>{project.title}</strong>
       <span className="sc-feed-metric"><b>{flag.stats[0][0]}</b>{flag.stats[0][1]}</span>
@@ -80,10 +78,9 @@ function ScrubWord({ progress, range, children }) {
   return <motion.span style={{ opacity }}>{children} </motion.span>;
 }
 function ScrubText({ lead, rest, className }) {
-  const scrollRef = useContext(ScrollContext);
   const reduced = useReducedMotion();
   const ref = useRef(null);
-  const { scrollYProgress } = useScroll({ container: scrollRef, target: ref, offset: ["start 0.9", "start 0.3"] });
+  const { scrollYProgress } = useScroll({ target: ref, offset: ["start 0.9", "start 0.3"] });
   const leadWords = lead.split(" "), restWords = rest.split(" ");
   const total = leadWords.length + restWords.length;
   const word = (text, i) => (reduced ? `${text} ` : <ScrubWord key={i} progress={scrollYProgress} range={[i / total, (i + 1) / total]}>{text}</ScrubWord>);
@@ -104,7 +101,6 @@ const NAME_SET_S = 0.62; // how long the name holds centre stage before it moves
 const NAME_TRAVEL = { duration: 0.75, ease: EASE.out };
 export function Hero({ ready = true, onReady }) {
   const reduced = useReducedMotion();
-  const scrollRef = useContext(ScrollContext);
   const heroRef = useRef(null);
   const nameRef = useRef(null);
   const visible = useInView(heroRef, { margin: "50px" });
@@ -174,7 +170,7 @@ export function Hero({ ready = true, onReady }) {
   // fractions of the viewport height (the hero is one viewport, pinned on
   // desktop while the next section slides over it), not fixed pixels.
   const vh = useViewportHeight();
-  const { scrollY } = useScroll({ container: scrollRef });
+  const { scrollY } = useScroll();
   const copyY = useTransform(scrollY, [0, vh * 0.9], reduced ? [0, 0] : [0, -vh * 0.16]);
   const copyOpacity = useTransform(scrollY, [0, vh * 0.62], reduced ? [1, 1] : [1, 0]);
   const feedY = useTransform(scrollY, [0, vh * 0.9], reduced ? [0, 0] : [0, -vh * 0.07]);
@@ -236,9 +232,8 @@ const HERO_LABELS = ["Jarvis", "Flight Recorder", "PRH-JEPA", "Haloscript"];
    second copy only exists so the loop has no seam; reduced motion gets a
    still, wrapping list instead. */
 function VelocityMarquee({ items, label, className = "", speed = 1.1 }) {
-  const scrollRef = useContext(ScrollContext);
   const reduced = useReducedMotion();
-  const { scrollY } = useScroll({ container: scrollRef });
+  const { scrollY } = useScroll();
   const velocity = useSpring(useVelocity(scrollY), { damping: 50, stiffness: 400 });
   const boost = useTransform(velocity, [-1500, 0, 1500], [-5, 0, 5], { clamp: false });
   const skewX = useTransform(velocity, [-2600, 2600], [2, -2]);
@@ -292,7 +287,7 @@ export function CapabilitiesSection() {
       <p className="sc-cap-unit">{cap.unit}</p>
       <h3>{cap.title}</h3>
       <p className="sc-cap-copy">{cap.copy}</p>
-      <ul>{cap.proof.map((slug) => { const project = getProject(slug); return project && <li key={slug}><a href={`#project/${slug}`}>{project.title}<ArrowUpRight size={14} aria-hidden="true" /></a></li>; })}</ul>
+      <ul>{cap.proof.map((slug) => { const project = getProject(slug); return project && <li key={slug}><a href={`/work/${slug}/`}>{project.title}<ArrowUpRight size={14} aria-hidden="true" /></a></li>; })}</ul>
     </Enter>)}</div>
   </div></section></Sheet>;
 }
@@ -303,7 +298,7 @@ function WorkCard({ item, index }) {
   if (!project) return null;
   const cover = coverOf(project);
   return <Enter index={index % 3}>
-    <a id={`card-${project.slug}`} href={`#project/${project.slug}`} className="sc-card" data-cursor="View">
+    <a id={`card-${project.slug}`} href={`/work/${project.slug}/`} className="sc-card" data-cursor="View">
       <div className="sc-card-media">
         {cover && !broken ? <img className="ed-lazy-media" src={media(cover)} alt="" loading="lazy" onLoad={revealImage} onError={() => setBroken(true)} /> : <span className="sc-card-type" aria-hidden="true">{project.title}</span>}
         <span className="sc-card-kind">{project.kind}</span>
@@ -327,7 +322,7 @@ export function MoreWorkSection() {
     <div className="sc-card-grid">{MORE_WORK.map((item, i) => <WorkCard key={item.slug} item={item} index={i} />)}</div>
     {ALSO_BUILT.length > 0 && <details className="sc-also">
       <summary><span>Also built</span><small>{ALSO_BUILT.length} more, from internal tools to early experiments</small></summary>
-      <ul>{ALSO_BUILT.map((project) => <li key={project.slug}><a id={`card-${project.slug}`} href={`#project/${project.slug}`}><strong>{project.title}</strong><span>{project.kind}</span><ArrowUpRight size={16} aria-hidden="true" /></a></li>)}</ul>
+      <ul>{ALSO_BUILT.map((project) => <li key={project.slug}><a id={`card-${project.slug}`} href={`/work/${project.slug}/`}><strong>{project.title}</strong><span>{project.kind}</span><ArrowUpRight size={16} aria-hidden="true" /></a></li>)}</ul>
     </details>}
   </div></section>;
 }

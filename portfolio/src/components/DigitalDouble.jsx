@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import * as THREE from "three";
 import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader.js";
+import { MeshoptDecoder } from "three/examples/jsm/libs/meshopt_decoder.module.js";
 import { ArrowLeft, ArrowDown, ArrowUpRight } from "lucide-react";
 
 const MODEL_URL = `${import.meta.env.BASE_URL}models/digital_double.glb`;
@@ -99,7 +100,7 @@ export default function DigitalDouble() {
     const gaze = new THREE.Vector3();
 
     let disposed = false;
-    new GLTFLoader().load(
+    new GLTFLoader().setMeshoptDecoder(MeshoptDecoder).load(
       MODEL_URL,
       (gltf) => {
         if (disposed) return;
@@ -186,7 +187,7 @@ export default function DigitalDouble() {
         {!loadModel && (
           <div className="absolute inset-0 grid place-items-center">
             <img src={IMG("final_front.jpg")} alt="The finished digital double" className="absolute inset-0 h-full w-full object-contain opacity-60" />
-            <button onClick={() => setLoadModel(true)} className="relative rounded-full bg-white px-5 py-3 text-sm font-semibold text-black">Load the 3D model (about 8 MB)</button>
+            <button onClick={() => setLoadModel(true)} className="relative rounded-full bg-white px-5 py-3 text-sm font-semibold text-black">Load the 3D model (about 3 MB)</button>
           </div>
         )}
         {loadModel && !loaded && !failed && (

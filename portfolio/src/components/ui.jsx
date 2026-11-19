@@ -3,7 +3,6 @@ import { motion, useReducedMotion, useScroll, useTransform } from "framer-motion
 import { ArrowDown, ArrowRight, ArrowUpRight } from "lucide-react";
 import { DUR, EASE } from "../lib/motion";
 import { ACCENTS } from "../data/projects";
-import { useScrollContainer } from "../appContexts";
 import { media } from "../lib/media";
 
 const clamp01 = (v) => Math.min(1, Math.max(0, v));
@@ -75,15 +74,14 @@ export function RiseText({ text, className = "", stagger = 0.045 }) {
    reads top to bottom on the way past. Reduced motion: flat, static. */
 export function ScrollShot({ src, label, onError, ratio = "aspect-[16/10]" }) {
   const reduced = useReducedMotion();
-  const scrollContainerRef = useScrollContainer();
   const wrapRef = useRef(null);
   const viewRef = useRef(null);
   const imgRef = useRef(null);
   const travel = useRef(0); // px the image is taller than its window
   const [short, setShort] = useState(false);
-  const { scrollYProgress } = useScroll({ container: scrollContainerRef, target: wrapRef, offset: ["start end", "end start"] });
+  const { scrollYProgress } = useScroll({ target: wrapRef, offset: ["start end", "end start"] });
   // Function-form transforms: framer would otherwise hand these to the
-  // browser's ScrollTimeline, which tracks the document, not <main>.
+  // browser's ScrollTimeline, and these read refs that change on resize.
   const y = useTransform(scrollYProgress, (v) => -travel.current * clamp01((v - 0.2) / 0.6));
   const rotateX = useTransform(scrollYProgress, (v) => 18 * (1 - clamp01(v / 0.38)));
   const scale = useTransform(scrollYProgress, (v) => 0.92 + 0.08 * clamp01(v / 0.38));

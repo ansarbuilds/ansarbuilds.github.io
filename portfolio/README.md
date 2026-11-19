@@ -31,7 +31,18 @@ interactive experiments section. The hero network pauses offscreen and in
 hidden tabs, uses fewer nodes on phones, and draws one still frame for
 reduced motion. The terminal and 3D scenes keep their own colors.
 
-Clicking a project opens `#project/<slug>`: the story, a flow diagram, what I took from it, and links.
+Clicking a project opens `/work/<slug>/`: the story, a flow diagram, what I took from it, and links.
+
+## URLs, scrolling and the build
+
+- **Every view has a real URL** (`src/lib/routes.js`): the home page is `/` with its sections as `/#projects`, `/#contact` and so on; project pages are `/work/<slug>/`; the full-screen views are `/playground/<id>/`. Links are ordinary `<a href>`, and one click handler in `App.jsx` turns the in-app ones into history changes. The old hash links (`/#project/jarvis`, `/#emet`) still open the right view and are rewritten to the new URL.
+- **Each URL is a file.** After `vite build`, `scripts/prerender-routes.mjs` writes `dist/work/<slug>/index.html` (and the other views) with that page's own title, description, canonical URL and share image, plus a short static version of the page for readers that do not run scripts. It also writes `404.html` and adds the pages to the sitemap.
+- **The document scrolls**, not a box inside it, smoothed by Lenis on the pages that scroll (`src/lib/scroll.js`). Anything that scrolls the page from code goes through that file.
+- **Fonts are self-hosted** (`src/fonts.css`, `src/assets/fonts/`): Anton, Outfit, Plus Jakarta Sans, Instrument Serif and JetBrains Mono, latin subset.
+- **Budgets.** `npm run check:budget` (run in CI after the build) fails when the first load or the shipped media grows past the limits in `scripts/check-budget.mjs`.
+- **Media.** The launch film is H.264 at CRF 30; the 3D model is meshopt-compressed (`gltf-transform meshopt`), which is why `DigitalDouble.jsx` gives the loader a `MeshoptDecoder`.
+
+`FABLE_REDESIGN_BRIEF.md` is the audit and the plan for the redesign this groundwork is for.
 
 ## Where things live
 
@@ -45,7 +56,6 @@ src/
     ui.jsx              Rail (scroller), FlowDiagram, tags, section heading
     EmetSection.jsx     the terminal
     SignalField.jsx      the hero's node network canvas
-    NameParticles.jsx    the old particle name animation (no longer used)
     SolarSystemExplorer.jsx, DataLineageExplorer.jsx, InfinityLoop.jsx
 public/shots/           screenshots used on project pages
 ```
@@ -60,7 +70,7 @@ Plain words, first person, short sentences, no em dashes. Work projects stay gen
 
 ## saywhen launch page
 
-`public/p/saywhen/index.html` is a standalone page at `/p/saywhen/` with the 60-second launch film (`demo.mp4`, a 720p re-encode of the film in the saywhen repository), its poster and the share image. `keyboard-museum.mp4` is the six-second film of a keyboard in a glass case. `who-its-for.mp4` is the eight-second home-then-office loop. Each has a `.jpg` poster. `real-run.mp4` is a real 23-second screen recording, cropped and silent, shown under the film. The survey figures stay in the page text. `public/p/saywhen/loops/` holds seven short silent loops (MP4, with a WebP still each) rendered from the saywhen repository's `docs/visuals/animated/`. They play only while on screen, and not at all for reduced motion or data saver. They are illustrations, not screen recordings. The saywhen README links to it, so keep the URL stable. `public/shots/spotlight/saywhen.webp` is the film's poster frame, an illustration and not a screenshot. `public/shots/saywhen/home-preview.webp` is the app in its browser demo mode.
+`public/p/saywhen/index.html` is a standalone page at `/p/saywhen/` with the 60-second launch film (`demo.mp4`, a re-encode of the film in the saywhen repository), its poster and the share image. `keyboard-museum.mp4` is the six-second film of a keyboard in a glass case. `who-its-for.mp4` is the eight-second home-then-office loop. Each has a `.jpg` poster. `real-run.mp4` is a real 23-second screen recording, cropped and silent, shown under the film. The survey figures stay in the page text. `public/p/saywhen/loops/` holds seven short silent loops (MP4, with a WebP still each) rendered from the saywhen repository's `docs/visuals/animated/`. They play only while on screen, and not at all for reduced motion or data saver. They are illustrations, not screen recordings. The saywhen README links to it, so keep the URL stable. `public/shots/spotlight/saywhen.webp` is the film's poster frame, an illustration and not a screenshot. `public/shots/saywhen/home-preview.webp` is the app in its browser demo mode.
 
 ## Run it
 

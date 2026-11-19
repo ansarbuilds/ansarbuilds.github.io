@@ -6,9 +6,42 @@ test('homepage and project navigation work', async ({ page }) => {
   await page.goto('/');
   await expect(page.getByRole('main')).toBeVisible();
   await expect(page.getByRole('link', { name: 'Skip to main content' })).toBeAttached();
-  await page.goto('/#project/storyera');
+  await page.goto('/work/storyera/');
   await expect(page.getByRole('heading', { name: 'StoryEra', level: 1 })).toBeVisible();
   await expect(page.getByRole('heading', { name: 'At a glance' })).toBeVisible();
+  await expect(page).toHaveTitle(/StoryEra/);
+});
+
+test('old hash links still open their page, at its new URL', async ({ page }) => {
+  await page.goto('/#project/storyera');
+  await expect(page.getByRole('heading', { name: 'StoryEra', level: 1 })).toBeVisible();
+  await expect(page).toHaveURL(/\/work\/storyera\/$/);
+  await page.goto('/#emet');
+  await expect(page).toHaveURL(/\/playground\/emet\/$/);
+});
+
+test('a card opens its project without a page load, and Back returns home', async ({ page }) => {
+  await page.addInitScript((key) => sessionStorage.setItem(key, '1'), INTRO_SESSION_KEY);
+  await page.goto('/');
+  await page.addStyleTag({ content: '.bb8-edge { display: none !important; }' });
+  await page.evaluate(() => { window.__sameDocument = true; });
+  await page.locator('a[href="/work/jarvis/"]').first().click({ force: true });
+  await expect(page).toHaveURL(/\/work\/jarvis\/$/);
+  await expect(page.getByRole('heading', { name: 'Jarvis', level: 1 })).toBeVisible();
+  expect(await page.evaluate(() => window.__sameDocument)).toBe(true);
+  await page.goBack();
+  await expect(page).toHaveURL(/\/$/);
+  await expect(page.locator('#projects')).toBeAttached();
+  expect(await page.evaluate(() => window.__sameDocument)).toBe(true);
+});
+
+test('the page scrolls the document and section links land on their section', async ({ page }) => {
+  await page.addInitScript((key) => sessionStorage.setItem(key, '1'), INTRO_SESSION_KEY);
+  await page.goto('/');
+  expect(await page.evaluate(() => getComputedStyle(document.querySelector('main')).overflowY)).toBe('visible');
+  await page.goto('/#contact');
+  await expect.poll(() => page.evaluate(() => window.scrollY)).toBeGreaterThan(1000);
+  await expect(page.locator('#contact')).toBeInViewport();
 });
 
 test('share pages open their matching case studies', async ({ page }) => {
@@ -23,7 +56,7 @@ test('share pages open their matching case studies', async ({ page }) => {
     const response = await page.goto(`/p/${slug}/index.html`);
     expect(response.status()).toBe(200);
     await page.getByRole('link', { name: 'Read the full case study' }).click();
-    await expect(page).toHaveURL(new RegExp(`/#project/${slug}$`));
+    await expect(page).toHaveURL(new RegExp(`/work/${slug}/$`));
     await expect(page.getByRole('heading', { name: title, level: 1 })).toBeVisible();
   }
 });
@@ -39,15 +72,15 @@ test('data saver visitors choose whether to load the 3D model', async ({ page })
   await page.addInitScript(() => Object.defineProperty(navigator, 'connection', { value: { saveData: true }, configurable: true }));
   let modelRequested = false;
   page.on('request', (request) => { if (request.url().includes('digital_double.glb')) modelRequested = true; });
-  await page.goto('/#digital-double');
-  await expect(page.getByRole('button', { name: 'Load the 3D model (about 8 MB)' })).toBeVisible();
+  await page.goto('/playground/digital-double/');
+  await expect(page.getByRole('button', { name: 'Load the 3D model (about 3 MB)' })).toBeVisible();
   expect(modelRequested).toBe(false);
-  await page.getByRole('button', { name: 'Load the 3D model (about 8 MB)' }).click();
+  await page.getByRole('button', { name: 'Load the 3D model (about 3 MB)' }).click();
   await expect.poll(() => modelRequested).toBe(true);
 });
 
 test('Jarvis project page renders and links its sample-data demo', async ({ page }) => {
-  await page.goto('/#project/jarvis');
+  await page.goto('/work/jarvis/');
   await expect(page.getByRole('heading', { name: 'Jarvis', level: 1 })).toBeVisible();
   const demo = page.getByRole('link', { name: /Try the demo/ });
   await expect(demo).toHaveAttribute('href', '/p/jarvis/demo/');
@@ -64,14 +97,10 @@ test('scrolling over the work grid moves the page, not a box inside it', async (
   // The roaming droid can park over any point on screen; this test is about
   // the lists, so keep it out of the way.
   await page.addStyleTag({ content: '.bb8-edge { display: none !important; }' });
-  const main = page.getByRole('main');
   const list = page.locator('.sc-card-grid').last();
   // Bring the list's top to just under the fixed nav, so the point we wheel
   // over is on the list itself and not on the nav or off screen.
-  await list.evaluate((node) => {
-    const scroller = document.querySelector('main');
-    scroller.scrollTop += node.getBoundingClientRect().top - 160;
-  });
+  await list.evaluate((node) => window.scrollBy(0, node.getBoundingClientRect().top - 160));
   // Nothing in the work grid may be a scroll box of its own.
   const scrollers = await page.locator('.sc-card-grid *').evaluateAll((nodes) => nodes.filter((node) => {
     const { overflowY } = getComputedStyle(node);
@@ -82,7 +111,7 @@ test('scrolling over the work grid moves the page, not a box inside it', async (
   const point = { x: box.x + box.width / 2, y: box.y + 120 };
   expect(await page.evaluate(({ x, y }) => !!document.elementFromPoint(x, y)?.closest('.sc-card-grid'), point)).toBe(true);
   await page.mouse.move(point.x, point.y);
-  const before = await main.evaluate((node) => node.scrollTop);
+  const before = await page.evaluate(() => window.scrollY);
   await page.mouse.wheel(0, 1200);
-  await expect.poll(() => main.evaluate((node) => node.scrollTop)).toBeGreaterThan(before + 600);
+  await expect.poll(() => page.evaluate(() => window.scrollY)).toBeGreaterThan(before + 600);
 });

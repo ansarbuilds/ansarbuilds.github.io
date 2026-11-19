@@ -1,4 +1,5 @@
 @import "tailwindcss";
+@import "./fonts.css";
 
 /* ============================================================
    DESIGN TOKENS
@@ -40,7 +41,6 @@
      typeface used on the portfolio site referenced as a style match,
      replacing Instrument Sans. */
   --font-display: "Outfit", sans-serif;
-  --font-display-legacy: "Bricolage Grotesque", sans-serif;
   --font-serif: "Instrument Serif", serif;
   /* The editorial display face: ultra-condensed caps for the big
      headlines. Free (Google Fonts) stand-in for a commercial condensed. */
@@ -92,13 +92,6 @@
   --color-ink-3: #13203f;
 }
 
-/* emet is the one section this portfolio-wide font refresh skips —
-   it already looked right, so it keeps the previous heading font
-   exactly as it was rather than picking up the new display font. */
-.dark-surface .font-display {
-  font-family: var(--font-display-legacy);
-}
-
 @layer base {
   /* One focus style for everything interactive: a ring in the element's
      own text color, so it reads on the light hero and every dark block. */
@@ -110,7 +103,6 @@
      It is not a control, so a ring around it only looks like a stray box. */
   :where(h1, h2)[tabindex="-1"]:focus-visible { outline: none; }
   html {
-    scroll-behavior: smooth;
     font-size: 18px;
   }
   body {
@@ -153,12 +145,6 @@
     backdrop-filter: blur(16px);
     background: rgba(21, 63, 96, 0.95);
     border: 1px solid rgba(255, 255, 255, 0.06);
-  }
-  .text-glow-cyan {
-    text-shadow: 0 0 6px rgba(34, 211, 238, 0.32);
-  }
-  .text-glow-amber {
-    text-shadow: 0 0 6px rgba(251, 191, 36, 0.28);
   }
   .text-glow-green {
     text-shadow: 0 0 6px rgba(52, 211, 153, 0.36);
@@ -280,10 +266,6 @@
 
 /* About: each word's opacity follows the paragraph's scroll progress
    (--p, 0-1) against its own index (--i) out of the word count (--n). */
-.word-reveal {
-  opacity: calc(0.26 + 0.74 * clamp(0, var(--p, 1) * var(--n, 1) - var(--i, 0), 1));
-  transition: opacity var(--dur-fast) linear;
-}
 
 /* SpinBadge: rotates only while its card is hovered or focused. */
 @keyframes badge-spin {
@@ -318,46 +300,18 @@
   }
 }
 
-@keyframes float-y {
-  0%,
-  100% {
-    transform: translateY(0);
-  }
-  50% {
-    transform: translateY(-8px);
-  }
-}
-.float-y {
-  animation: float-y 2.6s var(--ease-standard) infinite;
-}
-@keyframes glow-pulse {
-  0%,
-  100% {
-    filter: drop-shadow(0 0 6px rgba(34, 211, 238, 0.35));
-  }
-  50% {
-    filter: drop-shadow(0 0 16px rgba(34, 211, 238, 0.65));
-  }
-}
-.glow-pulse {
-  animation: glow-pulse 3.2s var(--ease-standard) infinite;
-}
-@media (prefers-reduced-motion: reduce) {
-  .float-y,
-  .glow-pulse {
-    animation: none;
-  }
-}
-
 /* Thin scrollbar for terminal-style scroll areas */
-.mono-scroll::-webkit-scrollbar {
+.mono-scroll::-webkit-scrollbar,
+html::-webkit-scrollbar {
   width: 6px;
 }
-.mono-scroll::-webkit-scrollbar-thumb {
+.mono-scroll::-webkit-scrollbar-thumb,
+html::-webkit-scrollbar-thumb {
   background: rgba(140, 168, 214, 0.25);
   border-radius: 999px;
 }
-.mono-scroll::-webkit-scrollbar-track {
+.mono-scroll::-webkit-scrollbar-track,
+html::-webkit-scrollbar-track {
   background: transparent;
 }
 

@@ -3,7 +3,7 @@
 // `featured: true` projects get the spotlight at the top: big rows, or a
 // two-column grid when `grid: true` is also set. Everything else
 // goes in the grid below them. Each project also gets its own
-// detail page at #project/<slug>, built from these same fields.
+// detail page at /work/<slug>/, built from these same fields.
 //
 // Flow diagrams are written as columns of boxes. If `links` is left out,
 // every box connects to every box in the next column. If a diagram needs
@@ -241,7 +241,7 @@ export const PROJECTS = [
       { label: "Read the technical report", href: "/p/rea-study/report.html", external: true, primary: true },
       { label: "Download the PDF", href: "/p/rea-study/report.pdf", external: true },
       { label: "Code, data and every run", href: "https://github.com/ansarbuilds/rea-study", external: true },
-      { label: "The earlier study it follows: My Take on Jev", href: "#project/decision-models" },
+      { label: "The earlier study it follows: My Take on Jev", href: "/work/decision-models/" },
     ],
   },
   {
@@ -351,7 +351,7 @@ export const PROJECTS = [
       { label: "Download the PDF", href: "/p/prh-jepa/report.pdf", external: true },
       { label: "Illustrated explainer", href: "/p/prh-jepa/explainer.html", external: true },
       { label: "Code, data and every run", href: "https://github.com/ansarbuilds/prh-jepa", external: true },
-      { label: "Earlier study: My Take on REA", href: "#project/rea-study" },
+      { label: "Earlier study: My Take on REA", href: "/work/rea-study/" },
     ],
   },
   {
@@ -829,7 +829,7 @@ export const PROJECTS = [
     companions: [{ slug: "reptrack", label: "Also on the App Store: RepTrack, my iPhone workout log" }],
     links: [
       { label: "Get Haloscript on the App Store", href: "https://apps.apple.com/ca/app/haloscript/id6820670080", external: true, primary: true },
-      { label: "See the full tour", href: "#project/haloscript", primary: true },
+      { label: "See the full tour", href: "/work/haloscript/", primary: true },
       { label: "Support and privacy", href: "https://ansarbuilds.github.io/haloscript-site/", external: true },
       { label: "Source is private. Walkthrough on request.", href: "#contact", locked: true },
     ],
@@ -874,7 +874,7 @@ export const PROJECTS = [
       ],
     },
     links: [
-      { label: "Meet the model", href: "#digital-double", primary: true },
+      { label: "Meet the model", href: "/playground/digital-double/", primary: true },
       { label: "Full write-up", href: "https://github.com/ansarbuilds/ai-digital-double", external: true },
     ],
   },
@@ -961,7 +961,7 @@ export const PROJECTS = [
     },
     links: [
       { label: "Code and full case study", href: "https://github.com/ansarbuilds/sitescout", external: true, primary: true },
-      { label: "The work tool behind it: Sidecar", href: "#project/sidecar" },
+      { label: "The work tool behind it: Sidecar", href: "/work/sidecar/" },
     ],
   },
   {
@@ -1055,7 +1055,7 @@ export const PROJECTS = [
     links: [
       { label: "Code, case study and runbook", href: "https://github.com/ansarbuilds/integration-in-a-box", external: true, primary: true },
       { label: "Watch the walkthrough", href: "https://github.com/ansarbuilds/integration-in-a-box/blob/main/docs/control-room-walkthrough.mp4", external: true },
-      { label: "The work behind it", href: "#project/health-dashboard" },
+      { label: "The work behind it", href: "/work/health-dashboard/" },
     ],
   },
   {
@@ -1137,7 +1137,7 @@ export const PROJECTS = [
     },
     links: [
       { label: "Code, case study and results", href: "https://github.com/ansarbuilds/analytics-assistant", external: true, primary: true },
-      { label: "The work behind it", href: "#project/mcp-workflow" },
+      { label: "The work behind it", href: "/work/mcp-workflow/" },
     ],
   },
   {
@@ -1318,7 +1318,7 @@ export const PROJECTS = [
     },
     links: [
       { label: "Code, case study and runbook", href: "https://github.com/ansarbuilds/data-delivery", external: true, primary: true },
-      { label: "See the lineage explorer", href: "#lineage-demo" },
+      { label: "See the lineage explorer", href: "/playground/lineage-demo/" },
     ],
   },
   {
@@ -1390,7 +1390,7 @@ export const PROJECTS = [
     },
     links: [
       { label: "Code, case study and results", href: "https://github.com/ansarbuilds/catalogue-checker", external: true, primary: true },
-      { label: "The notebook it grew from", href: "#project/smart-categorization" },
+      { label: "The notebook it grew from", href: "/work/smart-categorization/" },
     ],
   },
   {
@@ -1874,7 +1874,7 @@ export const PROJECTS = [
       ],
     },
     links: [
-      { label: "Open the demo", href: "#lineage-demo", primary: true },
+      { label: "Open the demo", href: "/playground/lineage-demo/", primary: true },
     ],
   },
   {
@@ -2144,7 +2144,7 @@ export const EXPERIMENTS = [
     accent: "green",
     hook: "A fake terminal on this site. Type a question, or press 1 to 4, and it answers the way I would.",
     body: "It matches what you type against a few topics, so it isn't a chatbot, and that's the point. Short, honest answers, typed out one letter at a time.",
-    href: "#emet",
+    href: "/playground/emet/",
     shot: "/shots/emet.webp",
     cardArt: "/shots/refined/emet.webp",
     cta: "Open the terminal",
@@ -2155,7 +2155,7 @@ export const EXPERIMENTS = [
     accent: "amber",
     hook: "A 3D solar system with real orbital mechanics and procedural planet textures, running in your browser.",
     body: "This one is pure curiosity. I wanted to see how far I could push three.js with an AI pair programmer, and it turned into several hundred lines of orbit maths and planet shaders.",
-    href: "#explore",
+    href: "/playground/explore/",
     shot: "/shots/solar-system.webp",
     cardArt: "/shots/refined/solar.webp",
     cta: "Take a look around",
@@ -2166,7 +2166,7 @@ export const EXPERIMENTS = [
     accent: "violet",
     hook: "A glowing infinity loop of stars that swirls when your pointer moves over it. It's a WebGL shader, and it used to open this site.",
     body: "Thousands of points drawn on the graphics card and held in a loop shape. It's the same kind of experiment: ask the AI, look at the result, push it further. Its dots now gather into my name at the top of the page.",
-    href: "#infinity",
+    href: "/playground/infinity/",
     shot: "/shots/infinity.webp",
     cardArt: "/shots/refined/stars.webp",
     cta: "See the infinity",

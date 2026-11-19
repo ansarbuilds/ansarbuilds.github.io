@@ -1,21 +1,25 @@
-import { Component, createRef, lazy, Suspense, useCallback, useContext, useEffect, useMemo, useRef, useState } from "react";
-import EmetSection from "./components/EmetSection";
+import { Component, createRef, lazy, Suspense, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Hero, ProjectsSection, CapabilitiesSection, MoreWorkSection, ContactSection } from "./components/Sections";
-import ProjectPage from "./components/ProjectPage";
-import ProjectWorkPage from "./components/ProjectWorkPage";
-import SandboxStubs from "./components/SandboxStubs";
 import CommandPalette from "./components/CommandPalette";
 import { MatrixBackground } from "./components/RouteBackgrounds";
 import PaletteSwatch from "./components/PaletteSwatch";
 import Cursor from "./components/Cursor";
 import { shouldPlayIntro } from "./lib/intro";
-import { runRouteChange } from "./lib/routeTransition";
+import { isRouteTransitioning, runRouteChange } from "./lib/routeTransition";
+import { parseTarget, pathForRoute, readLocation, urlForTarget } from "./lib/routes";
 import { titleForRoute } from "./lib/routeTitle";
 import { CONTACT } from "./data/content";
 import { applyPalette, clearPalette, paletteForRoute, pickPalette } from "./lib/palettes";
 import { OPEN_SOURCE_PROJECTS } from "./data/projects";
-import { RouteContext, SandboxContext, ScrollContext, ThemeContext, useRoute, useSandbox } from "./appContexts";
+import { RouteContext, SandboxContext, ThemeContext, useRoute, useSandbox } from "./appContexts";
+import { scrollToElement, scrollToTop, setSmoothScroll } from "./lib/scroll";
 
+// Only the home page ships in the first load; every other view arrives
+// when it is opened.
+const EmetSection = lazy(() => import("./components/EmetSection"));
+const ProjectPage = lazy(() => import("./components/ProjectPage"));
+const ProjectWorkPage = lazy(() => import("./components/ProjectWorkPage"));
+const SandboxStubs = lazy(() => import("./components/SandboxStubs"));
 const SolarSystemExplorer = lazy(() => import("./components/SolarSystemExplorer"));
 const DataLineageExplorer = lazy(() => import("./components/DataLineageExplorer"));
 const DigitalDouble = lazy(() => import("./components/DigitalDouble"));
@@ -24,33 +28,19 @@ const InfinityPage = lazy(() => import("./components/InfinityPage"));
 const BB8Companion = lazy(() => import("./components/BB8Companion"));
 
 /* ============================================================
-   ROUTER: "emet", "explore", "lineage-demo", "digital-double" and "project/<slug>" are
-   full takeover views (reached from cards, the nav or the command
-   palette). "main" is everything else: a single scrolled page, the
-   hero followed by Selected work, What I bring, More work, the
-   Playground and Contact, so a nav link
-   pointing at one of those doesn't swap a view, it smooth-scrolls to
-   that section's id within the document. Hash-based so every existing
-   <a href="#build"> (nav, emet's shortcuts, the command palette) keeps
-   working completely unmodified — only the interpretation of a
-   non-takeover hash changed, from "which view is active" to "which
-   section to scroll to."
+   ROUTER: every view has its own URL (see lib/routes.js). "main" is the
+   home page: one scrolled document, the hero followed by Selected work,
+   What I bring, More work, the Playground and Contact, so a link to one of
+   those does not swap a view, it scrolls to that section's id. Project
+   pages live at /work/<slug>/ and the full-screen views under
+   /playground/. Links are ordinary <a href>; one click handler turns the
+   in-app ones into history changes so the page never reloads.
    ============================================================ */
-function parseRoute(h) {
-  if (h === "emet" || h === "explore" || h === "lineage-demo" || h === "digital-double" || h === "infinity" || h === "work") return h;
-  if (h.startsWith("project/")) return h;
-  return "main";
-}
-
 function readRoute() {
   if (typeof window === "undefined") return "main";
-  return parseRoute(window.location.hash.replace(/^#/, ""));
+  return readLocation().route;
 }
 
-// Shared with the hero's InfinityLoop so it can read scroll position
-// off the same element Stage renders as <main> — set once, read every
-// frame via a plain ref rather than React state so scrolling never
-// triggers a re-render.
 // Coming back from a project page, the main document only mounts once the
 // page's exit animation finishes, so keep looking for the section for a
 // moment instead of giving up after one frame.
@@ -61,11 +51,7 @@ function scrollToSection(id, tries = 60) {
       // A build row is its own <details>; older archives wrap their links in one.
       const archive = el.tagName === "DETAILS" ? el : el.closest("details");
       if (archive) archive.open = true;
-      const scroller = el.closest("main");
-      const distance = scroller ? Math.abs(el.getBoundingClientRect().top - scroller.getBoundingClientRect().top) : 0;
-      const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-      const behavior = reduced || (scroller && distance > scroller.clientHeight * 1.25) ? "auto" : "smooth";
-      el.scrollIntoView({ behavior, block: id.startsWith("card-") ? "center" : "start", inline: "nearest" });
+      scrollToElement(el, { center: id.startsWith("card-") });
     }
     else if (tries > 0) scrollToSection(id, tries - 1);
   });
@@ -73,20 +59,26 @@ function scrollToSection(id, tries = 60) {
 
 function RouteProvider({ children }) {
   const [route, setRoute] = useState(readRoute);
-  const scrollContainerRef = useContext(ScrollContext);
   // The first run is the initial render, where moving focus would steal it
   // from the top of the page the visitor just opened.
   const first = useRef(true);
 
-  // The route the page is showing, readable from the hashchange handler
-  // without re-subscribing it on every change.
+  // The route the page is showing, readable from the history handlers
+  // without re-subscribing them on every change.
   const shownRoute = useRef(route);
   const leavingHeading = useRef(null);
-  useEffect(() => {
-    function onHashChange() {
-      const h = window.location.hash.replace(/^#/, "");
-      const next = parseRoute(h);
-      const from = shownRoute.current;
+  // Where the home page was scrolled to when the visitor left it, so Back
+  // returns them there.
+  const homeScroll = useRef(0);
+
+  // Show whatever the address bar now says.
+  const sync = useCallback(({ restore = false } = {}) => {
+    const { route: next, section, legacy } = readLocation();
+    // An old hash link: keep the view, move it to its real URL.
+    if (legacy) window.history.replaceState(null, "", pathForRoute(next));
+    const from = shownRoute.current;
+    if (next !== from) {
+      if (from === "main") homeScroll.current = window.scrollY;
       shownRoute.current = next;
       // Remember the heading being left. The swap below is synchronous, so
       // by the time the focus effect runs only the new page is in the DOM.
@@ -94,18 +86,67 @@ function RouteProvider({ children }) {
       // Home to a project page and back travel as one move; every other
       // change just swaps (see lib/routeTransition.js).
       runRouteChange({ from, to: next, apply: () => setRoute(next) });
-      if (h && next === "main") scrollToSection(h);
+      if (next === "main" && !section) {
+        // The closing transition brings the card back into view itself.
+        if (restore && !isRouteTransitioning()) requestAnimationFrame(() => window.scrollTo(0, homeScroll.current));
+        else if (!restore) scrollToTop({ instant: true });
+      }
     }
-    window.addEventListener("hashchange", onHashChange);
-    return () => window.removeEventListener("hashchange", onHashChange);
+    if (next === "main" && section) scrollToSection(section);
   }, []);
 
-  // Deep link on first load (e.g. a bookmark to #build) — no
-  // hashchange event fires for the hash already present at mount.
+  // Go to a view or section: a link target, a path, or a bare id.
+  const go = useCallback((href) => {
+    const target = parseTarget(href);
+    if (!target) { window.location.assign(href); return; }
+    // A hash link to something on the page being shown (a table of contents
+    // on a project page) scrolls there and stays on that page.
+    const here = shownRoute.current;
+    if (here !== "main" && target.route === "main" && target.section) {
+      const local = document.getElementById(target.section);
+      if (local) { scrollToElement(local); return; }
+    }
+    const url = urlForTarget(target);
+    const hashChanged = window.location.hash !== (target.section ? `#${target.section}` : "");
+    if (url !== window.location.pathname + window.location.hash) window.history.pushState(null, "", url);
+    sync();
+    // Components that follow the hash (the work stage) still hear about it.
+    if (hashChanged && target.route === "main" && here === "main") window.dispatchEvent(new HashChangeEvent("hashchange"));
+  }, [sync]);
+
   useEffect(() => {
-    const h = window.location.hash.replace(/^#/, "");
-    if (h && parseRoute(h) === "main") scrollToSection(h);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+    const onPop = () => sync({ restore: true });
+    // The visitor edited the hash by hand, or old code set it.
+    const onHashChange = (event) => { if (event.isTrusted) sync(); };
+    // In-app links change history instead of loading a page. Anything else
+    // (another site, a file under /p/, a new tab) is left to the browser.
+    const onClick = (event) => {
+      if (event.defaultPrevented || event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
+      const link = event.target.closest?.("a[href]");
+      if (!link || link.namespaceURI !== "http://www.w3.org/1999/xhtml" || (link.target && link.target !== "_self") || link.hasAttribute("download")) return;
+      const href = link.getAttribute("href");
+      if (!parseTarget(href)) return;
+      event.preventDefault();
+      go(href);
+    };
+    window.addEventListener("popstate", onPop);
+    window.addEventListener("hashchange", onHashChange);
+    document.addEventListener("click", onClick);
+    return () => {
+      window.removeEventListener("popstate", onPop);
+      window.removeEventListener("hashchange", onHashChange);
+      document.removeEventListener("click", onClick);
+    };
+  }, [go, sync]);
+
+  // First load: rewrite an old hash link, and scroll to a section named in
+  // the URL (no event fires for a hash already present at mount).
+  useEffect(() => {
+    // The app restores scroll itself; the browser's guess is for the wrong page.
+    window.history.scrollRestoration = "manual";
+    const { route: initial, section, legacy } = readLocation();
+    if (legacy) window.history.replaceState(null, "", pathForRoute(initial));
+    if (initial === "main" && section) scrollToSection(section);
   }, []);
 
   // A takeover view is a page as far as the browser and assistive tech are
@@ -114,6 +155,7 @@ function RouteProvider({ children }) {
   // instead of restarting at the top of the document.
   useEffect(() => {
     document.title = titleForRoute(route);
+    document.querySelector('link[rel="canonical"]')?.setAttribute("href", `https://ansarbuilds.dev${pathForRoute(route)}`);
     if (first.current) { first.current = false; return; }
     if (route === "main") return;
     // This effect can run while the outgoing view is still in the document
@@ -152,15 +194,14 @@ function RouteProvider({ children }) {
 
   const navigate = useCallback((id) => {
     if (id === "deck") {
-      if (window.location.hash) window.location.hash = "";
-      const scroller = scrollContainerRef?.current;
-      const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-      const behavior = reduced || (scroller && scroller.scrollTop > scroller.clientHeight * 1.25) ? "auto" : "smooth";
-      scroller?.scrollTo({ top: 0, behavior });
+      if (shownRoute.current === "main") {
+        if (window.location.hash) window.history.pushState(null, "", "/");
+        scrollToTop();
+      } else go("/");
       return;
     }
-    window.location.hash = id;
-  }, [scrollContainerRef]);
+    go(id);
+  }, [go]);
 
   const value = useMemo(() => ({ route, navigate }), [navigate, route]);
   return <RouteContext.Provider value={value}>{children}</RouteContext.Provider>;
@@ -199,11 +240,9 @@ function Nav({ booting = false }) {
   const { route, navigate } = useRoute();
   const editorial = route === "main";
   // While the dark hero is behind it, the nav goes dark glass to match.
-  const scrollContainerRef = useContext(ScrollContext);
   const [overHero, setOverHero] = useState(editorial);
   useEffect(() => {
-    const scroller = scrollContainerRef?.current;
-    if (!editorial || !scroller) { setOverHero(false); return undefined; }
+    if (!editorial) return undefined;
     let raf = 0;
     const update = () => {
       raf = 0;
@@ -216,9 +255,9 @@ function Nav({ booting = false }) {
     // The home page mounts a moment after the route changes.
     const settle = setTimeout(update, 400);
     update();
-    scroller.addEventListener("scroll", onScroll, { passive: true });
-    return () => { scroller.removeEventListener("scroll", onScroll); cancelAnimationFrame(raf); clearTimeout(settle); };
-  }, [editorial, scrollContainerRef]);
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => { window.removeEventListener("scroll", onScroll); cancelAnimationFrame(raf); clearTimeout(settle); };
+  }, [editorial]);
   function openPalette() {
     window.dispatchEvent(new KeyboardEvent("keydown", { key: "k", metaKey: true }));
   }
@@ -235,7 +274,7 @@ function Nav({ booting = false }) {
     document.addEventListener("keydown", close);
     return () => { document.removeEventListener("pointerdown", close); document.removeEventListener("keydown", close); };
   }, [menuOpen]);
-  return <nav className={`ed-nav ${overHero ? "is-over-hero" : ""} ${booting ? "is-booting" : ""}`} aria-label="Main navigation"><div className="ed-nav-inner">
+  return <nav className={`ed-nav ${editorial && overHero ? "is-over-hero" : ""} ${booting ? "is-booting" : ""}`} aria-label="Main navigation"><div className="ed-nav-inner">
     <button onClick={() => navigate("deck")} className="ed-wordmark" aria-label="Mohamed Ansar, home"><span className="ed-wordmark-symbol" aria-hidden="true">ma</span><span>mohamed ansar</span></button>
     <div className="ed-nav-links">{editorial ? <><a href="#projects" className="ed-nav-wide">Work</a><a href="#capabilities" className="ed-nav-wide">Capabilities</a><a href={CONTACT.github} className="ed-nav-wide" target="_blank" rel="noopener noreferrer">GitHub</a><span ref={menuRef} className="ed-nav-menu"><button type="button" aria-expanded={menuOpen} aria-controls="nav-menu" onClick={() => setMenuOpen((open) => !open)}>Menu</button>{menuOpen && <span id="nav-menu" className="ed-nav-menu-list" onClick={() => setMenuOpen(false)}><a href="#projects">Work</a><a href="#capabilities">Capabilities</a><a href="#more">More work</a><a href={CONTACT.github} target="_blank" rel="noopener noreferrer">GitHub ↗</a></span>}</span><a href="#contact" className="ed-nav-contact">Get in touch ↗</a></> : <button onClick={() => navigate("deck")}>← Home</button>}
       <button onClick={openPalette} className="ed-nav-command" aria-label="Open command palette">⌘ K</button>
@@ -252,11 +291,10 @@ function HomeCursor() {
 
 function ScrollProgress() {
   const { route } = useRoute();
-  const scrollContainerRef = useContext(ScrollContext);
   const barRef = useRef(null);
 
   useEffect(() => {
-    const scroller = scrollContainerRef?.current;
+    const scroller = document.scrollingElement;
     const bar = barRef.current;
     if (!scroller || !bar) return;
     let raf = null;
@@ -270,12 +308,14 @@ function ScrollProgress() {
       if (raf === null) raf = requestAnimationFrame(update);
     };
     update();
-    scroller.addEventListener("scroll", onScroll, { passive: true });
+    window.addEventListener("scroll", onScroll, { passive: true });
+    window.addEventListener("resize", onScroll);
     return () => {
-      scroller.removeEventListener("scroll", onScroll);
+      window.removeEventListener("scroll", onScroll);
+      window.removeEventListener("resize", onScroll);
       if (raf !== null) cancelAnimationFrame(raf);
     };
-  }, [route, scrollContainerRef]);
+  }, [route]);
 
   return <div className="ed-scroll-progress" aria-hidden="true"><span ref={barRef} /></div>;
 }
@@ -288,20 +328,18 @@ function RouteLoader({ label = "Loading interactive" }) {
 // recently crossed the middle of the screen sets the page's colour tokens,
 // and :root eases between them. Leaving the home page clears them, and
 // useRoutePalette sets the palette for the page being opened.
-function useSectionPalette(scrollContainerRef) {
+function useSectionPalette() {
   const { route } = useRoute();
   useEffect(() => {
-    const scroller = scrollContainerRef?.current;
     // MainDocument stays mounted through its exit animation, so key off the
     // route rather than mount state to let go as soon as it changes.
-    if (!scroller || route !== "main") return;
+    if (route !== "main") return;
     const root = document.documentElement;
     let current = null;
     let raf = null;
     const update = () => {
       raf = null;
-      const box = scroller.getBoundingClientRect();
-      const name = pickPalette(scroller.querySelectorAll("[data-palette]"), box.top + scroller.clientHeight * 0.5);
+      const name = pickPalette(document.querySelectorAll("[data-palette]"), window.innerHeight * 0.5);
       if (name === current) return;
       current = name;
       applyPalette(root, name);
@@ -310,15 +348,15 @@ function useSectionPalette(scrollContainerRef) {
       if (raf === null) raf = requestAnimationFrame(update);
     };
     update();
-    scroller.addEventListener("scroll", onScroll, { passive: true });
+    window.addEventListener("scroll", onScroll, { passive: true });
     window.addEventListener("resize", onScroll);
     return () => {
-      scroller.removeEventListener("scroll", onScroll);
+      window.removeEventListener("scroll", onScroll);
       window.removeEventListener("resize", onScroll);
       if (raf !== null) cancelAnimationFrame(raf);
       clearPalette(root);
     };
-  }, [route, scrollContainerRef]);
+  }, [route]);
 }
 
 const OPEN_SOURCE_SLUGS = new Set(OPEN_SOURCE_PROJECTS.map((p) => p.slug));
@@ -333,8 +371,7 @@ function useRoutePalette(route) {
 }
 
 function MainDocument({ bootDone, onBoot }) {
-  const scrollContainerRef = useContext(ScrollContext);
-  useSectionPalette(scrollContainerRef);
+  useSectionPalette();
   return (
     <>
       <Hero ready={bootDone} onReady={onBoot} />
@@ -349,12 +386,12 @@ function MainDocument({ bootDone, onBoot }) {
 // What each route shows. Takeover views fill the stage; the home page and
 // the project pages scroll.
 function RouteView({ route, bootDone, onBoot }) {
-  if (route === "emet") return <EmetSection />;
+  if (route === "emet") return <Suspense fallback={<RouteLoader label="Loading Emet" />}><EmetSection /></Suspense>;
   if (route === "explore") return <Suspense fallback={<RouteLoader label="Loading solar system" />}><SolarSystemExplorer /></Suspense>;
-  if (route === "work") return <ProjectWorkPage />;
+  if (route === "work") return <Suspense fallback={<RouteLoader label="Loading work" />}><ProjectWorkPage /></Suspense>;
   if (route === "project/digital-double") return <Suspense fallback={<RouteLoader label="Loading 3D project" />}><DigitalDouble /></Suspense>;
   if (route === "project/haloscript") return <Suspense fallback={<RouteLoader label="Loading project" />}><HaloscriptPage /></Suspense>;
-  if (route.startsWith("project/")) return <ProjectPage slug={route.slice("project/".length)} />;
+  if (route.startsWith("project/")) return <Suspense fallback={<RouteLoader label="Loading project" />}><ProjectPage slug={route.slice("project/".length)} /></Suspense>;
   if (route === "lineage-demo") return <Suspense fallback={<RouteLoader label="Loading data explorer" />}><DataLineageExplorer /></Suspense>;
   if (route === "infinity") return <Suspense fallback={<RouteLoader label="Loading particle scene" />}><InfinityPage /></Suspense>;
   if (route === "digital-double") return <Suspense fallback={<RouteLoader label="Loading 3D project" />}><DigitalDouble /></Suspense>;
@@ -369,23 +406,25 @@ function RouteView({ route, bootDone, onBoot }) {
 const FULL_HEIGHT = new Set(["emet", "explore", "lineage-demo", "infinity", "digital-double"]);
 function RouteTransition({ route, children }) {
   const kind = route === "main" ? "home" : route.startsWith("project/") || route === "work" ? "page" : "takeover";
-  return <div key={route} className={`rt rt-${kind} ${FULL_HEIGHT.has(route) ? "h-full" : ""}`}>{children}</div>;
+  return <div key={route} className={`rt rt-${kind} ${FULL_HEIGHT.has(route) ? "h-[100dvh]" : ""}`}>{children}</div>;
 }
 
 function Stage({ bootDone, onBoot }) {
   const { route } = useRoute();
   useRoutePalette(route);
   const { devMode, toggleDevMode } = useSandbox();
-  const scrollContainerRef = useContext(ScrollContext);
 
+  // The document is the scroller. Full-screen views own the wheel (orbit
+  // controls, the terminal), so smoothing is only on for pages that scroll.
   useEffect(() => {
-    if (route !== "main" && scrollContainerRef?.current) scrollContainerRef.current.scrollTop = 0;
-  }, [route, scrollContainerRef]);
+    setSmoothScroll(!FULL_HEIGHT.has(route));
+    if (route !== "main") scrollToTop({ instant: true });
+  }, [route]);
 
   return (
-    <main id="main-content" tabIndex={-1} ref={scrollContainerRef} className="relative flex-1 min-h-0 overflow-y-auto mono-scroll">
+    <main id="main-content" tabIndex={-1} className="relative min-h-[100dvh]">
       <RouteTransition route={route}><RouteView route={route} bootDone={bootDone} onBoot={onBoot} /></RouteTransition>
-      {devMode && <SandboxStubs onClose={toggleDevMode} />}
+      {devMode && <Suspense fallback={null}><SandboxStubs onClose={toggleDevMode} /></Suspense>}
     </main>
   );
 }
@@ -446,14 +485,12 @@ function useIdleAfterFirstInput(ready) {
 }
 
 function AppShell({ bootDone, onBoot }) {
-  const scrollContainerRef = useRef(null);
   const companionReady = useIdleAfterFirstInput(bootDone);
   return (
-    <ScrollContext.Provider value={scrollContainerRef}>
       <RouteProvider>
-        <div className="relative bg-ink text-slate-100 h-[100dvh] overflow-hidden">
+        <div className="relative bg-ink text-slate-100 min-h-[100dvh]">
           <Backdrop />
-          <div className="relative z-10 h-full flex flex-col">
+          <div className="relative z-10">
             <a className="skip-link" href="#main-content" onClick={(event) => { event.preventDefault(); document.getElementById("main-content")?.focus(); }}>Skip to main content</a>
             <Nav booting={!bootDone} />
             <ScrollProgress />
@@ -471,7 +508,6 @@ function AppShell({ bootDone, onBoot }) {
           </div>
         </div>
       </RouteProvider>
-    </ScrollContext.Provider>
   );
 }
 
