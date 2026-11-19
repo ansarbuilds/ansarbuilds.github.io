@@ -2,7 +2,7 @@ import { Fragment, useEffect, useLayoutEffect, useMemo, useRef, useState } from 
 import { motion, useReducedMotion, useScroll, useTransform } from "framer-motion";
 import { ArrowDown, ArrowRight, ArrowUpRight } from "lucide-react";
 import { DUR, EASE } from "../lib/motion";
-import { ACCENTS } from "../data/projects";
+import { ACCENTS } from "../data/projectIndex";
 import { media } from "../lib/media";
 
 const clamp01 = (v) => Math.min(1, Math.max(0, v));

@@ -2,6 +2,7 @@ import "./actFour/actFour.css";
 import { useEffect, useRef, useState } from "react";
 import { ArrowUpRight } from "lucide-react";
 import { ACT_FOUR_SCREENS } from "./actFour/screens";
+import { cueOnRise } from "../lib/sound";
 
 /* Act IV, the playground reel, on the home page between More work and
    Contact: the network collapses into a star, then the solar system, the
@@ -30,9 +31,10 @@ export default function ActFour({ experiments }) {
       node.style.transform = `translateY(${(1 - amount) * rise}px)`;
       node.style.visibility = amount > 0.02 ? "visible" : "hidden";
     };
+    const chimes = experiments.map(() => cueOnRise("chime"));
     const onFrame = (t, m) => {
       show(title.current, m.title, 16);
-      m.cards.forEach((amount, i) => show(cards.current[i], amount, 22));
+      m.cards.forEach((amount, i) => { show(cards.current[i], amount, 22); chimes[i](amount); });
     };
     const run = () => film?.setActive(onScreen && document.visibilityState === "visible");
     const load = async () => {
@@ -60,7 +62,7 @@ export default function ActFour({ experiments }) {
       document.removeEventListener("visibilitychange", run);
       film?.dispose();
     };
-  }, []);
+  }, [experiments]);
 
   if (failed) return null;
   return <section ref={section} id="ai" className="act4" aria-labelledby="act4-title" data-palette="neon" style={{ "--act-screens": SCREENS }}>

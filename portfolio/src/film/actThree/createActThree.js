@@ -7,6 +7,7 @@ import { OutputPass } from "three/examples/jsm/postprocessing/OutputPass.js";
 import { finishShader } from "../coldOpen/shaders.js";
 import { BONE, SIGNAL, floor, glow, points } from "../actTwo/kit.js";
 import { ACT_THREE, CENTRE, PILLARS, cameraAt, moments, timeAtProgress } from "./timeline.js";
+import { createAdaptive } from "../adaptive.js";
 
 /* Act III (A3-01, A3-02) in plain three.js: three monoliths of dark stone
    rise out of the ground, each carved with what it stands for and the
@@ -122,6 +123,8 @@ export function createActThree(canvas, { pillars, getProgress, onFrame }) {
   composer.addPass(bloom);
   composer.addPass(finish);
   composer.addPass(new OutputPass());
+  // Steps quality down if this device cannot keep up (see adaptive.js).
+  const adaptive = createAdaptive({ quality, bloom, apply: () => { renderer.setPixelRatio(quality.dpr); resize(); } });
 
   let width = 1, height = 1, fit = 1;
   const resize = () => {
@@ -175,6 +178,7 @@ export function createActThree(canvas, { pillars, getProgress, onFrame }) {
     // the frames is enough there.
     if ((t <= 0 || t >= ACT_THREE.seconds) && settledFrames++ % 4) return;
     if (t > 0 && t < ACT_THREE.seconds) settledFrames = 0;
+    adaptive.frame(nowMs, t <= 0 || t >= ACT_THREE.seconds);
     composer.render();
     onFrame?.(t, m);
   }

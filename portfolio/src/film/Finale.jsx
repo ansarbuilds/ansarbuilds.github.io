@@ -2,6 +2,7 @@ import "./finale/finale.css";
 import { useEffect, useRef, useState } from "react";
 import { ArrowUpRight, ExternalLink } from "lucide-react";
 import { FINALE_CONTACT_AT, FINALE_SCREENS } from "./finale/screens";
+import { cueOnRise } from "../lib/sound";
 
 /* The finale on the home page, in place of the Contact section: everything
    recedes into one point of light; then the contact line, the email and the
@@ -24,7 +25,9 @@ export default function Finale({ contact, pitch, credits, onTop, fallback }) {
       const span = box.height - window.innerHeight;
       return span > 0 ? Math.min(1, Math.max(0, -box.top / span)) : 0;
     };
+    const tone = cueOnRise("tone");
     const onFrame = (t, m) => {
+      tone(m.contact);
       if (block.current) {
         block.current.style.opacity = m.contact;
         block.current.style.visibility = m.contact > 0.02 ? "visible" : "hidden";

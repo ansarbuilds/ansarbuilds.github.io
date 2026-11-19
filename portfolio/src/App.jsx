@@ -4,13 +4,14 @@ import CommandPalette from "./components/CommandPalette";
 import { MatrixBackground } from "./components/RouteBackgrounds";
 import PaletteSwatch from "./components/PaletteSwatch";
 import Cursor from "./components/Cursor";
-import { COLD_OPEN_SESSION_KEY, coldOpenForced, coldOpenMode, shouldPlayIntro } from "./lib/intro";
+import { COLD_OPEN_SESSION_KEY, coldOpenForced, coldOpenMode, filmEnabled, shouldPlayIntro } from "./lib/intro";
+import SoundToggle from "./components/SoundToggle";
 import { isRouteTransitioning, noteSource, runRouteChange } from "./lib/routeTransition";
 import { PREVIS, parseTarget, pathForRoute, readLocation, urlForTarget } from "./lib/routes";
 import { titleForRoute } from "./lib/routeTitle";
 import { CONTACT } from "./data/content";
 import { applyPalette, clearPalette, paletteForRoute, pickPalette } from "./lib/palettes";
-import { OPEN_SOURCE_PROJECTS } from "./data/projects";
+import { OPEN_SOURCE_PROJECTS } from "./data/projectIndex";
 import { RouteContext, SandboxContext, ThemeContext, useRoute, useSandbox } from "./appContexts";
 import { scrollToElement, scrollToTop, setSmoothScroll } from "./lib/scroll";
 
@@ -246,6 +247,7 @@ function SandboxProvider({ children }) {
 // A consistent paper navigation anchors the alternating editorial sections.
 function Nav({ booting = false }) {
   const { route, navigate } = useRoute();
+  const [filmOn] = useState(filmEnabled);
   const editorial = route === "main";
   // While the dark hero is behind it, the nav goes dark glass to match.
   const [overHero, setOverHero] = useState(editorial);
@@ -283,9 +285,10 @@ function Nav({ booting = false }) {
     return () => { document.removeEventListener("pointerdown", close); document.removeEventListener("keydown", close); };
   }, [menuOpen]);
   return <nav className={`ed-nav ${editorial && overHero ? "is-over-hero" : ""} ${booting ? "is-booting" : ""}`} aria-label="Main navigation"><div className="ed-nav-inner">
-    <button onClick={() => navigate("deck")} className="ed-wordmark" aria-label="Mohamed Ansar, home"><span className="ed-wordmark-symbol" aria-hidden="true">ma</span><span>mohamed ansar</span></button>
+    <button onClick={() => navigate("deck")} className="ed-wordmark"><span className="ed-wordmark-symbol" aria-hidden="true">ma</span><span>mohamed ansar</span><span className="sr-only">, home</span></button>
     <div className="ed-nav-links">{editorial ? <><a href="#projects" className="ed-nav-wide">Work</a><a href="#capabilities" className="ed-nav-wide">Capabilities</a><a href={CONTACT.github} className="ed-nav-wide" target="_blank" rel="noopener noreferrer">GitHub</a><span ref={menuRef} className="ed-nav-menu"><button type="button" aria-expanded={menuOpen} aria-controls="nav-menu" onClick={() => setMenuOpen((open) => !open)}>Menu</button>{menuOpen && <span id="nav-menu" className="ed-nav-menu-list" onClick={() => setMenuOpen(false)}><a href="#projects">Work</a><a href="#capabilities">Capabilities</a><a href="#more">More work</a><a href={CONTACT.github} target="_blank" rel="noopener noreferrer">GitHub ↗</a></span>}</span><a href="#contact" className="ed-nav-contact">Get in touch ↗</a></> : <button onClick={() => navigate("deck")}>← Home</button>}
-      <button onClick={openPalette} className="ed-nav-command" aria-label="Open command palette">⌘ K</button>
+      {filmOn && <SoundToggle />}
+      <button onClick={openPalette} className="ed-nav-command" aria-label="⌘ K, open the command palette">⌘ K</button>
     </div>
   </div></nav>;
 }

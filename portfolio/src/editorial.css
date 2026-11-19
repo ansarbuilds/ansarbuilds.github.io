@@ -371,3 +371,8 @@ a:hover .ed-experiment-image img { transform: scale(1.04); }
  .ed-swatch-toggle { padding: 8px 10px; }
 }
 @media (prefers-reduced-motion: reduce) { .ed-swatch-chips b { transition: none; } }
+
+/* The film's sound switch in the nav. */
+.ed-nav-sound { display: inline-flex; align-items: center; gap: 6px; min-height: 40px; padding: 0 12px; border: 1px solid color-mix(in srgb, currentColor 25%, transparent); font: 500 .62rem/1 var(--font-mono); letter-spacing: .1em; text-transform: uppercase; }
+.ed-nav-sound[aria-pressed="true"] { color: #ff8a5f; border-color: #ff8a5f; }
+@media (max-width: 700px) { .ed-nav-sound span { display: none; } .ed-nav-sound { padding: 0 10px; } }

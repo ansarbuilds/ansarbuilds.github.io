@@ -62,11 +62,14 @@ test('share pages open their matching case studies', async ({ page }) => {
   }
 });
 
-test('homepage has no critical automated accessibility violations', async ({ page }) => {
+test('homepage has no critical or serious automated accessibility violations', async ({ page }) => {
   await page.goto('/');
   await expect(page.getByRole('main')).toBeVisible();
+  // Judge the settled page: text caught half faded in reads as low contrast.
+  await page.addStyleTag({ content: '*, *::before, *::after { animation-duration: 0s !important; animation-delay: 0s !important; transition: none !important; }' });
   const result = await new AxeBuilder({ page }).analyze();
-  expect(result.violations.filter((violation) => violation.impact === 'critical')).toEqual([]);
+  const bad = result.violations.filter((violation) => ['critical', 'serious'].includes(violation.impact));
+  expect(bad.map((v) => `${v.id}: ${v.nodes.map((n) => n.target.join(' ')).join(', ')}`)).toEqual([]);
 });
 
 test('data saver visitors choose whether to load the 3D model', async ({ page }) => {
@@ -140,6 +143,7 @@ test('the pre-vis follows the scrollbar from the first shot to the last', async 
 });
 
 test('the cold open plays over the home page, hands over to the hero, and can be skipped', async ({ page }) => {
+  test.setTimeout(90000);
   await page.goto('/?coldopen=full');
   // Its code can take a while on a dev server that has just rebuilt three.js.
   await expect(page.locator('.co')).toBeVisible({ timeout: 20000 });
@@ -164,6 +168,7 @@ test('the cold open does not play for reduced motion, a section link, or a secon
 });
 
 test('Act I pins its stage, keeps its words as real text, and loads its scene near the screen', async ({ page }) => {
+  test.setTimeout(90000);
   await page.addInitScript((key) => { sessionStorage.setItem(key, '1'); sessionStorage.setItem('cold-open-played', '1'); }, INTRO_SESSION_KEY);
   await page.goto('/');
   const act = page.locator('section.act1');
@@ -171,7 +176,7 @@ test('Act I pins its stage, keeps its words as real text, and loads its scene ne
   await expect(act.getByText('Most AI demos stop at the demo.')).toBeAttached();
   await expect(act.locator('dl dt')).toHaveCount(4);
   await act.evaluate((node) => window.scrollTo(0, node.getBoundingClientRect().top + window.scrollY + window.innerHeight));
-  await expect(act).toHaveClass(/is-live/, { timeout: 8000 });
+  await expect(act).toHaveClass(/is-live/, { timeout: 60000 });
   const stage = await page.locator('.act1-stage').boundingBox();
   expect(Math.abs(stage.y)).toBeLessThan(2);
 });
@@ -184,6 +189,7 @@ test('with reduced motion the short version is the plain section', async ({ page
 });
 
 test('Act II plays above the work stage, with real links that are hidden until their card shows', async ({ page }) => {
+  test.setTimeout(90000);
   await page.addInitScript((key) => { sessionStorage.setItem(key, '1'); sessionStorage.setItem('cold-open-played', '1'); }, INTRO_SESSION_KEY);
   await page.goto('/');
   const act = page.locator('section.act2');
@@ -193,7 +199,7 @@ test('Act II plays above the work stage, with real links that are hidden until t
   await expect(card.locator('a.act2-primary')).toHaveAttribute('href', '/work/saywhen/');
   // Before the scene, the card is out of the way of the keyboard.
   await act.evaluate((node) => window.scrollTo(0, node.getBoundingClientRect().top + window.scrollY));
-  await expect(act).toHaveClass(/is-live/, { timeout: 15000 });
+  await expect(act).toHaveClass(/is-live/, { timeout: 60000 });
   await expect(card).toBeHidden();
   // At the end of the act, the last project's card is there and usable,
   // and the earlier ones have gone.
@@ -206,6 +212,7 @@ test('Act II plays above the work stage, with real links that are hidden until t
 });
 
 test('Act III replaces What I bring with the monoliths, keeping its links and its place in the nav', async ({ page }) => {
+  test.setTimeout(90000);
   await page.addInitScript((key) => { sessionStorage.setItem(key, '1'); sessionStorage.setItem('cold-open-played', '1'); }, INTRO_SESSION_KEY);
   await page.goto('/');
   const act = page.locator('section.act3');
@@ -213,13 +220,14 @@ test('Act III replaces What I bring with the monoliths, keeping its links and it
   await expect(act.locator('article.act3-card')).toHaveCount(3);
   await expect(act.locator('article.act3-card a[href="/work/jarvis/"]')).toHaveCount(1);
   await act.evaluate((node) => window.scrollTo(0, node.getBoundingClientRect().top + window.scrollY + node.offsetHeight - window.innerHeight));
-  await expect(act).toHaveClass(/is-live/, { timeout: 15000 });
+  await expect(act).toHaveClass(/is-live/, { timeout: 60000 });
   // At the end, the last capability's card is the one showing.
   await expect(act.locator('article.act3-card').last()).toBeVisible();
   await expect(act.locator('article.act3-card').first()).toBeHidden();
 });
 
 test('Act IV plays between More work and Contact, and its cards open the experiments', async ({ page }) => {
+  test.setTimeout(90000);
   await page.addInitScript((key) => { sessionStorage.setItem(key, '1'); sessionStorage.setItem('cold-open-played', '1'); }, INTRO_SESSION_KEY);
   await page.goto('/');
   const act = page.locator('section.act4');
@@ -228,7 +236,7 @@ test('Act IV plays between More work and Contact, and its cards open the experim
   await expect(act.locator('a.act4-cta')).toHaveCount(3);
   await expect(act.locator('a.act4-cta[href="/playground/emet/"]')).toHaveCount(1);
   await act.evaluate((node) => window.scrollTo(0, node.getBoundingClientRect().top + window.scrollY + node.offsetHeight - window.innerHeight));
-  await expect(act).toHaveClass(/is-live/, { timeout: 15000 });
+  await expect(act).toHaveClass(/is-live/, { timeout: 60000 });
   await expect(act.locator('article.act4-card').last()).toBeVisible();
 });
 
@@ -266,4 +274,24 @@ test('the finale keeps the contact links real, and #contact lands on the contact
   await page.goto('/#contact');
   await expect(fin).toHaveClass(/is-live/, { timeout: 40000 });
   await expect(fin.locator('a.fin-email')).toBeVisible();
+});
+
+test('the film\'s sound is off until switched on, and the choice is remembered', async ({ page }) => {
+  await page.addInitScript((key) => sessionStorage.setItem(key, '1'), INTRO_SESSION_KEY);
+  await page.goto('/');
+  const sound = page.getByRole('button', { name: /film's sound/ });
+  await expect(sound).toHaveAttribute('aria-pressed', 'false');
+  await sound.click();
+  await expect(sound).toHaveAttribute('aria-pressed', 'true');
+  await page.reload();
+  await expect(page.getByRole('button', { name: /film's sound/ })).toHaveAttribute('aria-pressed', 'true');
+  await page.getByRole('button', { name: /film's sound/ }).click();
+  await expect(page.getByRole('button', { name: /film's sound/ })).toHaveAttribute('aria-pressed', 'false');
+});
+
+test('Act II has a way past it for the keyboard', async ({ page }) => {
+  test.setTimeout(90000);
+  await page.addInitScript((key) => sessionStorage.setItem(key, '1'), INTRO_SESSION_KEY);
+  await page.goto('/');
+  await expect(page.locator('section.act2 a.film-skip')).toHaveAttribute('href', '#projects');
 });

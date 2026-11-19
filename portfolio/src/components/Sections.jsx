@@ -4,7 +4,7 @@ import { ArrowDown, ArrowRight, ArrowUpRight, ExternalLink } from "lucide-react"
 import SignalField from "./SignalField";
 import WorkStage from "./WorkStage";
 import { CODE, CONTACT, HERO, RECEIPTS } from "../data/content";
-import { EXPERIMENTS, LISTED_PROJECTS, getProject } from "../data/projects";
+import { EXPERIMENTS, LISTED_PROJECTS, getProject } from "../data/projectIndex";
 import { CAPABILITIES, FLAGSHIPS, MORE_WORK, STACK_MARQUEE } from "../data/showcase";
 import { EASE, STAGGER, tween } from "../lib/motion";
 import { INTRO_SESSION_KEY, filmEnabled } from "../lib/intro";

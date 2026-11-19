@@ -8,6 +8,7 @@ import { poseAt } from "../rig.js";
 import { COLD_OPEN, SHORT_START, SUBTITLE, T, score } from "./score.js";
 import { sampleName } from "./sampleName.js";
 import { finishShader, flareFragment, flareVertex, lineFragment, lineVertex, particleFragment, particleVertex, raysFragment } from "./shaders.js";
+import { createAdaptive } from "../adaptive.js";
 
 /* The cold open's scene and its frame loop, in plain three.js.
 
@@ -126,6 +127,8 @@ export function createColdOpen(canvas, { mode, waited = 0, holdAt = null, onVeil
   composer.addPass(bloom);
   composer.addPass(finish);
   composer.addPass(new OutputPass());
+  // Steps quality down if this device cannot keep up (see adaptive.js).
+  const adaptive = createAdaptive({ quality, bloom, apply: () => { renderer.setPixelRatio(quality.dpr); resize(); } });
 
   let width = 1, height = 1;
   const resize = () => {
@@ -219,6 +222,7 @@ export function createColdOpen(canvas, { mode, waited = 0, holdAt = null, onVeil
     bloom.strength = now.bloom;
     finish.uniforms.uTime.value = t;
     finish.uniforms.uAberration.value = now.aberration;
+    adaptive.frame(nowMs);
     composer.render();
 
     // The page around the canvas.

@@ -9,6 +9,7 @@ import { finishShader } from "../coldOpen/shaders.js";
 import { ACT_ONE, LAYOUT, countAt, numberProgress, overlays, timeAtProgress } from "./timeline.js";
 import { pointFragment, pointVertex, riverFragment, riverVertex } from "./shaders.js";
 import { CODE_LINES } from "./codeLines.js";
+import { createAdaptive } from "../adaptive.js";
 
 /* Act I (storyboard A1-01 to A1-03) in plain three.js.
 
@@ -286,6 +287,8 @@ export function createActOne(canvas, { receipts, tools, getProgress, onFrame }) 
   composer.addPass(bloom);
   composer.addPass(finish);
   composer.addPass(new OutputPass());
+  // Steps quality down if this device cannot keep up (see adaptive.js).
+  const adaptive = createAdaptive({ quality, bloom, apply: () => { renderer.setPixelRatio(quality.dpr); resize(); } });
 
   let width = 1, height = 1, fit = 1;
   const resize = () => {
@@ -384,6 +387,7 @@ export function createActOne(canvas, { receipts, tools, getProgress, onFrame }) 
     // the frames is enough there.
     if ((t <= 0 || t >= ACT_ONE.seconds) && settledFrames++ % 4) return;
     if (t > 0 && t < ACT_ONE.seconds) settledFrames = 0;
+    adaptive.frame(nowMs, t <= 0 || t >= ACT_ONE.seconds);
     composer.render();
     onFrame?.(t, show);
   }
