@@ -8,7 +8,9 @@ import { Fragment, useEffect, useState } from "react";
    from the motion tokens, triggered by the act starting, not scrubbed by
    the scrollbar. `section` is the act's section; the card shows while the
    act is pinned and in its first `share` of scrolling. */
-export default function ActTitle({ section, children, share = 0.08 }) {
+// `as` sets the element: an act whose own heading is not on screen yet (Act
+// II) uses its title as that heading.
+export default function ActTitle({ section, children, share = 0.08, as: Tag = "p" }) {
   const [up, setUp] = useState(false);
   const words = String(children).split(" ");
   useEffect(() => {
@@ -28,8 +30,8 @@ export default function ActTitle({ section, children, share = 0.08 }) {
     window.addEventListener("resize", onScroll);
     return () => { cancelAnimationFrame(frame); window.removeEventListener("scroll", onScroll); window.removeEventListener("resize", onScroll); };
   }, [section, share]);
-  return <p className={`film-act-title${up ? " is-up" : ""}`}>
+  return <Tag className={`film-act-title${up ? " is-up" : ""}`}>
     {/* Real spaces between the words, so it reads as one line. */}
     {words.map((word, i) => <Fragment key={i}>{i > 0 && " "}<span className="film-act-word" style={{ "--i": i }}>{word}</span></Fragment>)}
-  </p>;
+  </Tag>;
 }
