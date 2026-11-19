@@ -392,13 +392,24 @@ function ExperimentImage({ experiment }) {
 }
 
 // The playground on the home page: Act IV where the film can play, ending on
-// a way into each experiment. Without the film the home page has no
-// playground section (the experiments are a click away in the command
-// palette and on their own pages), as before.
+// a way into each experiment. Without the film (reduced motion, a slow
+// connection, no WebGL 2) it is a plain row of the same experiments, so
+// those visitors can still find them from the home page.
 const FILM_EXPERIMENTS = ["solar", "stars", "emet"].map((id) => EXPERIMENTS.find((e) => e.id === id)).filter(Boolean);
 export function PlaygroundSection() {
   const [film] = useState(filmEnabled);
-  return film ? <ActFour experiments={FILM_EXPERIMENTS} /> : null;
+  if (film) return <ActFour experiments={FILM_EXPERIMENTS} />;
+  return <section id="ai" className="ed-projects ed-light ed-section" aria-labelledby="playground-title" data-palette="neon">
+    <div className="ed-wrap">
+      <Enter className="ed-section-heading"><div><IndexLabel number="05">Playground</IndexLabel><h2 id="playground-title">Rooms off <em>the hall.</em></h2></div><div className="ed-heading-aside"><p>Small things I built to try an idea. Each one opens on its own page.</p></div></Enter>
+      <div className="sc-card-grid is-three">{FILM_EXPERIMENTS.map((experiment, i) => <Enter key={experiment.id} index={i}>
+        <a href={experiment.href} className="sc-card">
+          <div className="sc-card-media"><ExperimentImage experiment={experiment} /></div>
+          <div className="sc-card-body"><h3>{experiment.title}<ArrowUpRight size={20} aria-hidden="true" /></h3><p className="sc-card-line">{experiment.hook}</p></div>
+        </a>
+      </Enter>)}</div>
+    </div>
+  </section>;
 }
 
 export function ExperimentsSection() {
