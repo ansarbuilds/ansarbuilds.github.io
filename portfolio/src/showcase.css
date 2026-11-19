@@ -431,3 +431,6 @@ html.is-vt .rt { animation: none; }
   .sc-card, .sc-feed-card, .ed-experiment, .sc-card-body h3 svg, .ed-experiment-title svg, .ed-experiment-cta svg, .sc-hero-btn, .sc-btn, .ed-contact-email { transition: none; translate: none; }
   .sc-card:hover, .sc-feed-card:hover, .ed-experiment:hover, .sc-hero-btn:hover, :is(.sc-btn, .sc-card, .sc-feed-card, .ed-experiment):active { translate: none; scale: none; }
 }
+
+/* Keeps a short phrase on one line, so a sentence never breaks before its last words. */
+.sc-nowrap { white-space: nowrap; }
