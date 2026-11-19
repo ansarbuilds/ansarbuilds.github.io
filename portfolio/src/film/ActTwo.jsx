@@ -38,10 +38,10 @@ export default function ActTwo({ projects }) {
       node.style.transform = `translateY(${(1 - amount) * rise}px)`;
       node.style.visibility = amount > 0.02 ? "visible" : "hidden";
     };
-    const rush = cueOnRise("whoosh", 0.9), chimes = projects.map(() => cueOnRise("chime"));
+    const cut = cueOnRise("tone", 0.9), chimes = projects.map(() => cueOnRise("chime"));
     const onFrame = (t, moments) => {
       let closed = false;
-      rush(Math.max(...moments.map((x) => x.streak)));
+      cut(Math.max(...moments.map((x) => x.cut)));
       moments.forEach((m, i) => {
         chimes[i](m.card);
         show(titles.current[i], m.title, 10);

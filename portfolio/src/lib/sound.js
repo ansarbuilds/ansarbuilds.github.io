@@ -1,6 +1,6 @@
 /* The film's sound: off by default, and generated in the browser (no audio
    files). A low ambient pad that opens up and adds air as the visitor
-   scrolls faster, and short cues: a whoosh on a light-speed streak, a soft
+   scrolls faster, and short cues: a whoosh, a low tone on a cut, a soft
    chime as a card comes up, one tone for the finale.
 
    The choice is remembered in this browser. Browsers start audio only after

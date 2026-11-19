@@ -8,8 +8,7 @@ import { poseAt } from "../rig.js";
 import { SETS } from "../shots.js";
 import { finishShader } from "../coldOpen/shaders.js";
 import { ACT_TWO, BUILT, moments, shotsFor, timeAtProgress } from "./timeline.js";
-import { cardVertex, streakFragment } from "./shaders.js";
-import { BONE, SIGNAL, additive, points } from "./kit.js";
+import { BONE, SIGNAL, points } from "./kit.js";
 import { buildSaywhen } from "./sets/saywhen.js";
 import { buildJarvis } from "./sets/jarvis.js";
 import { buildFlightRecorder } from "./sets/flightRecorder.js";
@@ -33,7 +32,7 @@ function pickQuality() {
   return low ? { dust: 5000, dpr: Math.min(window.devicePixelRatio, 1.25) } : { dust: 12000, dpr: Math.min(window.devicePixelRatio, 1.75) };
 }
 
-// Dust along each approach, so the streak has something to rush past.
+// Dust along each approach, so the space between sets is never empty.
 function buildDust(count) {
   const positions = new Float32Array(count * 3), colors = new Float32Array(count * 3);
   const tint = new THREE.Color();
@@ -70,15 +69,6 @@ export function createActTwo(canvas, { getProgress, onFrame, media }) {
     scene.add(group);
     return { slug, group, set: BUILDERS[slug]({ group, media, renderer }), playing: false };
   });
-
-  // The streak, on a card held in front of the lens.
-  const streakUniforms = { uStreak: { value: 0 }, uTime: { value: 0 }, uAspect: { value: 1 } };
-  const streakGeometry = new THREE.PlaneGeometry(2, 2);
-  const streak = new THREE.Mesh(streakGeometry, additive({ uniforms: streakUniforms, vertexShader: cardVertex, fragmentShader: streakFragment }));
-  streak.position.z = -1;
-  streak.renderOrder = 10;
-  streak.frustumCulled = false;
-  camera.add(streak);
 
   const composer = new EffectComposer(renderer);
   const bloom = new UnrealBloomPass(new THREE.Vector2(1, 1), 0.42, 0.45, 0.6);
@@ -129,27 +119,23 @@ export function createActTwo(canvas, { getProgress, onFrame, media }) {
     camera.lookAt(look);
     camera.updateMatrixWorld();
     const half = Math.tan(THREE.MathUtils.degToRad(camera.fov / 2));
-    streak.scale.set(half * camera.aspect, half, 1);
     const scale = renderer.domElement.height / (2 * half);
 
     const now = moments(t);
     dust.uniforms.uTime.value = clock;
     dust.uniforms.uScale.value = scale;
-    let rush = 0;
     sets.forEach((item, i) => {
       const m = now[i];
       item.group.visible = m.here || m.arrive > 0 && m.scene < 1;
       if (m.here !== item.playing) { item.playing = m.here; item.set.setPlaying(m.here); }
-      if (item.group.visible) item.set.update({ arrive: m.arrive, scene: m.scene, clock, scale, camera });
+      // Every frame of a set is a finished one: it is lit and assembled from
+      // the cut on, never built up on screen.
+      if (item.group.visible) item.set.update({ arrive: 1, scene: m.scene, clock, scale, camera });
       // The next set may want to start loading its heavier pieces now.
       if (m.here) sets[i + 1]?.set.prepare?.();
-      rush = Math.max(rush, m.streak);
     });
-    streakUniforms.uStreak.value = rush;
-    streakUniforms.uTime.value = clock;
-    streakUniforms.uAspect.value = camera.aspect;
     finish.uniforms.uTime.value = clock;
-    finish.uniforms.uAberration.value = 0.001 + rush * 0.006;
+    finish.uniforms.uAberration.value = 0.001;
     // Before the act starts or after it ends only ambient motion is left (dust,
     // a caret), often while the next section plays beside it: a quarter of
     // the frames is enough there.
@@ -181,8 +167,6 @@ export function createActTwo(canvas, { getProgress, onFrame, media }) {
       observer.disconnect();
       sets.forEach(({ set }) => set.dispose());
       dust.dispose();
-      streakGeometry.dispose();
-      streak.material.dispose();
       composer.dispose();
       renderer.dispose();
     },
