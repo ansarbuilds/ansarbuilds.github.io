@@ -204,3 +204,17 @@ test('Act II plays above the work stage, with real links that are hidden until t
   await expect(card).toBeHidden();
   expect(await page.locator('#projects').evaluate((node) => node.getBoundingClientRect().top > 0)).toBe(true);
 });
+
+test('Act III replaces What I bring with the monoliths, keeping its links and its place in the nav', async ({ page }) => {
+  await page.addInitScript((key) => { sessionStorage.setItem(key, '1'); sessionStorage.setItem('cold-open-played', '1'); }, INTRO_SESSION_KEY);
+  await page.goto('/');
+  const act = page.locator('section.act3');
+  await expect(act).toHaveId('capabilities');
+  await expect(act.locator('article.act3-card')).toHaveCount(3);
+  await expect(act.locator('article.act3-card a[href="/work/jarvis/"]')).toHaveCount(1);
+  await act.evaluate((node) => window.scrollTo(0, node.getBoundingClientRect().top + window.scrollY + node.offsetHeight - window.innerHeight));
+  await expect(act).toHaveClass(/is-live/, { timeout: 15000 });
+  // At the end, the last capability's card is the one showing.
+  await expect(act.locator('article.act3-card').last()).toBeVisible();
+  await expect(act.locator('article.act3-card').first()).toBeHidden();
+});

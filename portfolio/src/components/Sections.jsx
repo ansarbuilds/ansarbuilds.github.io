@@ -10,6 +10,7 @@ import { EASE, STAGGER, tween } from "../lib/motion";
 import { INTRO_SESSION_KEY, filmEnabled } from "../lib/intro";
 import ActOne from "../film/ActOne";
 import ActTwo from "../film/ActTwo";
+import ActThree from "../film/ActThree";
 import { BUILT as FILM_SETS } from "../film/actTwo/built";
 import { media } from "../lib/media";
 import Count from "./Count";
@@ -318,7 +319,21 @@ export function ProjectsSection() {
   </section></>;
 }
 
+// What Act III's monoliths and cards say: each capability, and the titles and
+// pages of the projects that prove it.
+const FILM_CAPABILITIES = CAPABILITIES.map((cap) => {
+  const projects = cap.proof.map(getProject).filter(Boolean);
+  return { ...cap, projects: projects.map((p) => p.title), links: projects.map((p) => ({ name: p.title, href: `/work/${p.slug}/` })) };
+});
+
 export function CapabilitiesSection() {
+  // Act III where the film can play; this plain section otherwise (and if it fails).
+  const [film] = useState(filmEnabled);
+  const plain = <PlainCapabilities />;
+  return film ? <ActThree capabilities={FILM_CAPABILITIES} fallback={plain} /> : plain;
+}
+
+function PlainCapabilities() {
   return <Sheet><section id="capabilities" className="sc-caps ed-section" data-palette="field"><div className="ed-wrap">
     <Enter className="ed-section-heading"><div><IndexLabel number="03">What I bring</IndexLabel><h2>Three things,<br /><em>done properly.</em></h2></div><p className="ed-heading-aside">The same loop on every build: make it work, measure it honestly, and ship it to real people.</p></Enter>
     <div className="sc-cap-grid">{CAPABILITIES.map((cap, i) => <Enter key={cap.id} index={i} className="sc-cap">

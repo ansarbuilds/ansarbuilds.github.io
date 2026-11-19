@@ -254,3 +254,9 @@ Review each video before approving the next step; that is the "director's" job.
 - The stages list moved to `src/data/digitalDouble.js`, shared by the model's page and the film.
 
 **Act II is complete.** Decision: the hands-on work stage stays below the film as the "try it" part (tabs, the live Jarvis demo, the saywhen film with sound).
+
+## Step 6, Act III: done in the `step-6-act-three` PR
+
+- "What I bring" becomes three monoliths of carved stone, one per capability (agents, research, shipping), each cut with its number, title and proof projects. They rise out of the ground under the title card; the camera then circles them on a true arc between the storyboard's two cameras, and each one's carving glows as it turns to face the camera, with a card of its real text and links.
+- The section keeps `id="capabilities"`, so the nav link still lands on it. Where the film is off, or the scene fails, the plain section is shown.
+- Storyboard change: A3-02 ends further back (radius 40, higher), so the last monolith's carving stays in frame.
