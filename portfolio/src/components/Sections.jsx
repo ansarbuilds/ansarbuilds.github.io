@@ -339,7 +339,7 @@ export function CapabilitiesSection() {
 
 function PlainCapabilities() {
   return <Sheet><section id="capabilities" className="sc-caps ed-section" data-palette="field"><div className="ed-wrap">
-    <Enter className="ed-section-heading"><div><IndexLabel number="03">What I bring</IndexLabel><h2>Three things,<br /><em>done properly.</em></h2></div><p className="ed-heading-aside">The same loop on every build: make it work, measure it honestly, and ship it to real people.</p></Enter>
+    <Enter className="ed-section-heading"><div><IndexLabel number="03">What I bring</IndexLabel><h2>Three things,{" "}<br /><em>done properly.</em></h2></div><p className="ed-heading-aside">The same loop on every build: make it work, measure it honestly, and ship it to real people.</p></Enter>
     <div className="sc-cap-grid">{CAPABILITIES.map((cap, i) => <Enter key={cap.id} index={i} className="sc-cap">
       <p className="sc-cap-count"><Count value={cap.count} /></p>
       <p className="sc-cap-unit">{cap.unit}</p>
@@ -376,7 +376,7 @@ const ALSO_BUILT = LISTED_PROJECTS.filter((project) => !SHOWN.has(project.slug))
 
 export function MoreWorkSection() {
   return <section id="more" className="sc-more ed-light ed-section" data-palette="lumora"><div className="ed-wrap">
-    <Enter className="ed-section-heading"><div><IndexLabel number="04">More shipped work</IndexLabel><h2>And plenty<br /><em>more shipped.</em></h2></div><p className="ed-heading-aside">Studies, an agent skill and apps. Every card opens a full write-up.</p></Enter>
+    <Enter className="ed-section-heading"><div><IndexLabel number="04">More shipped work</IndexLabel><h2>And plenty{" "}<br /><em>more shipped.</em></h2></div><p className="ed-heading-aside">Studies, an agent skill and apps. Every card opens a full write-up.</p></Enter>
     <div className="sc-card-grid">{MORE_WORK.map((item, i) => <WorkCard key={item.slug} item={item} index={i} />)}</div>
     {ALSO_BUILT.length > 0 && <details className="sc-also">
       <summary><span>Also built</span><small>{ALSO_BUILT.length} more, from internal tools to early experiments</small></summary>
@@ -414,7 +414,7 @@ export function PlaygroundSection() {
 
 export function ExperimentsSection() {
   return <Sheet><section id="ai" className="ed-experiments ed-section" data-palette="neon"><div className="ed-wrap">
-    <Enter className="ed-section-heading"><div><IndexLabel number="05">The playground</IndexLabel><h2>What if<br /><em>I tried this?</em></h2></div><p className="ed-heading-aside">Interactive experiments built with AI as a pair programmer. Open one and have a play.</p></Enter>
+    <Enter className="ed-section-heading"><div><IndexLabel number="05">The playground</IndexLabel><h2>What if{" "}<br /><em>I tried this?</em></h2></div><p className="ed-heading-aside">Interactive experiments built with AI as a pair programmer. Open one and have a play.</p></Enter>
     <div className="ed-experiment-grid">{EXPERIMENTS.map((experiment, i) => <Enter key={experiment.id} index={i}><a href={experiment.href} className="ed-experiment" data-cursor="Play"><div className="ed-experiment-image"><ExperimentImage experiment={experiment} /><span>0{i + 1} / Interactive</span></div><div className="ed-experiment-title"><h3>{experiment.title}</h3><ArrowUpRight size={22} /></div><p>{experiment.hook}</p><span className="ed-experiment-cta">{experiment.cta}<ArrowRight size={16} /></span></a></Enter>)}</div>
   </div></section></Sheet>;
 }
