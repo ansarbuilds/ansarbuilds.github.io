@@ -83,11 +83,13 @@ export const FLAGSHIPS = [
 ];
 
 // The rest of the shipped work, as image cards. `metric` is optional.
+// `art` is each card's evidence poster, drawn from the project's own
+// numbers by scripts/make-more-art.mjs.
 export const MORE_WORK = [
-  { slug: "decision-models", metric: "+16", unit: "points over a larger AI", line: "The best small model routed support tickets better than a larger one, and ran 5× faster on the same laptop." },
-  { slug: "rea-study", metric: "2.3×", unit: "the cost, no clear gain", line: "An independent test of a reverse-engineering tool for agents on 20 programs, with the null result published in full." },
-  { slug: "storyera", metric: "53", unit: "chapters in the first audit", line: "An agent skill that checks a novel for continuity, cites every passage and leaves the author in control." },
-  { slug: "reptrack", line: "A fast workout log for the gym floor. Native Swift, live on the App Store." },
+  { slug: "decision-models", art: "/shots/more/decision-models.webp", metric: "+16", unit: "points over a larger AI", line: "The best small model routed support tickets better than a larger one, and ran 5× faster on the same laptop." },
+  { slug: "rea-study", art: "/shots/more/rea-study.webp", metric: "2.3×", unit: "the cost, no clear gain", line: "An independent test of a reverse-engineering tool for agents on 20 programs, with the null result published in full." },
+  { slug: "storyera", art: "/shots/more/storyera.webp", metric: "53", unit: "chapters in the first audit", line: "An agent skill that checks a novel for continuity, cites every passage and leaves the author in control." },
+  { slug: "reptrack", art: "/shots/more/reptrack.webp", line: "A fast workout log for the gym floor. Native Swift, live on the App Store." },
 ];
 
 // What I do, with the projects that prove it.

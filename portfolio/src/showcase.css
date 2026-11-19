@@ -434,3 +434,8 @@ html.is-vt .rt { animation: none; }
 
 /* Keeps a short phrase on one line, so a sentence never breaks before its last words. */
 .sc-nowrap { white-space: nowrap; }
+
+/* An evidence poster (scripts/make-more-art.mjs) is shown whole, never
+   cropped: on a 4:3 phone card it sits on the same carbon it was drawn on. */
+.sc-card-media:has(.is-poster) { background: #0c0a09; }
+.sc-card-media img.is-poster { object-fit: contain; }
