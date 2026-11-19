@@ -29,7 +29,7 @@ export default function Finale({ contact, pitch, credits, onTop, fallback }) {
     const tone = cueOnRise("tone");
     // How far the headline lifts to make room for the credits: less on a
     // phone, whose headline already sits high (see finale.css).
-    const lift = !window.matchMedia("(max-width: 760px)").matches ? 30 : window.matchMedia("(max-height: 720px)").matches ? 15 : 18;
+    const lift = !window.matchMedia("(max-width: 760px)").matches ? 37 : window.matchMedia("(max-height: 720px)").matches ? 15 : 18;
     const onFrame = (t, m) => {
       tone(m.contact);
       if (block.current) {
