@@ -165,6 +165,8 @@ export function createActThree(canvas, { pillars, getProgress, onFrame }) {
     monoliths.forEach(({ pillar, mesh, front, pool }, i) => {
       const rise = m.rise[i];
       mesh.position.y = pillar.height / 2 - (1 - rise) * (pillar.height + 0.4);
+      // Under the floor it would show through the grid: not there until it rises.
+      mesh.visible = rise > 0;
       // A shudder as it breaks the surface.
       mesh.position.x = rise > 0 && rise < 1 ? Math.sin(clock * 60 + i) * 0.04 * (1 - rise) : 0;
       front.emissiveIntensity = 1.8 * m.glow[i];
