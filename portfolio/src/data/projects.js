@@ -131,13 +131,13 @@ export const PROJECTS = [
       links: [
         { label: "Read the technical report", href: "/p/decision-models/report.html", external: true, primary: true },
         { label: "Download the PDF", href: "/p/decision-models/report.pdf", external: true },
-        { label: "Code, data and every run", href: "https://github.com/ansarbuilds/decision-models", external: true },
+        { label: "Code and data are private. Walkthrough on request.", href: "#contact", locked: true },
       ],
     },
     links: [
       { label: "Read the technical report", href: "/p/decision-models/report.html", external: true, primary: true },
       { label: "Download the PDF", href: "/p/decision-models/report.pdf", external: true },
-      { label: "Code, data and every run", href: "https://github.com/ansarbuilds/decision-models", external: true },
+      { label: "Code and data are private. Walkthrough on request.", href: "#contact", locked: true },
     ],
   },
   {
