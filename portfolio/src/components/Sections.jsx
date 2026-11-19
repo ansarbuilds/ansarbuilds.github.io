@@ -97,9 +97,19 @@ function ScrubText({ lead, rest, className }) {
    buttons, proof cards, and the network last. Any click, key or scroll
    skips straight to the end. A return visit plays the same entrance without
    the travel. */
+// Where the name's letters are. Across: the text itself, since its lines
+// are full-width blocks. Down: the heading's own box, because each line
+// starts its entrance pushed down out of view and the text would read low.
+function textBox(el) {
+  const own = el.getBoundingClientRect();
+  const range = document.createRange();
+  range.selectNodeContents(el);
+  const text = range.getBoundingClientRect();
+  return text.width ? { left: text.left, width: text.width, top: own.top, height: own.height } : own;
+}
 const NAME_SET_S = 0.62; // how long the name holds centre stage before it moves
 const NAME_TRAVEL = { duration: 0.75, ease: EASE.out };
-export function Hero({ ready = true, onReady }) {
+export function Hero({ ready = true, hold = false, onReady }) {
   const reduced = useReducedMotion();
   const heroRef = useRef(null);
   const nameRef = useRef(null);
@@ -116,7 +126,9 @@ export function Hero({ ready = true, onReady }) {
     // re-runs effects in development) would measure the moved name instead.
     if (!intro || !nameRef.current || placed.current) return;
     placed.current = true;
-    const box = nameRef.current.getBoundingClientRect();
+    // The lines are full-width blocks, so centre the letters themselves,
+    // not the box around them.
+    const box = textBox(nameRef.current);
     nameX.set(window.innerWidth / 2 - (box.left + box.width / 2));
     nameY.set(window.innerHeight / 2 - (box.top + box.height / 2));
     nameScale.set(Math.min(1.22, Math.max(1, (window.innerWidth * 0.84) / box.width)));
@@ -124,6 +136,10 @@ export function Hero({ ready = true, onReady }) {
 
   useEffect(() => {
     if (!intro) { onReady?.(); return undefined; }
+    // The film's cold open is playing over the page. The name waits, set
+    // large mid-screen (the cold open builds its own name on top of it), and
+    // this intro starts the moment that hands over.
+    if (hold) return undefined;
     try {
       window.sessionStorage.setItem(INTRO_SESSION_KEY, "1");
       window.localStorage.setItem(INTRO_SESSION_KEY, "1");
@@ -154,7 +170,7 @@ export function Hero({ ready = true, onReady }) {
       clearTimeout(rest);
       events.forEach((name) => window.removeEventListener(name, skip));
     };
-  }, [intro, onReady, nameX, nameY, nameScale]);
+  }, [intro, hold, onReady, nameX, nameY, nameScale]);
 
   // The hint only appears if the hero has sat untouched for a while, and
   // goes for good at the first click.

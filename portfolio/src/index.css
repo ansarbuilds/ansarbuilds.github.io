@@ -344,3 +344,7 @@ html::-webkit-scrollbar-track {
 /* Expose the main content shortcut when navigating by keyboard. */
 .skip-link { position: fixed; top: .5rem; left: .5rem; z-index: 10000; padding: .75rem 1rem; background: #fff; color: #101010; transform: translateY(-200%); }
 .skip-link:focus { transform: translateY(0); outline: 3px solid #74200d; }
+
+/* The cold open's black, from the very first paint, before its own styles
+   (film/coldOpen/coldOpen.css) have loaded. */
+.co-veil { position: fixed; inset: 0; z-index: 9000; background: #000; }

@@ -204,3 +204,11 @@ Review each video before approving the next step; that is the "director's" job.
 **Act II has six sets, not seven.** The home page has six flagship projects; the brief miscounted.
 
 **Before step 3 (the cold open):** review the storyboard and say which shots to change.
+
+## Step 3, cold open: done in the `step-3-cold-open` PR
+
+- Shots CO-01 to CO-07 as built: the signal and its lens flare, two heartbeats, the pull back through a 64,000-particle network (24,000 on phones), the network forming the name with light rays behind it, the typed line, and the frame opening onto the real hero.
+- It is a layer over the real page, not a separate page. The particle name is built on top of the hero's own name, so the hand-over has no jump.
+- Plays once per session. A returning visitor gets a 1.5 s cut from the name onward. Skippable by any click, key, scroll or the Skip button.
+- 60 fps on an M4 at 1440x900 and on a phone-sized screen.
+- **Cost:** Lighthouse (first visit, slow phone and network) goes from 86 to 43 and 72 over two runs, and the hero name from 3.4 s to 5.1 s. three.js (171 kB) and the shaders load only for a visitor who sees the film.

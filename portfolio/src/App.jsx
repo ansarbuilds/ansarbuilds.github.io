@@ -4,7 +4,7 @@ import CommandPalette from "./components/CommandPalette";
 import { MatrixBackground } from "./components/RouteBackgrounds";
 import PaletteSwatch from "./components/PaletteSwatch";
 import Cursor from "./components/Cursor";
-import { shouldPlayIntro } from "./lib/intro";
+import { COLD_OPEN_SESSION_KEY, coldOpenMode, shouldPlayIntro } from "./lib/intro";
 import { isRouteTransitioning, runRouteChange } from "./lib/routeTransition";
 import { PREVIS, parseTarget, pathForRoute, readLocation, urlForTarget } from "./lib/routes";
 import { titleForRoute } from "./lib/routeTitle";
@@ -26,6 +26,9 @@ const DigitalDouble = lazy(() => import("./components/DigitalDouble"));
 const HaloscriptPage = lazy(() => import("./components/HaloscriptPage"));
 const InfinityPage = lazy(() => import("./components/InfinityPage"));
 const BB8Companion = lazy(() => import("./components/BB8Companion"));
+// The film's cold open. It brings three.js with it, so it loads on its own
+// and only for a visitor who is going to see it.
+const ColdOpen = lazy(() => import("./film/ColdOpen"));
 // The film's pre-vis pages. Development only: a production build drops both
 // the routes and these chunks.
 const Storyboard = import.meta.env.DEV ? lazy(() => import("./film/Storyboard")) : null;
@@ -374,11 +377,11 @@ function useRoutePalette(route) {
   }, [route]);
 }
 
-function MainDocument({ bootDone, onBoot }) {
+function MainDocument({ bootDone, held, onBoot }) {
   useSectionPalette();
   return (
     <>
-      <Hero ready={bootDone} onReady={onBoot} />
+      <Hero ready={bootDone} hold={held} onReady={onBoot} />
       <ProjectsSection />
       <CapabilitiesSection />
       <MoreWorkSection />
@@ -389,7 +392,7 @@ function MainDocument({ bootDone, onBoot }) {
 
 // What each route shows. Takeover views fill the stage; the home page and
 // the project pages scroll.
-function RouteView({ route, bootDone, onBoot }) {
+function RouteView({ route, bootDone, held, onBoot }) {
   if (Storyboard && route === "storyboard") return <Suspense fallback={<RouteLoader label="Loading storyboard" />}><Storyboard /></Suspense>;
   if (Previs && route === "previs") return <Suspense fallback={<RouteLoader label="Loading pre-vis" />}><Previs /></Suspense>;
   if (route === "emet") return <Suspense fallback={<RouteLoader label="Loading Emet" />}><EmetSection /></Suspense>;
@@ -401,7 +404,7 @@ function RouteView({ route, bootDone, onBoot }) {
   if (route === "lineage-demo") return <Suspense fallback={<RouteLoader label="Loading data explorer" />}><DataLineageExplorer /></Suspense>;
   if (route === "infinity") return <Suspense fallback={<RouteLoader label="Loading particle scene" />}><InfinityPage /></Suspense>;
   if (route === "digital-double") return <Suspense fallback={<RouteLoader label="Loading 3D project" />}><DigitalDouble /></Suspense>;
-  return <MainDocument bootDone={bootDone} onBoot={onBoot} />;
+  return <MainDocument bootDone={bootDone} held={held} onBoot={onBoot} />;
 }
 
 /* The one scene change for every route. The incoming view fades in (project
@@ -415,7 +418,7 @@ function RouteTransition({ route, children }) {
   return <div key={route} className={`rt rt-${kind} ${FULL_HEIGHT.has(route) ? "h-[100dvh]" : ""}`}>{children}</div>;
 }
 
-function Stage({ bootDone, onBoot }) {
+function Stage({ bootDone, held, onBoot }) {
   const { route } = useRoute();
   useRoutePalette(route);
   const { devMode, toggleDevMode } = useSandbox();
@@ -429,7 +432,7 @@ function Stage({ bootDone, onBoot }) {
 
   return (
     <main id="main-content" tabIndex={-1} className="relative min-h-[100dvh]">
-      <RouteTransition route={route}><RouteView route={route} bootDone={bootDone} onBoot={onBoot} /></RouteTransition>
+      <RouteTransition route={route}><RouteView route={route} bootDone={bootDone} held={held} onBoot={onBoot} /></RouteTransition>
       {devMode && <Suspense fallback={null}><SandboxStubs onClose={toggleDevMode} /></Suspense>}
     </main>
   );
@@ -498,7 +501,7 @@ function Companion() {
   return <Suspense fallback={null}><BB8Companion /></Suspense>;
 }
 
-function AppShell({ bootDone, onBoot }) {
+function AppShell({ bootDone, held, onBoot }) {
   const companionReady = useIdleAfterFirstInput(bootDone);
   return (
       <RouteProvider>
@@ -517,7 +520,7 @@ function AppShell({ bootDone, onBoot }) {
                 anywhere in the tree, breaking their viewport-relative
                 positioning. Each 3D component (deck cards, emet's chassis,
                 project cards) establishes its own local perspective instead. */}
-            <Stage bootDone={bootDone} onBoot={onBoot} />
+            <Stage bootDone={bootDone} held={held} onBoot={onBoot} />
             <CommandPalette />
           </div>
         </div>
@@ -576,18 +579,57 @@ class ErrorBoundary extends Component {
   }
 }
 
+/* The cold open's place in the app. Until its code arrives the screen is
+   plain black (which is also the film's first beat). If the code is slow or
+   fails, or WebGL gives up, the page is simply shown: the opening is a
+   flourish, never a gate. */
+const COLD_OPEN_PATIENCE_MS = 4500;
+class ColdOpenBoundary extends Component {
+  state = { failed: false };
+  static getDerivedStateFromError() { return { failed: true }; }
+  componentDidCatch() { this.props.onFail(); }
+  render() { return this.state.failed ? null : this.props.children; }
+}
+function ColdOpenLayer({ mode, onHandOver, onDone }) {
+  const [since] = useState(() => performance.now());
+  const started = useRef(false);
+  const abandon = useCallback(() => { onHandOver(); onDone(); }, [onHandOver, onDone]);
+  useEffect(() => {
+    try { window.sessionStorage.setItem(COLD_OPEN_SESSION_KEY, "1"); } catch { /* coldOpenMode already said no */ }
+    const timer = setTimeout(() => { if (!started.current) abandon(); }, COLD_OPEN_PATIENCE_MS);
+    return () => clearTimeout(timer);
+  }, [abandon]);
+  const onStart = useCallback(() => { started.current = true; }, []);
+  return <ColdOpenBoundary onFail={abandon}>
+    <Suspense fallback={<div className="co-veil" aria-hidden="true" />}>
+      <ColdOpen mode={mode} since={since} onStart={onStart} onHandOver={onHandOver} onDone={onDone} />
+    </Suspense>
+  </ColdOpenBoundary>;
+}
+
 export default function App() {
   // On a first visit to the home page the hero plays its intro: the name
   // sets large in the middle of the screen, then travels to its place as
   // the rest arrives (see Hero). Until that hands over, `bootDone` is false:
   // the nav stays out of the way and the companion does not load.
-  const [bootDone, setBootDone] = useState(() => !(shouldPlayIntro() && readRoute() === "main"));
+  // Before that, the film's cold open plays over the page (see ColdOpen).
+  // `held` keeps the hero's intro waiting underneath until it hands over.
+  // The cold open builds its name on top of the hero's name set mid-screen,
+  // so whenever it plays the hero's intro plays too, carrying the name from
+  // there to its place.
+  const [coldOpen] = useState(() => (readRoute() === "main" ? coldOpenMode() : null));
+  const [bootDone, setBootDone] = useState(() => coldOpen === null && !(shouldPlayIntro() && readRoute() === "main"));
   const onBoot = useCallback(() => setBootDone(true), []);
+  const [held, setHeld] = useState(coldOpen !== null);
+  const [coldOpenUp, setColdOpenUp] = useState(coldOpen !== null);
+  const release = useCallback(() => setHeld(false), []);
+  const closeColdOpen = useCallback(() => setColdOpenUp(false), []);
   return (
     <ErrorBoundary>
       <ThemeProvider>
         <SandboxProvider>
-          <AppShell bootDone={bootDone} onBoot={onBoot} />
+          <AppShell bootDone={bootDone} held={held} onBoot={onBoot} />
+          {coldOpenUp && <ColdOpenLayer mode={coldOpen} onHandOver={release} onDone={closeColdOpen} />}
         </SandboxProvider>
       </ThemeProvider>
     </ErrorBoundary>

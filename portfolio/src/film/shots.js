@@ -13,7 +13,8 @@
      cut      true when the shot starts on a hard cut. Otherwise the camera
               arrives in one continuous move from the shot before.
      camera   where the camera ends up: pos, the point it looks at, and the
-              lens (fov, degrees). `move` names the move for the board.
+              lens (fov, degrees). `move` names the move for the board;
+              `ease` paces it ("out" or "inOut", see rig.js).
      action   what happens on screen
      text     words on screen, set as a title card
      sound    what is heard (sound is off until the visitor turns it on)
@@ -68,10 +69,10 @@ export const SHOTS = [
   { id: "CO-01", act: "CO", title: "Black", seconds: 0.8, scroll: 0, cut: true, camera: { pos: [0, 0, 3], look: [0, 0, 0], fov: 32, move: "Locked off" }, action: "Nothing. Letterbox bars are closed. A small \"sound on\" pill sits in the corner.", sound: "Low hum fades up", bars: true, frame: "black" },
   { id: "CO-02", act: "CO", title: "The signal ignites", seconds: 1, scroll: 0, camera: { pos: [0, 0, 3], look: [0, 0, 0], fov: 32, move: "Locked off" }, action: "One pixel of light appears dead centre. A lens flare blooms across the frame.", sound: "A single soft tone", bars: true, frame: "point" },
   { id: "CO-03", act: "CO", title: "Heartbeat", seconds: 1.4, scroll: 0, camera: { pos: [0, 0, 6], look: [0, 0, 0], fov: 32, move: "Slow creep back" }, action: "The point pulses twice. Each beat throws out faint lines: the first nodes of a graph.", sound: "Two heartbeats", bars: true, frame: "pulse" },
-  { id: "CO-04", act: "CO", title: "Pull back", seconds: 1.6, scroll: 0, camera: { pos: [0, 4, 78], look: [0, 0, 0], fov: 40, move: "Fast dolly out, motion blur" }, action: "The camera rushes backwards. Thousands of nodes appear: an agent network shaped like a nebula.", sound: "Rising rush", bars: true, frame: "network" },
-  { id: "CO-05", act: "CO", title: "The name", seconds: 1.6, scroll: 0, camera: { pos: [0, 2, 70], look: [0, 0, 0], fov: 36, move: "Settle" }, action: "Signals race along the edges and converge. Particles assemble the name in 3D type, lit from behind.", text: "MOHAMED ANSAR", sound: "Impact, then a held chord", bars: true, frame: "name" },
+  { id: "CO-04", act: "CO", title: "Pull back", seconds: 1.6, scroll: 0, camera: { pos: [0, 4, 78], look: [0, 0, 0], fov: 40, ease: "out", move: "Fast dolly out, motion blur" }, action: "The camera rushes backwards. Thousands of nodes appear: an agent network shaped like a nebula.", sound: "Rising rush", bars: true, frame: "network" },
+  { id: "CO-05", act: "CO", title: "The name", seconds: 1.6, scroll: 0, camera: { pos: [0, 2, 70], look: [0, 0, 0], fov: 36, ease: "inOut", move: "Settle" }, action: "Signals race along the edges and converge. Particles assemble the name in 3D type, lit from behind.", text: "MOHAMED ANSAR", sound: "Impact, then a held chord", bars: true, frame: "name" },
   { id: "CO-06", act: "CO", title: "The line", seconds: 1, scroll: 0, cut: true, camera: { pos: [0, 2, 70], look: [0, 0, 0], fov: 36, move: "Locked off" }, action: "Hard cut to silence. One line types in under the name.", text: "I build agents, studies and apps. With proof.", sound: "Silence, key ticks", bars: true, frame: "subtitle" },
-  { id: "CO-07", act: "CO", title: "The frame opens", seconds: 0.8, scroll: 0, camera: { pos: [0, 2, 66], look: [0, 0, 0], fov: 36, move: "Bars slide away" }, action: "The letterbox bars slide off. The frame fills the screen and becomes the hero. The nav fades in.", sound: "Soft release", bars: false, frame: "open" },
+  { id: "CO-07", act: "CO", title: "The frame opens", seconds: 0.8, scroll: 0, camera: { pos: [0, 2, 70], look: [0, 0, 0], fov: 36, move: "Locked off, bars slide away" }, action: "The letterbox bars slide off. The frame fills the screen and becomes the hero. The nav fades in.", sound: "Soft release", bars: false, frame: "open" },
 
   // ---- Act I ----
   { id: "A1-01", act: "A1", title: "Through the name", seconds: 3, scroll: 0.8, camera: { pos: [0, 0, -18], look: [0, -1, -70], fov: 44, move: "Dolly forward, through the letters" }, action: "Scrolling starts the move. The camera passes between the letters and into the network behind them.", sound: "Air moving past", bars: false, frame: "through" },

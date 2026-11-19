@@ -27,6 +27,14 @@ export function buildTimeline(shots) {
 
 const clamp01 = (value) => Math.min(1, Math.max(0, value));
 
+// Pacing for a camera move: `out` leaves fast and settles (a dolly that
+// lands), `inOut` eases both ends.
+export const EASES = {
+  linear: (u) => u,
+  out: (u) => 1 - (1 - u) ** 3,
+  inOut: (u) => (u < 0.5 ? 4 * u * u * u : 1 - ((-2 * u + 2) ** 3) / 2),
+};
+
 // Scroll position (in screens) to film time (in seconds), and back.
 export function timeAtScroll(timeline, screens) {
   const { entries } = timeline;
@@ -63,6 +71,8 @@ export function poseAt(timeline, seconds) {
   const entry = entryAtTime(timeline, seconds);
   const progress = clamp01((seconds - entry.t0) / (entry.t1 - entry.t0));
   const camera = (index) => entries[index].shot.camera;
+  // How the move is paced. Linear unless the shot's camera names an ease.
+  const eased = (EASES[entry.shot.camera.ease] ?? EASES.linear)(progress);
   const i = entry.index;
   // The move into this shot runs from the previous shot's camera (b) to this
   // one's (c). A cut has no move: the camera is already here.
@@ -74,11 +84,11 @@ export function poseAt(timeline, seconds) {
   const d = c + 1 < entries.length && !starts(c + 1) ? c + 1 : c;
   // No move to make (a cut, or the very first shot): hold on this camera.
   if (b === c) return { pos: [...camera(c).pos], look: [...camera(c).look], fov: camera(c).fov, entry, progress };
-  const pick = (key) => splinePoint(camera(a)[key], camera(b)[key], camera(c)[key], camera(d)[key], progress);
+  const pick = (key) => splinePoint(camera(a)[key], camera(b)[key], camera(c)[key], camera(d)[key], eased);
   return {
     pos: pick("pos"),
     look: pick("look"),
-    fov: camera(b).fov + (camera(c).fov - camera(b).fov) * progress,
+    fov: camera(b).fov + (camera(c).fov - camera(b).fov) * eased,
     entry,
     progress,
   };
