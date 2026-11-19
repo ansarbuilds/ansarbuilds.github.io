@@ -354,11 +354,11 @@ function WorkCard({ item, index }) {
   const project = getProject(item.slug);
   const [broken, setBroken] = useState(false);
   if (!project) return null;
-  const cover = coverOf(project);
+  const cover = item.art || coverOf(project);
   return <Enter index={index % 3}>
     <a id={`card-${project.slug}`} href={`/work/${project.slug}/`} className="sc-card" data-cursor="View">
       <div className="sc-card-media">
-        {cover && !broken ? <img className="ed-lazy-media" src={media(cover)} alt="" loading="lazy" onLoad={revealImage} onError={() => setBroken(true)} /> : <span className="sc-card-type" aria-hidden="true">{project.title}</span>}
+        {cover && !broken ? <img className={`ed-lazy-media ${item.art ? "is-poster" : ""}`} src={media(cover)} alt="" loading="lazy" onLoad={revealImage} onError={() => setBroken(true)} /> : <span className="sc-card-type" aria-hidden="true">{project.title}</span>}
         <span className="sc-card-kind">{project.kind}</span>
       </div>
       <div className="sc-card-body">
