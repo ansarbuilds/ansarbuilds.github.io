@@ -226,7 +226,10 @@ test('Act III replaces What I bring with the monoliths, keeping its links and it
   await expect(act).toHaveClass(/is-live/, { timeout: 60000 });
   // At the end, the last capability's card is the one showing.
   await expect(act.locator('article.act3-card').last()).toBeVisible();
-  await expect(act.locator('article.act3-card').first()).toBeHidden();
+  // The first is out of shot: see-through and not under the pointer, though
+  // still in the tab order (see film/keyboard.css).
+  await expect(act.locator('article.act3-card').first()).toHaveClass(/is-offshot/);
+  await expect(act.locator('article.act3-card').first()).toHaveCSS('opacity', '0');
 });
 
 test('Act IV plays between More work and Contact, and its cards open the experiments', async ({ page }) => {
@@ -319,4 +322,21 @@ test('without the film the home page still links every playground experiment', a
   await expect(section.getByRole('heading', { level: 2 })).toBeAttached();
   for (const href of ['/playground/explore/', '/playground/infinity/', '/playground/emet/']) await expect(section.locator(`a[href="${href}"]`)).toHaveCount(1);
   await expect(page.locator('section.act4')).toHaveCount(0);
+});
+
+test('a keyboard user can reach every link in the film, down to the email', async ({ page, isMobile }) => {
+  test.skip(isMobile, 'tabbing is a desktop concern');
+  test.setTimeout(90000);
+  await page.addInitScript((key) => { sessionStorage.setItem(key, '1'); sessionStorage.setItem('cold-open-played', '1'); }, INTRO_SESSION_KEY);
+  await page.goto('/');
+  const seen = [];
+  for (let i = 0; i < 120; i++) {
+    await page.keyboard.press('Tab');
+    const label = await page.evaluate(() => (document.activeElement?.textContent || '').trim());
+    seen.push(label);
+    if (label.startsWith('Email me')) break;
+  }
+  expect(seen.some((label) => label.startsWith('Email me'))).toBe(true);
+  // While it has focus, it shows.
+  await expect(page.locator('.fin-block')).toHaveCSS('opacity', '1');
 });
