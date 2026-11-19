@@ -86,6 +86,7 @@ export default function ActTwo({ projects }) {
         <h3>{project.name}</h3>
         <p className="act2-headline">{project.headline}</p>
         <dl className="act2-stats">{project.stats.map(([value, label]) => <div key={label}><dt>{value}</dt><dd>{label}</dd></div>)}</dl>
+        {project.note && <p className="act2-note">{project.note}</p>}
         <div className="act2-links">
           <a className="act2-primary" href={`/work/${project.slug}/`}>Read the case study<ArrowUpRight size={16} aria-hidden="true" /></a>
           {project.links.map((link) => <a key={link.href} href={link.href} {...(link.external ? { target: "_blank", rel: "noopener noreferrer" } : {})}>{link.label}{link.external && <ArrowUpRight size={14} aria-hidden="true" />}</a>)}

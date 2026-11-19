@@ -4,7 +4,7 @@ import CommandPalette from "./components/CommandPalette";
 import { MatrixBackground } from "./components/RouteBackgrounds";
 import PaletteSwatch from "./components/PaletteSwatch";
 import Cursor from "./components/Cursor";
-import { COLD_OPEN_SESSION_KEY, coldOpenMode, shouldPlayIntro } from "./lib/intro";
+import { COLD_OPEN_SESSION_KEY, coldOpenForced, coldOpenMode, shouldPlayIntro } from "./lib/intro";
 import { isRouteTransitioning, runRouteChange } from "./lib/routeTransition";
 import { PREVIS, parseTarget, pathForRoute, readLocation, urlForTarget } from "./lib/routes";
 import { titleForRoute } from "./lib/routeTitle";
@@ -583,7 +583,9 @@ class ErrorBoundary extends Component {
    plain black (which is also the film's first beat). If the code is slow or
    fails, or WebGL gives up, the page is simply shown: the opening is a
    flourish, never a gate. */
-const COLD_OPEN_PATIENCE_MS = 4500;
+// When it is forced on the dev server (tests, review) it waits longer, so a
+// busy machine still gets to see it.
+const COLD_OPEN_PATIENCE_MS = coldOpenForced() ? 15000 : 4500;
 class ColdOpenBoundary extends Component {
   state = { failed: false };
   static getDerivedStateFromError() { return { failed: true }; }
