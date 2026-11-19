@@ -30,17 +30,28 @@ export function setSmoothScroll(on) {
 // screens is slow and makes every section on the way animate in.
 const farAway = (distance) => Math.abs(distance) > window.innerHeight * 1.25;
 
+/* The browser can move the page without Lenis knowing: following a #hash
+   itself, restoring a position. Lenis then measures from where it last left
+   the page, and a scroll it starts lands in the wrong place (back near the
+   top). Tell it where the page really is first. */
+function syncLenis() {
+  if (lenis && Math.abs(lenis.animatedScroll - window.scrollY) > 1) lenis.scrollTo(window.scrollY, { immediate: true, force: true });
+}
+
 export function scrollToTop({ instant = false } = {}) {
+  syncLenis();
   const jump = instant || reducedMotion() || farAway(window.scrollY);
   if (lenis) lenis.scrollTo(0, { immediate: jump, force: true });
   else window.scrollTo({ top: 0, behavior: jump ? "auto" : "smooth" });
 }
 
 export function scrollToElement(el, { center = false } = {}) {
+  syncLenis();
   const box = el.getBoundingClientRect();
   const jump = reducedMotion() || farAway(box.top);
   const move = () => {
-    if (lenis && !center) lenis.scrollTo(el, { immediate: jump, force: true });
+    // An absolute position, measured now: right even if the page moved.
+    if (lenis && !center) lenis.scrollTo(el.getBoundingClientRect().top + window.scrollY, { immediate: jump, force: true });
     else el.scrollIntoView({ behavior: jump ? "auto" : "smooth", block: center ? "center" : "start", inline: "nearest" });
   };
   move();

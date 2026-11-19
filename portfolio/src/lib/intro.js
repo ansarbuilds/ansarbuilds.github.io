@@ -38,6 +38,12 @@ export const COLD_OPEN_SESSION_KEY = "cold-open-played";
    "short" the first time in a later session, null otherwise. Never with
    reduced motion, on Save-Data or a 2G/3G connection, without WebGL 2, when the link points at a
    section further down, or when storage is unavailable. */
+// Dev server only: ?coldopen=full or ?coldopen=short forces the cold open.
+export function coldOpenForced() {
+  if (typeof window === "undefined" || !import.meta.env?.DEV) return false;
+  return ["full", "short"].includes(new URLSearchParams(window.location.search).get("coldopen"));
+}
+
 export function coldOpenMode() {
   if (typeof window === "undefined") return null;
   // On the dev server, /?coldopen=full (or short) always plays it, and

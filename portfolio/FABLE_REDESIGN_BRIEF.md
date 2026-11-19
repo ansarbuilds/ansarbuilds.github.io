@@ -224,5 +224,10 @@ Review each video before approving the next step; that is the "director's" job.
 
 - The Act II framework: per project, a cut into a light-speed streak, the arrival (title card, letterbox), and the scene with a card of real text and links. It sits above the interactive work stage, which stays as the hands-on version.
 - The saywhen set: a dark room, a monitor playing the real app loop, the digital double's head as 8,000 points turning to it, a voice waveform from its mouth to the screen, and `cargo test --release` typed and sent.
-- Next: one PR per remaining set, in order: Jarvis, Flight Recorder, PRH-JEPA, Haloscript, Digital double.
+- Next: one PR per remaining set, in order: Jarvis (done in `step-5b-act-two-jarvis`), Flight Recorder, PRH-JEPA, Haloscript, Digital double.
 - Open question for when all six are in: keep the work stage below the film, or fold it into the cards.
+
+## Step 5b, the Jarvis set: done in the `step-5b-act-two-jarvis` PR
+
+- A control room at night: the real dashboard screens (sample data) orbit a core of points, the agents (Scout, Builder, Recruiter, Ticker) circle it, and a gauge counts the day's AI calls to the hard cap of 20, where the core strains and the gauge glows orange.
+- Cards now say what their screens are ("Screens: the real dashboard, sample data"; "Screen: the launch animation").

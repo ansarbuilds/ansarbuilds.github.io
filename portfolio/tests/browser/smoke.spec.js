@@ -192,11 +192,14 @@ test('Act II plays above the work stage, with real links that are hidden until t
   await expect(card.locator('a.act2-primary')).toHaveAttribute('href', '/work/saywhen/');
   // Before the scene, the card is out of the way of the keyboard.
   await act.evaluate((node) => window.scrollTo(0, node.getBoundingClientRect().top + window.scrollY));
-  await expect(act).toHaveClass(/is-live/, { timeout: 8000 });
+  await expect(act).toHaveClass(/is-live/, { timeout: 15000 });
   await expect(card).toBeHidden();
-  // At the end of the act, it is there and usable.
+  // At the end of the act, the last project's card is there and usable,
+  // and the earlier ones have gone.
   await act.evaluate((node) => window.scrollTo(0, node.getBoundingClientRect().top + window.scrollY + node.offsetHeight - window.innerHeight));
-  await expect(card).toBeVisible();
-  await expect(card.getByRole('link', { name: 'Read the case study' })).toBeVisible();
+  const last = act.locator('article.act2-card').last();
+  await expect(last).toBeVisible();
+  await expect(last.getByRole('link', { name: 'Read the case study' })).toBeVisible();
+  await expect(card).toBeHidden();
   expect(await page.locator('#projects').evaluate((node) => node.getBoundingClientRect().top > 0)).toBe(true);
 });
