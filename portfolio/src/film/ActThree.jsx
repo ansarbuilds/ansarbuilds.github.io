@@ -1,5 +1,6 @@
 import "./actThree/actThree.css";
 import { useEffect, useRef, useState } from "react";
+import ActTitle from "./ActTitle";
 import { ArrowUpRight } from "lucide-react";
 import { ACT_THREE_SCREENS } from "./actThree/screens";
 import { cueOnRise, showBed } from "../lib/sound";
@@ -79,6 +80,7 @@ const near = new IntersectionObserver(([entry]) => { if (entry.isIntersecting) {
   if (failed) return fallback;
   return <section ref={section} id="capabilities" className="act3" aria-labelledby="act3-title" data-palette="field" style={{ "--act-screens": SCREENS }}>
     <div className="act3-stage" data-film-stage="act3">
+      <ActTitle section={section}>III. What I bring</ActTitle>
       <canvas ref={canvas} className="act3-canvas" aria-hidden="true" />
       <div ref={title} className="act3-title">
         <p className="act3-kicker">03 · What I bring</p>

@@ -1,5 +1,6 @@
 import "./finale/finale.css";
-import { useEffect, useRef, useState } from "react";
+import { Fragment, useEffect, useRef, useState } from "react";
+import ActTitle from "./ActTitle";
 import { ArrowUpRight, ExternalLink } from "lucide-react";
 import { FINALE_CONTACT_AT, FINALE_SCREENS } from "./finale/screens";
 import { cueOnRise, showBed } from "../lib/sound";
@@ -77,6 +78,7 @@ export default function Finale({ contact, pitch, credits, onTop, fallback }) {
     {/* Where #contact lands: the start of the contact beat. */}
     <span id="contact" className="fin-anchor" style={{ top: `calc(${FINALE_CONTACT_AT * FINALE_SCREENS} * 100vh)` }} aria-hidden="true" />
     <div className="fin-stage">
+      <ActTitle section={section}>Finale</ActTitle>
       <canvas ref={canvas} className="fin-canvas" aria-hidden="true" />
       <div ref={block} className="fin-block">
         <p className="fin-kicker">06 · Contact</p>
@@ -87,7 +89,7 @@ export default function Finale({ contact, pitch, credits, onTop, fallback }) {
         <p className="fin-pitch">{pitch}</p>
       </div>
       <div ref={roll} className="fin-credits">
-        {credits.map(([role, name]) => <p key={role}><span>{role}</span>{name}</p>)}
+        {credits.map(([role, name]) => <p key={role}><span>{role}</span>{Array.isArray(name) ? <span className="fin-credit-links">{name.map((link, i) => <Fragment key={link.href}>{i > 0 && " · "}<a href={link.href}>{link.name}</a></Fragment>)}</span> : name}</p>)}
         <footer className="fin-footer"><span>© {new Date().getFullYear()}</span><span>Designed and built by me, with AI as the pair programmer.</span><button type="button" onClick={onTop}>Back to top ↑</button></footer>
       </div>
     </div>

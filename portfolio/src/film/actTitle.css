@@ -1,0 +1,8 @@
+/* An act's title card: the display face, kerned, each word rising out of a
+   mask in reading order (timings from motion.js, via the CSS tokens). */
+.film-act-title { position: absolute; z-index: 3; top: clamp(82px, 10vh, 92px); left: max(20px, calc((100vw - 1200px) / 2)); right: 20px; margin: 0; pointer-events: none; font: 400 clamp(1.5rem, 3.6vw, 3rem)/1 var(--font-condensed); letter-spacing: .015em; font-kerning: normal; font-feature-settings: "kern" 1; color: #efe6d8; text-shadow: 0 4px 40px #000; overflow: hidden; padding-bottom: .08em; }
+.film-act-word { display: inline-block; opacity: 0; transform: translateY(108%); transition: transform var(--dur-slow) var(--ease-out), opacity var(--dur-slow) var(--ease-out); transition-delay: calc(var(--i) * var(--stagger-loose)); }
+.film-act-title.is-up .film-act-word { opacity: 1; transform: none; }
+/* Leaving: quicker, all together. */
+.film-act-title:not(.is-up) .film-act-word { transition-duration: var(--dur-base); transition-timing-function: var(--ease-exit); transition-delay: 0s; }
+@media (prefers-reduced-motion: reduce) { .film-act-word { transform: none; transition-property: opacity; } }

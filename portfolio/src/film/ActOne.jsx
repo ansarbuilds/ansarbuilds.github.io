@@ -1,5 +1,6 @@
 import "./actOne/actOne.css";
 import { useEffect, useRef, useState } from "react";
+import ActTitle from "./ActTitle";
 import { ACT_ONE_SCREENS } from "./actOne/screens";
 import { showBed } from "../lib/sound";
 
@@ -82,6 +83,7 @@ const near = new IntersectionObserver(([entry]) => { if (entry.isIntersecting) {
   if (failed) return fallback;
   return <section ref={section} className="ed-intro sc-brief act1" aria-label="The short version" data-palette="lumen" style={{ "--act-screens": SCREENS }}>
     <div className="act1-stage">
+      <ActTitle section={section}>I. The receipts</ActTitle>
       <canvas ref={canvas} className="act1-canvas" aria-hidden="true" />
       <div ref={card} className="act1-card"><p className="act1-statement">{lead} <em>{rest}</em></p></div>
       <p ref={toolsCaption} className="act1-tools" aria-hidden="true">Tools I build with <span>· point at one</span></p>
