@@ -49,7 +49,10 @@ export default function ActTwo({ projects }) {
         show(cards.current[i], m.card, 22);
         closed ||= m.bars;
       });
-      bars.current?.classList.toggle("is-closed", closed);
+      // Before the act starts its stage is still sliding up into view, and a
+      // closed bar there reads as a black block across the page: the bars
+      // only close once the act is playing.
+      bars.current?.classList.toggle("is-closed", closed && t > 0);
     };
     const run = () => film?.setActive(onScreen && document.visibilityState === "visible");
     const load = async () => {
@@ -92,7 +95,7 @@ const near = new IntersectionObserver(([entry]) => { if (entry.isIntersecting) {
     <div className="act2-stage" data-film-stage="act2">
       <ActTitle section={section}>II. Six builds</ActTitle>
       <canvas ref={canvas} className="act2-canvas" aria-hidden="true" />
-      <div ref={bars} className="act2-bars is-closed" aria-hidden="true"><span /><span /></div>
+      <div ref={bars} className="act2-bars" aria-hidden="true"><span /><span /></div>
       {projects.map((project, i) => <p key={project.slug} ref={(node) => { titles.current[i] = node; }} className="act2-title" aria-hidden="true">{project.name}</p>)}
       {projects.map((project, i) => <article key={project.slug} ref={(node) => { cards.current[i] = node; }} className="act2-card" aria-label={project.name}>
         <p className="act2-eyebrow">{String(i + 1).padStart(2, "0")} · {project.eyebrow}</p>
