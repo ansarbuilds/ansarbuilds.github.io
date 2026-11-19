@@ -331,6 +331,10 @@
    screen. Siblings stagger in reading order through --i. */
 .rv { opacity: 0; transform: translateY(28px); transition: opacity var(--dur-slow) var(--ease-out), transform var(--dur-slow) var(--ease-out); transition-delay: calc(var(--i, 0) * var(--stagger-base)); }
 .rv.is-in { opacity: 1; transform: none; }
+/* A keyboard user can tab to a card before its reveal has played: it shows
+   at once while it has focus. */
+.rv:focus-within { opacity: 1; transform: none; transition: none; }
+.rv:focus-within .sc-card-media { clip-path: inset(0 round 18px); opacity: 1; }
 
 /* The section heading, the same everywhere: index label, then the headline
    rising out of a mask, then its serif line, then the aside. The wrapper

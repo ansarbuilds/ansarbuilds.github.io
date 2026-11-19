@@ -1,3 +1,4 @@
+import "./keyboard.css";
 import "./finale/finale.css";
 import { Fragment, useEffect, useRef, useState } from "react";
 import ActTitle from "./ActTitle";
@@ -34,7 +35,9 @@ export default function Finale({ contact, pitch, credits, onTop, fallback }) {
       tone(m.contact);
       if (block.current) {
         block.current.style.opacity = m.contact;
-        block.current.style.visibility = m.contact > 0.02 ? "visible" : "hidden";
+        block.current.style.visibility = "visible";
+        block.current.classList.add("film-card");
+        block.current.classList.toggle("is-offshot", m.contact <= 0.02);
         // As the credits roll in, the contact rises to the top and keeps
         // only its line, the email and the links.
         block.current.style.transform = `translateY(${(1 - m.contact) * 24 - m.credits * lift}vh)`;
@@ -42,7 +45,9 @@ export default function Finale({ contact, pitch, credits, onTop, fallback }) {
       }
       if (roll.current) {
         roll.current.style.opacity = m.credits;
-        roll.current.style.visibility = m.credits > 0.02 ? "visible" : "hidden";
+        roll.current.style.visibility = "visible";
+        roll.current.classList.add("film-card");
+        roll.current.classList.toggle("is-offshot", m.credits <= 0.02);
         roll.current.style.transform = `translateY(${(1 - m.credits) * 50}vh)`;
       }
     };

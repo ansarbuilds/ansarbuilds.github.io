@@ -1,3 +1,4 @@
+import "./keyboard.css";
 import "./actThree/actThree.css";
 import { useEffect, useRef, useState } from "react";
 import ActTitle from "./ActTitle";
@@ -31,7 +32,12 @@ export default function ActThree({ capabilities, fallback }) {
       if (!node) return;
       node.style.opacity = amount;
       node.style.transform = `translateY(${(1 - amount) * rise}px)`;
-      node.style.visibility = amount > 0.02 ? "visible" : "hidden";
+      // Out of shot it is see-through and ignores the pointer, but it stays in
+      // the tab order: a keyboard user can still reach it, and it shows itself
+      // while it has focus (see .film-card in film/keyboard.css).
+      node.style.visibility = "visible";
+      node.classList.add("film-card");
+      node.classList.toggle("is-offshot", amount <= 0.02);
     };
     // A low tone as the act lands on its held match cut.
     const cut = cueOnRise("tone", 0.9), chimes = capabilities.map(() => cueOnRise("chime"));
