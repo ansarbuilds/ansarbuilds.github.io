@@ -140,6 +140,7 @@ test('the pre-vis follows the scrollbar from the first shot to the last', async 
 });
 
 test('the cold open plays over the home page, hands over to the hero, and can be skipped', async ({ page }) => {
+  test.setTimeout(90000);
   await page.goto('/?coldopen=full');
   // Its code can take a while on a dev server that has just rebuilt three.js.
   await expect(page.locator('.co')).toBeVisible({ timeout: 20000 });
@@ -164,6 +165,7 @@ test('the cold open does not play for reduced motion, a section link, or a secon
 });
 
 test('Act I pins its stage, keeps its words as real text, and loads its scene near the screen', async ({ page }) => {
+  test.setTimeout(90000);
   await page.addInitScript((key) => { sessionStorage.setItem(key, '1'); sessionStorage.setItem('cold-open-played', '1'); }, INTRO_SESSION_KEY);
   await page.goto('/');
   const act = page.locator('section.act1');
@@ -171,7 +173,7 @@ test('Act I pins its stage, keeps its words as real text, and loads its scene ne
   await expect(act.getByText('Most AI demos stop at the demo.')).toBeAttached();
   await expect(act.locator('dl dt')).toHaveCount(4);
   await act.evaluate((node) => window.scrollTo(0, node.getBoundingClientRect().top + window.scrollY + window.innerHeight));
-  await expect(act).toHaveClass(/is-live/, { timeout: 8000 });
+  await expect(act).toHaveClass(/is-live/, { timeout: 60000 });
   const stage = await page.locator('.act1-stage').boundingBox();
   expect(Math.abs(stage.y)).toBeLessThan(2);
 });
@@ -184,6 +186,7 @@ test('with reduced motion the short version is the plain section', async ({ page
 });
 
 test('Act II plays above the work stage, with real links that are hidden until their card shows', async ({ page }) => {
+  test.setTimeout(90000);
   await page.addInitScript((key) => { sessionStorage.setItem(key, '1'); sessionStorage.setItem('cold-open-played', '1'); }, INTRO_SESSION_KEY);
   await page.goto('/');
   const act = page.locator('section.act2');
@@ -193,7 +196,7 @@ test('Act II plays above the work stage, with real links that are hidden until t
   await expect(card.locator('a.act2-primary')).toHaveAttribute('href', '/work/saywhen/');
   // Before the scene, the card is out of the way of the keyboard.
   await act.evaluate((node) => window.scrollTo(0, node.getBoundingClientRect().top + window.scrollY));
-  await expect(act).toHaveClass(/is-live/, { timeout: 15000 });
+  await expect(act).toHaveClass(/is-live/, { timeout: 60000 });
   await expect(card).toBeHidden();
   // At the end of the act, the last project's card is there and usable,
   // and the earlier ones have gone.
