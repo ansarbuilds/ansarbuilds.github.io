@@ -7,6 +7,9 @@
 .act2-bars span:first-child { top: 0; transform: translateY(-101%); }
 .act2-bars span:last-child { bottom: 0; transform: translateY(101%); }
 .act2-bars.is-closed span { transform: none; }
+/* A wide-screen letterbox on a tall phone would leave a thin band between
+   two bars covering half the screen. Phones get slim bars instead. */
+@media (max-width: 760px) { .act2-bars span { height: 9vh; } }
 .act2-title, .act2-card { position: absolute; z-index: 2; opacity: 0; visibility: hidden; will-change: opacity, transform; }
 .act2-title { left: 0; right: 0; top: 50%; margin: -.5em 0 0; text-align: center; font: 400 clamp(3rem, 11vw, 9.5rem)/1 var(--font-condensed); text-transform: uppercase; letter-spacing: .02em; text-shadow: 0 4px 60px #000; pointer-events: none; }
 /* The card sits low on the left over a scrim, so the set keeps the frame. */
