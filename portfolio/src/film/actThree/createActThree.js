@@ -1,13 +1,7 @@
 import * as THREE from "three";
-import { EffectComposer } from "three/examples/jsm/postprocessing/EffectComposer.js";
-import { RenderPass } from "three/examples/jsm/postprocessing/RenderPass.js";
-import { UnrealBloomPass } from "three/examples/jsm/postprocessing/UnrealBloomPass.js";
-import { ShaderPass } from "three/examples/jsm/postprocessing/ShaderPass.js";
-import { OutputPass } from "three/examples/jsm/postprocessing/OutputPass.js";
-import { finishShader } from "../coldOpen/shaders.js";
 import { BONE, SIGNAL, floor, glow, points } from "../actTwo/kit.js";
 import { ACT_THREE, CENTRE, PILLARS, cameraAt, moments, timeAtProgress } from "./timeline.js";
-import { createAdaptive } from "../adaptive.js";
+import { attachFilm } from "../engine.js";
 
 /* Act III (A3-01, A3-02) in plain three.js: three monoliths of dark stone
    rise out of the ground, each carved with what it stands for and the
@@ -58,9 +52,9 @@ function carving(pillar, height) {
 
 export function createActThree(canvas, { pillars, getProgress, onFrame }) {
   const quality = pickQuality();
-  const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: false, powerPreference: "high-performance" });
-  renderer.setPixelRatio(quality.dpr);
-  renderer.setClearColor(0x060505, 1);
+  // The shared renderer (see engine.js): this act draws into it, and its
+  // frames are copied onto this canvas.
+  const film = attachFilm(canvas, { clear: 0x060505, bloom: [0.5, 0.5, 0.55], grain: 0.018 });
   const scene = new THREE.Scene();
   scene.fog = new THREE.Fog(0x060505, 40, 120);
   const camera = new THREE.PerspectiveCamera(36, 1, 0.1, 400);
@@ -115,24 +109,13 @@ export function createActThree(canvas, { pillars, getProgress, onFrame }) {
     return { pillar, mesh, front, pool };
   });
 
-  const composer = new EffectComposer(renderer);
-  const bloom = new UnrealBloomPass(new THREE.Vector2(1, 1), 0.5, 0.5, 0.55);
-  const finish = new ShaderPass(finishShader);
-  finish.uniforms.uGrain.value = 0.018;
-  composer.addPass(new RenderPass(scene, camera));
-  composer.addPass(bloom);
-  composer.addPass(finish);
-  composer.addPass(new OutputPass());
-  // Steps quality down if this device cannot keep up (see adaptive.js).
-  const adaptive = createAdaptive({ quality, bloom, apply: () => { renderer.setPixelRatio(quality.dpr); resize(); } });
+  const finish = film.finish;
 
   let width = 1, height = 1, fit = 1;
   const resize = () => {
     width = canvas.clientWidth || window.innerWidth;
     height = canvas.clientHeight || window.innerHeight;
-    renderer.setSize(width, height, false);
-    composer.setPixelRatio(quality.dpr);
-    composer.setSize(width, height);
+    film.resize();
     camera.aspect = width / height;
     camera.updateProjectionMatrix();
     fit = Math.min(1, Math.max(0.35, camera.aspect / 1.5));
@@ -173,15 +156,14 @@ export function createActThree(canvas, { pillars, getProgress, onFrame }) {
       pool.mesh.material.uniforms.uOpacity.value = 0.45 * m.glow[i];
     });
     dust.uniforms.uTime.value = clock;
-    dust.uniforms.uScale.value = renderer.domElement.height / (2 * Math.tan(THREE.MathUtils.degToRad(camera.fov / 2)));
+    dust.uniforms.uScale.value = film.pixelHeight / (2 * Math.tan(THREE.MathUtils.degToRad(camera.fov / 2)));
     finish.uniforms.uTime.value = clock;
     // Before the act starts or after it ends only ambient motion is left (dust,
     // a caret), often while the next section plays beside it: a quarter of
     // the frames is enough there.
     if ((t <= 0 || t >= ACT_THREE.seconds) && settledFrames++ % 4) return;
     if (t > 0 && t < ACT_THREE.seconds) settledFrames = 0;
-    adaptive.frame(nowMs, t <= 0 || t >= ACT_THREE.seconds);
-    composer.render();
+    film.render(scene, camera, { now: nowMs, skip: t <= 0 || t >= ACT_THREE.seconds });
     onFrame?.(t, m);
   }
 
@@ -196,8 +178,7 @@ export function createActThree(canvas, { pillars, getProgress, onFrame }) {
       cancelAnimationFrame(frame);
       observer.disconnect();
       disposers.forEach((fn) => fn());
-      composer.dispose();
-      renderer.dispose();
+      film.release();
     },
   };
 }

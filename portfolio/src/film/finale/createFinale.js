@@ -1,14 +1,9 @@
 import * as THREE from "three";
-import { EffectComposer } from "three/examples/jsm/postprocessing/EffectComposer.js";
-import { RenderPass } from "three/examples/jsm/postprocessing/RenderPass.js";
-import { UnrealBloomPass } from "three/examples/jsm/postprocessing/UnrealBloomPass.js";
-import { ShaderPass } from "three/examples/jsm/postprocessing/ShaderPass.js";
-import { OutputPass } from "three/examples/jsm/postprocessing/OutputPass.js";
 import { poseAt } from "../rig.js";
-import { finishShader, flareFragment, flareVertex } from "../coldOpen/shaders.js";
+import { flareFragment, flareVertex } from "../coldOpen/shaders.js";
 import { additive, points } from "../actTwo/kit.js";
 import { FINALE, POINT, moments, timeAtProgress } from "./timeline.js";
-import { createAdaptive } from "../adaptive.js";
+import { attachFilm } from "../engine.js";
 
 /* The finale (FN-01 to FN-03) in plain three.js: everything the visitor
    passed, as points in the colours of each act, falls back into one point
@@ -26,9 +21,9 @@ function pickQuality() {
 
 export function createFinale(canvas, { getProgress, onFrame }) {
   const quality = pickQuality();
-  const renderer = new THREE.WebGLRenderer({ canvas, antialias: false, alpha: false, powerPreference: "high-performance" });
-  renderer.setPixelRatio(quality.dpr);
-  renderer.setClearColor(0x000000, 1);
+  // The shared renderer (see engine.js): this act draws into it, and its
+  // frames are copied onto this canvas.
+  const film = attachFilm(canvas, { clear: 0x000000, bloom: [0.7, 0.6, 0.12], grain: 0.022 });
   const scene = new THREE.Scene();
   const camera = new THREE.PerspectiveCamera(36, 1, 0.05, 400);
   scene.add(camera);
@@ -53,24 +48,13 @@ export function createFinale(canvas, { getProgress, onFrame }) {
   flare.frustumCulled = false;
   scene.add(flare);
 
-  const composer = new EffectComposer(renderer);
-  const bloom = new UnrealBloomPass(new THREE.Vector2(1, 1), 0.7, 0.6, 0.12);
-  const finish = new ShaderPass(finishShader);
-  finish.uniforms.uGrain.value = 0.022;
-  composer.addPass(new RenderPass(scene, camera));
-  composer.addPass(bloom);
-  composer.addPass(finish);
-  composer.addPass(new OutputPass());
-  // Steps quality down if this device cannot keep up (see adaptive.js).
-  const adaptive = createAdaptive({ quality, bloom, apply: () => { renderer.setPixelRatio(quality.dpr); resize(); } });
+  const finish = film.finish;
 
   let width = 1, height = 1;
   const resize = () => {
     width = canvas.clientWidth || window.innerWidth;
     height = canvas.clientHeight || window.innerHeight;
-    renderer.setSize(width, height, false);
-    composer.setPixelRatio(quality.dpr);
-    composer.setSize(width, height);
+    film.resize();
     camera.aspect = width / height;
     camera.updateProjectionMatrix();
   };
@@ -111,7 +95,7 @@ export function createFinale(canvas, { getProgress, onFrame }) {
     }
     world.uniforms.uOpacity.value = 0.9 * (1 - smooth01((m.recede - 0.82) / 0.18));
     world.uniforms.uTime.value = clock;
-    world.uniforms.uScale.value = renderer.domElement.height / (2 * Math.tan(THREE.MathUtils.degToRad(camera.fov / 2)));
+    world.uniforms.uScale.value = film.pixelHeight / (2 * Math.tan(THREE.MathUtils.degToRad(camera.fov / 2)));
 
     // Keep the flare card filling the frame, at the point.
     const half = Math.tan(THREE.MathUtils.degToRad(camera.fov / 2));
@@ -126,8 +110,7 @@ export function createFinale(canvas, { getProgress, onFrame }) {
     if ((t <= 0 || t >= FINALE.seconds) && settledFrames++ % 4) return;
     if (t > 0 && t < FINALE.seconds) settledFrames = 0;
     finish.uniforms.uTime.value = clock;
-    adaptive.frame(nowMs, t <= 0 || t >= FINALE.seconds);
-    composer.render();
+    film.render(scene, camera, { now: nowMs, skip: t <= 0 || t >= FINALE.seconds });
     onFrame?.(t, m);
   }
   const smooth01 = (u) => { const x = Math.min(1, Math.max(0, u)); return x * x * (3 - 2 * x); };
@@ -145,8 +128,7 @@ export function createFinale(canvas, { getProgress, onFrame }) {
       world.dispose();
       cardGeometry.dispose();
       flare.material.dispose();
-      composer.dispose();
-      renderer.dispose();
+      film.release();
     },
   };
 }

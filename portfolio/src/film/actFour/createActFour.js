@@ -1,17 +1,11 @@
 import * as THREE from "three";
-import { EffectComposer } from "three/examples/jsm/postprocessing/EffectComposer.js";
-import { RenderPass } from "three/examples/jsm/postprocessing/RenderPass.js";
-import { UnrealBloomPass } from "three/examples/jsm/postprocessing/UnrealBloomPass.js";
-import { ShaderPass } from "three/examples/jsm/postprocessing/ShaderPass.js";
-import { OutputPass } from "three/examples/jsm/postprocessing/OutputPass.js";
 import { poseAt } from "../rig.js";
 import { SETS } from "../shots.js";
-import { finishShader } from "../coldOpen/shaders.js";
 import { BONE, SIGNAL, canvasCard, faceCamera, glow, points, ramp, smooth } from "../actTwo/kit.js";
 import { PLANETS, buildOrbitPoints, displayRadius, planetPosition } from "../../three/orbitalMechanics.js";
 import { getEmetEntry } from "../../emet/emetKnowledge.js";
 import { ACT_FOUR, moments, timeAtProgress } from "./timeline.js";
-import { createAdaptive } from "../adaptive.js";
+import { attachFilm } from "../engine.js";
 
 /* Act IV (A4-01 to A4-04), the playground reel, in plain three.js:
    the network collapses into a star; the solar system, on its real orbits;
@@ -194,9 +188,9 @@ function buildTerminal(centre) {
 
 export function createActFour(canvas, { getProgress, onFrame }) {
   const quality = pickQuality();
-  const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: false, powerPreference: "high-performance" });
-  renderer.setPixelRatio(quality.dpr);
-  renderer.setClearColor(0x040406, 1);
+  // The shared renderer (see engine.js): this act draws into it, and its
+  // frames are copied onto this canvas.
+  const film = attachFilm(canvas, { clear: 0x040406, bloom: [0.55, 0.5, 0.5], grain: 0.018 });
   const scene = new THREE.Scene();
   scene.fog = new THREE.FogExp2(0x040406, 0.012);
   const camera = new THREE.PerspectiveCamera(40, 1, 0.1, 500);
@@ -210,23 +204,12 @@ export function createActFour(canvas, { getProgress, onFrame }) {
   scene.add(network.mesh, solar.group, ribbon.mesh, head.mesh, terminal.dust.mesh, terminal.halo.mesh, terminal.panel.mesh);
   disposers.push(network.dispose, solar.dispose, ribbon.dispose, head.dispose, terminal.panel.dispose, terminal.halo.dispose, terminal.dust.dispose);
 
-  const composer = new EffectComposer(renderer);
-  const bloom = new UnrealBloomPass(new THREE.Vector2(1, 1), 0.55, 0.5, 0.5);
-  const finish = new ShaderPass(finishShader);
-  finish.uniforms.uGrain.value = 0.018;
-  composer.addPass(new RenderPass(scene, camera));
-  composer.addPass(bloom);
-  composer.addPass(finish);
-  composer.addPass(new OutputPass());
-  // Steps quality down if this device cannot keep up (see adaptive.js).
-  const adaptive = createAdaptive({ quality, bloom, apply: () => { renderer.setPixelRatio(quality.dpr); resize(); } });
+  const finish = film.finish;
 
   let fit = 1;
   const resize = () => {
     const width = canvas.clientWidth || window.innerWidth, height = canvas.clientHeight || window.innerHeight;
-    renderer.setSize(width, height, false);
-    composer.setPixelRatio(quality.dpr);
-    composer.setSize(width, height);
+    film.resize();
     camera.aspect = width / height;
     camera.updateProjectionMatrix();
     fit = Math.min(1, Math.max(0.35, camera.aspect / 1.5));
@@ -254,7 +237,7 @@ export function createActFour(canvas, { getProgress, onFrame }) {
     camera.position.copy(pos);
     camera.lookAt(look);
     camera.updateMatrixWorld();
-    const scale = renderer.domElement.height / (2 * Math.tan(THREE.MathUtils.degToRad(camera.fov / 2)));
+    const scale = film.pixelHeight / (2 * Math.tan(THREE.MathUtils.degToRad(camera.fov / 2)));
 
     const m = moments(t);
     // The collapse, and the star it leaves.
@@ -288,8 +271,7 @@ export function createActFour(canvas, { getProgress, onFrame }) {
     // the frames is enough there.
     if ((t <= 0 || t >= ACT_FOUR.seconds) && settledFrames++ % 4) return;
     if (t > 0 && t < ACT_FOUR.seconds) settledFrames = 0;
-    adaptive.frame(nowMs, t <= 0 || t >= ACT_FOUR.seconds);
-    composer.render();
+    film.render(scene, camera, { now: nowMs, skip: t <= 0 || t >= ACT_FOUR.seconds });
     onFrame?.(t, m);
   }
 
@@ -306,8 +288,7 @@ export function createActFour(canvas, { getProgress, onFrame }) {
       cancelAnimationFrame(frame);
       observer.disconnect();
       disposers.forEach((fn) => fn());
-      composer.dispose();
-      renderer.dispose();
+      film.release();
     },
   };
 }
