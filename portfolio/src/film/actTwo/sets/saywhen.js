@@ -86,6 +86,7 @@ export function buildSaywhen({ group, media }) {
   const mouth = new THREE.Object3D();
   head.add(mouth);
   let headPoints = null;
+  let headDone = false;
   loadHead(media("/film/head-points.bin")).then((data) => {
     const scale = 4.2 / data.size[1];
     headPoints = points(data.positions, data.colors, 0.05, { opacity: 1, wobble: 0.012 / scale });
@@ -93,7 +94,8 @@ export function buildSaywhen({ group, media }) {
     head.add(headPoints.mesh);
     // The mouth, in the model's own units: just under the nose, at the front.
     mouth.position.set(0, (-0.047 - data.centre[1]) * scale, (0.072 - data.centre[2]) * scale);
-  }).catch(() => {});
+    headDone = true;
+  }).catch(() => { headDone = true; });
   disposers.push(() => headPoints?.dispose());
 
   // The voice: points running from the mouth to the screen on a wave.
@@ -109,6 +111,7 @@ export function buildSaywhen({ group, media }) {
 
   const TURN = 1.15;
   return {
+    ready: () => headDone,
     setPlaying(on) {
       if (on) video.play().catch(() => {});
       else video.pause();

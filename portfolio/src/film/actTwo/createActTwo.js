@@ -106,7 +106,7 @@ export function createActTwo(canvas, { getProgress, onFrame, media }) {
   const observer = new ResizeObserver(resize);
   observer.observe(canvas);
 
-  let active = false, frame = 0, last = performance.now(), clock = 0, disposed = false, settledFrames = 0;
+  let drawn = false, active = false, frame = 0, last = performance.now(), clock = 0, disposed = false, settledFrames = 0;
   const look = new THREE.Vector3(), pos = new THREE.Vector3();
   function tick(nowMs) {
     if (!active || disposed) return;
@@ -155,8 +155,13 @@ export function createActTwo(canvas, { getProgress, onFrame, media }) {
     // the frames is enough there.
     if ((t <= 0 || t >= ACT_TWO.seconds) && settledFrames++ % 4) return;
     if (t > 0 && t < ACT_TWO.seconds) settledFrames = 0;
+    // A set that is on screen but still waiting for its pictures is not a
+    // finished frame: hold the last one drawn until it is. (Not drawing
+    // leaves the canvas showing that frame.)
+    if (drawn && sets.some((item) => item.group.visible && item.set.ready && !item.set.ready())) return;
     adaptive.frame(nowMs, t <= 0 || t >= ACT_TWO.seconds);
     composer.render();
+    drawn = true;
     onFrame?.(t, now);
   }
 

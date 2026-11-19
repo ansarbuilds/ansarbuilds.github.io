@@ -56,7 +56,7 @@ export function buildDigitalDouble({ group, media }) {
   let headPoints = null;
   let model = null;
   const phone = window.matchMedia("(max-width: 760px)").matches;
-  let loading = false;
+  let loading = false, headDone = false, framesIn = 0;
   const load = () => {
     if (loading) return;
     loading = true;
@@ -66,7 +66,8 @@ export function buildDigitalDouble({ group, media }) {
         headPoints.mesh.scale.setScalar(MODEL_HEIGHT / data.size[1]);
         rig.add(headPoints.mesh);
         disposers.push(headPoints.dispose);
-      }).catch(() => {});
+        headDone = true;
+      }).catch(() => { headDone = true; });
       return;
     }
     new GLTFLoader().setMeshoptDecoder(MeshoptDecoder).load(media("/models/digital_double.glb"), (gltf) => {
@@ -85,8 +86,9 @@ export function buildDigitalDouble({ group, media }) {
         if (o.name.startsWith("Web_Eye")) eyes.push(o);
       });
       rig.add(holder);
+      headDone = true;
       disposers.push(() => model.traverse((o) => { if (o.isMesh) { o.geometry.dispose(); [o.material].flat().forEach((m) => { m.map?.dispose(); m.dispose(); }); } }));
-    }, undefined, () => {});
+    }, undefined, () => { headDone = true; });
   };
 
   // The contact sheet: every stage, with its number and verdict.
@@ -126,7 +128,7 @@ export function buildDigitalDouble({ group, media }) {
   let framesLoaded = false;
   const loadFrames = () => {
     framesLoaded = true;
-    frames.forEach((frame) => loader.load(media(`/shots/digital-double/${frame.stage.img}`), (map) => { map.colorSpace = THREE.SRGBColorSpace; frame.material.map = map; frame.material.needsUpdate = true; }));
+    frames.forEach((frame) => loader.load(media(`/shots/digital-double/${frame.stage.img}`), (map) => { map.colorSpace = THREE.SRGBColorSpace; frame.material.map = map; frame.material.needsUpdate = true; framesIn++; }, undefined, () => { framesIn++; }));
   };
 
   // Where the visitor is pointing, -1 to 1 across the window.
@@ -139,6 +141,7 @@ export function buildDigitalDouble({ group, media }) {
   const right = new THREE.Vector3(), up = new THREE.Vector3(), gaze = new THREE.Vector3();
   return {
     prepare() { load(); if (!framesLoaded) loadFrames(); },
+    ready() { return headDone && framesLoaded && framesIn >= frames.length; },
     setPlaying() {},
     update({ arrive, scene, clock, scale, camera }) {
       load();

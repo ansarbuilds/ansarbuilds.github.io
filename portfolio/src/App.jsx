@@ -608,7 +608,7 @@ function ColdOpenLayer({ mode, onHandOver, onDone }) {
   }, [abandon]);
   const onStart = useCallback(() => { started.current = true; }, []);
   return <ColdOpenBoundary onFail={abandon}>
-    <Suspense fallback={<div className="co-veil" aria-hidden="true" />}>
+    <Suspense fallback={null}>
       <ColdOpen mode={mode} since={since} onStart={onStart} onHandOver={onHandOver} onDone={onDone} />
     </Suspense>
   </ColdOpenBoundary>;

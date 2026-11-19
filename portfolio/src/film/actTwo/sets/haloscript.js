@@ -136,11 +136,12 @@ export function buildHaloscript({ group, media, renderer }) {
   let showing = -1;
   // The screenshots (about 1 MB together) load only once the camera is on
   // its way here, not with the rest of the act.
-  let loaded = false;
+  let loaded = false, arrived = 0, wanted = 0;
   const load = () => {
     loaded = true;
+    wanted = screens.reduce((n, s) => n + s.sources.length, 0);
     screens.forEach((s) => s.sources.forEach((src, i) => {
-      const texture = loader.load(media(src), () => { showing = -1; });
+      const texture = loader.load(media(src), () => { showing = -1; arrived++; }, undefined, () => { arrived++; });
       texture.colorSpace = THREE.SRGBColorSpace;
       texture.anisotropy = renderer.capabilities.getMaxAnisotropy();
       disposers.push(() => texture.dispose());
@@ -151,6 +152,9 @@ export function buildHaloscript({ group, media, renderer }) {
     setPlaying() {},
     // Called while the set before this one is on screen.
     prepare() { if (!loaded) load(); },
+    // Finished only once every screenshot is in (a failed one counts, so
+    // the film never waits forever).
+    ready() { return loaded && arrived >= wanted; },
     update({ arrive, scene, camera }) {
       if (!loaded) load();
       // Off to the right only on a wide screen; centred on a narrow one.
