@@ -311,3 +311,12 @@ test('each act has its title card as real text, outside the keyboard order', asy
   }
   await expect(page.locator('.fin-credit-links a')).toHaveCount(6);
 });
+
+test('without the film the home page still links every playground experiment', async ({ page }) => {
+  await page.emulateMedia({ reducedMotion: 'reduce' });
+  await page.goto('/');
+  const section = page.locator('section#ai');
+  await expect(section.getByRole('heading', { level: 2 })).toBeAttached();
+  for (const href of ['/playground/explore/', '/playground/infinity/', '/playground/emet/']) await expect(section.locator(`a[href="${href}"]`)).toHaveCount(1);
+  await expect(page.locator('section.act4')).toHaveCount(0);
+});

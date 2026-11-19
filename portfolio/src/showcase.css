@@ -439,3 +439,6 @@ html.is-vt .rt { animation: none; }
    cropped: on a 4:3 phone card it sits on the same carbon it was drawn on. */
 .sc-card-media:has(.is-poster) { background: #0c0a09; }
 .sc-card-media img.is-poster { object-fit: contain; }
+
+/* The plain playground: three experiments side by side on a wide screen. */
+@media (min-width: 1000px) { .sc-card-grid.is-three { grid-template-columns: repeat(3, minmax(0, 1fr)); } .sc-card-grid.is-three .sc-card-media { aspect-ratio: 4 / 3; } }
