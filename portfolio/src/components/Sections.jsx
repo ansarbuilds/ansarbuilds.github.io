@@ -297,7 +297,7 @@ function Sheet({ children }) {
 const coverOf = (project) => project.spotlightArt || project.cardArt || project.cardShot || project.shots?.[0];
 // What each set's screens are, said on its card: nothing in the film
 // passes for more than it is.
-const FILM_NOTES = { saywhen: "Screen: the launch animation", jarvis: "Screens: the real dashboard, sample data", "agent-flight-recorder": "Illustration of a recorded run" };
+const FILM_NOTES = { saywhen: "Screen: the launch animation", jarvis: "Screens: the real dashboard, sample data", "agent-flight-recorder": "Illustration of a recorded run", "prh-jepa": "Illustration of the finding" };
 
 // The projects Act II has sets for, with what their cards say.
 const FILM_PROJECTS = FILM_SETS.map((slug) => {

@@ -224,7 +224,7 @@ Review each video before approving the next step; that is the "director's" job.
 
 - The Act II framework: per project, a cut into a light-speed streak, the arrival (title card, letterbox), and the scene with a card of real text and links. It sits above the interactive work stage, which stays as the hands-on version.
 - The saywhen set: a dark room, a monitor playing the real app loop, the digital double's head as 8,000 points turning to it, a voice waveform from its mouth to the screen, and `cargo test --release` typed and sent.
-- Next: one PR per remaining set, in order: Jarvis (done in `step-5b-act-two-jarvis`), Flight Recorder (done in `step-5c-act-two-flight-recorder`), PRH-JEPA, Haloscript, Digital double.
+- Next: one PR per remaining set, in order: Jarvis (done in `step-5b-act-two-jarvis`), Flight Recorder (done in `step-5c-act-two-flight-recorder`), PRH-JEPA (done in `step-5d-act-two-prh-jepa`), Haloscript, Digital double.
 - Open question for when all six are in: keep the work stage below the film, or fold it into the cards.
 
 ## Step 5b, the Jarvis set: done in the `step-5b-act-two-jarvis` PR
@@ -235,3 +235,8 @@ Review each video before approving the next step; that is the "director's" job.
 ## Step 5c, the Flight Recorder set: done in the `step-5c-act-two-flight-recorder` PR
 
 - An orange black box under a real spotlight comes apart into one layer per recorded step, from the home page's illustrated run (read, edit, run, failure, suspect, evidence). The failure layer lights red; the suspect edit flashes and flies to the camera with its diff. The card says "Illustration of a recorded run".
+
+## Step 5d, the PRH-JEPA set: done in the `step-5d-act-two-prh-jepa` PR
+
+- Two clouds of points, images and text, drift apart with lines between matching points; one rotation snaps them together; a light sweeps across and turns exactly 35% of the points red, and "−35%" comes up: of the top score came from a hidden clip. The card says "Illustration of the finding".
+- On phones every Act II set now stands in the upper part of the frame, above its card.
