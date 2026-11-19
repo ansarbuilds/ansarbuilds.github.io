@@ -105,7 +105,7 @@
 .st-device-tabs button.is-on { background: var(--ed-blue); color: var(--ed-ivory); opacity: 1; }
 
 /* Cover-only demos */
-.st-cover { position: relative; border-radius: 16px; overflow: hidden; border: 1px solid rgb(255 255 255 / .1); box-shadow: 0 40px 80px -30px rgb(0 0 0 / .8); }
+.st-cover { position: relative; background: #0c0a09; border-radius: 16px; overflow: hidden; border: 1px solid rgb(255 255 255 / .1); box-shadow: 0 40px 80px -30px rgb(0 0 0 / .8); }
 .st-cover img { width: 100%; height: 100%; object-fit: cover; }
 
 /* Site Recon terminal */

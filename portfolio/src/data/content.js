@@ -6,6 +6,8 @@
 export const HERO = {
   eyebrow: "Canada",
   title: "I build agents, test AI claims and ship apps.",
+  // What he wants next, said under the sentence. No title, no employer.
+  next: "Next I want hard problems in agents, honest evals and products that have to ship.",
   lede: [
     { text: "I build agents that run on their own, tools that make coding agents debuggable, independent evaluations of AI claims, and native apps people download from the App Store. Everything ships with its code, its numbers and a full write-up, including what failed." },
   ],

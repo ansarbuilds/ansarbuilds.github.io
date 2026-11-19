@@ -1,16 +1,12 @@
-import { useEffect, useLayoutEffect, useRef, useState } from "react";
-import { animate, motion, useAnimationFrame, useInView, useMotionValue, useReducedMotion, useScroll, useSpring, useTransform, useVelocity } from "framer-motion";
+import { useEffect, useRef, useState } from "react";
+import { motion, useAnimationFrame, useInView, useMotionValue, useReducedMotion, useScroll, useSpring, useTransform, useVelocity } from "framer-motion";
 import { ArrowDown, ArrowRight, ArrowUpRight, ExternalLink } from "lucide-react";
 import SignalField from "./SignalField";
 import WorkStage from "./WorkStage";
 import { CODE, CONTACT, HERO, RECEIPTS } from "../data/content";
 import { EXPERIMENTS, LISTED_PROJECTS, getProject } from "../data/projects";
 import { CAPABILITIES, FLAGSHIPS, MORE_WORK, STACK_MARQUEE } from "../data/showcase";
-import { EASE, STAGGER, tween } from "../lib/motion";
-import { INTRO_SESSION_KEY, filmEnabled } from "../lib/intro";
-import ActOne from "../film/ActOne";
-import ActTwo from "../film/ActTwo";
-import { BUILT as FILM_SETS } from "../film/actTwo/built";
+import { STAGGER } from "../lib/motion";
 import { media } from "../lib/media";
 import Count from "./Count";
 import MagneticLink from "./Magnetic";
@@ -103,80 +99,14 @@ function ScrubText({ lead, rest, className }) {
 const STATEMENT = { lead: "Most AI demos stop at the demo.", rest: "Mine ship with tests, real numbers and a write-up, including the parts that failed." };
 const RECEIPT_VALUES = RECEIPTS.map((item) => ({ ...item, value: item.value === "PROJECTS" ? `${LISTED_PROJECTS.length}+` : item.value }));
 
-// Where the name's letters are. Across: the text itself, since its lines
-// are full-width blocks. Down: the heading's own box, because each line
-// starts its entrance pushed down out of view and the text would read low.
-function textBox(el) {
-  const own = el.getBoundingClientRect();
-  const range = document.createRange();
-  range.selectNodeContents(el);
-  const text = range.getBoundingClientRect();
-  return text.width ? { left: text.left, width: text.width, top: own.top, height: own.height } : own;
-}
-const NAME_SET_S = 0.62; // how long the name holds centre stage before it moves
-const NAME_TRAVEL = { duration: 0.75, ease: EASE.out };
-export function Hero({ ready = true, hold = false, onReady }) {
+export function Hero({ onReady }) {
   const reduced = useReducedMotion();
   const heroRef = useRef(null);
-  const nameRef = useRef(null);
   const visible = useInView(heroRef, { margin: "50px" });
-  // `ready` is false only on a first visit, before the intro has handed over.
-  const [intro] = useState(() => !ready && !reduced);
-  const [arrived, setArrived] = useState(!intro);
-  const nameX = useMotionValue(0), nameY = useMotionValue(0), nameScale = useMotionValue(1);
-
-  // Before the first paint, move the name from its place to mid-screen.
-  const placed = useRef(false);
-  useLayoutEffect(() => {
-    // Measure once, from the name's untransformed box. A second run (React
-    // re-runs effects in development) would measure the moved name instead.
-    if (!intro || !nameRef.current || placed.current) return;
-    placed.current = true;
-    // The lines are full-width blocks, so centre the letters themselves,
-    // not the box around them.
-    const box = textBox(nameRef.current);
-    nameX.set(window.innerWidth / 2 - (box.left + box.width / 2));
-    nameY.set(window.innerHeight / 2 - (box.top + box.height / 2));
-    nameScale.set(Math.min(1.22, Math.max(1, (window.innerWidth * 0.84) / box.width)));
-  }, [intro, nameX, nameY, nameScale]);
-
-  useEffect(() => {
-    if (!intro) { onReady?.(); return undefined; }
-    // The film's cold open is playing over the page. The name waits, set
-    // large mid-screen (the cold open builds its own name on top of it), and
-    // this intro starts the moment that hands over.
-    if (hold) return undefined;
-    try {
-      window.sessionStorage.setItem(INTRO_SESSION_KEY, "1");
-      window.localStorage.setItem(INTRO_SESSION_KEY, "1");
-    } catch { /* storage unavailable: shouldPlayIntro already said no */ }
-    let moves = [];
-    let handed = false;
-    const handOver = () => {
-      if (handed) return;
-      handed = true;
-      setArrived(true);
-      onReady?.();
-    };
-    // The name leaves for its place; the rest starts a beat into the move.
-    const travel = setTimeout(() => {
-      moves = [animate(nameX, 0, NAME_TRAVEL), animate(nameY, 0, NAME_TRAVEL), animate(nameScale, 1, NAME_TRAVEL)];
-    }, NAME_SET_S * 1000);
-    const rest = setTimeout(handOver, (NAME_SET_S + 0.18) * 1000);
-    const skip = () => {
-      clearTimeout(travel);
-      moves.forEach((move) => move.stop());
-      nameX.set(0); nameY.set(0); nameScale.set(1);
-      handOver();
-    };
-    const events = ["pointerdown", "keydown", "wheel", "touchstart"];
-    events.forEach((name) => window.addEventListener(name, skip, { once: true, passive: true }));
-    return () => {
-      clearTimeout(travel);
-      clearTimeout(rest);
-      events.forEach((name) => window.removeEventListener(name, skip));
-    };
-  }, [intro, hold, onReady, nameX, nameY, nameScale]);
+  // The hero is the first frame: the name, the sentence and the proof cards
+  // are there on first paint. There is no intro to wait for.
+  useEffect(() => { onReady?.(); }, [onReady]);
+  const arrived = true;
 
   // The hint only appears if the hero has sat untouched for a while, and
   // goes for good at the first click.
@@ -200,23 +130,10 @@ export function Hero({ ready = true, hold = false, onReady }) {
   const fieldScale = useTransform(scrollY, [0, vh], reduced ? [1, 1] : [1, 1.14]);
   const fieldOpacity = useTransform(scrollY, [0, vh], reduced ? [1, 1] : [1, 0.3]);
 
-  // One timeline. The name's lines lead; each later part is a step behind
-  // the one before. Without the intro, the rest waits for the name to be
-  // well on its way.
-  const lead = intro ? 0 : 0.28;
-  const appear = (step) => (reduced ? {} : {
-    initial: { opacity: 0, y: 16 },
-    animate: arrived ? { opacity: 1, y: 0 } : { opacity: 0, y: 16 },
-    transition: tween("slow", "out", lead + step * STAGGER.loose),
-  });
-  const line = (i) => (reduced ? {} : {
-    initial: { y: "106%", skewY: 5 },
-    animate: { y: "0%", skewY: 0 },
-    transition: tween("slow", "out", i * STAGGER.loose),
-  });
-  // The short version: Act I of the film where it can play, or the plain
-  // sheet (also its fallback).
-  const [film] = useState(filmEnabled);
+  // Nothing in the hero enters from nothing: every part is on the first
+  // frame, so the helpers that used to stage an entrance add nothing.
+  const appear = () => ({});
+
   const brief = <section className="ed-intro ed-light sc-brief" aria-label="The short version" data-palette="lumen">
     <div className="ed-wrap">
       <ScrubText className="sc-statement" lead={STATEMENT.lead} rest={STATEMENT.rest} />
@@ -227,17 +144,18 @@ export function Hero({ ready = true, hold = false, onReady }) {
   return <div className="sc-open">
     <section ref={heroRef} id="hero" aria-labelledby="hero-name" className="sc-hero" data-palette="lumen" onPointerDown={() => setHint(false)}>
       <motion.div className="sc-hero-stage" style={{ scale: fieldScale, opacity: fieldOpacity }}>
-        {/* The network comes up last, once everything it sits behind is in. */}
-        <motion.div className="sc-hero-fade" initial={reduced ? false : { opacity: 0 }} animate={{ opacity: arrived ? 1 : 0 }} transition={tween("scene", "out", lead + 0.4)}><SignalField className="sc-hero-field" labels={HERO_LABELS} /></motion.div>
+        
+        <div className="sc-hero-fade"><SignalField className="sc-hero-field" labels={HERO_LABELS} /></div>
       </motion.div>
       <div className="sc-hero-grid" aria-hidden="true" />
       <motion.div className="sc-hero-inner" style={{ y: copyY, opacity: copyOpacity }}>
         <motion.p className="sc-hero-kicker" {...appear(0)}><i aria-hidden="true" />Index of work · {CODE.asOf}</motion.p>
-        <motion.h1 ref={nameRef} id="hero-name" className="sc-hero-name" aria-label="Mohamed Ansar" style={{ x: nameX, y: nameY, scale: nameScale }}>
-          <span className="sc-name-line" aria-hidden="true"><motion.span {...line(0)}>MOHAMED</motion.span></span>
-          <span className="sc-name-line" aria-hidden="true"><motion.span className="is-outline" {...line(1)}>ANSAR</motion.span></span>
-        </motion.h1>
+        <h1 id="hero-name" className="sc-hero-name" aria-label="Mohamed Ansar">
+          <span className="sc-name-line" aria-hidden="true"><span>MOHAMED</span></span>
+          <span className="sc-name-line" aria-hidden="true"><span className="is-outline">ANSAR</span></span>
+        </h1>
         <motion.p className="sc-hero-line" {...appear(1)}>{HERO.title} <em>Here are {LISTED_PROJECTS.length} of them.</em></motion.p>
+        <motion.p className="sc-hero-next" {...appear(1)}>{HERO.next}</motion.p>
         <motion.div className="sc-hero-ctas" {...appear(2)}>
           <MagneticLink href="#projects" className="sc-hero-btn">See the work<ArrowDown size={18} aria-hidden="true" /></MagneticLink>
           <a href="#contact" className="sc-hero-ghost">Get in touch<ArrowUpRight size={16} aria-hidden="true" /></a>
@@ -246,7 +164,7 @@ export function Hero({ ready = true, hold = false, onReady }) {
       </motion.div>
       <motion.div className="sc-hero-bottom" style={{ y: feedY, opacity: feedOpacity }}><HeroFeed appear={appear} from={3} /></motion.div>
     </section>
-    {film ? <ActOne receipts={RECEIPT_VALUES} tools={STACK_MARQUEE} lead={STATEMENT.lead} rest={STATEMENT.rest} fallback={brief} /> : brief}
+    {brief}
   </div>;
 }
 
@@ -295,27 +213,14 @@ function Sheet({ children }) {
 }
 
 const coverOf = (project) => project.spotlightArt || project.cardArt || project.cardShot || project.shots?.[0];
-// What each set's screens are, said on its card: nothing in the film
-// passes for more than it is.
-const FILM_NOTES = { saywhen: "Screen: the launch animation", jarvis: "Screens: the real dashboard, sample data", "agent-flight-recorder": "Illustration of a recorded run", "prh-jepa": "Illustration of the finding", haloscript: "Screens: the real app" };
-
-// The projects Act II has sets for, with what their cards say.
-const FILM_PROJECTS = FILM_SETS.map((slug) => {
-  const flag = FLAGSHIPS.find((item) => item.slug === slug);
-  const project = getProject(slug);
-  return { slug, name: project.title, eyebrow: flag.eyebrow, headline: flag.headline, stats: flag.stats, note: FILM_NOTES[slug], links: project.links.filter((link) => !link.locked && link.href !== `/work/${slug}/`).slice(0, 2) };
-});
-
 export function ProjectsSection() {
-  // Act II plays above the hands-on stage where the film can play.
-  const [film] = useState(filmEnabled);
-  return <>{film && <ActTwo projects={FILM_PROJECTS} />}<section id="projects" className="ed-projects ed-light ed-section" data-palette="bloom">
+  return <section id="projects" className="ed-projects ed-light ed-section" data-palette="bloom">
     <div className="ed-section-watermark" aria-hidden="true">WORK</div>
     <div className="ed-wrap">
-      <Enter className="ed-section-heading sc-stage-heading"><div><IndexLabel number="02">Selected work</IndexLabel><h2>Don’t read about it. <em>Try it.</em></h2></div><div className="ed-heading-aside"><p>Six builds, each one live on this page: watch the film, run the agent, replay the failure, flip the finding, switch the device.</p></div></Enter>
+      <Enter className="ed-section-heading sc-stage-heading"><div><IndexLabel number="02">Selected work</IndexLabel><h2>Six builds. <em>Each with its numbers.</em></h2></div><div className="ed-heading-aside"><p>Each one comes with the number, the picture and a way in. Some you can run, some you watch, some you read.</p><a href="/reel/" className="sc-reel-link">Watch the film<ArrowUpRight size={14} aria-hidden="true" /></a></div></Enter>
       <WorkStage />
     </div>
-  </section></>;
+  </section>;
 }
 
 export function CapabilitiesSection() {
