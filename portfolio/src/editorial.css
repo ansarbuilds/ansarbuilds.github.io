@@ -34,9 +34,6 @@
 .ed-nav-contact { background: var(--ed-blue); color: var(--ed-ivory); box-shadow: inset 0 -3px 0 var(--ed-coral); padding: 10px 16px !important; }
 .ed-nav-command { border: 1px solid var(--ed-rule); padding: 7px 9px; font: .55rem var(--font-mono); }
 /* The canvas gets the whole opening, with typography and controls at its edges. */
-/* Both statement variants are rendered only when the hero stays static, so
-   visibility belongs to useStaticHero in lib/staticHero.js, not to a media
-   query here. These rules style them; they never decide whether they show. */
 .ed-intro { padding-block: 100px 60px; }
 /* The receipts count things; this measures one. Same rules, same type, but a
    band of its own so a five-digit number is not squeezed into a column. */
