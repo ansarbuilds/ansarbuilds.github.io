@@ -8,7 +8,7 @@ import { LINEAGE_NODES, LINEAGE_EDGES } from "../data/lineageData";
 // stacked in the order they appear in LINEAGE_NODES. This is enough
 // structure to read a DAG left-to-right without pulling in a graph
 // layout library for a demo dataset this small.
-function computeLayout(nodes, edges) {
+function computeLayout(nodes, edges, vertical = false) {
   const forward = new Map(nodes.map((n) => [n.id, []]));
   const remainingIn = new Map(nodes.map((n) => [n.id, 0]));
   edges.forEach(([from, to]) => {
@@ -37,20 +37,24 @@ function computeLayout(nodes, edges) {
     columns.get(d).push(n.id);
   });
 
-  const colWidth = 150;
-  const rowHeight = 46;
+  // The pipeline is long and narrow (about 11 steps, at most 3 abreast). On
+  // a wide screen it runs left to right; on a phone's tall panel it runs top
+  // to bottom, or it would shrink to a thin strip of dots.
+  const step = vertical ? 74 : 150;
+  const lane = vertical ? 132 : 46;
   const positions = new Map();
   const maxRows = Math.max(...[...columns.values()].map((c) => c.length));
   columns.forEach((ids, col) => {
-    const offsetY = ((maxRows - ids.length) * rowHeight) / 2;
+    const offset = ((maxRows - ids.length) * lane) / 2;
     ids.forEach((id, row) => {
-      positions.set(id, { x: col * colWidth + 50, y: offsetY + row * rowHeight + 36 });
+      const along = col * step + 40, across = offset + row * lane + 40;
+      positions.set(id, vertical ? { x: across, y: along, label: "below" } : { x: along, y: across, label: "right" });
     });
   });
 
-  const width = (Math.max(...depth.values()) + 1) * colWidth + 110;
-  const height = maxRows * rowHeight + 70;
-  return { positions, forward, width, height };
+  const length = (Math.max(...depth.values()) + 1) * step + (vertical ? 40 : 110);
+  const breadth = maxRows * lane + (vertical ? 60 : 70);
+  return { positions, forward, width: vertical ? breadth : length, height: vertical ? length : breadth };
 }
 
 // Reverse adjacency, built once, so hover can reach a node's upstream
@@ -145,8 +149,11 @@ function LineageNode({ node, pos, active, dimmed, onClick, onHoverStart, onHover
           small, this just widens the hit area around it. */}
       <circle r={16} fill="transparent" style={{ pointerEvents: "all" }} />
       <text
-        x={style.r + 10}
-        y={4}
+        // Beside the node on a wide screen; centred under it on a phone, where
+        // the pipeline runs top to bottom and nodes sit side by side.
+        x={pos.label === "below" ? 0 : style.r + 10}
+        y={pos.label === "below" ? style.r + 16 : 4}
+        textAnchor={pos.label === "below" ? "middle" : "start"}
         className="font-mono select-none pointer-events-none transition-opacity duration-150"
         fontSize={11}
         fontWeight={700}
@@ -164,9 +171,10 @@ export default function DataLineageExplorer() {
   const [selected, setSelected] = useState(null);
   const [hovered, setHovered] = useState(null);
 
+  const [vertical] = useState(() => typeof window !== "undefined" && window.matchMedia("(max-width: 640px)").matches);
   const { positions, forward, width, height } = useMemo(
-    () => computeLayout(LINEAGE_NODES, LINEAGE_EDGES),
-    []
+    () => computeLayout(LINEAGE_NODES, LINEAGE_EDGES, vertical),
+    [vertical]
   );
   const reverse = useMemo(() => buildReverse(LINEAGE_NODES, LINEAGE_EDGES), []);
 
@@ -207,7 +215,7 @@ export default function DataLineageExplorer() {
         </p>
 
         <div className="grid lg:grid-cols-[1fr_320px] gap-6">
-          <div className="rounded-2xl border border-white/10 bg-black/30 p-2 h-[420px] sm:h-[500px]">
+          <div className="rounded-2xl border border-white/10 bg-black/30 p-2 h-[640px] sm:h-[500px]">
             <svg
               viewBox={`0 0 ${width} ${height}`}
               preserveAspectRatio="xMidYMid meet"

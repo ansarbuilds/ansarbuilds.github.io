@@ -704,7 +704,7 @@ export default function SolarSystemExplorer() {
       )}
 
       {!failed && ready && showHint && (
-        <div className="pointer-events-none absolute top-20 inset-x-0 flex justify-center px-4">
+        <div className="pointer-events-none absolute top-44 lg:top-20 inset-x-0 flex justify-center px-4">
           <p className="glass rounded-full px-4 py-2 font-mono text-[.68rem] text-[color:var(--ink-300)] text-center">
             Drag to look around · Scroll or pinch to zoom · Click a planet
           </p>
