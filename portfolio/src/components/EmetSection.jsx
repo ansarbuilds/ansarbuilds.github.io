@@ -369,9 +369,9 @@ export default function EmetSection() {
       <div className="mx-auto max-w-[1180px] grid lg:grid-cols-[0.9fr_1.1fr] gap-14 items-center">
         <div>
           <span className="font-mono text-[.7rem] tracking-[.2em] uppercase text-green/70">assistant</span>
-          <h2 className="mt-4 font-display text-[clamp(2.1rem,4.6vw,3.4rem)] font-semibold leading-[1.05] text-[color:var(--ink-50)]">
+          <h1 className="mt-4 font-display text-[clamp(2.1rem,4.6vw,3.4rem)] font-semibold leading-[1.05] text-[color:var(--ink-50)]">
             Ask <span className="italic text-green" style={{ fontFamily: "'Instrument Serif', serif" }}>emet</span>
-          </h2>
+          </h1>
           <p className="mt-5 max-w-md text-[1.02rem] leading-relaxed text-[color:var(--ink-400)]">
             A small terminal that answers right here, no page changes. Type a number, or just ask about
             SQL, Snowflake, the App Store launch, or how to reach me.

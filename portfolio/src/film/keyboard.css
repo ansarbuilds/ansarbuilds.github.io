@@ -5,4 +5,7 @@
    (Act II instead hides cards that are not on screen and offers a link to
    skip the film.) */
 .film-card.is-offshot { pointer-events: none; }
-.film-card:focus-within { opacity: 1 !important; visibility: visible !important; pointer-events: auto; }
+.film-card:focus-within,
+/* By class too: a keyboard user can reach a card before its act's scene has
+   started (the frame loop is what adds .film-card). */
+.act3-card:focus-within, .act4-card:focus-within, .fin-block:focus-within, .fin-credits:focus-within { opacity: 1 !important; visibility: visible !important; pointer-events: auto; }
