@@ -16,6 +16,12 @@ import { MORE_WORK } from "../data/showcase";
 // Projects with an evidence poster (scripts/make-more-art.mjs) show it here
 // too, in place of a conceptual illustration.
 const POSTERS = Object.fromEntries(MORE_WORK.filter((item) => item.art).map((item) => [item.slug, item.art]));
+// Projects with real material to open on, in place of an illustration. A
+// figure (`whole`) is shown uncropped, on the white it was drawn on.
+const REAL_HEADERS = {
+  jarvis: { src: "/shots/jarvis/dashboard.webp", alt: "The Jarvis dashboard, running on sample data", caption: "Jarvis · the real dashboard, sample data" },
+  "prh-jepa": { src: "/p/prh-jepa/fig2-wit1024-baselines.svg", alt: "Figure 2 from the report: alignment of six open text encoders with DINOv2 on WIT-1024", caption: "My Take on PRH-JEPA · figure 2 from the report", whole: true },
+};
 
 // The accent is a CSS colour (the current palette's accent ink), so its
 // translucent tints are mixed rather than built by appending hex alpha.
@@ -94,7 +100,8 @@ function PageTitle({ project }) {
 }
 
 function SignatureArtwork({ project, reduced }) {
-  const poster = POSTERS[project.slug];
+  const real = REAL_HEADERS[project.slug];
+  const poster = POSTERS[project.slug] || real?.src;
   const art = poster || project.heroArt || project.spotlightArt || project.cardArt;
   if (!art) return null;
   return (
@@ -106,10 +113,10 @@ function SignatureArtwork({ project, reduced }) {
       transition={{ duration: DUR.slow, ease: EASE.out }}
     >
       <div className="project-signature-frame">
-        <img src={media(art)} alt={poster ? `${project.title}: the evidence, drawn from the study's own numbers` : project.heroAlt || `${project.title} conceptual artwork`} loading="eager" />
+        <img src={media(art)} style={real?.whole ? { objectFit: "contain", background: "#fff" } : undefined} alt={real ? real.alt : poster ? `${project.title}: the evidence, drawn from the study's own numbers` : project.heroAlt || `${project.title} conceptual artwork`} loading="eager" />
         {!poster && <ProjectMotionPreview project={project} active expanded />}
       </div>
-      <figcaption>{poster ? `${project.title} · drawn from its own numbers` : project.heroCaption || (project.slug === "site-recon" ? "A public page, separated into the evidence a browser can verify." : `${project.title} · project visual`)}</figcaption>
+      <figcaption>{real ? real.caption : poster ? `${project.title} · drawn from its own numbers` : project.heroCaption || (project.slug === "site-recon" ? "A public page, separated into the evidence a browser can verify." : `${project.title} · project visual`)}</figcaption>
     </motion.figure>
   );
 }
