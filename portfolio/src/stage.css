@@ -227,3 +227,7 @@
   .st-playhead, .st-clip-bar span, .st-clip-caption span { transition: none; }
   .st-flight-detail pre code { opacity: 1; transform: none; animation: none; }
 }
+
+/* Digital Me's render is portrait: shown whole, on its own black. */
+.st-cover.is-render { background: #000; }
+.st-cover.is-render img { object-fit: contain; }
