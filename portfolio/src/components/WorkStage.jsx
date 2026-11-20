@@ -100,7 +100,7 @@ function JarvisDemo() {
       ? <iframe src={media("/p/jarvis/demo/index.html")} title="Jarvis demo with sample data" loading="lazy" />
       : <>
         <img className="ed-lazy-media" src={media("/shots/jarvis/dashboard.webp")} alt="Jarvis dashboard with sample data" loading="lazy" onLoad={reveal} />
-        <button type="button" className="st-launch" onClick={() => setLive(true)}><Play size={16} aria-hidden="true" />Run the live demo here</button>
+        <button type="button" className="st-launch" onClick={() => setLive(true)}><Play size={16} aria-hidden="true" />Run the sample-data demo here</button>
       </>}
   </Frame>;
 }
@@ -162,10 +162,11 @@ function HaloDemo({ active }) {
   </div>;
 }
 
-/* Digital Me: the cover, and a way in to the live model. */
+/* Digital Me: a real render of the model (not an illustration of it), shown
+   whole on the black it was rendered on, and a way in to the live model. */
 function DigitalDemo({ project }) {
-  return <div className="st-cover">
-    <img className="ed-lazy-media" src={media(coverOf(project))} alt="" loading="lazy" onLoad={reveal} />
+  return <div className="st-cover is-render">
+    <img className="ed-lazy-media" src={media(project.shots?.[0] || coverOf(project))} alt="A render of the 3D model of my head" loading="lazy" onLoad={reveal} />
     <a href="/playground/digital-double/" className="st-launch"><Play size={16} aria-hidden="true" />Meet the live 3D model</a>
   </div>;
 }
