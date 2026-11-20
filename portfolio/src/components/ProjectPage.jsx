@@ -400,9 +400,9 @@ export default function ProjectPage({ slug }) {
       <div className="mx-auto max-w-3xl px-5 pt-32 pb-24">
         <div className="panel project-panel rounded-2xl p-8">
           <h1 className="font-display text-2xl font-semibold text-[color:var(--ink-100)]">I couldn't find that project</h1>
-          <p className="mt-2 text-[color:var(--ink-200)]">It may have moved. The full list is on the home page.</p>
-          <a href="#projects" className="mt-5 inline-flex items-center gap-2 text-cyan font-mono text-xs uppercase tracking-[.12em]">
-            <ArrowLeft size={14} /> All projects
+          <p className="mt-2 text-[color:var(--ink-200)]">It may have moved. Every project is in the full list.</p>
+          <a href="/work/" className="mt-5 inline-flex min-h-11 items-center gap-2 text-[#ff8a5f] font-mono text-xs uppercase tracking-[.12em]">
+            <ArrowLeft size={14} aria-hidden="true" /> All projects
           </a>
         </div>
       </div>
