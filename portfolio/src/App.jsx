@@ -247,6 +247,9 @@ function SandboxProvider({ children }) {
   return <SandboxContext.Provider value={value}>{children}</SandboxContext.Provider>;
 }
 
+// The command palette's shortcut as the visitor's keyboard writes it.
+const PALETTE_KEY = typeof navigator !== "undefined" && /Mac|iPhone|iPad/.test(navigator.userAgentData?.platform || navigator.platform || navigator.userAgent) ? "⌘" : "Ctrl";
+
 // A consistent paper navigation anchors the alternating editorial sections.
 function Nav({ booting = false }) {
   const { route, navigate } = useRoute();
@@ -291,7 +294,7 @@ function Nav({ booting = false }) {
     <button onClick={() => navigate("deck")} className="ed-wordmark"><span className="ed-wordmark-symbol" aria-hidden="true">ma</span><span>mohamed ansar</span><span className="sr-only">, home</span></button>
     <div className="ed-nav-links">{editorial ? <><a href="#projects" className="ed-nav-wide">Work</a><a href="#capabilities" className="ed-nav-wide">Capabilities</a><a href={CONTACT.github} className="ed-nav-wide" target="_blank" rel="noopener noreferrer">GitHub</a><span ref={menuRef} className="ed-nav-menu"><button type="button" aria-expanded={menuOpen} aria-controls="nav-menu" onClick={() => setMenuOpen((open) => !open)}>Menu</button>{menuOpen && <span id="nav-menu" className="ed-nav-menu-list" onClick={() => setMenuOpen(false)}><a href="#projects">Work</a><a href="#capabilities">Capabilities</a><a href="#more">More work</a><a href={CONTACT.github} target="_blank" rel="noopener noreferrer">GitHub ↗</a></span>}</span><a href="#contact" className="ed-nav-contact">Get in touch ↗</a></> : <button onClick={() => navigate("deck")}>← Home</button>}
       {filmOn && <SoundToggle />}
-      <button onClick={openPalette} className="ed-nav-command" aria-label="⌘ K, open the command palette">⌘ K</button>
+      <button type="button" onClick={openPalette} className="ed-nav-command" aria-label={`${PALETTE_KEY} K, open the command palette`}>{PALETTE_KEY} K</button>
     </div>
   </div></nav>;
 }

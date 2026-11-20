@@ -340,3 +340,37 @@ test('a keyboard user can reach every link in the film, down to the email', asyn
   // While it has focus, it shows.
   await expect(page.locator('.fin-block')).toHaveCSS('opacity', '1');
 });
+
+test('the command palette lists every project, works by keyboard and gives focus back', async ({ page, isMobile }) => {
+  test.skip(isMobile, 'the palette button lives in the desktop nav');
+  await page.addInitScript((key) => { sessionStorage.setItem(key, '1'); sessionStorage.setItem('cold-open-played', '1'); }, INTRO_SESSION_KEY);
+  await page.goto('/');
+  const opener = page.getByRole('button', { name: /open the command palette/ });
+  await opener.focus();
+  await page.keyboard.press('Enter');
+  const dialog = page.getByRole('dialog', { name: 'Command palette' });
+  await expect(dialog).toBeVisible();
+  const box = dialog.getByRole('combobox');
+  await expect(box).toBeFocused();
+  // Every flagship is there, including the two the old list left out.
+  for (const name of ['saywhen', 'Agent Flight Recorder', 'Jarvis', 'Digital Me']) await expect(dialog.getByRole('option', { name: new RegExp(name) })).toHaveCount(1);
+  // The highlighted result is announced through aria-activedescendant.
+  await page.keyboard.press('ArrowDown');
+  const active = await box.getAttribute('aria-activedescendant');
+  await expect(dialog.locator(`#${active}`)).toHaveAttribute('aria-selected', 'true');
+  // Tab stays inside the dialog.
+  await page.keyboard.press('Tab');
+  await page.keyboard.press('Tab');
+  expect(await dialog.evaluate((node) => node.contains(document.activeElement))).toBe(true);
+  // Escape closes it and gives focus back to the button that opened it.
+  await page.keyboard.press('Escape');
+  await expect(dialog).toHaveCount(0);
+  await expect(opener).toBeFocused();
+  // Typing filters, and Enter opens the highlighted project.
+  await page.keyboard.press('Enter');
+  await expect(box).toBeFocused();
+  await page.keyboard.type('flight');
+  await expect(dialog.getByRole('option').first()).toContainText('Flight Recorder');
+  await page.keyboard.press('Enter');
+  await expect(page).toHaveURL(/\/work\/agent-flight-recorder\/$/);
+});

@@ -1,92 +1,131 @@
 import { DUR, EASE } from "../lib/motion";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
-import { Search, CornerDownLeft, ArrowUp, ArrowDown, X, Hash, Link2, Terminal } from "lucide-react";
+import { Search, CornerDownLeft, ArrowUp, ArrowDown, X, Hash, Link2, Terminal, Sparkles } from "lucide-react";
 import { COMMAND_ITEMS } from "../data/content";
+import { LISTED_PROJECTS } from "../data/projectIndex";
+import { FLAGSHIPS } from "../data/showcase";
 import { useRoute, useSandbox } from "../appContexts";
 
-const GROUP_ICONS = { Sections: Hash, Projects: Hash, Fun: Terminal, Links: Link2, System: Terminal };
+const GROUP_ICONS = { Sections: Hash, Projects: Hash, Playground: Sparkles, Links: Link2, System: Terminal };
+const GROUP_ORDER = ["Sections", "Projects", "Playground", "Links", "System"];
+const CORAL = "#ff8a5f";
+
+// Every listed project, flagships first in stage order, each with its stage
+// eyebrow (or its kind) so a search for "agent" or "app" finds it.
+const PROJECT_ITEMS = [
+  ...FLAGSHIPS.map((flag) => [flag, LISTED_PROJECTS.find((p) => p.slug === flag.slug)]),
+  ...LISTED_PROJECTS.filter((p) => !FLAGSHIPS.some((flag) => flag.slug === p.slug)).map((p) => [null, p]),
+].filter(([, project]) => project).map(([flag, project]) => ({
+  label: `${project.title} · ${flag?.eyebrow || project.kind}`,
+  go: `/work/${project.slug}/`,
+  group: "Projects",
+}));
+
+// A tool for working on the site, not for visitors: the dev server only.
+const SYSTEM_ITEMS = import.meta.env.DEV ? [{ label: "Toggle dev_mode · sandbox stubs", action: "toggle-sandbox", group: "System" }] : [];
+
+const ALL_ITEMS = [...COMMAND_ITEMS, ...PROJECT_ITEMS, ...SYSTEM_ITEMS]
+  .sort((a, b) => GROUP_ORDER.indexOf(a.group) - GROUP_ORDER.indexOf(b.group));
 
 /**
  * Global ⌘K / Ctrl+K command palette.
- * Owns its own open/close + query state; the parent only needs to
- * mount it once — the keyboard listener is global for the app's life.
+ *
+ * A combobox: focus stays in the search box, the arrow keys move the
+ * highlighted result, and a screen reader hears it (aria-activedescendant).
+ * Tab stays inside the dialog, and closing hands focus back to whatever had
+ * it before.
  */
 export default function CommandPalette() {
   const [open, setOpen] = useState(false);
   const [query, setQuery] = useState("");
   const [activeIndex, setActiveIndex] = useState(0);
   const inputRef = useRef(null);
+  const closeRef = useRef(null);
+  const listRef = useRef(null);
+  const returnTo = useRef(null);
   const { toggleDevMode } = useSandbox();
   const { navigate } = useRoute();
 
   const results = useMemo(() => {
     const q = query.trim().toLowerCase();
-    const items = q
-      ? COMMAND_ITEMS.filter((item) => item.label.toLowerCase().includes(q))
-      : COMMAND_ITEMS;
-    return items;
+    return q ? ALL_ITEMS.filter((item) => item.label.toLowerCase().includes(q)) : ALL_ITEMS;
   }, [query]);
 
-  // Global shortcut listener — meta+k / ctrl+k toggles, Escape closes.
+  // Global shortcut listener: meta+k / ctrl+k toggles, Escape closes.
   useEffect(() => {
     function onKeyDown(e) {
       const isCmdK = (e.metaKey || e.ctrlKey) && e.key.toLowerCase() === "k";
       if (isCmdK) {
         e.preventDefault();
         if (!open) {
+          returnTo.current = document.activeElement;
           setQuery("");
           setActiveIndex(0);
         }
         setOpen((prev) => !prev);
         return;
       }
-      if (e.key === "Escape" && open) {
-        setOpen(false);
-      }
+      if (e.key === "Escape" && open) setOpen(false);
     }
     window.addEventListener("keydown", onKeyDown);
     return () => window.removeEventListener("keydown", onKeyDown);
   }, [open]);
 
+  // Focus the search box on open; give focus back on close.
   useEffect(() => {
     if (open) {
       const id = setTimeout(() => inputRef.current?.focus(), 30);
       return () => clearTimeout(id);
     }
+    const back = returnTo.current;
+    returnTo.current = null;
+    if (back && back.isConnected && typeof back.focus === "function") back.focus({ preventScroll: true });
+    return undefined;
   }, [open]);
+
+  // Keep the highlighted result in view as the arrow keys move it.
+  useEffect(() => {
+    if (!open) return;
+    listRef.current?.querySelector(`#cp-opt-${activeIndex}`)?.scrollIntoView({ block: "nearest" });
+  }, [activeIndex, open]);
 
   function runItem(item) {
     if (!item) return;
-    if (item.action === "toggle-sandbox") {
-      toggleDevMode();
-    } else if (item.go) {
-      navigate(item.go);
-    } else if (item.href) {
-      window.open(item.href, item.href.startsWith("mailto:") ? "_self" : "_blank", "noopener,noreferrer");
-    }
+    // Navigating moves focus to the new place; don't pull it back.
+    returnTo.current = null;
+    if (item.action === "toggle-sandbox") toggleDevMode();
+    else if (item.go) navigate(item.go);
+    else if (item.href) window.open(item.href, item.href.startsWith("mailto:") ? "_self" : "_blank", "noopener,noreferrer");
     setOpen(false);
   }
 
   function onKeyDownList(e) {
-    if (e.key === "ArrowDown") {
+    const last = results.length - 1;
+    const move = { ArrowDown: (i) => Math.min(i + 1, last), ArrowUp: (i) => Math.max(i - 1, 0), Home: () => 0, End: () => last }[e.key];
+    if (move) {
+      // Home and End keep their usual meaning inside the text while typing.
+      if ((e.key === "Home" || e.key === "End") && query) return;
       e.preventDefault();
-      setActiveIndex((i) => Math.min(i + 1, results.length - 1));
-    } else if (e.key === "ArrowUp") {
-      e.preventDefault();
-      setActiveIndex((i) => Math.max(i - 1, 0));
+      setActiveIndex(move);
     } else if (e.key === "Enter") {
       e.preventDefault();
       runItem(results[activeIndex]);
     }
   }
 
+  // Tab and Shift+Tab move between the search box and the close button only.
+  function onKeyDownDialog(e) {
+    if (e.key !== "Tab") return;
+    e.preventDefault();
+    (document.activeElement === inputRef.current ? closeRef.current : inputRef.current)?.focus();
+  }
+
   const grouped = useMemo(() => {
     const groups = {};
     results.forEach((item, i) => {
       const key = item.group || "Other";
-      groups[key] = groups[key] || [];
-      groups[key].push({ ...item, _index: i });
+      (groups[key] ||= []).push({ ...item, _index: i });
     });
     return groups;
   }, [results]);
@@ -103,18 +142,19 @@ export default function CommandPalette() {
           onClick={() => setOpen(false)}
         >
           <motion.div
-            className="glass w-full max-w-xl rounded-2xl overflow-hidden shadow-2xl shadow-black/60 ring-1 ring-marigold/10"
+            className="w-full max-w-xl rounded-2xl overflow-hidden border border-white/10 bg-[#15110e]/95 backdrop-blur-xl shadow-2xl shadow-black/60"
             initial={{ opacity: 0, y: -16, scale: 0.96 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: -10, scale: 0.97 }}
             transition={{ duration: DUR.fast, ease: EASE.out }}
             onClick={(e) => e.stopPropagation()}
+            onKeyDown={onKeyDownDialog}
             role="dialog"
             aria-modal="true"
             aria-label="Command palette"
           >
             <div className="flex items-center gap-3 px-4 py-3 border-b border-white/8">
-              <Search size={16} className="text-marigold shrink-0" />
+              <Search size={16} className="shrink-0" style={{ color: CORAL }} aria-hidden="true" />
               <input
                 ref={inputRef}
                 value={query}
@@ -123,52 +163,65 @@ export default function CommandPalette() {
                   setActiveIndex(0);
                 }}
                 onKeyDown={onKeyDownList}
-                placeholder="Jump to a section or link…"
+                role="combobox"
+                aria-expanded="true"
+                aria-controls="cp-list"
+                aria-autocomplete="list"
+                aria-activedescendant={results.length ? `cp-opt-${activeIndex}` : undefined}
+                aria-label="Search sections, projects and links"
+                placeholder="Jump to a section, project or link…"
                 className="flex-1 bg-transparent outline-none text-sm font-mono text-[color:var(--ink-100)] placeholder:text-[color:var(--ink-400)]"
                 autoComplete="off"
                 spellCheck={false}
               />
               <button
+                ref={closeRef}
+                type="button"
                 onClick={() => setOpen(false)}
                 aria-label="Close command palette"
-                className="text-[color:var(--ink-400)] hover:text-[color:var(--ink-200)] transition-colors"
+                className="grid h-8 w-8 place-items-center rounded-md text-[color:var(--ink-400)] hover:text-[color:var(--ink-200)] transition-colors"
               >
-                <X size={15} />
+                <X size={15} aria-hidden="true" />
               </button>
             </div>
 
-            <div className="max-h-[50vh] overflow-y-auto mono-scroll py-2">
+            <div ref={listRef} id="cp-list" role="listbox" aria-label="Results" className="max-h-[50vh] overflow-y-auto mono-scroll py-2">
               {results.length === 0 && (
-                <p className="px-4 py-6 text-center text-sm text-[color:var(--ink-400)] font-mono">No matches.</p>
+                <p role="presentation" className="px-4 py-6 text-center text-sm text-[color:var(--ink-400)] font-mono">No matches.</p>
               )}
               {Object.entries(grouped).map(([groupName, items]) => {
                 const GroupIcon = GROUP_ICONS[groupName];
                 return (
-                  <div key={groupName} className="mb-1">
-                    <p className="flex items-center gap-1.5 px-4 pt-2 pb-1 text-[.62rem] tracking-[.14em] uppercase text-[color:var(--ink-400)] font-mono">
-                      {GroupIcon && <GroupIcon size={10} className="opacity-70" />}
+                  <div key={groupName} role="group" aria-labelledby={`cp-group-${groupName}`} className="mb-1">
+                    <p id={`cp-group-${groupName}`} className="flex items-center gap-1.5 px-4 pt-2 pb-1 text-[.62rem] tracking-[.14em] uppercase text-[color:var(--ink-400)] font-mono">
+                      {GroupIcon && <GroupIcon size={10} className="opacity-70" aria-hidden="true" />}
                       {groupName}
                     </p>
                     {items.map((item) => {
                       const active = item._index === activeIndex;
                       return (
-                        <button
+                        <div
                           key={item.label}
+                          id={`cp-opt-${item._index}`}
+                          role="option"
+                          aria-selected={active}
                           onMouseEnter={() => setActiveIndex(item._index)}
+                          // Keep focus in the search box while clicking.
+                          onMouseDown={(e) => e.preventDefault()}
                           onClick={() => runItem(item)}
-                          className={`relative w-full flex items-center justify-between gap-3 pl-4 pr-4 py-2.5 text-left text-sm transition-colors ${
-                            active ? "bg-marigold/10 text-marigold" : "text-[color:var(--ink-300)] hover:bg-white/5"
+                          className={`relative w-full flex cursor-pointer items-center justify-between gap-3 pl-4 pr-4 py-2.5 text-left text-sm transition-colors ${
+                            active ? "bg-white/[.06]" : "text-[color:var(--ink-300)] hover:bg-white/5"
                           }`}
+                          style={active ? { color: CORAL } : undefined}
                         >
                           <span
-                            className={`absolute left-0 top-1 bottom-1 w-[2.5px] rounded-full bg-marigold transition-opacity ${
-                              active ? "opacity-100" : "opacity-0"
-                            }`}
+                            className={`absolute left-0 top-1 bottom-1 w-[2.5px] rounded-full transition-opacity ${active ? "opacity-100" : "opacity-0"}`}
+                            style={{ background: CORAL }}
                             aria-hidden="true"
                           />
                           <span className="font-mono">{item.label}</span>
-                          {active && <CornerDownLeft size={13} className="shrink-0" />}
-                        </button>
+                          {active && <CornerDownLeft size={13} className="shrink-0" aria-hidden="true" />}
+                        </div>
                       );
                     })}
                   </div>
@@ -176,7 +229,7 @@ export default function CommandPalette() {
               })}
             </div>
 
-            <div className="flex items-center gap-4 px-4 py-2.5 border-t border-white/8 text-[.62rem] font-mono text-[color:var(--ink-400)]">
+            <div className="flex items-center gap-4 px-4 py-2.5 border-t border-white/8 text-[.62rem] font-mono text-[color:var(--ink-400)]" aria-hidden="true">
               <span className="flex items-center gap-1">
                 <ArrowUp size={11} />
                 <ArrowDown size={11} /> navigate
