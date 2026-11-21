@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from "react";
+import { onQuiet } from "../film/quiet";
 import { createPortal } from "react-dom";
 import { useRoute } from "../appContexts";
 import { createBB8Scene } from "../bb8/createBB8Scene";
@@ -84,7 +85,10 @@ function isEditableTarget(target) {
 
 export default function BB8Companion() {
   const { route, navigate } = useRoute();
-  const routeHidden = HIDDEN_ROUTES.has(route);
+  // While a film stage covers the viewport the droid parks and pauses: it must not cross a face, a button or a caption.
+  const [filmQuiet, setFilmQuiet] = useState(false);
+  useEffect(() => onQuiet(setFilmQuiet), []);
+  const routeHidden = HIDDEN_ROUTES.has(route) || filmQuiet;
   // On the home page the droid may not sit on top of the work: it hides
   // whenever it would overlap a project card, the stage or the contact
   // address. The playground and the project pages are its own ground.

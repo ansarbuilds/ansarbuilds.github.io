@@ -374,6 +374,11 @@ a:hover .ed-experiment-image img { transform: scale(1.04); }
 .ed-nav-sound[aria-pressed="true"] { color: #ff8a5f; border-color: #ff8a5f; }
 @media (max-width: 700px) { .ed-nav-sound span { display: none; } .ed-nav-sound { padding: 0 10px; } }
 
+/* film-quiet: a film stage covers the viewport (see film/quiet.js). The
+   sound switch and the command button step out of the way and come back
+   the moment the stage is gone. */
+.ed-nav-sound, .ed-nav-command { transition: opacity var(--dur-fast) var(--ease-out); }
+html.film-quiet .ed-nav-sound, html.film-quiet .ed-nav-command { opacity: 0; pointer-events: none; visibility: hidden; transition: opacity var(--dur-fast) var(--ease-out), visibility 0s linear var(--dur-fast); }
 /* Project page hero: the project's art fills the card behind a giant title,
    drifting slowly (an ambient loop: 18 s, low amplitude, transform only).
    Pages without art keep the accent glow, just taller. */

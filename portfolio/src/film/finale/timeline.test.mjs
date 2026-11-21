@@ -12,14 +12,11 @@ test('the page sizes the finale, and finds its contact beat, from the real timel
   assert.equal(timeAtProgress(1), FINALE.seconds);
 });
 
-test('it recedes first, then contact, then the credits, and ends with everything settled', () => {
+test('the signal comes first, then the line, and it ends settled', () => {
   for (const t of steps) {
     const m = moments(t);
     for (const v of Object.values(m)) assert.ok(v >= 0 && v <= 1);
-    if (m.contact > 0) assert.equal(m.recede, 1);
-    if (m.credits > 0) assert.equal(m.contact, 1);
+    if (m.contact > 0) assert.equal(m.core, 1);
   }
-  const end = moments(FINALE.seconds);
-  assert.equal(end.credits, 1);
-  assert.equal(end.contact, 1);
+  assert.equal(moments(FINALE.seconds).contact, 1);
 });

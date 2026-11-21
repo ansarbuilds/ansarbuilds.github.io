@@ -1,38 +1,25 @@
 /* The finale on the home page: a tall section with a pinned stage. */
-.fin { position: relative; height: calc(var(--act-screens) * 100vh); overflow: clip; background: #000; color: #efe6d8; }
+.fin { position: relative; height: calc(var(--act-screens) * 100vh); overflow: clip; background: #070605; color: #efe6d8; }
 .fin-anchor { position: absolute; left: 0; width: 1px; height: 1px; }
 .fin-stage { position: sticky; top: 0; height: 100vh; overflow: hidden; }
 .fin-canvas { position: absolute; inset: 0; display: block; width: 100%; height: 100%; opacity: 0; transition: opacity var(--dur-scene) var(--ease-out); }
 .fin.is-live .fin-canvas { opacity: 1; }
-.fin-block, .fin-credits { position: absolute; left: 0; right: 0; z-index: 2; text-align: center; opacity: 0; pointer-events: none; will-change: opacity, transform; }
-.fin-block { top: 50%; padding: 0 20px; margin-top: 4vh; }
-.fin-kicker { font: 500 .62rem/1 var(--font-mono); letter-spacing: .16em; text-transform: uppercase; color: #ff8a5f; }
-.fin-block h2 { margin-top: 14px; font: 400 clamp(3rem, 9vw, 8rem)/.9 var(--font-condensed); text-transform: uppercase; }
-.fin-block h2 em { font: 400 .72em/1 var(--font-serif); font-style: italic; text-transform: none; letter-spacing: -.02em; color: #ffb48f; }
-/* The email glows like the signal it sits under. */
-.fin-email { display: inline-flex; align-items: center; gap: 8px; min-height: 52px; margin-top: 28px; padding: 0 26px; border-radius: 999px; background: #ff8a5f; color: #160a05; font: 600 1rem/1 var(--font-body); box-shadow: 0 0 40px rgb(255 138 95 / .55), 0 0 120px rgb(255 138 95 / .25); }
+/* The type is real text over the canvas, so the canvas bloom never touches it. */
+.fin-block { position: absolute; left: 0; right: 0; top: 50%; z-index: 2; padding: 0 20px; margin-top: 7vh; text-align: center; opacity: 0; pointer-events: none; will-change: opacity, transform; }
+.fin-block a { pointer-events: auto; }
+.fin-block h2 { font: 400 clamp(3rem, 9vw, 8rem)/.9 var(--font-condensed); text-transform: uppercase; }
+.fin-block h2 em { font: 400 .72em/1 var(--font-serif); font-style: italic; text-transform: none; letter-spacing: -.02em; color: #ff8a5f; }
+.fin-email { display: inline-flex; align-items: center; gap: 8px; min-height: 52px; margin-top: 40px; padding: 0 28px; border-radius: 999px; background: #ff8a5f; color: #160a05; font: 600 1rem/1 var(--font-body); }
 .fin-email:hover { background: #ffa47f; }
-.fin-address, .fin-pitch { opacity: var(--fin-detail, 1); }
-.fin-address { margin-top: 12px; font: 500 .74rem/1.4 var(--font-mono); letter-spacing: .04em; color: #a39a8f; }
-.fin-pitch { max-width: 34rem; margin: 18px auto 0; font-size: .92rem; line-height: 1.6; color: rgb(239 230 216 / .78); }
-.fin-links { display: flex; justify-content: center; gap: 22px; margin-top: 14px; }
-.fin-links a { display: inline-flex; align-items: center; gap: 5px; min-height: 40px; font: 500 .84rem/1 var(--font-body); color: #efe6d8; border-bottom: 1px solid rgb(239 230 216 / .3); }
-.fin-links a:hover { color: #ff8a5f; border-color: #ff8a5f; }
-.fin-credits { top: 60vh; }
-/* A phone's headline block is taller than the gap above the credits:
-   lift it, and the credits sit clear underneath. */
-@media (max-width: 760px) {
-  .fin-block { top: 26%; }
-  .fin-credits { top: 64vh; padding: 0 16px; }
-}
-/* A short phone has no room for the pitch under the links; the email
-   button and links say the same thing. (The plain Contact section keeps it.) */
-@media (max-width: 760px) and (max-height: 720px) { .fin-pitch { display: none; } .fin-block { top: 23%; } }
-.fin-credits p { margin: 0 0 12px; font: 400 clamp(.82rem, 1.25vw, 1rem)/1.25 var(--font-condensed); text-transform: uppercase; letter-spacing: .04em; }
-.fin-credits p span { display: block; margin-bottom: 4px; font: 500 .56rem/1 var(--font-mono); letter-spacing: .18em; color: #8a8075; }
-.fin-credits p .fin-credit-links { display: inline; margin: 0; font: inherit; letter-spacing: inherit; color: inherit; }
-.fin-credits p .fin-credit-links a { color: #efe6d8; border-bottom: 1px solid rgb(239 230 216 / .3); }
-.fin-credits p .fin-credit-links a:hover { color: #ff8a5f; border-color: #ff8a5f; }
-.fin-footer { display: flex; flex-wrap: wrap; justify-content: center; align-items: center; gap: 8px 26px; margin-top: 34px; padding: 0 20px; font: .72rem/1.5 var(--font-body); color: #a39a8f; }
+.fin-address { margin-top: 14px; font: 500 .74rem/1.4 var(--font-mono); letter-spacing: .04em; color: #a39a8f; }
+.fin-links { display: flex; justify-content: center; gap: 24px; margin-top: 8px; }
+.fin-links a { display: inline-flex; align-items: center; min-height: 40px; font: 500 .84rem/1 var(--font-body); color: rgb(239 230 216 / .72); }
+.fin-links a:hover { color: #ff8a5f; }
+.fin-credit { margin-top: 22px; font: 500 .6rem/1.4 var(--font-mono); letter-spacing: .16em; text-transform: uppercase; color: #8a8075; }
+@media (max-width: 760px) { .fin-block { top: 34%; margin-top: 0; } }
+/* The pitch and the footer: ordinary page, under the pinned stage. */
+.fin-doc { padding: 56px 20px 40px; background: #070605; color: #efe6d8; text-align: center; }
+.fin-pitch { max-width: 34rem; margin: 0 auto; font-size: .98rem; line-height: 1.6; color: rgb(239 230 216 / .78); }
+.fin-footer { display: flex; flex-wrap: wrap; justify-content: center; align-items: center; gap: 8px 26px; margin-top: 34px; font: .72rem/1.5 var(--font-body); color: #a39a8f; }
 .fin-footer button { min-height: 40px; color: #efe6d8; border-bottom: 1px solid rgb(239 230 216 / .3); }
 @media (prefers-reduced-motion: reduce) { .fin-canvas { transition: none; } }

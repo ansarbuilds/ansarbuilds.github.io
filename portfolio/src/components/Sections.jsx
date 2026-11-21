@@ -10,8 +10,6 @@ import { EASE, STAGGER, tween } from "../lib/motion";
 import { INTRO_SESSION_KEY, filmEnabled } from "../lib/intro";
 import ActOne from "../film/ActOne";
 import ActTwo from "../film/ActTwo";
-import ActThree from "../film/ActThree";
-import ActFour from "../film/ActFour";
 import Finale from "../film/Finale";
 import { BUILT as FILM_SETS } from "../film/actTwo/built";
 import { media } from "../lib/media";
@@ -300,16 +298,15 @@ function Sheet({ children }) {
 }
 
 const coverOf = (project) => project.spotlightArt || project.cardArt || project.cardShot || project.shots?.[0];
-// What each set's screens are, said on its card: nothing in the film
-// passes for more than it is.
-const FILM_NOTES = { saywhen: "Screen: the launch animation", jarvis: "Screens: the real dashboard, sample data", "agent-flight-recorder": "Illustration of a recorded run", "prh-jepa": "Illustration of the finding", haloscript: "Screens: the real app", "digital-double": "Made from the real model. It looks back at you" };
+// What each caption says: a small eyebrow, the headline, one line of proof.
+// Nothing in the film passes for more than it is.
+const FILM_CAPTIONS = {
+  saywhen: { eyebrow: "Open source", headline: "Look at the screen. Say the command. It types it, and can press Enter.", proof: "34/34 spoken commands cleaned exactly" },
+  "digital-double": { eyebrow: "A head, from 13 seconds of video", headline: "Made from the real model. It looks back at you." },
+};
 
-// The projects Act II has sets for, with what their cards say.
-const FILM_PROJECTS = FILM_SETS.map((slug) => {
-  const flag = FLAGSHIPS.find((item) => item.slug === slug);
-  const project = getProject(slug);
-  return { slug, name: project.title, eyebrow: flag.eyebrow, headline: flag.headline, stats: flag.stats, note: FILM_NOTES[slug], links: project.links.filter((link) => !link.locked && link.href !== `/work/${slug}/`).slice(0, 2) };
-});
+// The projects Act II has sets for.
+const FILM_PROJECTS = FILM_SETS.map((slug) => ({ slug, name: getProject(slug).title, ...FILM_CAPTIONS[slug] }));
 
 export function ProjectsSection() {
   // Act II plays above the hands-on stage where the film can play.
@@ -323,18 +320,8 @@ export function ProjectsSection() {
   </section></>;
 }
 
-// What Act III's monoliths and cards say: each capability, and the titles and
-// pages of the projects that prove it.
-const FILM_CAPABILITIES = CAPABILITIES.map((cap) => {
-  const projects = cap.proof.map(getProject).filter(Boolean);
-  return { ...cap, projects: projects.map((p) => p.title), links: projects.map((p) => ({ name: p.title, href: `/work/${p.slug}/` })) };
-});
-
 export function CapabilitiesSection() {
-  // Act III where the film can play; this plain section otherwise (and if it fails).
-  const [film] = useState(filmEnabled);
-  const plain = <PlainCapabilities />;
-  return film ? <ActThree capabilities={FILM_CAPABILITIES} fallback={plain} /> : plain;
+  return <PlainCapabilities />;
 }
 
 function PlainCapabilities() {
@@ -397,8 +384,6 @@ function ExperimentImage({ experiment }) {
 // those visitors can still find them from the home page.
 const FILM_EXPERIMENTS = ["solar", "stars", "emet"].map((id) => EXPERIMENTS.find((e) => e.id === id)).filter(Boolean);
 export function PlaygroundSection() {
-  const [film] = useState(filmEnabled);
-  if (film) return <ActFour experiments={FILM_EXPERIMENTS} />;
   return <section id="ai" className="ed-projects ed-light ed-section" aria-labelledby="playground-title" data-palette="neon">
     <div className="ed-wrap">
       <Enter className="ed-section-heading"><div><IndexLabel number="05">Playground</IndexLabel><h2 id="playground-title">Rooms off <em>the hall.</em></h2></div><div className="ed-heading-aside"><p>Small things I built to try an idea. Each one opens on its own page.</p></div></Enter>
@@ -423,14 +408,7 @@ export function ExperimentsSection() {
    and the network behind it sends its signals in to that address once,
    then goes quiet. */
 const PITCH = "I like the hard part: agents that have to be trusted, evals that have to be honest, and products that have to ship. If that sounds like your problem, write to me.";
-// The credits are true to how the site was made.
-const CREDITS = [
-  ["Directed, designed and built by", "Mohamed Ansar"],
-  ["Pair programmer", "AI"],
-  ["Built with", "React · three.js · GLSL · Vite · Lenis"],
-  // The seven builds the film plays, each a link to its page.
-  ["Featuring", FILM_SETS.map((slug) => ({ name: getProject(slug).title, href: `/work/${slug}/` }))],
-];
+const CREDIT = "Directed, designed and built by Mohamed Ansar";
 
 // Contact: the film's finale where it can play; the plain section otherwise
 // (and if the finale fails to start).
@@ -438,7 +416,7 @@ export function ContactSection() {
   const [film] = useState(filmEnabled);
   const { navigate } = useRoute();
   const plain = <PlainContact />;
-  return film ? <Finale contact={CONTACT} pitch={PITCH} credits={CREDITS} onTop={() => navigate("deck")} fallback={plain} /> : plain;
+  return film ? <Finale contact={CONTACT} pitch={PITCH} credit={CREDIT} onTop={() => navigate("deck")} fallback={plain} /> : plain;
 }
 
 function PlainContact() {
