@@ -1,45 +1,24 @@
 import * as THREE from "three";
 import { poseAt } from "../rig.js";
 import { flareFragment, flareVertex } from "../coldOpen/shaders.js";
-import { additive, points } from "../actTwo/kit.js";
+import { additive } from "../actTwo/kit.js";
 import { FINALE, POINT, moments, timeAtProgress } from "./timeline.js";
 import { attachFilm } from "../engine.js";
 
-/* The finale (FN-01 to FN-03) in plain three.js: everything the visitor
-   passed, as points in the colours of each act, falls back into one point
-   of light. That point is the cold open's signal, drawn with the same flare
-   shader, so the film ends where it began. */
-
-// The acts' colours: the signal, saywhen's violet, Jarvis's night blue, the
-// recorder's orange, PRH-JEPA's red, Emet's green, and bone.
-const PALETTE = ["#ff8a5f", "#9e52db", "#6b99ff", "#ff6b1f", "#ff4d38", "#5aff99", "#efe6d8"].map((c) => new THREE.Color(c));
-
-function pickQuality() {
-  const low = window.matchMedia("(max-width: 760px)").matches || (navigator.hardwareConcurrency || 8) <= 4;
-  return low ? { count: 6000, dpr: Math.min(window.devicePixelRatio, 1.25) } : { count: 16000, dpr: Math.min(window.devicePixelRatio, 1.75) };
-}
+/* The finale (FN-01 and FN-02) in plain three.js: one point of light on
+   carbon black. It is the cold open's signal, drawn with the same flare
+   shader, so the film ends where it began. Nothing else is in the scene. The
+   type is in the DOM over the canvas, so the bloom cannot touch it. */
 
 export function createFinale(canvas, { getProgress, onFrame }) {
-  const quality = pickQuality();
   // The shared renderer (see engine.js): this act draws into it, and its
-  // frames are copied onto this canvas.
-  const film = attachFilm(canvas, { clear: 0x000000, bloom: [0.7, 0.6, 0.12], grain: 0.022 });
+  // frames are copied onto this canvas. Bloom is higher than the portraits:
+  // the point is supposed to bloom.
+  const film = attachFilm(canvas, { clear: 0x070605, bloom: [0.5, 0.6, 0.3], grain: 0.008 });
   const scene = new THREE.Scene();
-  const camera = new THREE.PerspectiveCamera(36, 1, 0.05, 400);
+  const camera = new THREE.PerspectiveCamera(32, 1, 0.05, 400);
   scene.add(camera);
   const point = new THREE.Vector3().fromArray(POINT);
-
-  // The world, in a wide drifting field round the point.
-  const start = new Float32Array(quality.count * 3), positions = new Float32Array(quality.count * 3), colors = new Float32Array(quality.count * 3);
-  for (let i = 0; i < quality.count; i++) {
-    const r = 8 + 90 * Math.random() ** 0.8, a = Math.random() * Math.PI * 2;
-    start.set([Math.cos(a) * r * 1.3, (Math.random() - 0.5) * r * 0.6, Math.sin(a) * r * 0.9 - 10], i * 3);
-    PALETTE[i % PALETTE.length].clone().multiplyScalar(0.55 + Math.random() * 0.45).toArray(colors, i * 3);
-  }
-  positions.set(start);
-  const world = points(positions, colors, 0.08, { opacity: 0.9, far: 260, wobble: 0.15 });
-  world.mesh.position.copy(point);
-  scene.add(world.mesh);
 
   // The signal: the cold open's flare, on a card held in front of the lens.
   const flareUniforms = { uCore: { value: 0 }, uFlare: { value: 0 }, uBeat1: { value: -1 }, uBeat2: { value: -1 }, uAspect: { value: 1 } };
@@ -50,27 +29,20 @@ export function createFinale(canvas, { getProgress, onFrame }) {
 
   const finish = film.finish;
 
-  let width = 1, height = 1;
   const resize = () => {
-    width = canvas.clientWidth || window.innerWidth;
-    height = canvas.clientHeight || window.innerHeight;
     film.resize();
-    camera.aspect = width / height;
+    camera.aspect = (canvas.clientWidth || window.innerWidth) / (canvas.clientHeight || window.innerHeight);
     camera.updateProjectionMatrix();
   };
   resize();
   const observer = new ResizeObserver(resize);
   observer.observe(canvas);
 
-  let active = false, frame = 0, last = performance.now(), clock = 0, disposed = false, settledFrames = 0;
-  const v = new THREE.Vector3();
-  let folded = -1;
+  let active = false, frame = 0, clock = 0, disposed = false, settledFrames = 0;
   function tick(nowMs) {
     if (!active || disposed) return;
     frame = requestAnimationFrame(tick);
-    const dt = Math.min(0.1, (nowMs - last) / 1000);
-    last = nowMs;
-    clock += dt;
+    clock += 1 / 60;
     const t = timeAtProgress(getProgress());
     const pose = poseAt(FINALE, t);
     camera.position.fromArray(pose.pos);
@@ -79,55 +51,35 @@ export function createFinale(canvas, { getProgress, onFrame }) {
     camera.updateMatrixWorld();
     const m = moments(t);
 
-    // Fold the world in: far things last, on a slow turn.
-    if (m.recede !== folded) {
-      folded = m.recede;
-      for (let i = 0; i < quality.count; i++) {
-        v.fromArray(start, i * 3);
-        const left = Math.max(0, 1 - m.recede * (1.2 - v.length() / 200)) ** 1.5;
-        const turn = (1 - left) * 1.6;
-        const c = Math.cos(turn), s = Math.sin(turn);
-        positions[i * 3] = (v.x * c - v.z * s) * left;
-        positions[i * 3 + 1] = v.y * left;
-        positions[i * 3 + 2] = (v.x * s + v.z * c) * left;
-      }
-      world.mesh.geometry.attributes.position.needsUpdate = true;
-    }
-    world.uniforms.uOpacity.value = 0.9 * (1 - smooth01((m.recede - 0.82) / 0.18));
-    world.uniforms.uTime.value = clock;
-    world.uniforms.uScale.value = film.pixelHeight / (2 * Math.tan(THREE.MathUtils.degToRad(camera.fov / 2)));
-
-    // Keep the flare card filling the frame, at the point.
+    // Keep the flare card filling the frame, at the point. Half again the
+    // frame: the shared flare shader is drawn for a card that size.
     const half = Math.tan(THREE.MathUtils.degToRad(camera.fov / 2));
     const distance = camera.position.distanceTo(point);
     flare.position.copy(point);
     flare.quaternion.copy(camera.quaternion);
-    // Half again the frame: the shared flare shader is drawn for a card
-    // that size (see coldOpen/shaders.js).
     flare.scale.set(distance * half * camera.aspect * 1.5, distance * half * 1.5, 1);
     flareUniforms.uCore.value = m.core * (0.9 + 0.1 * Math.sin(clock * 2.2));
-    flareUniforms.uFlare.value = m.flare;
+    flareUniforms.uFlare.value = m.flare * 0.8;
     flareUniforms.uAspect.value = camera.aspect;
 
+    // Before the act starts or after it ends the frame does not change.
     if ((t <= 0 || t >= FINALE.seconds) && settledFrames++ % 4) return;
     if (t > 0 && t < FINALE.seconds) settledFrames = 0;
     finish.uniforms.uTime.value = clock;
     film.render(scene, camera, { now: nowMs, skip: t <= 0 || t >= FINALE.seconds });
     onFrame?.(t, m);
   }
-  const smooth01 = (u) => { const x = Math.min(1, Math.max(0, u)); return x * x * (3 - 2 * x); };
 
   return {
     setActive(on) {
       if (on === active || disposed) return;
       active = on;
-      if (on) { last = performance.now(); frame = requestAnimationFrame(tick); } else cancelAnimationFrame(frame);
+      if (on) frame = requestAnimationFrame(tick); else cancelAnimationFrame(frame);
     },
     dispose() {
       disposed = true;
       cancelAnimationFrame(frame);
       observer.disconnect();
-      world.dispose();
       cardGeometry.dispose();
       flare.material.dispose();
       film.release();

@@ -85,7 +85,7 @@ function createEngine() {
   };
 }
 
-export function attachFilm(target, { clear = 0x000000, bloom = [0.5, 0.5, 0.5], grain = 0.018 } = {}) {
+export function attachFilm(target, { clear = 0x000000, bloom = [0.5, 0.5, 0.5], grain = 0.008 } = {}) {
   engine ??= createEngine();
   const own = engine;
   const context = target.getContext("2d", { alpha: false });

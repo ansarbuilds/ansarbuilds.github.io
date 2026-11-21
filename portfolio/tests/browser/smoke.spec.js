@@ -140,8 +140,8 @@ test('the pre-vis follows the scrollbar from the first shot to the last', async 
   await page.keyboard.press('ArrowRight');
   await expect(page.locator('.pv-hud h1')).toContainText('CO-02');
   await page.evaluate(() => window.scrollTo(0, document.documentElement.scrollHeight));
-  await expect(page.locator('.pv-hud h1')).toContainText('FN-03');
-  await expect(page.locator('.pv-clock strong')).toHaveText(/^01:3\d\.\d$/);
+  await expect(page.locator('.pv-hud h1')).toContainText('FN-02');
+  await expect(page.locator('.pv-clock strong')).toHaveText(/^00:2\d\.\d$/);
 });
 
 test('the cold open plays over the home page, hands over to the hero, and can be skipped', async ({ page }) => {
@@ -214,36 +214,13 @@ test('Act II plays above the work stage, with real links that are hidden until t
   expect(await page.locator('#projects').evaluate((node) => node.getBoundingClientRect().top > 0)).toBe(true);
 });
 
-test('Act III replaces What I bring with the monoliths, keeping its links and its place in the nav', async ({ page }) => {
-  test.setTimeout(90000);
+test('What I bring and the playground are plain sections with real links, and no act is mounted for them', async ({ page }) => {
   await page.addInitScript((key) => { sessionStorage.setItem(key, '1'); sessionStorage.setItem('cold-open-played', '1'); }, INTRO_SESSION_KEY);
   await page.goto('/');
-  const act = page.locator('section.act3');
-  await expect(act).toHaveId('capabilities');
-  await expect(act.locator('article.act3-card')).toHaveCount(3);
-  await expect(act.locator('article.act3-card a[href="/work/jarvis/"]')).toHaveCount(1);
-  await act.evaluate((node) => window.scrollTo(0, node.getBoundingClientRect().top + window.scrollY + node.offsetHeight - window.innerHeight));
-  await expect(act).toHaveClass(/is-live/, { timeout: 60000 });
-  // At the end, the last capability's card is the one showing.
-  await expect(act.locator('article.act3-card').last()).toBeVisible();
-  // The first is out of shot: see-through and not under the pointer, though
-  // still in the tab order (see film/keyboard.css).
-  await expect(act.locator('article.act3-card').first()).toHaveClass(/is-offshot/);
-  await expect(act.locator('article.act3-card').first()).toHaveCSS('opacity', '0');
-});
-
-test('Act IV plays between More work and Contact, and its cards open the experiments', async ({ page }) => {
-  test.setTimeout(90000);
-  await page.addInitScript((key) => { sessionStorage.setItem(key, '1'); sessionStorage.setItem('cold-open-played', '1'); }, INTRO_SESSION_KEY);
-  await page.goto('/');
-  const act = page.locator('section.act4');
-  await expect(act).toHaveId('ai');
-  expect(await page.evaluate(() => { const a = document.querySelector('#more'), b = document.querySelector('#ai'), c = document.querySelector('#contact'); return a.compareDocumentPosition(b) & 4 && b.compareDocumentPosition(c) & 4; })).toBeTruthy();
-  await expect(act.locator('a.act4-cta')).toHaveCount(3);
-  await expect(act.locator('a.act4-cta[href="/playground/emet/"]')).toHaveCount(1);
-  await act.evaluate((node) => window.scrollTo(0, node.getBoundingClientRect().top + window.scrollY + node.offsetHeight - window.innerHeight));
-  await expect(act).toHaveClass(/is-live/, { timeout: 60000 });
-  await expect(act.locator('article.act4-card').last()).toBeVisible();
+  await expect(page.locator('section.act3, section.act4')).toHaveCount(0);
+  await expect(page.locator('section#capabilities a[href="/work/jarvis/"]')).toHaveCount(1);
+  const section = page.locator('section#ai');
+  for (const href of ['/playground/explore/', '/playground/emet/']) await expect(section.locator(`a[href="${href}"]`)).toHaveCount(1);
 });
 
 test('a film card opens its project, and Back returns to the same moment of the film', async ({ page }) => {
@@ -306,13 +283,13 @@ test('each act has its title card as real text, outside the keyboard order', asy
   await page.addInitScript((key) => { sessionStorage.setItem(key, '1'); sessionStorage.setItem('cold-open-played', '1'); }, INTRO_SESSION_KEY);
   await page.goto('/');
   const titles = page.locator('.film-act-title');
-  await expect(titles).toHaveText(['I. The receipts', 'II. Six builds', 'III. What I bring', 'IV. The playground', 'Finale']);
+  await expect(titles).toHaveText(['I. The receipts', 'II. Two builds']);
   for (const title of await titles.all()) {
     await expect(title).not.toHaveAttribute('tabindex');
     await expect(title).not.toHaveAttribute('aria-hidden');
     expect(await title.locator('a, button, [tabindex]').count()).toBe(0);
   }
-  await expect(page.locator('.fin-credit-links a')).toHaveCount(6);
+  await expect(page.locator('.fin-credit')).toHaveText('Directed, designed and built by Mohamed Ansar');
 });
 
 test('without the film the home page still links every playground experiment', async ({ page }) => {
@@ -320,7 +297,7 @@ test('without the film the home page still links every playground experiment', a
   await page.goto('/');
   const section = page.locator('section#ai');
   await expect(section.getByRole('heading', { level: 2 })).toBeAttached();
-  for (const href of ['/playground/explore/', '/playground/infinity/', '/playground/emet/']) await expect(section.locator(`a[href="${href}"]`)).toHaveCount(1);
+  for (const href of ['/playground/explore/', '/playground/emet/']) await expect(section.locator(`a[href="${href}"]`)).toHaveCount(1);
   await expect(page.locator('section.act4')).toHaveCount(0);
 });
 

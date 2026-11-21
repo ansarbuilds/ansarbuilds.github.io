@@ -149,7 +149,7 @@ export const raysFragment = /* glsl */ `
 /* The film finish, over the whole frame: colour fringing toward the edges
    (stronger while the camera is moving fast), grain, and a vignette. */
 export const finishShader = {
-  uniforms: { tDiffuse: { value: null }, uTime: { value: 0 }, uAberration: { value: 0.0012 }, uGrain: { value: 0.028 }, uGrade: { value: 1 } },
+  uniforms: { tDiffuse: { value: null }, uTime: { value: 0 }, uAberration: { value: 0.0002 }, uGrain: { value: 0.008 }, uGrade: { value: 1 } },
   vertexShader: /* glsl */ `varying vec2 vUv; void main() { vUv = uv; gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.); }`,
   fragmentShader: /* glsl */ `
     ${COMMON}

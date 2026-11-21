@@ -2,7 +2,7 @@ import "./film.css";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Canvas, useFrame } from "@react-three/fiber";
 import * as THREE from "three";
-import { ACT_ONE, ACTS, SETS, TIMELINE_SHOTS } from "./shots";
+import { ACTS, SETS, TIMELINE_SHOTS } from "./shots";
 import { buildTimeline, entryAtTime, poseAt, scrollAtTime, timeAtScroll, timecode } from "./rig";
 
 /* The moving pre-vis: the camera flies the real path through a grey-box
@@ -12,7 +12,6 @@ import { buildTimeline, entryAtTime, poseAt, scrollAtTime, timeAtScroll, timecod
 
 const TIMELINE = buildTimeline(TIMELINE_SHOTS);
 const BONE = "#efe6d8";
-const SIGNAL = "#ff8a5f";
 
 /* ---------- world ---------- */
 
@@ -81,8 +80,7 @@ const DUST = scatter(5200, 11, (next) => { const angle = next() * Math.PI * 2, r
 const NETWORK = scatter(1800, 5, (next) => { const angle = next() * Math.PI * 2, tilt = Math.acos(2 * next() - 1), reach = 30 * Math.cbrt(next()); return [Math.sin(tilt) * Math.cos(angle) * reach * 1.5, Math.cos(tilt) * reach * 0.55, Math.sin(tilt) * Math.sin(angle) * reach]; });
 const NETWORK_LINKS = (() => { const lines = []; for (let i = 0; i < 520; i++) { const a = (i * 7) % 1800, b = (i * 13 + 5) % 1800; lines.push(NETWORK[a * 3], NETWORK[a * 3 + 1], NETWORK[a * 3 + 2], NETWORK[b * 3], NETWORK[b * 3 + 1], NETWORK[b * 3 + 2]); } return new Float32Array(lines); })();
 
-const NUMBERS = ["10+", "2", "3", "2"].map((text, i) => [text, ACT_ONE.numbers[i]]);
-const PROJECT_SLUGS = Object.keys(SETS).filter((key) => !["monoliths", "star", "solar", "ribbon", "head", "point"].includes(key));
+const PROJECT_SLUGS = Object.keys(SETS).filter((key) => !["point"].includes(key));
 
 function Sets() {
   const at = (key, dx = 0, dy = 0, dz = 0) => [SETS[key].at[0] + dx, SETS[key].at[1] + dy, SETS[key].at[2] + dz];
@@ -93,27 +91,13 @@ function Sets() {
       <Glow position={at(slug)} size={10} />
       <Label text={SETS[slug].label.toUpperCase()} position={at(slug, 0, 7.5)} />
     </group>)}
-    {[-11, 0, 11].map((dx, i) => <Box key={dx} size={[6, 20 + i * 4, 6]} position={at("monoliths", dx, 10 + i * 2)} />)}
-    <Label text="AGENTS · RESEARCH · SHIPPING" position={at("monoliths", 0, 30)} height={2} />
-    <mesh position={at("star")}><sphereGeometry args={[6, 16, 10]} /><meshBasicMaterial color={SIGNAL} wireframe transparent opacity={0.5} /></mesh>
-    <Glow position={at("star")} size={20} />
-    <mesh position={at("solar")}><sphereGeometry args={[4, 16, 10]} /><meshBasicMaterial color={SIGNAL} wireframe /></mesh>
-    {[10, 17, 25].map((radius) => <mesh key={radius} position={at("solar")} rotation={[Math.PI / 2, 0, 0]}><torusGeometry args={[radius, 0.05, 6, 96]} /><meshBasicMaterial color={BONE} transparent opacity={0.5} /></mesh>)}
-    <Label text="SOLAR SYSTEM" position={at("solar", 0, 9)} height={2} />
-    <mesh position={at("ribbon")} rotation={[0.3, 0.6, 0]}><torusKnotGeometry args={[7, 0.25, 160, 8, 2, 1]} /><meshBasicMaterial color={SIGNAL} wireframe transparent opacity={0.7} /></mesh>
-    <mesh position={at("head", 0, 1.5)}><sphereGeometry args={[3, 14, 10]} /><meshBasicMaterial color={BONE} wireframe transparent opacity={0.6} /></mesh>
-    <mesh position={at("head", 6, -1.6)}><sphereGeometry args={[1.4, 12, 8]} /><meshBasicMaterial color={SIGNAL} wireframe /></mesh>
-    <Label text="HEAD + BB-8" position={at("head", 0, 7)} height={1.8} />
     <Glow position={at("point")} size={5} />
-    <Glow position={ACT_ONE.tools.at} size={8} />
-    {ACT_ONE.tools.rings.map((radius) => <mesh key={radius} position={ACT_ONE.tools.at} rotation={[Math.PI / 2 - 0.35, 0, 0]}><torusGeometry args={[radius, 0.04, 6, 96]} /><meshBasicMaterial color={BONE} transparent opacity={0.4} /></mesh>)}
-    <Label text="TOOLS" position={[ACT_ONE.tools.at[0], ACT_ONE.tools.at[1] + 6, ACT_ONE.tools.at[2]]} height={1.8} />
   </>;
 }
 
 // Things that only exist from a certain shot on.
-const NAME_FROM = TIMELINE.entries.find((entry) => entry.shot.id === "CO-05").t0;
-const NETWORK_FROM = TIMELINE.entries.find((entry) => entry.shot.id === "CO-03").t0;
+const NAME_FROM = Infinity;
+const NETWORK_FROM = Infinity;
 const SIGNAL_FROM = TIMELINE.entries.find((entry) => entry.shot.id === "CO-02").t0;
 
 function World({ time }) {
@@ -135,7 +119,6 @@ function World({ time }) {
       <lineSegments><bufferGeometry><bufferAttribute attach="attributes-position" args={[NETWORK_LINKS, 3]} /></bufferGeometry><lineBasicMaterial color={BONE} transparent opacity={0.07} /></lineSegments>
     </group>
     <group ref={name}><Label text="MOHAMED ANSAR" position={[0, 0, 0]} height={8.5} /></group>
-    {NUMBERS.map(([text, position], i) => <Label key={i} text={text} position={position} height={7} color={i === 0 ? SIGNAL : BONE} />)}
     <Sets />
   </>;
 }

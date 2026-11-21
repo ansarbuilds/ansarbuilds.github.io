@@ -10,10 +10,10 @@ import { test, expect } from '@playwright/test';
    measured with the act's stage pinned. Frame rate on a phone is
    scripts/check-fps.mjs --mobile, on a real GPU. */
 
-const ACTS = ['act1', 'act2', 'act3', 'act4', 'fin'];
+const ACTS = ['act1', 'act2', 'fin'];
 // Everything the film fades in and out, shown for the measurement.
 const SHOW_ALL = `
-  .act1-card, .act1-statement, .act1-tools, .act2-title, .act2-card, .act3-title, .act3-card, .act4-title, .act4-card, .fin-block, .fin-credits, .film-act-title, .film-act-word {
+  .act1-card, .act1-statement, .act2-card, .fin-block, .film-act-title, .film-act-word {
     opacity: 1 !important; visibility: visible !important; transform: none !important;
   }
   .bb8-edge { display: none !important; }

@@ -1,26 +1,27 @@
 import "./keyboard.css";
 import "./finale/finale.css";
-import { Fragment, useEffect, useRef, useState } from "react";
-import ActTitle from "./ActTitle";
-import { ArrowUpRight, ExternalLink } from "lucide-react";
+import { trackQuiet } from "./quiet";
+import { useEffect, useRef, useState } from "react";
+import { ArrowUpRight } from "lucide-react";
 import { FINALE_CONTACT_AT, FINALE_SCREENS } from "./finale/screens";
-import { cueOnRise, showBed } from "../lib/sound";
+import { cueOnRise } from "../lib/sound";
 
-/* The finale on the home page, in place of the Contact section: everything
-   recedes into one point of light; then the contact line, the email and the
-   links; then the credits roll up into the footer. All of it is real text
-   and real links. `#contact` lands on the contact beat, not the receding. */
+/* The finale on the home page, in place of the Contact section: one point of
+   light, then the line, one button, the address and two quiet links. The long
+   pitch and the footer sit below the pinned stage in the document, so they
+   are real and readable but not on the poster. `#contact` lands on the line,
+   not on the black before it. */
 const SCREENS = FINALE_SCREENS + 1;
 
-export default function Finale({ contact, pitch, credits, onTop, fallback }) {
+export default function Finale({ contact, pitch, credit, onTop, fallback }) {
   const section = useRef(null);
   const canvas = useRef(null);
   const block = useRef(null);
-  const roll = useRef(null);
   const [failed, setFailed] = useState(false);
 
   useEffect(() => {
     const el = section.current;
+    const untrack = trackQuiet(el.querySelector(".fin-stage"));
     let film = null, cancelled = false, onScreen = false, loading = false;
     const progress = () => {
       const box = el.getBoundingClientRect();
@@ -28,27 +29,14 @@ export default function Finale({ contact, pitch, credits, onTop, fallback }) {
       return span > 0 ? Math.min(1, Math.max(0, -box.top / span)) : 0;
     };
     const tone = cueOnRise("tone");
-    // How far the headline lifts to make room for the credits: less on a
-    // phone, whose headline already sits high (see finale.css).
-    const lift = !window.matchMedia("(max-width: 760px)").matches ? 37 : window.matchMedia("(max-height: 720px)").matches ? 15 : 18;
     const onFrame = (t, m) => {
-      tone(m.contact);
+      tone(m.core);
       if (block.current) {
         block.current.style.opacity = m.contact;
         block.current.style.visibility = "visible";
         block.current.classList.add("film-card");
         block.current.classList.toggle("is-offshot", m.contact <= 0.02);
-        // As the credits roll in, the contact rises to the top and keeps
-        // only its line, the email and the links.
-        block.current.style.transform = `translateY(${(1 - m.contact) * 24 - m.credits * lift}vh)`;
-        block.current.style.setProperty("--fin-detail", 1 - m.credits);
-      }
-      if (roll.current) {
-        roll.current.style.opacity = m.credits;
-        roll.current.style.visibility = "visible";
-        roll.current.classList.add("film-card");
-        roll.current.classList.toggle("is-offshot", m.credits <= 0.02);
-        roll.current.style.transform = `translateY(${(1 - m.credits) * 50}vh)`;
+        block.current.style.transform = `translateY(${(1 - m.contact) * 16}px)`;
       }
     };
     const run = () => film?.setActive(onScreen && document.visibilityState === "visible");
@@ -66,40 +54,39 @@ export default function Finale({ contact, pitch, credits, onTop, fallback }) {
       }
     };
     const near = new IntersectionObserver(([entry]) => { if (entry.isIntersecting) { near.disconnect(); load(); } }, { rootMargin: "0px 0px 150% 0px" });
-    // The sound bed follows the act on screen (silent unless sound is on).
-    const seen = new IntersectionObserver(([entry]) => { onScreen = entry.isIntersecting; showBed("finale", onScreen); run(); });
+    const seen = new IntersectionObserver(([entry]) => { onScreen = entry.isIntersecting; run(); });
     near.observe(el);
     seen.observe(el);
     document.addEventListener("visibilitychange", run);
     return () => {
       cancelled = true;
+      untrack();
       near.disconnect();
       seen.disconnect();
-      showBed("finale", false);
       document.removeEventListener("visibilitychange", run);
       film?.dispose();
     };
   }, []);
 
   if (failed) return fallback;
-  return <section ref={section} className="fin" aria-labelledby="fin-title" data-palette="blueBloom" style={{ "--act-screens": SCREENS }}>
-    {/* Where #contact lands: the start of the contact beat. */}
-    <span id="contact" className="fin-anchor" style={{ top: `calc(${FINALE_CONTACT_AT * FINALE_SCREENS} * 100vh)` }} aria-hidden="true" />
-    <div className="fin-stage">
-      <ActTitle section={section}>Finale</ActTitle>
-      <canvas ref={canvas} className="fin-canvas" aria-hidden="true" />
-      <div ref={block} className="fin-block">
-        <p className="fin-kicker">06 · Contact</p>
-        <h2 id="fin-title">Let's build <em>something.</em></h2>
-        <a className="fin-email" href={`mailto:${contact.email}`}>Email me<ArrowUpRight size={20} aria-hidden="true" /></a>
-        <p className="fin-links"><a href={contact.github} target="_blank" rel="noopener noreferrer">GitHub<ExternalLink size={14} aria-hidden="true" /></a><a href={contact.linkedin} target="_blank" rel="noopener noreferrer">LinkedIn<ExternalLink size={14} aria-hidden="true" /></a></p>
-        <p className="fin-address">{contact.email}</p>
-        <p className="fin-pitch">{pitch}</p>
+  return <>
+    <section ref={section} className="fin" aria-labelledby="fin-title" data-palette="blueBloom" style={{ "--act-screens": SCREENS }}>
+      {/* Where #contact lands: the start of the line. */}
+      <span id="contact" className="fin-anchor" style={{ top: `calc(${FINALE_CONTACT_AT * FINALE_SCREENS} * 100vh)` }} aria-hidden="true" />
+      <div className="fin-stage" data-film-stage="finale">
+        <canvas ref={canvas} className="fin-canvas" aria-hidden="true" />
+        <div ref={block} className="fin-block">
+          <h2 id="fin-title">Let's build <em>something.</em></h2>
+          <a className="fin-email" href={`mailto:${contact.email}`}>Email me<ArrowUpRight size={20} aria-hidden="true" /></a>
+          <p className="fin-address">{contact.email}</p>
+          <p className="fin-links"><a href={contact.github} target="_blank" rel="noopener noreferrer">GitHub</a><a href={contact.linkedin} target="_blank" rel="noopener noreferrer">LinkedIn</a></p>
+          <p className="fin-credit">{credit}</p>
+        </div>
       </div>
-      <div ref={roll} className="fin-credits">
-        {credits.map(([role, name]) => <p key={role}><span>{role}</span>{Array.isArray(name) ? <span className="fin-credit-links">{name.map((link, i) => <Fragment key={link.href}>{i > 0 && " · "}<a href={link.href}>{link.name}</a></Fragment>)}</span> : name}</p>)}
-        <footer className="fin-footer"><span>© {new Date().getFullYear()}</span><span>Designed and built by me, with AI as the pair programmer.</span><button type="button" onClick={onTop}>Back to top ↑</button></footer>
-      </div>
+    </section>
+    <div className="fin-doc">
+      <p className="fin-pitch">{pitch}</p>
+      <footer className="fin-footer"><span>© {new Date().getFullYear()}</span><span>Designed and built by me, with AI as the pair programmer.</span><button type="button" onClick={onTop}>Back to top ↑</button></footer>
     </div>
-  </section>;
+  </>;
 }
