@@ -171,7 +171,16 @@ function DigitalDemo({ project }) {
   </div>;
 }
 
+/* Hedwig: the case study's title card (a real run, replayed) and a way in. */
+function HedwigDemo({ project }) {
+  return <div className="st-cover is-render">
+    <img className="ed-lazy-media" src={media(coverOf(project))} alt={project.heroAlt} loading="lazy" onLoad={reveal} />
+    <a href="/p/hedwig/" className="st-launch"><Play size={16} aria-hidden="true" />Watch it write</a>
+  </div>;
+}
+
 const DEMOS = {
+  hedwig: HedwigDemo,
   saywhen: SaywhenDemo,
   jarvis: JarvisDemo,
   "agent-flight-recorder": FlightDemo,

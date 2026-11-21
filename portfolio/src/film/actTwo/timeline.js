@@ -23,6 +23,7 @@ const HOLD_SCROLL = 0.12, HOLD_SECONDS = 0.5;
 // Where each set's subject stands in its own local space (mirrors the
 // constants in sets/*.js: +z faces the scene camera, +x is screen right).
 export const SUBJECTS = {
+  hedwig: [-1.6, 1.8, 0.8],
   saywhen: [0, 1, 0],
   jarvis: [2.4, 1.5, -4],
   "agent-flight-recorder": [0.6, 0.9, -1.2],

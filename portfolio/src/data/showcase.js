@@ -5,11 +5,21 @@
 //
 // House style: plain words, short sentences, no em dashes.
 
-// The six flagship case studies, in order. `visual` is the optional second
+// The seven flagship case studies, in order. `visual` is the optional second
 // image that floats over the cover art: a real screenshot or figure ("shot"),
 // or a short illustrated terminal ("terminal") for tools that have no screen
 // of their own. Leave it out and the cover fills the frame on its own.
 export const FLAGSHIPS = [
+  {
+    slug: "hedwig",
+    eyebrow: "Open source · LLM from scratch",
+    badge: "New · runs in your browser",
+    headline: "I built a ChatGPT-style model from scratch, then grew it to 286.7M parameters for $2.45.",
+    copy: "Plain PyTorch, all three training stages, first on a MacBook Air and then on rented GPUs. It caught itself reward hacking, got a fluency anchor, and now runs in the browser in JavaScript I wrote by hand.",
+    stats: [["286.7M", "parameters, largest model"], ["$2.45", "total cloud spend"], ["98.3%", "DPO win-rate"]],
+    stack: ["PyTorch", "JavaScript", "RunPod", "Hugging Face"],
+    visual: { type: "shot", src: "/p/hedwig/mac-app.jpg", caption: "The Mac app with the Brain X-Ray" },
+  },
   {
     slug: "saywhen",
     eyebrow: "Open source · desktop app",

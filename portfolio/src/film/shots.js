@@ -29,7 +29,7 @@
 export const ACTS = [
   { id: "CO", title: "Cold open", note: "Plays once on a first visit, about 8 seconds, can be skipped. A returning visitor gets shots CO-05 to CO-07 only, about 1.5 seconds." },
   { id: "A1", title: "Act I · The short version", note: "The camera goes through the name. The four numbers are objects it passes." },
-  { id: "A2", title: "Act II · Selected work", note: "Six sets, one per project. Each is pinned for about a screen of scrolling. Each opens on a hard cut held on a finished frame; where two sets share a shape the cut matches them. Nothing fades." },
+  { id: "A2", title: "Act II · Selected work", note: "Seven sets, one per project. Each is pinned for about a screen of scrolling. Each opens on a hard cut held on a finished frame; where two sets share a shape the cut matches them. Nothing fades." },
   { id: "A3", title: "Act III · What I bring", note: "Three monoliths: agents, research, shipping." },
   { id: "A4", title: "Act IV · The playground", note: "The effects reel: the network collapses into a star, then the solar system, the infinity ribbon and Emet's terminal, each with a way in." },
   { id: "FN", title: "Finale · Contact", note: "Everything returns to one point. Bookend to the cold open." },
@@ -38,19 +38,20 @@ export const ACTS = [
 
 // Where each project's set stands. Sides alternate so the path weaves.
 export const SETS = {
-  saywhen: { label: "saywhen", at: [-34, 0, -190] },
-  jarvis: { label: "Jarvis", at: [36, 4, -270] },
-  "agent-flight-recorder": { label: "Flight Recorder", at: [-32, -4, -350] },
-  "prh-jepa": { label: "PRH-JEPA", at: [34, 2, -430] },
-  haloscript: { label: "Haloscript", at: [-34, 3, -510] },
-  "digital-double": { label: "Digital double", at: [32, 0, -590] },
-  monoliths: { label: "Three monoliths", at: [0, 0, -690] },
+  hedwig: { label: "Hedwig", at: [34, 2, -190] },
+  saywhen: { label: "saywhen", at: [-34, 0, -270] },
+  jarvis: { label: "Jarvis", at: [36, 4, -350] },
+  "agent-flight-recorder": { label: "Flight Recorder", at: [-32, -4, -430] },
+  "prh-jepa": { label: "PRH-JEPA", at: [34, 2, -510] },
+  haloscript: { label: "Haloscript", at: [-34, 3, -590] },
+  "digital-double": { label: "Digital double", at: [32, 0, -670] },
+  monoliths: { label: "Three monoliths", at: [0, 0, -770] },
   // The star the network collapses into is the solar system's sun.
-  star: { label: "Star", at: [0, 0, -860] },
-  solar: { label: "Solar system", at: [0, 0, -860] },
-  ribbon: { label: "Infinity ribbon", at: [26, 6, -930] },
-  head: { label: "Emet", at: [-22, 0, -990] },
-  point: { label: "The signal, again", at: [0, 0, -1080] },
+  star: { label: "Star", at: [0, 0, -940] },
+  solar: { label: "Solar system", at: [0, 0, -940] },
+  ribbon: { label: "Infinity ribbon", at: [26, 6, -1010] },
+  head: { label: "Emet", at: [-22, 0, -1070] },
+  point: { label: "The signal, again", at: [0, 0, -1160] },
 };
 
 // Act I's props, along the first stretch of the path. The camera passes the
@@ -61,7 +62,7 @@ export const ACT_ONE = {
   name: { at: [0, 0, 0], width: 40 },
   numbers: [[11, 0, -80], [-11, 0, -94], [11, 0, -108], [-11, 0, -120]],
   river: { y: -7, from: 60, to: -210, width: 46 },
-  tools: { at: [-12, 1, -168], rings: [6, 10, 14] },
+  tools: { at: [12, 1, -168], rings: [6, 10, 14] },
 };
 
 const near = ([x, y, z], dx, dy, dz) => [x + dx, y + dy, z + dz];
@@ -89,9 +90,10 @@ export const SHOTS = [
   // ---- Act I ----
   { id: "A1-01", act: "A1", title: "Through the name", seconds: 3, scroll: 0.8, camera: { pos: [0, 0, -18], look: [0, -1, -70], fov: 44, move: "Dolly forward, through the letters" }, action: "Scrolling starts the move. The camera passes between the letters and into the network behind them.", sound: "Air moving past", bars: false, frame: "through" },
   { id: "A1-02", act: "A1", title: "The four numbers", seconds: 4, scroll: 1, camera: { pos: [3, 1, -92], look: [0, -1, -140], fov: 42, move: "Glide past, slight drift" }, action: "Four numbers built from glowing cubes stand along the path and count up as the camera passes: 10+ projects, 2 open-source tools, 3 studies, 2 apps. Under the camera, lines of code flow like a river.", text: "Most AI demos stop at the demo.", sound: "A tick per count", bars: false, frame: "numbers" },
-  { id: "A1-03", act: "A1", title: "The tools", seconds: 3, scroll: 0.7, camera: { pos: [0, 2, -142], look: [-20, 0, -185], fov: 40, move: "Arc left toward the first set" }, action: "The tools I build with orbit like satellites. Pointing at one pulls it toward the camera.", sound: "Faint orbit hum", bars: false, frame: "orbit" },
+  { id: "A1-03", act: "A1", title: "The tools", seconds: 3, scroll: 0.7, camera: { pos: [0, 2, -142], look: [20, 0, -185], fov: 40, move: "Arc right toward the first set" }, action: "The tools I build with orbit like satellites. Pointing at one pulls it toward the camera.", sound: "Faint orbit hum", bars: false, frame: "orbit" },
 
   // ---- Act II ----
+  ...projectShots(0, "hedwig", { title: "A language model, built from nothing.", push: "Slow push past the owl to the page", action: "Night, a branch and the moon. An owl made of points turns toward a floating page. Word-pieces stream from its eyes as a real run of the 13.8M model types onto the page, with the three pieces it was choosing between under the line.", sound: "Night air, soft key ticks", frame: "owl" }),
   ...projectShots(1, "saywhen", { title: "Look at the screen. Say the command.", push: "Slow push to the monitor", action: "A dark room and a floating monitor. A face made of points turns toward it. A waveform rises from the mouth and becomes text that types onto the screen. The real launch film plays on that monitor.", sound: "A voice, then typing", frame: "monitor" }),
   ...projectShots(2, "jarvis", { title: "A personal AI agent that runs itself.", push: "Orbit a quarter turn around the core", action: "A control room at night. Panels of the real dashboard orbit a core. A gauge marked \"20 calls a day\" glows like a reactor limit.", sound: "Control-room hum", frame: "control" }),
   ...projectShots(3, "agent-flight-recorder", { title: "A black box recorder for coding agents.", push: "Push in as the box opens", action: "An aircraft black box in an orange spotlight. It comes apart into layers: tool calls, edits, the failure. The suspect edit flashes red and flies to the camera.", sound: "Cockpit beeps, one alarm", frame: "blackbox" }),
@@ -100,19 +102,19 @@ export const SHOTS = [
   ...projectShots(6, "digital-double", { title: "A 3D double of my head, from 13 seconds of video.", push: "Push in to eye level", action: "The head stands in a cone of light and looks at the visitor. Its twelve build stages hang behind it like a contact sheet.", sound: "Quiet room", frame: "head" }),
 
   // ---- Act III ----
-  { id: "A3-01", act: "A3", title: "The monoliths rise", seconds: 3, scroll: 0.8, camera: { pos: [0, 10, -642], look: [0, 6, -690], fov: 36, move: "Low angle, tilt up" }, action: "Three monoliths rise out of the ground: agents, research, shipping.", text: "THREE THINGS, done properly.", sound: "Deep stone movement", bars: true, frame: "monoliths" },
-  { id: "A3-02", act: "A3", title: "Orbit", seconds: 5, scroll: 1.2, camera: { pos: [31, 9, -716], look: [0, 7, -690], fov: 34, move: "Orbit right around the three" }, action: "The camera circles them. Project names are etched in each face and light up as they turn toward the camera.", sound: "One note per name", bars: false, frame: "orbitstones" },
+  { id: "A3-01", act: "A3", title: "The monoliths rise", seconds: 3, scroll: 0.8, camera: { pos: [0, 10, -722], look: [0, 6, -770], fov: 36, move: "Low angle, tilt up" }, action: "Three monoliths rise out of the ground: agents, research, shipping.", text: "THREE THINGS, done properly.", sound: "Deep stone movement", bars: true, frame: "monoliths" },
+  { id: "A3-02", act: "A3", title: "Orbit", seconds: 5, scroll: 1.2, camera: { pos: [31, 9, -796], look: [0, 7, -770], fov: 34, move: "Orbit right around the three" }, action: "The camera circles them. Project names are etched in each face and light up as they turn toward the camera.", sound: "One note per name", bars: false, frame: "orbitstones" },
 
   // ---- Act IV ----
-  { id: "A4-01", act: "A4", title: "Collapse into a star", seconds: 2.5, scroll: 0.6, camera: { pos: [0, 3, -828], look: [0, 0, -860], fov: 40, move: "Pull back as it collapses" }, action: "The whole network falls inward and becomes a star: the sun of the solar system that follows.", sound: "Everything drawn in, then a bloom", bars: true, frame: "star" },
-  { id: "A4-02", act: "A4", title: "The solar system", seconds: 4, scroll: 1, camera: { pos: [10, 8, -825], look: [0, 0, -860], fov: 38, move: "Fly in over the ecliptic" }, action: "The camera passes into the solar system: real orbits, lit planets, haze on the horizon of each one.", sound: "Wide, slow pad", bars: false, frame: "solar" },
-  { id: "A4-03", act: "A4", title: "The ribbon", seconds: 3, scroll: 0.8, camera: { pos: [14, 8, -905], look: [26, 6, -930], fov: 42, move: "Ride along the curve" }, action: "An infinity loop made of light. The camera rides along it like a track.", sound: "Rising glide", bars: false, frame: "ribbon" },
-  { id: "A4-04", act: "A4", title: "Emet answers", seconds: 4, scroll: 1, camera: { pos: [-14, 1.5, -966], look: [-22, 0.5, -990], fov: 32, move: "Slow push" }, action: "Emet's terminal floats in the dark as a glass panel. A question types in, and Emet answers in its own words. (Emet is the droid that already roams the page, and the head has its scene in Act II.)", sound: "Key ticks, a soft chime", bars: false, frame: "droid" },
+  { id: "A4-01", act: "A4", title: "Collapse into a star", seconds: 2.5, scroll: 0.6, camera: { pos: [0, 3, -908], look: [0, 0, -940], fov: 40, move: "Pull back as it collapses" }, action: "The whole network falls inward and becomes a star: the sun of the solar system that follows.", sound: "Everything drawn in, then a bloom", bars: true, frame: "star" },
+  { id: "A4-02", act: "A4", title: "The solar system", seconds: 4, scroll: 1, camera: { pos: [10, 8, -905], look: [0, 0, -940], fov: 38, move: "Fly in over the ecliptic" }, action: "The camera passes into the solar system: real orbits, lit planets, haze on the horizon of each one.", sound: "Wide, slow pad", bars: false, frame: "solar" },
+  { id: "A4-03", act: "A4", title: "The ribbon", seconds: 3, scroll: 0.8, camera: { pos: [14, 8, -985], look: [26, 6, -1010], fov: 42, move: "Ride along the curve" }, action: "An infinity loop made of light. The camera rides along it like a track.", sound: "Rising glide", bars: false, frame: "ribbon" },
+  { id: "A4-04", act: "A4", title: "Emet answers", seconds: 4, scroll: 1, camera: { pos: [-14, 1.5, -1046], look: [-22, 0.5, -1070], fov: 32, move: "Slow push" }, action: "Emet's terminal floats in the dark as a glass panel. A question types in, and Emet answers in its own words. (Emet is the droid that already roams the page, and the head has its scene in Act II.)", sound: "Key ticks, a soft chime", bars: false, frame: "droid" },
 
   // ---- Finale ----
-  { id: "FN-01", act: "FN", title: "Everything recedes", seconds: 3, scroll: 0.8, camera: { pos: [0, 2, -1020], look: [0, 0, -1080], fov: 36, move: "Hold while the world pulls away" }, action: "Every set the visitor passed shrinks back toward one point of light.", sound: "The score thins to one tone", bars: true, frame: "recede" },
-  { id: "FN-02", act: "FN", title: "Contact", seconds: 4, scroll: 1, camera: { pos: [0, 0, -1074], look: [0, 0, -1080], fov: 32, move: "Creep in" }, action: "Black. One line in the title face. The email button glows like the first signal.", text: "Let's build something.", sound: "The opening tone, once", bars: true, frame: "contact" },
-  { id: "FN-03", act: "FN", title: "Credits", seconds: 3, scroll: 0.6, camera: { pos: [0, 0, -1076], look: [0, 0, -1080], fov: 32, move: "Locked off" }, action: "A credits roll for the footer: the stack, the tools, \"Directed by Mohamed Ansar\".", sound: "Silence", bars: true, frame: "credits" },
+  { id: "FN-01", act: "FN", title: "Everything recedes", seconds: 3, scroll: 0.8, camera: { pos: [0, 2, -1100], look: [0, 0, -1160], fov: 36, move: "Hold while the world pulls away" }, action: "Every set the visitor passed shrinks back toward one point of light.", sound: "The score thins to one tone", bars: true, frame: "recede" },
+  { id: "FN-02", act: "FN", title: "Contact", seconds: 4, scroll: 1, camera: { pos: [0, 0, -1154], look: [0, 0, -1160], fov: 32, move: "Creep in" }, action: "Black. One line in the title face. The email button glows like the first signal.", text: "Let's build something.", sound: "The opening tone, once", bars: true, frame: "contact" },
+  { id: "FN-03", act: "FN", title: "Credits", seconds: 3, scroll: 0.6, camera: { pos: [0, 0, -1156], look: [0, 0, -1160], fov: 32, move: "Locked off" }, action: "A credits roll for the footer: the stack, the tools, \"Directed by Mohamed Ansar\".", sound: "Silence", bars: true, frame: "credits" },
 
   // ---- Project pages (off the main timeline) ----
   { id: "PG-01", act: "PG", title: "Dive into a project", seconds: 1.2, scroll: 0, offTimeline: true, camera: { pos: [0, 0, 0], look: [0, 0, -1], fov: 30, move: "Push through the set's screen" }, action: "Clicking a project sends the camera into that set. The screen in the scene grows until it is the header of the project page.", sound: "Short rush", bars: false, frame: "dive" },

@@ -93,7 +93,7 @@ const near = new IntersectionObserver(([entry]) => { if (entry.isIntersecting) {
     {/* Nine screens of film: a way past it for keyboards and screen readers. */}
     <a className="film-skip" href="#projects">Skip the film, go to the work</a>
     <div className="act2-stage" data-film-stage="act2">
-      <ActTitle section={section} as="h2">II. Six builds</ActTitle>
+      <ActTitle section={section} as="h2">II. Seven builds</ActTitle>
       <canvas ref={canvas} className="act2-canvas" aria-hidden="true" />
       <div ref={bars} className="act2-bars" aria-hidden="true"><span /><span /></div>
       {projects.map((project, i) => <p key={project.slug} ref={(node) => { titles.current[i] = node; }} className="act2-title" aria-hidden="true">{project.name}</p>)}
