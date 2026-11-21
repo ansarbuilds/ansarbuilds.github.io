@@ -2,7 +2,13 @@ import * as THREE from "three";
 import { poseAt } from "../rig.js";
 import { SETS } from "../shots.js";
 import { ACT_TWO, BUILT, moments, shotsFor, timeAtProgress } from "./timeline.js";
+import { BONE, SIGNAL, points } from "./kit.js";
+import { buildHedwig } from "./sets/hedwig.js";
 import { buildSaywhen } from "./sets/saywhen.js";
+import { buildJarvis } from "./sets/jarvis.js";
+import { buildFlightRecorder } from "./sets/flightRecorder.js";
+import { buildPrhJepa } from "./sets/prhJepa.js";
+import { buildHaloscript } from "./sets/haloscript.js";
 import { buildDigitalDouble } from "./sets/digitalDouble.js";
 import { attachFilm } from "../engine.js";
 
@@ -14,18 +20,42 @@ import { attachFilm } from "../engine.js";
    how far through its arrival and scene the film is. Only the set on screen
    plays its footage. */
 
-const BUILDERS = { saywhen: buildSaywhen, "digital-double": buildDigitalDouble };
-// Bloom per set: low, with a high threshold, so only the screen glows and skin and hair do not.
-const BLOOM = { saywhen: [0.2, 0.3, 0.85], "digital-double": [0.15, 0.3, 0.9] };
+const BUILDERS = { hedwig: buildHedwig, saywhen: buildSaywhen, jarvis: buildJarvis, "agent-flight-recorder": buildFlightRecorder, "prh-jepa": buildPrhJepa, haloscript: buildHaloscript, "digital-double": buildDigitalDouble };
+
+function pickQuality() {
+  const low = window.matchMedia("(max-width: 760px)").matches || (navigator.hardwareConcurrency || 8) <= 4;
+  return low ? { dust: 5000, dpr: Math.min(window.devicePixelRatio, 1.25) } : { dust: 12000, dpr: Math.min(window.devicePixelRatio, 1.75) };
+}
+
+// Dust along each approach, so the space between sets is never empty.
+function buildDust(count) {
+  const positions = new Float32Array(count * 3), colors = new Float32Array(count * 3);
+  const tint = new THREE.Color();
+  const lines = BUILT.map((slug) => { const [arrive] = shotsFor(slug); return [SETS[slug].at, arrive.camera.pos]; });
+  for (let i = 0; i < count; i++) {
+    const [set, arrive] = lines[i % lines.length];
+    const along = -0.2 + Math.random() * 3.8;
+    const angle = Math.random() * Math.PI * 2, reach = 5 + 46 * Math.random() ** 0.8;
+    for (let k = 0; k < 3; k++) positions[i * 3 + k] = set[k] + (arrive[k] - set[k]) * along;
+    positions[i * 3] += Math.cos(angle) * reach;
+    positions[i * 3 + 1] += Math.sin(angle) * reach * 0.6;
+    tint.copy(BONE).lerp(SIGNAL, Math.random() ** 3).toArray(colors, i * 3);
+  }
+  return points(positions, colors, 0.08, { opacity: 0.5 });
+}
 
 export function createActTwo(canvas, { getProgress, onFrame, media }) {
+  const quality = pickQuality();
   // The shared renderer (see engine.js): this act draws into it, and its
   // frames are copied onto this canvas.
-  const film = attachFilm(canvas, { clear: 0x050405, bloom: [0.2, 0.3, 0.85], grain: 0.008 });
+  const film = attachFilm(canvas, { clear: 0x050405, bloom: [0.42, 0.45, 0.6], grain: 0.008 });
   const renderer = film.renderer;
   const scene = new THREE.Scene();
   const camera = new THREE.PerspectiveCamera(38, 1, 0.1, 800);
   scene.add(camera);
+
+  const dust = buildDust(quality.dust);
+  scene.add(dust.mesh);
 
   const sets = BUILT.map((slug) => {
     const group = new THREE.Group();
@@ -53,7 +83,6 @@ export function createActTwo(canvas, { getProgress, onFrame, media }) {
 
   let drawn = false, active = false, frame = 0, last = performance.now(), clock = 0, disposed = false, settledFrames = 0;
   const look = new THREE.Vector3(), pos = new THREE.Vector3();
-  let last3 = null;
   function tick(nowMs) {
     if (!active || disposed) return;
     frame = requestAnimationFrame(tick);
@@ -66,6 +95,11 @@ export function createActTwo(canvas, { getProgress, onFrame, media }) {
     // A narrow screen sees less across, so the camera stands further back.
     pos.fromArray(pose.pos).sub(look).divideScalar(fit).add(look);
     if (camera.fov !== pose.fov) { camera.fov = pose.fov; camera.updateProjectionMatrix(); }
+    // On a narrow screen the card covers the lower half: pan the frame down
+    // so each set stands in the upper part, above it.
+    const pan = (1 - Math.min(1, camera.aspect / 1.5)) * 0.62 * pos.distanceTo(look) * Math.tan(THREE.MathUtils.degToRad(camera.fov / 2));
+    pos.y -= pan;
+    look.y -= pan;
     camera.position.copy(pos);
     camera.lookAt(look);
     camera.updateMatrixWorld();
@@ -73,6 +107,8 @@ export function createActTwo(canvas, { getProgress, onFrame, media }) {
     const scale = film.pixelHeight / (2 * half);
 
     const now = moments(t);
+    dust.uniforms.uTime.value = clock;
+    dust.uniforms.uScale.value = scale;
     sets.forEach((item, i) => {
       const m = now[i];
       item.group.visible = m.here || m.arrive > 0 && m.scene < 1;
@@ -84,12 +120,7 @@ export function createActTwo(canvas, { getProgress, onFrame, media }) {
       if (m.here) sets[i + 1]?.set.prepare?.();
     });
     finish.uniforms.uTime.value = clock;
-    // The portraits are holds: clean edges. The fringe only shows while the camera moves fast.
-    const moved = last3 ? last3.distanceTo(pos) / Math.max(dt, 1e-3) : 0;
-    last3 = (last3 ?? new THREE.Vector3()).copy(pos);
-    finish.uniforms.uAberration.value = 0.0002 + Math.min(0.0008, moved * 0.00004);
-    const here = sets.findIndex((item, i) => now[i].here);
-    if (here >= 0) film.bloom.splice(0, 3, ...BLOOM[sets[here].slug]);
+    finish.uniforms.uAberration.value = 0.0004;
     // Before the act starts or after it ends only ambient motion is left (dust,
     // a caret), often while the next section plays beside it: a quarter of
     // the frames is enough there.
@@ -119,6 +150,7 @@ export function createActTwo(canvas, { getProgress, onFrame, media }) {
       cancelAnimationFrame(frame);
       observer.disconnect();
       sets.forEach(({ set }) => set.dispose());
+      dust.dispose();
       film.release();
     },
   };

@@ -2,7 +2,7 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { ACTS, SETS, SHOTS, TIMELINE_SHOTS } from './shots.js';
 import { buildTimeline, entryAtTime, poseAt, scrollAtTime, timeAtScroll, timecode } from './rig.js';
-import { BUILT } from './actTwo/built.js';
+import { FLAGSHIPS } from '../data/showcase.js';
 
 const timeline = buildTimeline(TIMELINE_SHOTS);
 const distance = (a, b) => Math.hypot(a[0] - b[0], a[1] - b[1], a[2] - b[2]);
@@ -27,9 +27,9 @@ test('every shot is complete and has a unique id', () => {
   }
 });
 
-test('Act II has one set per built project, in order', () => {
+test('Act II has one set per flagship project, in the home page order', () => {
   const sets = [...new Set(SHOTS.filter((shot) => shot.act === 'A2').map((shot) => shot.slug))];
-  assert.deepEqual(sets, BUILT);
+  assert.deepEqual(sets, FLAGSHIPS.map((flag) => flag.slug));
   for (const slug of sets) assert.ok(SETS[slug], `${slug}: no set`);
 });
 

@@ -2,10 +2,20 @@
    loads there is no layer at all: the hero's name is what the visitor sees.
    The layer itself stays invisible until the scene has drawn its first real
    frame (ColdOpen.jsx sets its opacity from then on). */
-.co { position: fixed; inset: 0; z-index: 9000; background: #070605; opacity: 0; }
+.co { position: fixed; inset: 0; z-index: 9000; background: #000; opacity: 0; }
 .co { overflow: hidden; color: #efe6d8; cursor: default; }
 /* Once it has handed over, clicks go to the page underneath. */
 .co.is-leaving { pointer-events: none; }
 .co-canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
+/* 2.39:1 letterbox: bars as tall as it takes to leave that shape, never
+   thinner than a visible band, and on a tall phone screen never leaving a
+   frame shorter than 46% of the screen. */
+.co-bars span { position: absolute; left: 0; right: 0; height: max(7vh, calc((100vh - max(100vw / 2.39, 46vh)) / 2)); background: #000; transition: transform var(--dur-scene) var(--ease-out); }
+.co-bars span:first-child { top: 0; transform: translateY(-101%); }
+.co-bars span:last-child { bottom: 0; transform: translateY(101%); }
+.co-bars.is-closed span { transform: none; }
+/* The typed line, hung under the name (its place is set from the page). */
+.co-line { position: absolute; margin: clamp(14px, 2.4vh, 28px) 0 0; transform: translateX(-50%); width: max-content; max-width: 92vw; text-align: center; font: 500 clamp(.72rem, 1.5vw, 1.02rem)/1.4 var(--font-mono); letter-spacing: .06em; text-shadow: 0 0 18px #000; }
+.co-line:not(:empty)::after { content: ""; display: inline-block; width: .55em; height: 1.05em; margin-left: .2em; vertical-align: -.16em; background: #ff8a5f; }
 .co-skip { position: absolute; right: clamp(14px, 2.4vw, 32px); bottom: clamp(14px, 2.4vw, 28px); z-index: 2; padding: 8px 12px; border: 1px solid rgb(239 230 216 / .22); border-radius: 999px; background: rgb(0 0 0 / .4); color: rgb(239 230 216 / .72); font: 500 .58rem/1 var(--font-mono); letter-spacing: .12em; text-transform: uppercase; }
 .co-skip:hover { color: #efe6d8; border-color: #efe6d8; }

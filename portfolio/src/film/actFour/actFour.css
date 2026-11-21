@@ -1,0 +1,17 @@
+/* Act IV on the home page: a tall section with a pinned stage. */
+.act4 { position: relative; height: calc(var(--act-screens) * 100vh); overflow: clip; background: #040406; color: #efe6d8; }
+.act4-stage { position: sticky; top: 0; height: 100vh; overflow: hidden; }
+.act4-canvas { position: absolute; inset: 0; display: block; width: 100%; height: 100%; opacity: 0; transition: opacity var(--dur-scene) var(--ease-out); }
+.act4.is-live .act4-canvas { opacity: 1; }
+.act4-title, .act4-card { position: absolute; z-index: 2; opacity: 0; pointer-events: none; will-change: opacity, transform; }
+.act4-title { left: 0; right: 0; bottom: clamp(28px, 12vh, 130px); text-align: center; pointer-events: none; text-shadow: 0 4px 50px #000; }
+.act4-kicker { font: 500 .62rem/1 var(--font-mono); letter-spacing: .16em; text-transform: uppercase; color: #ff8a5f; }
+.act4-title h2 { margin-top: 12px; font: 400 clamp(3rem, 8vw, 7rem)/.9 var(--font-condensed); text-transform: uppercase; }
+.act4-title h2 em { display: block; font: 400 .7em/1 var(--font-serif); font-style: italic; text-transform: none; letter-spacing: -.02em; color: #b9a8ff; }
+.act4-card { left: max(20px, calc((100vw - 1200px) / 2)); bottom: clamp(20px, 7vh, 72px); width: min(26rem, calc(100vw - 40px)); padding: 22px 24px 20px; border: 1px solid rgb(239 230 216 / .12); border-radius: 18px; background: linear-gradient(160deg, rgb(10 10 14 / .93), rgb(6 6 9 / .84)); /* No backdrop blur: over a canvas that changes every frame it costs dropped frames. */ box-shadow: 0 30px 80px -30px #000; }
+.act4-card h3 { margin: 10px 0 6px; font: 400 clamp(1.7rem, 3vw, 2.3rem)/.98 var(--font-condensed); text-transform: uppercase; }
+.act4-copy { font-size: .86rem; line-height: 1.55; color: rgb(239 230 216 / .82); }
+.act4-cta { display: inline-flex; align-items: center; gap: 6px; min-height: 40px; margin-top: 16px; padding: 0 16px; border-radius: 999px; background: #ff8a5f; color: #160a05; font: 600 .82rem/1 var(--font-body); }
+.act4-cta:hover { background: #ffa47f; }
+@media (max-width: 760px) { .act4-card { bottom: 76px; padding: 16px 18px; } .act4-title { bottom: 96px; } }
+@media (prefers-reduced-motion: reduce) { .act4-canvas { transition: none; } }
