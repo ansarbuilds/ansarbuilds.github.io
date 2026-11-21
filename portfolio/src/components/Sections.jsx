@@ -314,7 +314,7 @@ export function ProjectsSection() {
   return <>{film && <ActTwo projects={FILM_PROJECTS} />}<section id="projects" className="ed-projects ed-light ed-section" data-palette="bloom">
     <div className="ed-section-watermark" aria-hidden="true">WORK</div>
     <div className="ed-wrap">
-      <Enter className="ed-section-heading sc-stage-heading"><div><IndexLabel number="02">Selected work</IndexLabel><h2>Six builds. <em>Each with its numbers.</em></h2></div><div className="ed-heading-aside"><p>Each one has the number, the picture and a way in. Some you can run, some you watch, some you read.</p></div></Enter>
+      <Enter className="ed-section-heading sc-stage-heading"><div><IndexLabel number="02">Selected work</IndexLabel><h2>Seven builds. <em>Each with its numbers.</em></h2></div><div className="ed-heading-aside"><p>Each one has the number, the picture and a way in. Some you can run, some you watch, some you read.</p></div></Enter>
       <WorkStage />
     </div>
   </section></>;

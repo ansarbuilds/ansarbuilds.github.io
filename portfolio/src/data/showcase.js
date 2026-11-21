@@ -5,17 +5,27 @@
 //
 // House style: plain words, short sentences, no em dashes.
 
-// The six flagship case studies, in order. `visual` is the optional second
+// The seven flagship case studies, in order. `visual` is the optional second
 // image that floats over the cover art: a real screenshot or figure ("shot"),
 // or a short illustrated terminal ("terminal") for tools that have no screen
 // of their own. Leave it out and the cover fills the frame on its own.
 export const FLAGSHIPS = [
   {
+    slug: "hedwig",
+    eyebrow: "Open source · LLM from scratch",
+    badge: "New · runs in your browser",
+    headline: "I built a ChatGPT-style model from scratch, then grew it to 286.7M parameters for $2.45.",
+    copy: "Plain PyTorch, all three training stages, a reward hack caught and fixed, and now it runs in your browser.",
+    stats: [["286.7M", "parameters, largest model"], ["$2.45", "total cloud spend"], ["98.3%", "DPO win-rate"]],
+    stack: ["PyTorch", "JavaScript", "RunPod", "Hugging Face"],
+    visual: { type: "shot", src: "/p/hedwig/mac-app.jpg", caption: "The Mac app with the Brain X-Ray" },
+  },
+  {
     slug: "saywhen",
     eyebrow: "Open source · desktop app",
     badge: "New · open source beta",
     headline: "Look at the screen. Say the command. It types it, and can press Enter.",
-    copy: "Voice input for terminals and coding assistants with no hotkey. The webcam notices you are facing the screen and talking, speech becomes text on your own computer, and every send waits behind a preview you can cancel.",
+    copy: "No hotkey: it sees you are talking to the screen, turns speech into text on your own computer, and waits behind a preview you can cancel.",
     stats: [["34/34", "spoken commands cleaned exactly"], ["0%", "false starts on 56 replay clips"], ["4", "ways to send, all cancelable"]],
     stack: ["Tauri", "Rust", "TypeScript", "MediaPipe", "Whisper"],
   },
@@ -24,7 +34,7 @@ export const FLAGSHIPS = [
     eyebrow: "Autonomous agent",
     badge: "Running on my Mac",
     headline: "A personal AI agent that runs itself, on a budget, and remembers everything.",
-    copy: "It checks job postings against my profile, researches companies and ideas, reviews my GitHub repos and keeps a record of every run. Calls and spend are capped, and a large test suite keeps it honest.",
+    copy: "It checks job postings, researches companies and reviews my repos, with capped spend and a large test suite.",
     stats: [["453", "automated tests"], ["20", "AI calls a day, hard cap"], ["$0", "extra running cost"]],
     stack: ["Claude Code", "Python", "SQLite", "GitHub Actions"],
     visual: { type: "shot", src: "/shots/jarvis/dashboard.webp", caption: "Dashboard, sample data" },
@@ -34,7 +44,7 @@ export const FLAGSHIPS = [
     eyebrow: "Open source · on PyPI",
     badge: "Open source",
     headline: "A black box recorder for coding agents.",
-    copy: "When an agent breaks the build, the final error rarely says which edit caused it. Flight Recorder logs every tool call, file change and failure locally, then names the suspect edit with the diff and the evidence behind it.",
+    copy: "It logs every tool call and file change locally, then names the edit that broke the build, with the evidence.",
     stats: [["5/5", "reference failures traced"], ["0", "core dependencies"], ["3", "ways to inspect a run"]],
     stack: ["Python", "SQLite", "MCP", "Codex"],
     visual: {
@@ -56,7 +66,7 @@ export const FLAGSHIPS = [
     eyebrow: "Research replication",
     badge: "Full technical report",
     headline: "I re-ran a LeCun paper on one laptop, then found what the score was hiding.",
-    copy: "The paper claims image and text models trained apart learn the same space up to one rotation. On a 16 GB Mac I passed 135 of 139 released tests, matched all six open baselines within 0.0012, and traced 35% of the top model's score to a hidden clip.",
+    copy: "On a 16 GB Mac: 135 of 139 tests passed, six baselines matched within 0.0012, and 35% of the top score traced to a hidden clip.",
     stats: [["6/6", "open baselines reproduced"], ["135/139", "released tests passed"], ["−35%", "score without the hidden clip"]],
     stack: ["PyTorch", "Hugging Face", "DINOv2", "pandas"],
     visual: { type: "shot", src: "/p/prh-jepa/fig2-wit1024-baselines.svg", caption: "Figure 2 from the report", light: true },
@@ -66,7 +76,7 @@ export const FLAGSHIPS = [
     eyebrow: "Native app · App Store",
     badge: "Live on the App Store",
     headline: "A writing studio for novelists, on Mac, iPad and iPhone.",
-    copy: "Write the story next to an endless whiteboard. Plan scenes on a corkboard, keep a bible of characters and places, sketch with Apple Pencil, and sync it all through iCloud. Designed, built and shipped solo.",
+    copy: "An endless whiteboard beside the manuscript, a corkboard, Apple Pencil and iCloud sync. Designed, built and shipped solo.",
     stats: [["3", "Apple platforms"], ["Live", "on the App Store"], ["Solo", "design to release"]],
     stack: ["Swift", "SwiftUI", "SwiftData", "CloudKit", "PencilKit"],
     visual: { type: "shot", src: "/shots/haloscript/hero_home_mac.jpg", caption: "Haloscript on the Mac" },
@@ -76,7 +86,7 @@ export const FLAGSHIPS = [
     eyebrow: "AI + 3D",
     badge: "Live demo",
     headline: "A 3D double of my head, directed with AI from 13 seconds of video.",
-    copy: "Phone photos and a short clip in, an explorable 3D head out. I directed Claude Code through Blender and photogrammetry tools, tried 12 approaches, and shipped the one whose eyes follow you around the page.",
+    copy: "I directed Claude Code through Blender and photogrammetry, tried 12 approaches, and shipped the one whose eyes follow you.",
     stats: [["12", "approaches tried"], ["13 s", "of phone video"], ["$0", "spent on tools"]],
     stack: ["Claude Code", "Blender", "MCP", "three.js"],
   },

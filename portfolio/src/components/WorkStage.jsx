@@ -171,7 +171,45 @@ function DigitalDemo({ project }) {
   </div>;
 }
 
+/* Hedwig: an 18-second silent cut of its launch film, looping while it is
+   on stage, with the same rules as saywhen's film (desktop only, not under
+   reduced motion or data saver). "Play the film with sound" swaps in the
+   full 60-second film with controls. Both files stream from the hedwig
+   repo's own Pages site on this domain, so they cost this site nothing. */
+const HEDWIG_REEL = "https://ansarbuilds.dev/hedwig/site/reel.mp4";
+const HEDWIG_POSTER = "https://ansarbuilds.dev/hedwig/site/reel-poster.jpg";
+const HEDWIG_FILM = "https://ansarbuilds.dev/hedwig/film/out/hedwig-demo.mp4";
+function HedwigDemo({ active, hold }) {
+  const reduced = useReducedMotion();
+  const video = useRef(null);
+  const [sound, setSound] = useState(false);
+  const saveData = typeof navigator !== "undefined" && navigator.connection?.saveData;
+  const desktop = useDesktop();
+  const autoplay = !reduced && !saveData && desktop;
+  useEffect(() => {
+    const node = video.current;
+    if (!node) return;
+    if (!active) { node.pause(); return; }
+    if (autoplay && !sound) node.play().catch(() => {});
+  }, [active, autoplay, sound]);
+  const playWithSound = () => {
+    const node = video.current;
+    if (!node) return;
+    setSound(true);
+    hold?.(); // keep the stage on Hedwig while the film plays
+    node.src = HEDWIG_FILM;
+    node.muted = false;
+    node.loop = false;
+    node.play().catch(() => {});
+  };
+  return <Frame title={sound ? "hedwig · launch film, with sound" : "hedwig · launch film, highlights"} className="is-film">
+    <video ref={video} src={HEDWIG_REEL} poster={HEDWIG_POSTER} muted={!sound} loop={!sound} playsInline preload="none" controls={sound || !autoplay} aria-label="Highlights from Hedwig's launch film: a field of dials, letters falling into a glowing core, a bad story burning beside a good one, three towers for three model sizes, and 832 tokens a second" />
+    {!sound && <button type="button" className="st-launch" onClick={playWithSound}><Play size={16} aria-hidden="true" />Play the film with sound</button>}
+  </Frame>;
+}
+
 const DEMOS = {
+  hedwig: HedwigDemo,
   saywhen: SaywhenDemo,
   jarvis: JarvisDemo,
   "agent-flight-recorder": FlightDemo,

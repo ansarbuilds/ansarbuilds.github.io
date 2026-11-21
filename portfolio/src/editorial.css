@@ -379,3 +379,24 @@ a:hover .ed-experiment-image img { transform: scale(1.04); }
    the moment the stage is gone. */
 .ed-nav-sound, .ed-nav-command { transition: opacity var(--dur-fast) var(--ease-out); }
 html.film-quiet .ed-nav-sound, html.film-quiet .ed-nav-command { opacity: 0; pointer-events: none; visibility: hidden; transition: opacity var(--dur-fast) var(--ease-out), visibility 0s linear var(--dur-fast); }
+/* Project page hero: the project's art fills the card behind a giant title,
+   drifting slowly (an ambient loop: 18 s, low amplitude, transform only).
+   Pages without art keep the accent glow, just taller. */
+.pp-hero { min-height: min(72vh, 680px); display: flex; flex-direction: column; justify-content: flex-end; isolation: isolate; }
+.pp-hero > :not(.pp-hero-art) { position: relative; z-index: 1; }
+.pp-hero-art { position: absolute; inset: 0; z-index: 0; overflow: hidden; }
+.pp-hero-art img { width: 100%; height: 100%; object-fit: cover; object-position: 60% 40%; opacity: .62;
+  animation: pp-drift 18s var(--ease-standard) infinite alternate; }
+.pp-hero-art::after { content: ""; position: absolute; inset: 0;
+  background: linear-gradient(90deg, rgb(10 10 10 / .82) 0%, rgb(10 10 10 / .45) 55%, rgb(10 10 10 / .15) 100%),
+    linear-gradient(180deg, rgb(10 10 10 / .1) 30%, rgb(10 10 10 / .85) 100%); }
+.pp-hero.has-art h1 { text-shadow: 0 8px 40px rgb(0 0 0 / .5); }
+.pp-hero-line { max-width: 40ch; }
+@keyframes pp-drift { from { transform: scale(1.04) translate3d(0, 0, 0); } to { transform: scale(1.12) translate3d(-2%, -1.5%, 0); } }
+@media (prefers-reduced-motion: reduce) { .pp-hero-art img { animation: none; transform: none; } }
+/* Stats over art read on a frosted dark backing; phones get a darker veil. */
+.pp-hero.has-art .project-stat-tile { background: rgb(10 10 10 / .58) !important; backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); }
+@media (max-width: 640px) {
+  .pp-hero-art img { opacity: .4; }
+  .pp-hero-art::after { background: linear-gradient(180deg, rgb(10 10 10 / .35) 0%, rgb(10 10 10 / .8) 60%, rgb(10 10 10 / .92) 100%); }
+}
