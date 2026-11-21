@@ -28,6 +28,7 @@ const SolarSystemExplorer = lazy(() => import("./components/SolarSystemExplorer"
 const DataLineageExplorer = lazy(() => import("./components/DataLineageExplorer"));
 const DigitalDouble = lazy(() => import("./components/DigitalDouble"));
 const HaloscriptPage = lazy(() => import("./components/HaloscriptPage"));
+const HedwigPage = lazy(() => import("./components/HedwigPage"));
 const InfinityPage = lazy(() => import("./components/InfinityPage"));
 const BB8Companion = lazy(() => import("./components/BB8Companion"));
 // The film's cold open. It brings three.js with it, so it loads on its own
@@ -411,6 +412,7 @@ function RouteView({ route, bootDone, held, onBoot }) {
   if (route === "work") return <Suspense fallback={<RouteLoader label="Loading work" />}><ProjectWorkPage /></Suspense>;
   if (route === "project/digital-double") return <Suspense fallback={<RouteLoader label="Loading 3D project" />}><DigitalDouble /></Suspense>;
   if (route === "project/haloscript") return <Suspense fallback={<RouteLoader label="Loading project" />}><HaloscriptPage /></Suspense>;
+  if (route === "project/hedwig") return <Suspense fallback={<RouteLoader label="Loading project" />}><HedwigPage /></Suspense>;
   if (route.startsWith("project/")) return <Suspense fallback={<RouteLoader label="Loading project" />}><ProjectPage slug={route.slice("project/".length)} /></Suspense>;
   if (route === "lineage-demo") return <Suspense fallback={<RouteLoader label="Loading data explorer" />}><DataLineageExplorer /></Suspense>;
   if (route === "infinity") return <Suspense fallback={<RouteLoader label="Loading particle scene" />}><InfinityPage /></Suspense>;
