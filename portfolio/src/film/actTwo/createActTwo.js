@@ -3,6 +3,7 @@ import { poseAt } from "../rig.js";
 import { SETS } from "../shots.js";
 import { ACT_TWO, BUILT, moments, shotsFor, timeAtProgress } from "./timeline.js";
 import { BONE, SIGNAL, points } from "./kit.js";
+import { buildHedwig } from "./sets/hedwig.js";
 import { buildSaywhen } from "./sets/saywhen.js";
 import { buildJarvis } from "./sets/jarvis.js";
 import { buildFlightRecorder } from "./sets/flightRecorder.js";
@@ -19,7 +20,7 @@ import { attachFilm } from "../engine.js";
    how far through its arrival and scene the film is. Only the set on screen
    plays its footage. */
 
-const BUILDERS = { saywhen: buildSaywhen, jarvis: buildJarvis, "agent-flight-recorder": buildFlightRecorder, "prh-jepa": buildPrhJepa, haloscript: buildHaloscript, "digital-double": buildDigitalDouble };
+const BUILDERS = { hedwig: buildHedwig, saywhen: buildSaywhen, jarvis: buildJarvis, "agent-flight-recorder": buildFlightRecorder, "prh-jepa": buildPrhJepa, haloscript: buildHaloscript, "digital-double": buildDigitalDouble };
 
 function pickQuality() {
   const low = window.matchMedia("(max-width: 760px)").matches || (navigator.hardwareConcurrency || 8) <= 4;

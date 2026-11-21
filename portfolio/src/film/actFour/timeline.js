@@ -10,7 +10,7 @@ const shots = SHOTS.filter((shot) => shot.act === "A4");
 const first = shots[0];
 // The collapse is seen from close in, pulling back as it falls.
 export const ACT_FOUR_SHOTS = [
-  { ...first, id: "A4-00", seconds: 0.001, scroll: 0.001, cut: true, camera: { pos: [0, 1, -842], look: first.camera.look, fov: 50, move: "Close in" } },
+  { ...first, id: "A4-00", seconds: 0.001, scroll: 0.001, cut: true, camera: { pos: [0, 1, -922], look: first.camera.look, fov: 50, move: "Close in" } },
   ...shots,
 ];
 export const ACT_FOUR = buildTimeline(ACT_FOUR_SHOTS);

@@ -153,7 +153,7 @@ export const CONTACT = {
 // The command palette's fixed entries. Its project list is built from the
 // listed projects themselves (see CommandPalette.jsx), so it never drifts.
 export const COMMAND_ITEMS = [
-  { label: "Selected work · six flagship builds", go: "#projects", group: "Sections" },
+  { label: "Selected work · seven flagship builds", go: "#projects", group: "Sections" },
   { label: "What I bring · agents, evals, shipping", go: "#capabilities", group: "Sections" },
   { label: "More shipped work", go: "#more", group: "Sections" },
   { label: "Contact", go: "#contact", group: "Sections" },
