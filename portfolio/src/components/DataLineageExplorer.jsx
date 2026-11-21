@@ -215,11 +215,18 @@ export default function DataLineageExplorer() {
         </p>
 
         <div className="grid lg:grid-cols-[1fr_320px] gap-6">
-          <div className="rounded-2xl border border-white/10 bg-black/30 p-2 h-[640px] sm:h-[500px]">
+          <div>
+          {/* On a wide screen the pipeline is about 8 times wider than tall.
+              Squeezed into a fixed box it shrank to a thin strip of unreadable
+              labels, so it is drawn near its real size instead and scrolls
+              sideways inside its frame when the screen is narrower. */}
+          <div className={`rounded-2xl border border-white/10 bg-black/30 p-2 ${vertical ? "h-[640px]" : "overflow-x-auto overscroll-x-contain mono-scroll"}`}
+            tabIndex={vertical ? undefined : 0} aria-label={vertical ? undefined : "Pipeline graph, scrolls sideways"}>
             <svg
               viewBox={`0 0 ${width} ${height}`}
               preserveAspectRatio="xMidYMid meet"
               className="block w-full h-full"
+              style={vertical ? undefined : { width: `max(100%, ${Math.round(width * 0.85)}px)`, height: "auto", aspectRatio: `${width} / ${height}` }}
             >
               <g>
                 {LINEAGE_EDGES.map(([from, to]) => {
@@ -265,6 +272,8 @@ export default function DataLineageExplorer() {
                 })}
               </g>
             </svg>
+          </div>
+          {!vertical && <p className="mt-2 font-mono text-[.65rem] text-slate-400">Scroll sideways inside the frame to follow the pipeline →</p>}
           </div>
 
           <motion.div
