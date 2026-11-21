@@ -8,7 +8,8 @@ import { TOOL_INFO } from "../data/tools";
 import { BEFORE_AFTER, STEP_TOOLS } from "../data/summaries";
 import FlowDiagram, { FlourishTitle, Kicker, TagPill } from "./ui";
 import ProjectMotionPreview from "./ProjectMotionPreview";
-import { DUR, EASE } from "../lib/motion";
+import { PREVIEWABLE_PROJECTS } from "../lib/projectMotion";
+import { DUR, EASE, STAGGER, fadeUp } from "../lib/motion";
 import { isRouteTransitioning } from "../lib/routeTransition";
 import { media } from "../lib/media";
 import { MORE_WORK } from "../data/showcase";
@@ -28,16 +29,16 @@ const REAL_HEADERS = {
 const tint = (color, alpha) => `color-mix(in srgb, ${color} ${Math.round(alpha / 2.55)}%, transparent)`;
 
 /* Big headline numbers under a project's hook. */
-function StatTiles({ stats, accent }) {
+function StatTiles({ stats, accent, reduced }) {
   const a = ACCENTS[accent];
   return (
     <dl className="mt-6 grid grid-cols-2 gap-3 lg:grid-cols-4">
       {stats.map((s, index) => (
-        <div key={s.label} className={`project-stat-tile rounded-2xl border p-4 ${index === 0 ? "project-stat-primary" : ""}`} style={{ borderColor: `${tint(a.hex, 0x40)}`, background: `${tint(a.hex, 0x12)}` }}>
+        <motion.div initial={reduced ? false : { opacity: 0, y: 14 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: DUR.base, ease: EASE.out, delay: 0.25 + index * STAGGER.base }} key={s.label} className={`project-stat-tile rounded-2xl border p-4 ${index === 0 ? "project-stat-primary" : ""}`} style={{ borderColor: `${tint(a.hex, 0x40)}`, background: `${tint(a.hex, 0x12)}` }}>
           <dt className="sr-only">{s.label}</dt>
           <dd className={`font-condensed text-[clamp(2rem,5vw,3rem)] leading-none ${a.text}`}>{s.value}</dd>
-          <dd className="mt-2 text-sm leading-snug text-[color:var(--ink-200)]">{s.label}</dd>
-        </div>
+          <dd className="mt-2 text-sm leading-snug text-[color:var(--ink-200)]" title={s.short ? s.label : undefined} aria-hidden={s.short ? "true" : undefined}>{s.short || s.label}</dd>
+        </motion.div>
       ))}
     </dl>
   );
@@ -99,11 +100,11 @@ function PageTitle({ project }) {
   return <FlourishTitle text={project.title} accent={project.accent} />;
 }
 
-function SignatureArtwork({ project, reduced }) {
+function SignatureArtwork({ project, reduced, heroArt }) {
   const real = REAL_HEADERS[project.slug];
   const poster = POSTERS[project.slug] || real?.src;
   const art = poster || project.heroArt || project.spotlightArt || project.cardArt;
-  if (!art) return null;
+  if (!art || (!poster && !real && art === heroArt && !PREVIEWABLE_PROJECTS.has(project.slug))) return null;
   return (
     <motion.figure
       className={`project-signature-art project-signature-${project.slug}`}
@@ -249,13 +250,14 @@ function SummaryChart({ project }) {
 }
 
 function Block({ label, accent, children }) {
+  const reduced = useReducedMotion();
   return (
-    <section className="mt-10 first:mt-0">
+    <motion.section className="mt-10 first:mt-0" variants={fadeUp} initial={reduced ? false : "hidden"} whileInView="shown" viewport={{ once: true, margin: "0px 0px -10% 0px" }}>
       <h2 className="mb-4">
         <Kicker accent={accent}>{label}</Kicker>
       </h2>
       {children}
-    </section>
+    </motion.section>
   );
 }
 
@@ -417,6 +419,12 @@ export default function ProjectPage({ slug }) {
   const theme = pageTheme(project, i);
   const depth = DEPTH[slug];
   const summary = CASE_SUMMARIES[slug];
+  // The hero opens on the project's illustrated art (never an evidence
+  // poster or a report figure: those are content and stay sharp below),
+  // with only the hook's first sentence. The rest of the hook follows it.
+  const heroArt = project.spotlightArt || project.cardArt || project.heroArt || null;
+  const hookLead = firstSentences(project.hook, 1);
+  const hookRest = (project.hook || "").slice(hookLead.length).trim();
 
   return (
     <div className="ed-case-study min-h-full">
@@ -432,9 +440,10 @@ export default function ProjectPage({ slug }) {
 
       <header
         data-vt="frame"
-        className="mt-5 rounded-3xl border p-6 sm:p-10"
+        className={`pp-hero relative mt-5 overflow-hidden rounded-3xl border p-6 sm:p-10 ${heroArt ? "has-art" : ""}`}
         style={{ background: `radial-gradient(130% 100% at 0% 0%, ${tint(a.hex, 0x30)}, transparent 62%), rgba(16, 16, 16, 0.04)`, borderColor: `${tint(a.hex, 0x40)}` }}
       >
+        {heroArt && <div className="pp-hero-art" aria-hidden="true"><img src={media(heroArt)} alt="" /></div>}
         <div className="flex flex-wrap items-center gap-x-4 gap-y-1 font-mono text-xs uppercase tracking-[.16em]">
           <span className={`font-semibold ${a.text}`}>{project.kind}</span>
           <span className="text-[color:var(--ink-300)]">{project.status}</span>
@@ -444,8 +453,8 @@ export default function ProjectPage({ slug }) {
             <PageTitle project={project} style={theme.title} />
           </motion.span>
         </h1>
-        <p className="mt-5 text-lg leading-relaxed text-[color:var(--ink-100)]">{project.hook}</p>
-        {project.stats && <StatTiles stats={project.stats} accent={project.accent} />}
+        <p className="pp-hero-line mt-5 text-[clamp(1.2rem,2.2vw,1.6rem)] leading-snug text-[color:var(--ink-100)]">{hookLead}</p>
+        {project.stats && <StatTiles stats={project.stats} accent={project.accent} reduced={reduced || travelled} />}
         <p className="mt-3 text-sm text-[color:var(--ink-300)]">
           <span className={`font-mono text-micro uppercase tracking-[.14em] mr-2 ${a.text}`}>My role</span>
           {project.role}
@@ -464,12 +473,7 @@ export default function ProjectPage({ slug }) {
         </div>
       </header>
 
-      {summary && <section aria-labelledby="case-summary-title" className="mt-6 rounded-3xl border border-white/10 bg-white/[0.03] p-6 sm:p-8">
-        <h2 id="case-summary-title" className="font-display text-2xl font-semibold text-[color:var(--ink-100)]">At a glance</h2>
-        <dl className="mt-4 grid gap-4 sm:grid-cols-2">
-          {[["Problem", summary.problem], ["My role", project.role], ["Outcome", summary.outcome], ["Proof", summary.proof], ["Limits", summary.limits], ["Status", project.status]].map(([label, value]) => <div key={label}><dt className="font-mono text-xs uppercase tracking-wide text-[color:var(--ink-300)]">{label}</dt><dd className="mt-1 text-sm leading-relaxed text-[color:var(--ink-100)]">{value}</dd></div>)}
-        </dl>
-      </section>}
+      {hookRest && <motion.p className="mt-8 max-w-3xl text-lg leading-relaxed text-[color:var(--ink-100)]" variants={fadeUp} initial={reduced ? false : "hidden"} whileInView="shown" viewport={{ once: true }}>{hookRest}</motion.p>}
 
       {project.film
         ? <figure className="mt-6">
@@ -480,7 +484,7 @@ export default function ProjectPage({ slug }) {
           </div>
           <figcaption className="mt-3 text-sm text-[color:var(--ink-300)]">{project.film.caption}</figcaption>
         </figure>
-        : <SignatureArtwork project={project} reduced={reduced} />}
+        : <SignatureArtwork project={project} reduced={reduced} heroArt={heroArt} />}
 
       <SummaryChart project={project} />
 
@@ -506,6 +510,13 @@ export default function ProjectPage({ slug }) {
           ))}
         </div>
       )}
+
+      {summary && <section aria-labelledby="case-summary-title" className="mt-6 rounded-3xl border border-white/10 bg-white/[0.03] p-6 sm:p-8">
+        <h2 id="case-summary-title" className="font-display text-2xl font-semibold text-[color:var(--ink-100)]">At a glance</h2>
+        <dl className="mt-4 grid gap-4 sm:grid-cols-2">
+          {[["Problem", summary.problem], ["My role", project.role], ["Outcome", summary.outcome], ["Proof", summary.proof], ["Limits", summary.limits], ["Status", project.status]].map(([label, value]) => <div key={label}><dt className="font-mono text-xs uppercase tracking-wide text-[color:var(--ink-300)]">{label}</dt><dd className="mt-1 text-sm leading-relaxed text-[color:var(--ink-100)]">{value}</dd></div>)}
+        </dl>
+      </section>}
 
       <div className="panel project-panel rounded-2xl p-6 sm:p-9 mt-6">
         {depth && (
