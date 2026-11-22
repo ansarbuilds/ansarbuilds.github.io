@@ -26,6 +26,20 @@ const BEAT_SECONDS = 0.62;
 export const IMPACT = T.name + 1.22;
 // A returning visitor starts here, with the network already grown.
 export const SHORT_START = T.name - 0.75;
+
+/* The cold open's sound, cue by cue (lib/sound.js plays them): the point
+   ignites, two heartbeats, a riser under the pull back that lands as the
+   name forms, then the chord that opens the frame. A returning visitor,
+   who joins at the name, gets a shorter riser into the same hit. */
+export const CUES = [
+  { at: T.ignite, kind: "ignite", mode: "full" },
+  { at: BEATS[0], kind: "heartbeat", mode: "full" },
+  { at: BEATS[1], kind: "heartbeat", mode: "full" },
+  { at: T.pull, kind: "riser", length: IMPACT - T.pull, mode: "full" },
+  { at: SHORT_START, kind: "riser", length: IMPACT - SHORT_START, mode: "short" },
+  { at: IMPACT, kind: "hit" },
+  { at: T.open, kind: "bloom" },
+];
 export const SUBTITLE = "I build agents, studies and apps. With proof.";
 
 const clamp01 = (value) => Math.min(1, Math.max(0, value));

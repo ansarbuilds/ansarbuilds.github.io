@@ -1,6 +1,7 @@
 import "./coldOpen/coldOpen.css";
 import { useEffect, useRef, useState } from "react";
 import { createColdOpen } from "./coldOpen/createColdOpen";
+import { setSound, soundPlaying } from "../lib/sound";
 
 /* The cold open (storyboard shots CO-01 to CO-07): a point of light, two
    heartbeats, the pull back through the network, the network becoming the
@@ -25,6 +26,7 @@ export default function ColdOpen({ mode, since, onStart, onHandOver, onDone }) {
   const line = useRef(null);
   const [bars, setBars] = useState(true);
   const [handed, setHanded] = useState(false);
+  const [sound, setSoundState] = useState(soundPlaying);
 
   useEffect(() => {
     let film;
@@ -54,6 +56,8 @@ export default function ColdOpen({ mode, since, onStart, onHandOver, onDone }) {
     onStart?.();
     const skip = (event) => {
       if (event.type === "keydown" && ["Shift", "Control", "Alt", "Meta", "Tab"].includes(event.key)) return;
+      // Turning the sound on is not a skip.
+      if (event.target?.closest?.(".co-sound")) return;
       film.skip();
     };
     const events = ["pointerdown", "keydown", "wheel", "touchstart"];
@@ -65,6 +69,7 @@ export default function ColdOpen({ mode, since, onStart, onHandOver, onDone }) {
     <canvas ref={canvas} className="co-canvas" aria-hidden="true" />
     <div className={`co-bars ${bars ? "is-closed" : ""}`} aria-hidden="true"><span /><span /></div>
     <p ref={line} className="co-line" aria-hidden="true" />
+    <button type="button" className={`co-sound ${sound ? "is-on" : ""}`} aria-label="Play the film with sound" onClick={() => { setSound(true); setSoundState(true); }}><i aria-hidden="true"><b /><b /><b /></i>Play with sound</button>
     <button type="button" className="co-skip">Skip intro</button>
   </div>;
 }

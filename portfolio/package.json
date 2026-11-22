@@ -9,7 +9,7 @@
     "build": "vite build && node scripts/prerender-routes.mjs",
     "build:bb8": "vite build --config vite.bb8.config.js",
     "lint": "oxlint",
-    "test:emet": "node --test src/lib/palettes.test.mjs src/components/companionMotion.test.mjs src/components/createEmetBehaviorDirector.test.mjs src/components/createBB8Roaming.test.mjs src/emet/emetKnowledge.test.mjs src/bb8/motionCues.test.mjs src/bb8/reactionMath.test.mjs src/film/rig.test.mjs src/film/coldOpen/score.test.mjs src/film/actOne/timeline.test.mjs src/film/actTwo/timeline.test.mjs src/film/actThree/timeline.test.mjs src/film/actFour/timeline.test.mjs src/film/finale/timeline.test.mjs src/data/projectIndex.test.mjs src/film/adaptive.test.mjs src/film/coldOpen/quality.test.mjs",
+    "test:emet": "node --test src/lib/palettes.test.mjs src/lib/score.test.mjs src/components/companionMotion.test.mjs src/components/createEmetBehaviorDirector.test.mjs src/components/createBB8Roaming.test.mjs src/emet/emetKnowledge.test.mjs src/bb8/motionCues.test.mjs src/bb8/reactionMath.test.mjs src/film/rig.test.mjs src/film/coldOpen/score.test.mjs src/film/actOne/timeline.test.mjs src/film/actTwo/timeline.test.mjs src/film/actThree/timeline.test.mjs src/film/actFour/timeline.test.mjs src/film/finale/timeline.test.mjs src/data/projectIndex.test.mjs src/film/adaptive.test.mjs src/film/coldOpen/quality.test.mjs",
     "preview": "vite preview",
     "check:budget": "node scripts/check-budget.mjs",
     "check:tools": "node scripts/check-tools.mjs",

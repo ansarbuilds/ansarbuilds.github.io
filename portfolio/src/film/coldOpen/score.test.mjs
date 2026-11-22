@@ -53,3 +53,11 @@ test('the hard cut clears the network and the line is the storyboard line', () =
   assert.equal(score(T.line).lines, 0);
   assert.equal(SUBTITLE, SHOTS.find((shot) => shot.id === 'CO-06').text);
 });
+
+test('the sound cues fall inside the cold open, and the riser lands on the hit', async () => {
+  const { CUES, IMPACT, T } = await import('./score.js');
+  for (const c of CUES) assert.ok(c.at >= 0 && c.at <= T.end, c.kind);
+  const hit = CUES.find((c) => c.kind === 'hit');
+  assert.equal(hit.at, IMPACT);
+  for (const riser of CUES.filter((c) => c.kind === 'riser')) assert.ok(Math.abs(riser.at + riser.length - IMPACT) < 1e-9);
+});

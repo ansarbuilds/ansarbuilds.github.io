@@ -144,6 +144,18 @@ test('the pre-vis follows the scrollbar from the first shot to the last', async 
   await expect(page.locator('.pv-clock strong')).toHaveText(/^01:3\d\.\d$/);
 });
 
+test('the cold open offers sound, and turning it on does not skip the film', async ({ page }) => {
+  test.setTimeout(90000);
+  await page.goto('/?coldopen=full');
+  await expect(page.locator('.co')).toBeVisible({ timeout: 20000 });
+  const sound = page.locator('.co').getByRole('button', { name: 'Play the film with sound' });
+  await sound.click();
+  expect(await page.evaluate(() => localStorage.getItem('film-sound'))).toBe('1');
+  await expect(page.locator('.co-sound')).toHaveClass(/is-on/);
+  // Still playing: the layer is up and the hero has not been handed over.
+  await expect(page.locator('.co')).not.toHaveClass(/is-leaving/);
+});
+
 test('the cold open plays over the home page, hands over to the hero, and can be skipped', async ({ page }) => {
   test.setTimeout(90000);
   await page.goto('/?coldopen=full');
