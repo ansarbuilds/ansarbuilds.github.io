@@ -36,6 +36,7 @@ jobs:
       - run: npx playwright install --with-deps chromium
       - run: npx playwright test
       - run: npm run build
+      - run: node --test scripts/prerender.test.mjs
       - run: npm run check:budget
 
   emet-worker:

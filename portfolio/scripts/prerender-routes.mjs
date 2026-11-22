@@ -7,6 +7,8 @@
 import { readFile, writeFile, mkdir, access, copyFile } from 'node:fs/promises';
 import { dirname, resolve } from 'node:path';
 import { PROJECTS } from '../src/data/projects.js';
+import { CONTACT, HERO } from '../src/data/content.js';
+import { FLAGSHIPS } from '../src/data/showcase.js';
 import { PLAYGROUND, pathForRoute } from '../src/lib/routes.js';
 import { titleForRoute } from '../src/lib/routeTitle.js';
 
@@ -38,7 +40,7 @@ function summarize(text, limit = 160) {
   return text.slice(0, limit - 1).replace(/\s+\S*$/, '') + '…';
 }
 
-function page({ route, title, description, image, body }) {
+function page({ route, title, description, image, body, quiet = false }) {
   const url = ORIGIN + pathForRoute(route);
   const meta = (html, pattern, value) => {
     if (!pattern.test(html)) throw new Error(`prerender: ${pattern} not found in index.html`);
@@ -58,7 +60,10 @@ function page({ route, title, description, image, body }) {
     html = meta(html, /(<meta name="twitter:image" content=")[^"]*(")/, ORIGIN + image);
   }
   if (!html.includes('<div id="root"></div>')) throw new Error('prerender: #root not found in index.html');
-  return html.replace('<div id="root"></div>', `<div id="root"><main style="max-width:48rem;margin:16vh auto;padding:0 1.5rem">${body}</main></div>`);
+  // The home page opens on the film, so a browser that runs scripts never
+  // shows its static text: it is there for readers and crawlers that do not.
+  if (quiet) html = html.replace('</head>', '<script>document.documentElement.classList.add("js")</script><style>.js #root>.prerendered{display:none}</style></head>');
+  return html.replace('<div id="root"></div>', `<div id="root"><main${quiet ? ' class="prerendered"' : ''} style="max-width:48rem;margin:16vh auto;padding:0 1.5rem">${body}</main></div>`);
 }
 
 const pages = [];
@@ -87,6 +92,30 @@ for (const entry of pages) {
   await writeFile(file, page(entry));
 }
 await copyFile(resolve(DIST, 'index.html'), resolve(DIST, '404.html'));
+
+// The home page, last, so 404.html above stays the bare app: who I am, the
+// work with a link to each page, and how to reach me.
+const listed = PROJECTS.filter((project) => !project.hidden);
+const flagships = FLAGSHIPS.map((flag) => listed.find((project) => project.slug === flag.slug)).filter(Boolean);
+const others = listed.filter((project) => !flagships.includes(project));
+const item = (project) => `<li><a href="/work/${project.slug}/">${escape(project.title)}</a>: ${escape(project.kind || summarize(project.hook, 120))}</li>`;
+const homeTitle = template.match(/<title>([^<]*)<\/title>/)[1];
+const homeDescription = template.match(/<meta name="description" content="([^"]*)"/)[1];
+await writeFile(resolve(DIST, 'index.html'), page({
+  route: 'home',
+  title: homeTitle,
+  description: homeDescription,
+  image: null,
+  quiet: true,
+  body: [
+    `<h1>Mohamed Ansar</h1>`,
+    `<p>${escape(HERO.title)}</p>`,
+    ...HERO.lede.map((part) => `<p>${escape(part.text)}</p>`),
+    `<h2>Selected work</h2><ul>${flagships.map(item).join('')}</ul>`,
+    `<h2>More work</h2><ul>${others.map(item).join('')}</ul>`,
+    `<h2>Contact</h2><p><a href="mailto:${escape(CONTACT.email)}">${escape(CONTACT.email)}</a> · <a href="${escape(CONTACT.github)}">GitHub</a> · <a href="${escape(CONTACT.linkedin)}">LinkedIn</a></p>`,
+  ].join(''),
+}));
 
 // Add the new pages to the sitemap that public/ already ships.
 const sitemapFile = resolve(DIST, 'sitemap.xml');

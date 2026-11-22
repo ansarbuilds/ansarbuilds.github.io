@@ -277,7 +277,10 @@ export default function WorkStage() {
         const Demo = DEMOS[flag.slug];
         const shown = !desktop || i === active;
         const outbound = outboundLink(project);
-        return <article key={flag.slug} id={`card-${flag.slug}`} role={desktop ? "tabpanel" : undefined} aria-labelledby={desktop ? `st-tab-${flag.slug}` : undefined} className={`st-panel ${shown ? "is-active" : ""}`} inert={!shown}>
+        // A tab panel on desktop (a div, since an article cannot take that
+        // role); a plain article in the phone list.
+        const Panel = desktop ? "div" : "article";
+        return <Panel key={flag.slug} id={`card-${flag.slug}`} role={desktop ? "tabpanel" : undefined} aria-labelledby={desktop ? `st-tab-${flag.slug}` : undefined} className={`st-panel ${shown ? "is-active" : ""}`} inert={!shown}>
           <div className="st-demo">{Demo ? <Demo flag={flag} project={project} active={shown && live} hold={() => setHeld(true)} /> : <div className="st-cover"><img className="ed-lazy-media" src={media(coverOf(project))} alt="" loading="lazy" onLoad={reveal} /></div>}</div>
           <div className="st-info">
             <p className="st-eyebrow"><span>{String(i + 1).padStart(2, "0")} / {String(STAGE.length).padStart(2, "0")}</span><em><i aria-hidden="true" />{flag.badge}</em></p>
@@ -291,7 +294,7 @@ export default function WorkStage() {
               {outbound && <a className="sc-btn-ghost" href={outbound.href} target="_blank" rel="noopener noreferrer">{outbound.label}<ExternalLink size={15} aria-hidden="true" /></a>}
             </div>
           </div>
-        </article>;
+        </Panel>;
       })}
     </div>
   </div>;
