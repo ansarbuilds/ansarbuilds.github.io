@@ -15,6 +15,8 @@ import { SCORE, arpNote, chordAt, hz } from "./score.js";
 const KEY = "film-sound";
 let ctx = null, master = null, music = null, padTone = null, air = null, verb = null, on = false;
 let noiseBuffer = null;
+// The film is paused: the score holds where it is until it plays again.
+let paused = false;
 // The chord voices still ringing, so a change of act can let them go.
 const sounding = new Set();
 const listeners = new Set();
@@ -109,13 +111,13 @@ function build() {
     clearTimeout(settle);
     settle = setTimeout(() => { padTone.frequency.setTargetAtTime(900, ctx.currentTime, 0.8); air.gain.setTargetAtTime(0, ctx.currentTime, 0.6); }, 160);
   }, { passive: true });
-  document.addEventListener("visibilitychange", () => { if (document.visibilityState === "hidden") ctx.suspend(); else if (on) ctx.resume(); });
+  document.addEventListener("visibilitychange", () => { if (document.visibilityState === "hidden") ctx.suspend(); else if (on && !paused) ctx.resume(); });
   setInterval(schedule, 50);
 }
 
 function start() {
   if (!ctx) build();
-  ctx.resume();
+  if (!paused) ctx.resume();
   master.gain.cancelScheduledValues(ctx.currentTime);
   master.gain.setTargetAtTime(0.7, ctx.currentTime, 0.4);
 }
@@ -409,4 +411,12 @@ export function cueOnRise(kind, at = 0.5) {
     if (below && value >= at) { below = false; cue(kind); }
     else if (value < at * 0.5) below = true;
   };
+}
+
+// Pausing the film holds the score and every ringing note with it.
+export function holdSound(next) {
+  paused = next;
+  if (!ctx) return;
+  if (paused) ctx.suspend();
+  else if (on && document.visibilityState === "visible") ctx.resume();
 }

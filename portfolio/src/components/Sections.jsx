@@ -1,13 +1,13 @@
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { animate, motion, useAnimationFrame, useInView, useMotionValue, useReducedMotion, useScroll, useSpring, useTransform, useVelocity } from "framer-motion";
-import { ArrowDown, ArrowRight, ArrowUpRight, ExternalLink } from "lucide-react";
+import { ArrowDown, ArrowRight, ArrowUpRight, ExternalLink, Play } from "lucide-react";
 import SignalField from "./SignalField";
 import WorkStage from "./WorkStage";
 import { CODE, CONTACT, HERO, RECEIPTS } from "../data/content";
 import { EXPERIMENTS, LISTED_PROJECTS, getProject } from "../data/projectIndex";
 import { CAPABILITIES, FLAGSHIPS, MORE_WORK, STACK_MARQUEE } from "../data/showcase";
 import { EASE, STAGGER, tween } from "../lib/motion";
-import { INTRO_SESSION_KEY, filmEnabled } from "../lib/intro";
+import { INTRO_SESSION_KEY, filmEnabled, watchFilm } from "../lib/intro";
 import ActOne from "../film/ActOne";
 import ActTwo from "../film/ActTwo";
 import ActThree from "../film/ActThree";
@@ -219,8 +219,8 @@ export function Hero({ ready = true, hold = false, onReady }) {
     animate: { y: "0%", skewY: 0 },
     transition: tween("slow", "out", i * STAGGER.loose),
   });
-  // The short version: Act I of the film where it can play, or the plain
-  // sheet (also its fallback).
+  // The film plays over the page on its own (see FilmPlayer); the hero
+  // offers it to anyone who has not just seen it.
   const [film] = useState(filmEnabled);
   const brief = <section className="ed-intro ed-light sc-brief" aria-label="The short version" data-palette="lumen">
     <div className="ed-wrap">
@@ -246,12 +246,13 @@ export function Hero({ ready = true, hold = false, onReady }) {
         <motion.div className="sc-hero-ctas" {...appear(2)}>
           <MagneticLink href="#projects" className="sc-hero-btn">See the work<ArrowDown size={18} aria-hidden="true" /></MagneticLink>
           <a href="#contact" className="sc-hero-ghost">Get in touch<ArrowUpRight size={16} aria-hidden="true" /></a>
+          {film && <button type="button" className="sc-hero-ghost sc-hero-film" onClick={watchFilm}><Play size={14} aria-hidden="true" />Watch the film</button>}
           <span className={`sc-hero-hint ${hint ? "is-shown" : ""}`} aria-hidden="true">Click the network</span>
         </motion.div>
       </motion.div>
       <motion.div className="sc-hero-bottom" style={{ y: feedY, opacity: feedOpacity }}><HeroFeed appear={appear} from={3} /></motion.div>
     </section>
-    {film ? <ActOne receipts={RECEIPT_VALUES} tools={STACK_MARQUEE} lead={STATEMENT.lead} rest={STATEMENT.rest} fallback={brief} /> : brief}
+    {brief}
   </div>;
 }
 
@@ -312,9 +313,7 @@ const FILM_PROJECTS = FILM_SETS.map((slug) => {
 });
 
 export function ProjectsSection() {
-  // Act II plays above the hands-on stage where the film can play.
-  const [film] = useState(filmEnabled);
-  return <>{film && <ActTwo projects={FILM_PROJECTS} />}<section id="projects" className="ed-projects ed-light ed-section" data-palette="bloom">
+  return <><section id="projects" className="ed-projects ed-light ed-section" data-palette="bloom">
     <div className="ed-section-watermark" aria-hidden="true">WORK</div>
     <div className="ed-wrap">
       <Enter className="ed-section-heading sc-stage-heading"><div><IndexLabel number="02">Selected work</IndexLabel><h2>Seven builds. <em>Each with its numbers.</em></h2></div><div className="ed-heading-aside"><p>Each one has the number, the picture and a way in. Some you can run, some you watch, some you read.</p></div></Enter>
@@ -331,10 +330,7 @@ const FILM_CAPABILITIES = CAPABILITIES.map((cap) => {
 });
 
 export function CapabilitiesSection() {
-  // Act III where the film can play; this plain section otherwise (and if it fails).
-  const [film] = useState(filmEnabled);
-  const plain = <PlainCapabilities />;
-  return film ? <ActThree capabilities={FILM_CAPABILITIES} fallback={plain} /> : plain;
+  return <PlainCapabilities />;
 }
 
 function PlainCapabilities() {
@@ -391,14 +387,10 @@ function ExperimentImage({ experiment }) {
   return <img className="ed-lazy-media" src={media(!artBroken && experiment.cardArt ? experiment.cardArt : experiment.shot)} alt="" width={1200} height={900} loading="lazy" onLoad={revealImage} onError={() => setArtBroken(true)} />;
 }
 
-// The playground on the home page: Act IV where the film can play, ending on
-// a way into each experiment. Without the film (reduced motion, a slow
-// connection, no WebGL 2) it is a plain row of the same experiments, so
-// those visitors can still find them from the home page.
+// The playground on the home page: a row of the experiments Act IV plays,
+// each a way into the real thing.
 const FILM_EXPERIMENTS = ["solar", "stars", "emet"].map((id) => EXPERIMENTS.find((e) => e.id === id)).filter(Boolean);
 export function PlaygroundSection() {
-  const [film] = useState(filmEnabled);
-  if (film) return <ActFour experiments={FILM_EXPERIMENTS} />;
   return <section id="ai" className="ed-projects ed-light ed-section" aria-labelledby="playground-title" data-palette="neon">
     <div className="ed-wrap">
       <Enter className="ed-section-heading"><div><IndexLabel number="05">Playground</IndexLabel><h2 id="playground-title">Rooms off <em>the hall.</em></h2></div><div className="ed-heading-aside"><p>Small things I built to try an idea. Each one opens on its own page.</p></div></Enter>
@@ -422,16 +414,22 @@ export function ExperimentsSection() {
 /* The last shot: the address itself is the biggest thing in the section,
    and the network behind it sends its signals in to that address once,
    then goes quiet. */
-const PITCH = "I like the hard part: agents that have to be trusted, evals that have to be honest, and products that have to ship. If that sounds like your problem, write to me.";
 const CREDIT = "Directed, designed and built by Mohamed Ansar";
 
-// Contact: the film's finale where it can play; the plain section otherwise
-// (and if the finale fails to start).
 export function ContactSection() {
-  const [film] = useState(filmEnabled);
-  const { navigate } = useRoute();
-  const plain = <PlainContact />;
-  return film ? <Finale contact={CONTACT} pitch={PITCH} credit={CREDIT} onTop={() => navigate("deck")} fallback={plain} /> : plain;
+  return <PlainContact />;
+}
+
+/* The film's acts, in order, for the film player (film/FilmPlayer.jsx).
+   Each is given the player's clock and the words it puts over its frames. */
+export function FilmReel({ playback }) {
+  return <>
+    <ActOne playback={playback} receipts={RECEIPT_VALUES} tools={STACK_MARQUEE} lead={STATEMENT.lead} rest={STATEMENT.rest} />
+    <ActTwo playback={playback} projects={FILM_PROJECTS} />
+    <ActThree playback={playback} capabilities={FILM_CAPABILITIES} />
+    <ActFour playback={playback} experiments={FILM_EXPERIMENTS} />
+    <Finale playback={playback} contact={CONTACT} credit={CREDIT} />
+  </>;
 }
 
 function PlainContact() {

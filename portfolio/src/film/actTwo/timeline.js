@@ -19,7 +19,7 @@ export { BUILT };
    set's subject lands exactly where the last one's stood, the same size, and
    the camera pulls back from there. A join is always far shorter than the
    scenes either side of it. */
-const HOLD_SCROLL = 0.12, HOLD_SECONDS = 0.5;
+const HOLD_SCROLL = 0.12, HOLD_SECONDS = 0.4;
 // Where each set's subject stands in its own local space (mirrors the
 // constants in sets/*.js: +z faces the scene camera, +x is screen right).
 export const SUBJECTS = {

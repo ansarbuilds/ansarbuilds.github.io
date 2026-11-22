@@ -4,7 +4,7 @@ import { SETS } from "../shots.js";
 import { BONE, SIGNAL, canvasCard, faceCamera, glow, points, ramp, smooth } from "../actTwo/kit.js";
 import { PLANETS, buildOrbitPoints, displayRadius, planetPosition } from "../../three/orbitalMechanics.js";
 import { getEmetEntry } from "../../emet/emetKnowledge.js";
-import { ACT_FOUR, moments, timeAtProgress } from "./timeline.js";
+import { ACT_FOUR, moments } from "./timeline.js";
 import { attachFilm } from "../engine.js";
 
 /* Act IV (A4-01 to A4-04), the playground reel, in plain three.js:
@@ -186,7 +186,7 @@ function buildTerminal(centre) {
   };
 }
 
-export function createActFour(canvas, { getProgress, onFrame }) {
+export function createActFour(canvas, { getTime, onFrame }) {
   const quality = pickQuality();
   // The shared renderer (see engine.js): this act draws into it, and its
   // frames are copied onto this canvas.
@@ -226,7 +226,7 @@ export function createActFour(canvas, { getProgress, onFrame }) {
     const dt = Math.min(0.1, (nowMs - last) / 1000);
     last = nowMs;
     clock += dt;
-    const t = timeAtProgress(getProgress());
+    const t = Math.min(ACT_FOUR.seconds, Math.max(0, getTime()));
     const pose = poseAt(ACT_FOUR, t);
     look.fromArray(pose.look);
     pos.fromArray(pose.pos).sub(look).divideScalar(fit).add(look);

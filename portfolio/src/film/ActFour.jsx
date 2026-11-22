@@ -1,88 +1,38 @@
-import "./keyboard.css";
 import "./actFour/actFour.css";
-import { trackQuiet } from "./quiet";
-import { useEffect, useRef, useState } from "react";
+import { useRef } from "react";
 import ActTitle from "./ActTitle";
 import { ArrowUpRight } from "lucide-react";
-import { ACT_FOUR_SCREENS } from "./actFour/screens";
-import { cueOnRise, showBed } from "../lib/sound";
+import { cueOnRise } from "../lib/sound";
+import { show, useAct } from "./useAct";
 
-/* Act IV, the playground reel, on the home page between More work and
-   Contact: the network collapses into a star, then the solar system, the
-   infinity ribbon and Emet's terminal, each with a card that opens the real
-   experiment. `experiments` are in film order. */
-const SCREENS = ACT_FOUR_SCREENS + 1;
-
-export default function ActFour({ experiments }) {
-  const section = useRef(null);
+/* Act IV, the playground reel, in the film player: the network collapses
+   into a star, then the solar system, the infinity ribbon and Emet's
+   terminal, each with a card that opens the real experiment. `experiments`
+   are in film order. */
+export default function ActFour({ playback, experiments }) {
   const canvas = useRef(null);
   const title = useRef(null);
   const cards = useRef([]);
-  const [failed, setFailed] = useState(false);
+  const chimes = useRef(null);
+  chimes.current ??= experiments.map(() => cueOnRise("chime"));
 
-  useEffect(() => {
-    const el = section.current;
-    const untrack = trackQuiet(el.querySelector(".act4-stage"));
-    let film = null, cancelled = false, onScreen = false, loading = false;
-    const progress = () => {
-      const box = el.getBoundingClientRect();
-      const span = box.height - window.innerHeight;
-      return span > 0 ? Math.min(1, Math.max(0, -box.top / span)) : 0;
-    };
-    const show = (node, amount, rise) => {
-      if (!node) return;
-      node.style.opacity = amount;
-      node.style.transform = `translateY(${(1 - amount) * rise}px)`;
-      // Out of shot it is see-through and ignores the pointer, but it stays in
-      // the tab order: a keyboard user can still reach it, and it shows itself
-      // while it has focus (see .film-card in film/keyboard.css).
-      node.style.visibility = "visible";
-      node.classList.add("film-card");
-      node.classList.toggle("is-offshot", amount <= 0.02);
-    };
-    const chimes = experiments.map(() => cueOnRise("chime"));
-    const onFrame = (t, m) => {
+  const { failed, titleUp } = useAct({
+    id: "act4",
+    playback,
+    load: async () => {
+      const [{ createActFour }] = await Promise.all([import("./actFour/createActFour"), document.fonts?.load("500 34px JetBrains Mono")]);
+      return (options) => createActFour(canvas.current, options);
+    },
+    onFrame: (t, m) => {
       show(title.current, m.title, 16);
-      m.cards.forEach((amount, i) => { show(cards.current[i], amount, 22); chimes[i](amount); });
-    };
-    const run = () => film?.setActive(onScreen && document.visibilityState === "visible");
-    const load = async () => {
-      if (loading) return;
-      loading = true;
-      try {
-        const [{ createActFour }] = await Promise.all([import("./actFour/createActFour"), document.fonts?.load("500 34px JetBrains Mono")]);
-        if (cancelled) return;
-        film = createActFour(canvas.current, { getProgress: progress, onFrame });
-        el.classList.add("is-live");
-        run();
-      } catch {
-        if (!cancelled) setFailed(true);
-      }
-    };
-        // Once this act is on its way, fetch the next act's code too, so a fast
-    // scroller never waits for a scene to arrive. (Fetched once; cached.)
-    const warmNext = () => import("./finale/createFinale").catch(() => {});
-const near = new IntersectionObserver(([entry]) => { if (entry.isIntersecting) { near.disconnect(); load(); warmNext(); } }, { rootMargin: "0px 0px 150% 0px" });
-    // The sound bed follows the act on screen (silent unless sound is on).
-    const seen = new IntersectionObserver(([entry]) => { onScreen = entry.isIntersecting; showBed("act4", onScreen); run(); });
-    near.observe(el);
-    seen.observe(el);
-    document.addEventListener("visibilitychange", run);
-    return () => {
-      cancelled = true;
-      untrack();
-      near.disconnect();
-      seen.disconnect();
-      showBed("act4", false);
-      document.removeEventListener("visibilitychange", run);
-      film?.dispose();
-    };
-  }, [experiments]);
+      m.cards.forEach((amount, i) => { show(cards.current[i], amount, 22); chimes.current[i]?.(amount); });
+    },
+  });
 
   if (failed) return null;
-  return <section ref={section} id="ai" className="act4" aria-labelledby="act4-title" data-palette="neon" style={{ "--act-screens": SCREENS }}>
+  return <section className="act4 film-act" data-act="act4" aria-labelledby="act4-title">
     <div className="act4-stage">
-      <ActTitle section={section}>IV. The playground</ActTitle>
+      <ActTitle up={titleUp}>IV. The playground</ActTitle>
       <canvas ref={canvas} className="act4-canvas" aria-hidden="true" />
       <div ref={title} className="act4-title">
         <p className="act4-kicker">05 · The playground</p>

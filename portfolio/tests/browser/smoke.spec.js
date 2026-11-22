@@ -63,10 +63,15 @@ test('share pages open their matching case studies', async ({ page }) => {
 });
 
 test('homepage has no critical or serious automated accessibility violations', async ({ page }) => {
+  await page.addInitScript((key) => sessionStorage.setItem(key, '1'), INTRO_SESSION_KEY);
   await page.goto('/');
   await expect(page.getByRole('main')).toBeVisible();
   // Judge the settled page: text caught half faded in reads as low contrast.
   await page.addStyleTag({ content: '*, *::before, *::after { animation-duration: 0s !important; animation-delay: 0s !important; transition: none !important; }' });
+  // The short version's statement reveals word by word as it scrolls up:
+  // judge it read in full.
+  await page.locator('.sc-statement').evaluate((node) => window.scrollTo(0, node.getBoundingClientRect().top + window.scrollY - window.innerHeight * 0.25));
+  await page.waitForTimeout(600);
   const result = await new AxeBuilder({ page }).analyze();
   const bad = result.violations.filter((violation) => ['critical', 'serious'].includes(violation.impact));
   expect(bad.map((v) => `${v.id}: ${v.nodes.map((n) => n.target.join(' ')).join(', ')}`)).toEqual([]);
@@ -141,216 +146,128 @@ test('the pre-vis follows the scrollbar from the first shot to the last', async 
   await expect(page.locator('.pv-hud h1')).toContainText('CO-02');
   await page.evaluate(() => window.scrollTo(0, document.documentElement.scrollHeight));
   await expect(page.locator('.pv-hud h1')).toContainText('FN-02');
-  await expect(page.locator('.pv-clock strong')).toHaveText(/^01:3\d\.\d$/);
+  await expect(page.locator('.pv-clock strong')).toHaveText(/^01:1\d\.\d$/);
 });
 
-test('the cold open offers sound, and turning it on does not skip the film', async ({ page }) => {
-  test.setTimeout(90000);
+// A visitor who has been here before: the page, without the poster.
+const RETURNING = (key) => { sessionStorage.setItem(key, '1'); sessionStorage.setItem('cold-open-played', '1'); };
+
+test('a first visit opens on the poster, and Play runs the film with sound, then the page', async ({ page }) => {
+  test.setTimeout(120000);
   await page.goto('/?coldopen=full');
-  await expect(page.locator('.co')).toBeVisible({ timeout: 20000 });
-  const sound = page.locator('.co').getByRole('button', { name: 'Play with sound' });
-  await sound.click();
+  const play = page.getByRole('button', { name: 'Play the film', exact: true });
+  await expect(play).toBeFocused();
+  await play.click();
+  // Pressing Play is the click a browser needs before it allows sound.
   expect(await page.evaluate(() => localStorage.getItem('film-sound'))).toBe('1');
+  await expect(page.locator('.co')).toBeVisible({ timeout: 20000 });
   await expect(page.locator('.co-sound')).toHaveClass(/is-on/);
-  // Still playing: the layer is up and the hero has not been handed over.
-  await expect(page.locator('.co')).not.toHaveClass(/is-leaving/);
+  // A click skips the cold open only: the acts carry on in the player.
+  await page.waitForTimeout(800);
+  await page.mouse.click(20, 200);
+  await expect(page.locator('.film-player.is-rolling')).toBeVisible({ timeout: 20000 });
+  await expect(page.locator('.film-act.is-on')).toHaveAttribute('data-act', 'act1');
+  // The page under the film holds still and is out of reach.
+  await expect(page.locator('#main-content')).toHaveAttribute('inert', '');
+  await expect(page.getByRole('button', { name: 'Pause the film' })).toBeAttached();
+  await expect(page.getByRole('slider', { name: 'Where the film is' })).toBeAttached();
+  // Escape skips to the page, which then scrolls as usual.
+  await page.keyboard.press('Escape');
+  await expect(page.locator('.film-player')).toHaveCount(0);
+  await expect(page.locator('#main-content')).not.toHaveAttribute('inert', '');
+  await page.evaluate(() => window.scrollTo(0, 1200));
+  await expect.poll(() => page.evaluate(() => window.scrollY)).toBeGreaterThan(1000);
 });
 
-test('the cold open plays over the home page, hands over to the hero, and can be skipped', async ({ page }) => {
-  test.setTimeout(90000);
+test('the poster can be skipped straight to the page', async ({ page }) => {
   await page.goto('/?coldopen=full');
-  // Its code can take a while on a dev server that has just rebuilt three.js.
-  await expect(page.locator('.co')).toBeVisible({ timeout: 20000 });
-  await expect(page.locator('.ed-nav')).toHaveCSS('opacity', '0');
-  await page.waitForTimeout(800);
-  await page.getByRole('button', { name: 'Skip intro' }).click();
-  await expect(page.locator('.co, .co-veil')).toHaveCount(0, { timeout: 4000 });
+  await page.getByRole('button', { name: 'Skip to the site' }).click();
+  await expect(page.locator('.film-poster, .co, .film-player')).toHaveCount(0);
   await expect(page.getByRole('heading', { name: 'Mohamed Ansar', level: 1 })).toBeVisible();
   await expect(page.locator('.ed-nav')).toHaveCSS('opacity', '1');
 });
 
-test('the cold open does not play for reduced motion, a section link, or a second page view', async ({ page }) => {
+test('"Skip to the site" during the cold open skips the whole film', async ({ page }) => {
+  test.setTimeout(90000);
+  await page.goto('/?coldopen=full');
+  await page.getByRole('button', { name: 'Play the film', exact: true }).click();
+  await expect(page.locator('.co')).toBeVisible({ timeout: 20000 });
+  await page.waitForTimeout(800);
+  await page.locator('.co').getByRole('button', { name: 'Skip to the site' }).click();
+  await expect(page.locator('.co, .film-player')).toHaveCount(0, { timeout: 4000 });
+  await expect(page.getByRole('heading', { name: 'Mohamed Ansar', level: 1 })).toBeVisible();
+});
+
+test('the poster does not show for reduced motion, a section link, or a second page view', async ({ page }) => {
   await page.emulateMedia({ reducedMotion: 'reduce' });
   await page.goto('/');
-  await expect(page.locator('.co, .co-veil')).toHaveCount(0);
+  await expect(page.locator('.film-poster')).toHaveCount(0);
   await page.emulateMedia({ reducedMotion: 'no-preference' });
   await page.goto('/#contact');
-  await expect(page.locator('.co, .co-veil')).toHaveCount(0);
+  await expect(page.locator('.film-poster')).toHaveCount(0);
   await page.evaluate(() => sessionStorage.setItem('cold-open-played', '1'));
   await page.goto('/');
-  await expect(page.locator('.co, .co-veil')).toHaveCount(0);
+  await expect(page.locator('.film-poster')).toHaveCount(0);
 });
 
-test('Act I pins its stage, keeps its words as real text, and loads its scene near the screen', async ({ page }) => {
-  test.setTimeout(90000);
-  await page.addInitScript((key) => { sessionStorage.setItem(key, '1'); sessionStorage.setItem('cold-open-played', '1'); }, INTRO_SESSION_KEY);
+test('a returning visitor can watch the film from the nav, and pause it', async ({ page, isMobile }) => {
+  test.skip(isMobile, 'the nav button is the same on a phone');
+  test.setTimeout(120000);
+  await page.addInitScript(RETURNING, INTRO_SESSION_KEY);
   await page.goto('/');
-  const act = page.locator('section.act1');
-  await expect(act).toHaveCount(1);
-  await expect(act.getByText('Most AI demos stop at the demo.')).toBeAttached();
-  await expect(act.locator('dl dt')).toHaveCount(4);
-  await act.evaluate((node) => window.scrollTo(0, node.getBoundingClientRect().top + window.scrollY + window.innerHeight));
-  await expect(act).toHaveClass(/is-live/, { timeout: 60000 });
-  const stage = await page.locator('.act1-stage').boundingBox();
-  expect(Math.abs(stage.y)).toBeLessThan(2);
+  await page.evaluate(() => window.scrollTo(0, 1500));
+  await page.locator('.ed-nav').getByRole('button', { name: 'Watch the film' }).click();
+  await expect(page.locator('.co')).toBeVisible({ timeout: 20000 });
+  await expect.poll(() => page.evaluate(() => window.scrollY)).toBe(0);
+  await page.waitForTimeout(800);
+  await page.keyboard.press('Enter');
+  await expect(page.locator('.film-player.is-rolling')).toBeVisible({ timeout: 20000 });
+  await page.getByRole('button', { name: 'Pause the film' }).click();
+  const scrub = page.getByRole('slider', { name: 'Where the film is' });
+  const at = await scrub.inputValue();
+  await page.waitForTimeout(1200);
+  expect(await scrub.inputValue()).toBe(at);
+  await page.getByRole('button', { name: 'Skip to the site' }).click();
+  await expect(page.locator('.film-player')).toHaveCount(0);
 });
 
-test('with reduced motion the short version is the plain section', async ({ page }) => {
+test('the home page is a plain page to scroll, with every section in it', async ({ page }) => {
+  await page.addInitScript(RETURNING, INTRO_SESSION_KEY);
+  await page.goto('/');
+  await expect(page.locator('.film-act')).toHaveCount(0);
+  await expect(page.locator('.sc-receipts dt')).toHaveCount(4);
+  for (const id of ['projects', 'capabilities', 'more', 'ai', 'contact']) await expect(page.locator(`#${id}`)).toHaveCount(1);
+  for (const href of ['/playground/explore/', '/playground/infinity/', '/playground/emet/']) await expect(page.locator(`section#ai a[href="${href}"]`)).toHaveCount(1);
+  await expect(page.locator('#contact a[href^="mailto:"]').first()).toBeAttached();
+});
+
+test('with reduced motion there is no film to watch', async ({ page }) => {
   await page.emulateMedia({ reducedMotion: 'reduce' });
   await page.goto('/');
-  await expect(page.locator('section.act1')).toHaveCount(0);
+  await expect(page.getByRole('button', { name: 'Watch the film' })).toHaveCount(0);
   await expect(page.locator('.sc-receipts dt')).toHaveCount(4);
 });
 
-test('Act II plays above the work stage, with real links that are hidden until their card shows', async ({ page }) => {
+test('the film keeps its words as real text and its links real, and an act off screen is out of reach', async ({ page }) => {
   test.setTimeout(90000);
-  await page.addInitScript((key) => { sessionStorage.setItem(key, '1'); sessionStorage.setItem('cold-open-played', '1'); }, INTRO_SESSION_KEY);
-  await page.goto('/');
-  const act = page.locator('section.act2');
-  await expect(act).toHaveCount(1);
-  const card = act.locator('article.act2-card').first();
-  // Selected directly: while hidden, it is rightly out of the accessibility tree.
-  await expect(card.locator('a.act2-primary')).toHaveAttribute('href', '/work/hedwig/');
-  // Before the scene, the card is out of the way of the keyboard.
-  await act.evaluate((node) => window.scrollTo(0, node.getBoundingClientRect().top + window.scrollY));
-  await expect(act).toHaveClass(/is-live/, { timeout: 60000 });
-  await expect(card).toBeHidden();
-  // At the end of the act, the last project's card is there and usable,
-  // and the earlier ones have gone.
-  await act.evaluate((node) => window.scrollTo(0, node.getBoundingClientRect().top + window.scrollY + node.offsetHeight - window.innerHeight));
-  const last = act.locator('article.act2-card').last();
-  // The scene has to catch up with the jump before its card shows.
-  await expect(last).toBeVisible({ timeout: 20000 });
-  await expect(last.getByRole('link', { name: 'Read the case study' })).toBeVisible();
-  await expect(card).toBeHidden();
-  expect(await page.locator('#projects').evaluate((node) => node.getBoundingClientRect().top > 0)).toBe(true);
-});
-
-test('Act III replaces What I bring with the monoliths, keeping its links and its place in the nav', async ({ page }) => {
-  test.setTimeout(90000);
-  await page.addInitScript((key) => { sessionStorage.setItem(key, '1'); sessionStorage.setItem('cold-open-played', '1'); }, INTRO_SESSION_KEY);
-  await page.goto('/');
-  const act = page.locator('section.act3');
-  await expect(act).toHaveId('capabilities');
-  await expect(act.locator('article.act3-card')).toHaveCount(3);
-  await expect(act.locator('article.act3-card a[href="/work/jarvis/"]')).toHaveCount(1);
-  await act.evaluate((node) => window.scrollTo(0, node.getBoundingClientRect().top + window.scrollY + node.offsetHeight - window.innerHeight));
-  await expect(act).toHaveClass(/is-live/, { timeout: 60000 });
-  // At the end, the last capability's card is the one showing.
-  await expect(act.locator('article.act3-card').last()).toBeVisible();
-  // The first is out of shot: see-through and not under the pointer, though
-  // still in the tab order (see film/keyboard.css).
-  await expect(act.locator('article.act3-card').first()).toHaveClass(/is-offshot/);
-  await expect(act.locator('article.act3-card').first()).toHaveCSS('opacity', '0');
-});
-
-test('Act IV plays between More work and Contact, and its cards open the experiments', async ({ page }) => {
-  test.setTimeout(90000);
-  await page.addInitScript((key) => { sessionStorage.setItem(key, '1'); sessionStorage.setItem('cold-open-played', '1'); }, INTRO_SESSION_KEY);
-  await page.goto('/');
-  const act = page.locator('section.act4');
-  await expect(act).toHaveId('ai');
-  expect(await page.evaluate(() => { const a = document.querySelector('#more'), b = document.querySelector('#ai'), c = document.querySelector('#contact'); return a.compareDocumentPosition(b) & 4 && b.compareDocumentPosition(c) & 4; })).toBeTruthy();
-  await expect(act.locator('a.act4-cta')).toHaveCount(3);
-  await expect(act.locator('a.act4-cta[href="/playground/emet/"]')).toHaveCount(1);
-  await act.evaluate((node) => window.scrollTo(0, node.getBoundingClientRect().top + window.scrollY + node.offsetHeight - window.innerHeight));
-  await expect(act).toHaveClass(/is-live/, { timeout: 60000 });
-  await expect(act.locator('article.act4-card').last()).toBeVisible();
-});
-
-test('a film card opens its project, and Back returns to the same moment of the film', async ({ page }) => {
-  // Building every Act II set under software rendering is slow on a busy machine.
-  test.setTimeout(90000);
-  await page.addInitScript((key) => { sessionStorage.setItem(key, '1'); sessionStorage.setItem('cold-open-played', '1'); }, INTRO_SESSION_KEY);
-  await page.goto('/');
-  await page.addStyleTag({ content: '.bb8-edge { display: none !important; }' });
-  const act = page.locator('section.act2');
-  // The end of the act: the last project's card is up.
-  await act.evaluate((node) => window.scrollTo(0, node.getBoundingClientRect().top + window.scrollY + node.offsetHeight - window.innerHeight));
-  await expect(act).toHaveClass(/is-live/, { timeout: 60000 });
-  const card = act.locator('article.act2-card').last();
-  await expect(card).toBeVisible();
-  const before = await page.evaluate(() => window.scrollY);
-  const href = await card.locator('a.act2-primary').getAttribute('href');
-  await card.locator('a.act2-primary').click();
-  await expect(page).toHaveURL(new RegExp(`${href}$`));
-  await page.goBack();
-  await expect(page).toHaveURL(/\/$/);
-  await expect.poll(() => page.evaluate(() => window.scrollY)).toBeGreaterThan(before - 40);
-  expect(Math.abs((await page.evaluate(() => window.scrollY)) - before)).toBeLessThan(40);
-  // The home page is rebuilt on the way back, so the act starts its scene again.
-  await expect(act).toHaveClass(/is-live/, { timeout: 60000 });
-  await expect(card).toBeVisible({ timeout: 15000 });
-});
-
-test('the finale keeps the contact links real, and #contact lands on the contact beat', async ({ page }) => {
-  test.setTimeout(60000);
-  await page.addInitScript((key) => { sessionStorage.setItem(key, '1'); sessionStorage.setItem('cold-open-played', '1'); }, INTRO_SESSION_KEY);
-  await page.goto('/');
-  const fin = page.locator('section.fin');
-  await expect(fin.locator('a.fin-email')).toHaveAttribute('href', /^mailto:/);
-  await page.goto('/#contact');
-  await expect(fin).toHaveClass(/is-live/, { timeout: 40000 });
-  await expect(fin.locator('a.fin-email')).toBeVisible();
-});
-
-test('the film\'s sound is off until switched on, and the choice is remembered', async ({ page }) => {
-  await page.addInitScript((key) => sessionStorage.setItem(key, '1'), INTRO_SESSION_KEY);
-  await page.goto('/');
-  const sound = page.getByRole('button', { name: /film's sound/ });
-  await expect(sound).toHaveAttribute('aria-pressed', 'false');
-  await sound.click();
-  await expect(sound).toHaveAttribute('aria-pressed', 'true');
-  await page.reload();
-  await expect(page.getByRole('button', { name: /film's sound/ })).toHaveAttribute('aria-pressed', 'true');
-  await page.getByRole('button', { name: /film's sound/ }).click();
-  await expect(page.getByRole('button', { name: /film's sound/ })).toHaveAttribute('aria-pressed', 'false');
-});
-
-test('Act II has a way past it for the keyboard', async ({ page }) => {
-  test.setTimeout(90000);
-  await page.addInitScript((key) => sessionStorage.setItem(key, '1'), INTRO_SESSION_KEY);
-  await page.goto('/');
-  await expect(page.locator('section.act2 a.film-skip')).toHaveAttribute('href', '#projects');
-});
-
-test('each act has its title card as real text, outside the keyboard order', async ({ page }) => {
-  await page.addInitScript((key) => { sessionStorage.setItem(key, '1'); sessionStorage.setItem('cold-open-played', '1'); }, INTRO_SESSION_KEY);
-  await page.goto('/');
-  const titles = page.locator('.film-act-title');
-  await expect(titles).toHaveText(['I. The receipts', 'II. Seven builds', 'III. What I bring', 'IV. The playground']);
-  for (const title of await titles.all()) {
-    await expect(title).not.toHaveAttribute('tabindex');
+  await page.goto('/?coldopen=full');
+  await page.getByRole('button', { name: 'Play the film', exact: true }).click();
+  const reel = page.locator('.film-player');
+  await expect(reel.locator('.film-act')).toHaveCount(5, { timeout: 20000 });
+  await expect(reel.locator('.film-act-title')).toHaveText(['I. The receipts', 'II. Seven builds', 'III. What I bring', 'IV. The playground']);
+  for (const title of await reel.locator('.film-act-title').all()) {
     await expect(title).not.toHaveAttribute('aria-hidden');
     expect(await title.locator('a, button, [tabindex]').count()).toBe(0);
   }
-  await expect(page.locator('.fin-credit')).toHaveText('Directed, designed and built by Mohamed Ansar');
-});
-
-test('without the film the home page still links every playground experiment', async ({ page }) => {
-  await page.emulateMedia({ reducedMotion: 'reduce' });
-  await page.goto('/');
-  const section = page.locator('section#ai');
-  await expect(section.getByRole('heading', { level: 2 })).toBeAttached();
-  for (const href of ['/playground/explore/', '/playground/infinity/', '/playground/emet/']) await expect(section.locator(`a[href="${href}"]`)).toHaveCount(1);
-  await expect(page.locator('section.act4')).toHaveCount(0);
-});
-
-test('a keyboard user can reach every link in the film, down to the email', async ({ page, isMobile }) => {
-  test.skip(isMobile, 'tabbing is a desktop concern');
-  test.setTimeout(90000);
-  await page.addInitScript((key) => { sessionStorage.setItem(key, '1'); sessionStorage.setItem('cold-open-played', '1'); }, INTRO_SESSION_KEY);
-  await page.goto('/');
-  const seen = [];
-  for (let i = 0; i < 120; i++) {
-    await page.keyboard.press('Tab');
-    const label = await page.evaluate(() => (document.activeElement?.textContent || '').trim());
-    seen.push(label);
-    if (label.startsWith('Email me')) break;
-  }
-  expect(seen.some((label) => label.startsWith('Email me'))).toBe(true);
-  // While it has focus, it shows.
-  await expect(page.locator('.fin-block')).toHaveCSS('opacity', '1');
+  await expect(reel.getByText('Most AI demos stop at the demo.')).toBeAttached();
+  await expect(reel.locator('article.act2-card a.act2-primary').first()).toHaveAttribute('href', '/work/hedwig/');
+  await expect(reel.locator('article.act3-card a[href="/work/jarvis/"]')).toHaveCount(1);
+  await expect(reel.locator('a.act4-cta[href="/playground/emet/"]')).toHaveCount(1);
+  await expect(reel.locator('a.fin-email')).toHaveAttribute('href', /^mailto:/);
+  await expect(reel.locator('.fin-credit')).toHaveText('Directed, designed and built by Mohamed Ansar');
+  await page.mouse.click(20, 200);
+  await expect(page.locator('.film-act.is-on')).toHaveAttribute('data-act', 'act1', { timeout: 20000 });
+  for (const act of ['act2', 'act3', 'act4', 'finale']) await expect(page.locator(`.film-act[data-act="${act}"]`)).toHaveAttribute('inert', '');
 });
 
 test('the command palette lists every project, works by keyboard and gives focus back', async ({ page, isMobile }) => {

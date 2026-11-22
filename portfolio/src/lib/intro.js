@@ -33,36 +33,30 @@ export function filmEnabled() {
 
 export const COLD_OPEN_SESSION_KEY = "cold-open-played";
 
-/* Whether the film's cold open should play over the home page, and which
-   cut: "full" on a first visit (it then hands over to the hero's intro),
-   "short" the first time in a later session or on a phone held upright,
-   null otherwise. Never with
-   reduced motion, on Save-Data or a 2G/3G connection, without WebGL 2, when the link points at a
-   section further down, or when storage is unavailable. */
-// Dev server only: ?coldopen=full or ?coldopen=short forces the cold open.
+// Dev server only: ?coldopen=full forces the film's poster on every load.
 export function coldOpenForced() {
   if (typeof window === "undefined" || !import.meta.env?.DEV) return false;
-  return ["full", "short"].includes(new URLSearchParams(window.location.search).get("coldopen"));
+  return new URLSearchParams(window.location.search).get("coldopen") === "full";
 }
 
-export function coldOpenMode() {
-  if (typeof window === "undefined") return null;
-  // On the dev server, /?coldopen=full (or short) always plays it, and
-  // adding &at=5.2 holds it on that second, for working on a single frame.
-  if (import.meta.env?.DEV) {
-    const forced = new URLSearchParams(window.location.search).get("coldopen");
-    if (forced === "full" || forced === "short") return forced;
-  }
-  if (window.location.hash || !filmEnabled()) return null;
-  let seenBefore;
+/* Whether the home page opens on the film's poster (a Play button over
+   black, see FilmPoster): on a first visit, where the film can play, and
+   not when the link points at a section further down. Pressing Play starts
+   the film with sound: a browser lets a page make sound only after a click.
+   Everyone else gets the page, with "Watch the film" in the nav and hero. */
+export function filmPosterWanted() {
+  if (typeof window === "undefined") return false;
+  if (coldOpenForced()) return true;
+  if (window.location.hash || !filmEnabled()) return false;
   try {
-    if (window.sessionStorage.getItem(INTRO_SESSION_KEY) || window.sessionStorage.getItem(COLD_OPEN_SESSION_KEY)) return null;
-    seenBefore = !!window.localStorage.getItem(INTRO_SESSION_KEY);
+    return !window.localStorage.getItem(INTRO_SESSION_KEY) && !window.sessionStorage.getItem(INTRO_SESSION_KEY) && !window.sessionStorage.getItem(COLD_OPEN_SESSION_KEY);
   } catch {
-    return null;
+    return false;
   }
-  // On a phone held upright the full cut is a long wait in a thin strip of
-  // screen, so a phone gets the short cut, which joins at the name.
-  const phone = window.matchMedia?.("(max-width: 700px) and (orientation: portrait)").matches;
-  return seenBefore || phone ? "short" : "full";
+}
+
+// Asks the app to play the film from the start (the nav and hero buttons).
+export const WATCH_FILM = "film:watch";
+export function watchFilm() {
+  window.dispatchEvent(new Event(WATCH_FILM));
 }

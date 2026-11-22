@@ -1,6 +1,6 @@
 import * as THREE from "three";
 import { poseAt } from "../rig.js";
-import { ACT_ONE, LAYOUT, countAt, numberProgress, overlays, timeAtProgress } from "./timeline.js";
+import { ACT_ONE, LAYOUT, countAt, numberProgress, overlays } from "./timeline.js";
 import { digitsFragment, digitsVertex, pointFragment, pointVertex, riverFragment, riverVertex } from "./shaders.js";
 import { CODE_LINES } from "./codeLines.js";
 import { attachFilm } from "../engine.js";
@@ -9,8 +9,8 @@ import { attachFilm } from "../engine.js";
 
    createActOne(canvas, options) builds the scene and returns
    { setActive, dispose }. While active it draws every frame: it asks
-   `getProgress()` how far the visitor has scrolled through the act (0 to 1),
-   turns that into film time and a camera pose, and tells the page through
+   `getTime()` where the film's clock is in the act (seconds), turns
+   that into a camera pose, and tells the page through
    `onFrame(t, overlays)` so it can place its title cards.
 
    options.receipts  [{ value: "10+", label }] for the four numbers
@@ -259,7 +259,7 @@ function buildTools(tools) {
   return { group, items, glow, dispose };
 }
 
-export function createActOne(canvas, { receipts, tools, getProgress, onFrame }) {
+export function createActOne(canvas, { receipts, tools, getTime, onFrame }) {
   const quality = pickQuality();
   // The shared renderer (see engine.js): this act draws into it, and its
   // frames are copied onto this canvas.
@@ -326,7 +326,7 @@ export function createActOne(canvas, { receipts, tools, getProgress, onFrame }) 
     const dt = Math.min(0.1, (nowMs - last) / 1000);
     last = nowMs;
     clock += dt;
-    const t = Math.min(ACT_ONE.seconds, Math.max(0, getProgressTime()));
+    const t = Math.min(ACT_ONE.seconds, Math.max(0, getTime()));
     const pose = poseAt(ACT_ONE, t);
     camera.position.fromArray(pose.pos);
     camera.lookAt(...pose.look);
@@ -383,7 +383,6 @@ export function createActOne(canvas, { receipts, tools, getProgress, onFrame }) 
   }
   // Scroll position is read every frame, not from scroll events, so the
   // camera never lags the page.
-  const getProgressTime = () => timeAtProgress(getProgress());
 
   return {
     setActive(on) {

@@ -9,7 +9,7 @@
      title    what the shot is
      seconds  how long it runs at playing speed
      scroll   screens of scrolling it takes. 0 means it plays on its own
-              (the cold open); everything else is driven by the scrollbar.
+              (the cold open); everything else is scrubbed in the pre-vis.
      cut      true when the shot starts on a hard cut. Otherwise the camera
               arrives in one continuous move from the shot before.
      camera   where the camera ends up: pos, the point it looks at, and the
@@ -29,7 +29,7 @@
 export const ACTS = [
   { id: "CO", title: "Cold open", note: "Plays once on a first visit, about 8 seconds, can be skipped. A returning visitor gets shots CO-05 to CO-07 only, about 1.5 seconds." },
   { id: "A1", title: "Act I · The short version", note: "The camera goes through the name. The four numbers are objects it passes." },
-  { id: "A2", title: "Act II · Selected work", note: "Seven sets, one per project. Each is pinned for about a screen of scrolling. Each opens on a hard cut held on a finished frame; where two sets share a shape the cut matches them. Nothing fades." },
+  { id: "A2", title: "Act II · Selected work", note: "Seven sets, one per project. Each plays for about five seconds. Each opens on a hard cut held on a finished frame; where two sets share a shape the cut matches them. Nothing fades." },
   { id: "A3", title: "Act III · What I bring", note: "Three monoliths: agents, research, shipping." },
   { id: "A4", title: "Act IV · The playground", note: "The effects reel: the network collapses into a star, then the solar system, the infinity ribbon and Emet's terminal, each with a way in." },
   { id: "FN", title: "Finale · Contact", note: "The signal returns, then one line and one button. Bookend to the cold open." },
@@ -72,8 +72,8 @@ function projectShots(n, slug, { title, action, push, sound, frame }) {
   const side = Math.sign(at[0]) || 1;
   const code = String(n).padStart(2, "0");
   return [
-    { id: `A2-${code}a`, act: "A2", slug, title: `${SETS[slug].label}: arrive`, seconds: 2.5, scroll: 0.5, camera: { pos: near(at, -side * 26, 5, 46), look: at, fov: 38, ease: "out", move: "Cut in, settle wide" }, action: `Hard cut onto the set, held, then the camera settles wide. Title card: ${title}.`, text: SETS[slug].label.toUpperCase(), sound: "A low tone on the cut, then the room tone of this set", bars: true, frame: "tunnel" },
-    { id: `A2-${code}b`, act: "A2", slug, title: `${SETS[slug].label}: the scene`, seconds: 5, scroll: 1, camera: { pos: near(at, -side * 7, 1.5, 15), look: near(at, 0, 0.5, 0), fov: 30, move: push }, action, sound, bars: false, frame },
+    { id: `A2-${code}a`, act: "A2", slug, title: `${SETS[slug].label}: arrive`, seconds: 1.5, scroll: 0.5, camera: { pos: near(at, -side * 26, 5, 46), look: at, fov: 38, ease: "out", move: "Cut in, settle wide" }, action: `Hard cut onto the set, held, then the camera settles wide. Title card: ${title}.`, text: SETS[slug].label.toUpperCase(), sound: "A low tone on the cut, then the room tone of this set", bars: true, frame: "tunnel" },
+    { id: `A2-${code}b`, act: "A2", slug, title: `${SETS[slug].label}: the scene`, seconds: 3.5, scroll: 1, camera: { pos: near(at, -side * 7, 1.5, 15), look: near(at, 0, 0.5, 0), fov: 30, move: push }, action, sound, bars: false, frame },
   ];
 }
 

@@ -1,0 +1,41 @@
+/* The film player (FilmPlayer.jsx): the acts stacked full screen over the
+   page, one on at a time, with the controls along the bottom. */
+.film-player { position: fixed; inset: 0; z-index: 8000; visibility: hidden; pointer-events: none; outline: none; color: #efe6d8; }
+.film-player.is-rolling { visibility: visible; pointer-events: auto; }
+.film-player.is-idle { cursor: none; }
+/* An act off screen is see-through and inert (out of the keyboard order):
+   its cards set their own visibility, so hiding the act alone would not. */
+.film-player .film-act { position: absolute; inset: 0; height: auto; overflow: hidden; opacity: 0; pointer-events: none; }
+.film-player.is-rolling .film-act.is-on { opacity: 1; pointer-events: auto; }
+.film-player .film-act > [class$="-stage"] { position: absolute; inset: 0; height: 100%; }
+/* Act I slides up over the hero (the player moves it); it casts a shadow
+   up onto the page as it comes. */
+.film-player [data-act="act1"] { box-shadow: 0 -30px 60px rgb(0 0 0 / .45); will-change: transform; }
+
+.film-controls { position: absolute; left: 0; right: 0; bottom: 0; z-index: 50; display: flex; align-items: center; gap: 12px; padding: 40px clamp(14px, 2.6vw, 34px) clamp(12px, 2.2vw, 24px); background: linear-gradient(to top, rgb(0 0 0 / .62), rgb(0 0 0 / 0)); transition: opacity .5s var(--ease-out, ease), transform .5s var(--ease-out, ease); }
+.film-player.is-idle .film-controls { opacity: 0; transform: translateY(8px); pointer-events: none; }
+.film-player.is-idle .film-controls:focus-within { opacity: 1; transform: none; pointer-events: auto; }
+.film-button { display: inline-grid; place-items: center; width: 36px; height: 36px; flex: none; border: 1px solid rgb(239 230 216 / .28); border-radius: 999px; background: rgb(0 0 0 / .35); color: #efe6d8; transition: border-color .2s, color .2s; }
+.film-button:hover, .film-button:focus-visible { border-color: #efe6d8; }
+.film-button[aria-pressed="false"] { color: rgb(239 230 216 / .6); }
+.film-time { flex: none; min-width: 7.5ch; font: 500 .64rem/1 var(--font-mono); letter-spacing: .08em; color: rgb(239 230 216 / .72); font-variant-numeric: tabular-nums; }
+.film-skip-film { flex: none; padding: 10px 14px; border: 1px solid rgb(239 230 216 / .28); border-radius: 999px; background: rgb(0 0 0 / .35); color: #efe6d8; font: 500 .6rem/1 var(--font-mono); letter-spacing: .12em; text-transform: uppercase; transition: border-color .2s; }
+.film-skip-film:hover, .film-skip-film:focus-visible { border-color: #efe6d8; }
+
+/* The scrub bar: a thin line that thickens under the pointer. */
+.film-scrub { flex: 1; min-width: 60px; height: 24px; margin: 0; background: transparent; appearance: none; -webkit-appearance: none; cursor: pointer; }
+.film-scrub::-webkit-slider-runnable-track { height: 2px; border-radius: 2px; background: rgb(239 230 216 / .25); }
+.film-scrub::-moz-range-track { height: 2px; border-radius: 2px; background: rgb(239 230 216 / .25); }
+.film-scrub::-moz-range-progress { height: 2px; background: #ff8a5f; }
+.film-scrub::-webkit-slider-thumb { width: 12px; height: 12px; margin-top: -5px; border: 0; border-radius: 50%; background: #ff8a5f; -webkit-appearance: none; }
+.film-scrub::-moz-range-thumb { width: 12px; height: 12px; border: 0; border-radius: 50%; background: #ff8a5f; }
+.film-scrub:focus-visible { outline: 1px solid rgb(239 230 216 / .6); outline-offset: 4px; }
+
+@media (max-width: 560px) {
+  .film-controls { gap: 8px; }
+  .film-time { display: none; }
+  .film-skip-film { padding: 10px; }
+}
+
+/* The page does not scroll under the film. */
+html.is-scroll-held, html.is-scroll-held body { overflow: hidden; }

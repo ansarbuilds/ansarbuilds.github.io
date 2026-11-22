@@ -1,5 +1,5 @@
 import { Component, createRef, lazy, Suspense, useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { Hero, ProjectsSection, CapabilitiesSection, MoreWorkSection, PlaygroundSection, ContactSection } from "./components/Sections";
+import { FilmReel, Hero, ProjectsSection, CapabilitiesSection, MoreWorkSection, PlaygroundSection, ContactSection } from "./components/Sections";
 import CommandPalette from "./components/CommandPalette";
 import { MatrixBackground } from "./components/RouteBackgrounds";
 import PaletteSwatch from "./components/PaletteSwatch";
@@ -7,8 +7,10 @@ import PaletteSwatch from "./components/PaletteSwatch";
 // on the dev server, or with ?palette in the address.
 const SHOW_SWATCH = typeof window !== "undefined" && (import.meta.env.DEV || new URLSearchParams(window.location.search).has("palette"));
 import Cursor from "./components/Cursor";
-import { COLD_OPEN_SESSION_KEY, coldOpenForced, coldOpenMode, filmEnabled, shouldPlayIntro } from "./lib/intro";
-import SoundToggle from "./components/SoundToggle";
+import { COLD_OPEN_SESSION_KEY, WATCH_FILM, coldOpenForced, filmEnabled, filmPosterWanted, shouldPlayIntro, watchFilm } from "./lib/intro";
+import FilmPoster from "./components/FilmPoster";
+import { Play } from "lucide-react";
+import { setSound } from "./lib/sound";
 import { isRouteTransitioning, noteSource, runRouteChange } from "./lib/routeTransition";
 import { PREVIS, parseTarget, pathForRoute, readLocation, urlForTarget } from "./lib/routes";
 import { titleForRoute } from "./lib/routeTitle";
@@ -34,6 +36,9 @@ const BB8Companion = lazy(() => import("./components/BB8Companion"));
 // The film's cold open. It brings three.js with it, so it loads on its own
 // and only for a visitor who is going to see it.
 const ColdOpen = lazy(() => import("./film/ColdOpen"));
+// The rest of the film, which follows it. Loaded with the cold open.
+const loadFilmPlayer = () => import("./film/FilmPlayer");
+const FilmPlayer = lazy(loadFilmPlayer);
 // The film's pre-vis pages. Development only: a production build drops both
 // the routes and these chunks.
 const Storyboard = import.meta.env.DEV ? lazy(() => import("./film/Storyboard")) : null;
@@ -294,7 +299,7 @@ function Nav({ booting = false }) {
   return <nav className={`ed-nav ${editorial && overHero ? "is-over-hero" : ""} ${booting ? "is-booting" : ""}`} aria-label="Main navigation"><div className="ed-nav-inner">
     <button onClick={() => navigate("deck")} className="ed-wordmark"><span className="ed-wordmark-symbol" aria-hidden="true">ma</span><span>mohamed ansar</span><span className="sr-only">, home</span></button>
     <div className="ed-nav-links">{editorial ? <><a href="#projects" className="ed-nav-wide">Work</a><a href="#capabilities" className="ed-nav-wide">Capabilities</a><a href={CONTACT.github} className="ed-nav-wide" target="_blank" rel="noopener noreferrer">GitHub</a><span ref={menuRef} className="ed-nav-menu"><button type="button" aria-expanded={menuOpen} aria-controls="nav-menu" onClick={() => setMenuOpen((open) => !open)}>Menu</button>{menuOpen && <span id="nav-menu" className="ed-nav-menu-list" onClick={() => setMenuOpen(false)}><a href="#projects">Work</a><a href="#capabilities">Capabilities</a><a href="#more">More work</a><a href={CONTACT.github} target="_blank" rel="noopener noreferrer">GitHub ↗</a></span>}</span><a href="#contact" className="ed-nav-contact">Get in touch ↗</a></> : <button onClick={() => navigate("deck")}>← Home</button>}
-      {filmOn && <SoundToggle />}
+      {filmOn && editorial && <button type="button" className="ed-nav-sound ed-nav-film" onClick={watchFilm} aria-label="Watch the film"><Play size={14} aria-hidden="true" /><span>Watch the film</span></button>}
       <button type="button" onClick={openPalette} className="ed-nav-command" aria-label={`${PALETTE_KEY} K, open the command palette`}>{PALETTE_KEY} K</button>
     </div>
   </div></nav>;
@@ -388,11 +393,12 @@ function useRoutePalette(route) {
   }, [route]);
 }
 
-function MainDocument({ bootDone, held, onBoot }) {
+function MainDocument({ bootDone, held, onBoot, heroRun }) {
   useSectionPalette();
   return (
     <>
-      <Hero ready={bootDone} hold={held} onReady={onBoot} />
+      {/* A new run of the film sets the hero up again for its entrance. */}
+      <Hero key={heroRun} ready={bootDone} hold={held} onReady={onBoot} />
       <ProjectsSection />
       <CapabilitiesSection />
       <MoreWorkSection />
@@ -404,7 +410,7 @@ function MainDocument({ bootDone, held, onBoot }) {
 
 // What each route shows. Takeover views fill the stage; the home page and
 // the project pages scroll.
-function RouteView({ route, bootDone, held, onBoot }) {
+function RouteView({ route, bootDone, held, onBoot, heroRun }) {
   if (Storyboard && route === "storyboard") return <Suspense fallback={<RouteLoader label="Loading storyboard" />}><Storyboard /></Suspense>;
   if (Previs && route === "previs") return <Suspense fallback={<RouteLoader label="Loading pre-vis" />}><Previs /></Suspense>;
   if (route === "emet") return <Suspense fallback={<RouteLoader label="Loading Emet" />}><EmetSection /></Suspense>;
@@ -417,7 +423,7 @@ function RouteView({ route, bootDone, held, onBoot }) {
   if (route === "lineage-demo") return <Suspense fallback={<RouteLoader label="Loading data explorer" />}><DataLineageExplorer /></Suspense>;
   if (route === "infinity") return <Suspense fallback={<RouteLoader label="Loading particle scene" />}><InfinityPage /></Suspense>;
   if (route === "digital-double") return <Suspense fallback={<RouteLoader label="Loading 3D project" />}><DigitalDouble /></Suspense>;
-  return <MainDocument bootDone={bootDone} held={held} onBoot={onBoot} />;
+  return <MainDocument bootDone={bootDone} held={held} onBoot={onBoot} heroRun={heroRun} />;
 }
 
 /* The one scene change for every route. The incoming view fades in (project
@@ -431,7 +437,7 @@ function RouteTransition({ route, children }) {
   return <div key={route} className={`rt rt-${kind} ${FULL_HEIGHT.has(route) ? "h-[100dvh]" : ""}`}>{children}</div>;
 }
 
-function Stage({ bootDone, held, onBoot }) {
+function Stage({ bootDone, held, onBoot, heroRun }) {
   const { route } = useRoute();
   useRoutePalette(route);
   const { devMode, toggleDevMode } = useSandbox();
@@ -445,7 +451,7 @@ function Stage({ bootDone, held, onBoot }) {
 
   return (
     <main id="main-content" tabIndex={-1} className="relative min-h-[100dvh]">
-      <RouteTransition route={route}><RouteView route={route} bootDone={bootDone} held={held} onBoot={onBoot} /></RouteTransition>
+      <RouteTransition route={route}><RouteView route={route} bootDone={bootDone} held={held} onBoot={onBoot} heroRun={heroRun} /></RouteTransition>
       {devMode && <Suspense fallback={null}><SandboxStubs onClose={toggleDevMode} /></Suspense>}
     </main>
   );
@@ -517,7 +523,7 @@ function Companion() {
   return <Suspense fallback={null}><BB8Companion /></Suspense>;
 }
 
-function AppShell({ bootDone, held, onBoot }) {
+function AppShell({ bootDone, held, onBoot, heroRun }) {
   const companionReady = useIdleAfterFirstInput(bootDone);
   return (
       <RouteProvider>
@@ -536,7 +542,7 @@ function AppShell({ bootDone, held, onBoot }) {
                 anywhere in the tree, breaking their viewport-relative
                 positioning. Each 3D component (deck cards, emet's chassis,
                 project cards) establishes its own local perspective instead. */}
-            <Stage bootDone={bootDone} held={held} onBoot={onBoot} />
+            <Stage bootDone={bootDone} held={held} onBoot={onBoot} heroRun={heroRun} />
             <CommandPalette />
           </div>
         </div>
@@ -608,46 +614,100 @@ class ColdOpenBoundary extends Component {
   componentDidCatch() { this.props.onFail(); }
   render() { return this.state.failed ? null : this.props.children; }
 }
-function ColdOpenLayer({ mode, onHandOver, onDone }) {
+function ColdOpenLayer({ mode, onStarted, onHandOver, onDone, onSkipFilm }) {
   const [since] = useState(() => performance.now());
   const started = useRef(false);
   const abandon = useCallback(() => { onHandOver(); onDone(); }, [onHandOver, onDone]);
   useEffect(() => {
-    try { window.sessionStorage.setItem(COLD_OPEN_SESSION_KEY, "1"); } catch { /* coldOpenMode already said no */ }
+    try { window.sessionStorage.setItem(COLD_OPEN_SESSION_KEY, "1"); } catch { /* not remembered */ }
     const timer = setTimeout(() => { if (!started.current) { if (import.meta.env.DEV) console.warn("cold open: gave up waiting for its code"); abandon(); } }, COLD_OPEN_PATIENCE_MS);
     return () => clearTimeout(timer);
   }, [abandon]);
-  const onStart = useCallback(() => { started.current = true; }, []);
+  const onStart = useCallback(() => { started.current = true; onStarted?.(); }, [onStarted]);
   return <ColdOpenBoundary onFail={abandon}>
     <Suspense fallback={null}>
-      <ColdOpen mode={mode} since={since} onStart={onStart} onHandOver={onHandOver} onDone={onDone} />
+      <ColdOpen mode={mode} since={since} onStart={onStart} onHandOver={onHandOver} onDone={onDone} onSkipFilm={onSkipFilm} />
     </Suspense>
   </ColdOpenBoundary>;
 }
 
+// How long the hero's entrance has, between the cold open lifting and Act I
+// sliding up over it.
+const HERO_BEAT_MS = 1400;
+
+/* The film's place in the app, start to end:
+     poster    a first visit opens on it (FilmPoster); Play starts the film
+               with sound, "Skip to the site" just shows the page
+     cold open its own layer (ColdOpen), building its name on the hero's
+     acts      the film player (FilmPlayer), over the page, on one clock
+     the page  an ordinary page to scroll, with "Watch the film" in the nav
+               and the hero to play it again
+   The hero's entrance plays as the cold open lifts. Until it hands over,
+   `bootDone` is false: the nav stays out of the way and the companion does
+   not load. `held` keeps the entrance waiting, with the name set large
+   mid-screen for the cold open to build on. */
 export default function App() {
-  // On a first visit to the home page the hero plays its intro: the name
-  // sets large in the middle of the screen, then travels to its place as
-  // the rest arrives (see Hero). Until that hands over, `bootDone` is false:
-  // the nav stays out of the way and the companion does not load.
-  // Before that, the film's cold open plays over the page (see ColdOpen).
-  // `held` keeps the hero's intro waiting underneath until it hands over.
-  // The cold open builds its name on top of the hero's name set mid-screen,
-  // so whenever it plays the hero's intro plays too, carrying the name from
-  // there to its place.
-  const [coldOpen] = useState(() => (readRoute() === "main" ? coldOpenMode() : null));
-  const [bootDone, setBootDone] = useState(() => coldOpen === null && !(shouldPlayIntro() && readRoute() === "main"));
+  const [poster] = useState(() => readRoute() === "main" && filmPosterWanted());
+  // The black over the page: the poster itself, then plain black from a
+  // Play press until the cold open's first frame.
+  const [cover, setCover] = useState(poster ? "poster" : null);
+  const [bootDone, setBootDone] = useState(() => !poster && !(shouldPlayIntro() && readRoute() === "main"));
   const onBoot = useCallback(() => setBootDone(true), []);
-  const [held, setHeld] = useState(coldOpen !== null);
-  const [coldOpenUp, setColdOpenUp] = useState(coldOpen !== null);
-  const release = useCallback(() => setHeld(false), []);
+  const [held, setHeld] = useState(poster);
+  const [heroRun, setHeroRun] = useState(0);
+  // Each press of Play is a new take: the film's layers mount fresh for it.
+  const [take, setTake] = useState(0);
+  const [filmUp, setFilmUp] = useState(false);
+  const [coldOpenUp, setColdOpenUp] = useState(false);
+  const [rolling, setRolling] = useState(false);
+  const running = useRef(false);
+  useEffect(() => { running.current = filmUp; }, [filmUp]);
+
+  const play = useCallback(() => {
+    // Pressing Play is the click a browser waits for before any sound.
+    setSound(true);
+    loadFilmPlayer().catch(() => {});
+    setCover("black");
+    setRolling(false);
+    setColdOpenUp(true);
+    setFilmUp(true);
+    setTake((n) => n + 1);
+  }, []);
+  const skipPoster = useCallback(() => { setCover(null); setHeld(false); }, []);
+  const onStarted = useCallback(() => { setTimeout(() => setCover(null), 250); }, []);
+  const release = useCallback(() => {
+    setCover(null);
+    setHeld(false);
+    setTimeout(() => { if (running.current) setRolling(true); }, HERO_BEAT_MS);
+  }, []);
   const closeColdOpen = useCallback(() => setColdOpenUp(false), []);
+  const endFilm = useCallback(() => { setFilmUp(false); setRolling(false); }, []);
+
+  // "Watch the film", from the nav or the hero: back to the top, the hero
+  // set up again for its entrance, and the film from the start.
+  useEffect(() => {
+    const watch = () => {
+      if (running.current || !filmEnabled()) return;
+      scrollToTop({ instant: true });
+      setBootDone(false);
+      setHeld(true);
+      setHeroRun((n) => n + 1);
+      play();
+    };
+    window.addEventListener(WATCH_FILM, watch);
+    return () => window.removeEventListener(WATCH_FILM, watch);
+  }, [play]);
+
   return (
     <ErrorBoundary>
       <ThemeProvider>
         <SandboxProvider>
-          <AppShell bootDone={bootDone} held={held} onBoot={onBoot} />
-          {coldOpenUp && <ColdOpenLayer mode={coldOpen} onHandOver={release} onDone={closeColdOpen} />}
+          <AppShell bootDone={bootDone} held={held} onBoot={onBoot} heroRun={heroRun} />
+          {filmUp && <ColdOpenBoundary key={`film-${take}`} onFail={endFilm}><Suspense fallback={null}>
+            <FilmPlayer rolling={rolling} onEnd={endFilm}>{(playback) => <FilmReel playback={playback} />}</FilmPlayer>
+          </Suspense></ColdOpenBoundary>}
+          {coldOpenUp && <ColdOpenLayer key={`co-${take}`} mode="full" onStarted={onStarted} onHandOver={release} onDone={closeColdOpen} onSkipFilm={endFilm} />}
+          {cover && <FilmPoster cover={cover === "black"} onPlay={play} onSkip={skipPoster} />}
         </SandboxProvider>
       </ThemeProvider>
     </ErrorBoundary>
