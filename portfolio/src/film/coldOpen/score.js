@@ -72,9 +72,11 @@ export function score(t) {
     signals: 0.35 + 1.5 * ramp(t, T.name - 0.3, T.name + 0.6),
     // Everything that is not the name.
     dust: cut ? 0.1 * (1 - open) : 1 - 0.7 * form,
-    rays: smooth(ramp(t, IMPACT - 0.3, IMPACT + 0.25)) * (cut ? 0.62 : 1) * (1 - open),
+    // The light behind the name flares as it lands, then settles low so the
+    // letters stay readable against it.
+    rays: smooth(ramp(t, IMPACT - 0.3, IMPACT + 0.1)) * (0.38 + 0.62 * decay(t, IMPACT + 0.1, 3.2)) * (cut ? 0.7 : 1) * (1 - open),
     impact,
-    aberration: 0.001 + 0.0035 * Math.sin(Math.PI * ramp(t, T.pull, T.pull + 1.3)) + impact * 0.004,
+    aberration: 0.0005 + 0.0025 * Math.sin(Math.PI * ramp(t, T.pull, T.pull + 1.3)) + impact * 0.002,
     bloom: 0.55 + thump * 0.35 + impact * 0.6,
     // The name's particles let go as the real page takes over.
     gone: open,

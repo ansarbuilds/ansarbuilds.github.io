@@ -93,7 +93,12 @@ export function attachFilm(target, { clear = 0x000000, bloom = [0.5, 0.5, 0.5], 
   finish.uniforms.uGrain.value = grain;
   const view = {
     renderer: own.renderer,
-    clear: new THREE.Color(clear),
+    // The composer's buffers have no colour space, so three clears them with
+    // the colour's sRGB numbers and the output pass then encodes those a
+    // second time: 0x070605 came out as a milky #2a2622 behind every act.
+    // Converting once more first cancels three's conversion, so the buffer
+    // holds the linear value and the frame lands on the colour asked for.
+    clear: new THREE.Color(clear).convertSRGBToLinear(),
     // [strength, radius, threshold], read before each frame.
     bloom: [...bloom],
     finish,
