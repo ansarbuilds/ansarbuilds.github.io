@@ -1,6 +1,6 @@
 import * as THREE from "three";
 import { BONE, SIGNAL, floor, glow, points } from "../actTwo/kit.js";
-import { ACT_THREE, CENTRE, PILLARS, cameraAt, moments, timeAtProgress } from "./timeline.js";
+import { ACT_THREE, CENTRE, PILLARS, cameraAt, moments } from "./timeline.js";
 import { attachFilm } from "../engine.js";
 
 /* Act III (A3-01, A3-02) in plain three.js: three monoliths of dark stone
@@ -8,7 +8,7 @@ import { attachFilm } from "../engine.js";
    projects that prove it. The camera circles them; the carving glows as each
    one turns to face it.
 
-   createActThree(canvas, { pillars, getProgress, onFrame }) where pillars are
+   createActThree(canvas, { pillars, getTime, onFrame }) where pillars are
    [{ count, unit, title, projects: ["Jarvis", ...] }], left to right. Fonts
    must be loaded first: the carving is drawn from them. */
 
@@ -50,7 +50,7 @@ function carving(pillar, height) {
   return { map, glowMap };
 }
 
-export function createActThree(canvas, { pillars, getProgress, onFrame }) {
+export function createActThree(canvas, { pillars, getTime, onFrame }) {
   const quality = pickQuality();
   // The shared renderer (see engine.js): this act draws into it, and its
   // frames are copied onto this canvas.
@@ -132,7 +132,7 @@ export function createActThree(canvas, { pillars, getProgress, onFrame }) {
     const dt = Math.min(0.1, (nowMs - last) / 1000);
     last = nowMs;
     clock += dt;
-    const t = timeAtProgress(getProgress());
+    const t = Math.min(ACT_THREE.seconds, Math.max(0, getTime()));
     const pose = cameraAt(t);
     look.fromArray(pose.look);
     // A narrow screen stands further back to keep all three in frame, and

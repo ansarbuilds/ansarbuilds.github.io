@@ -1,7 +1,7 @@
 import "./coldOpen/coldOpen.css";
 import { useEffect, useRef, useState } from "react";
 import { createColdOpen } from "./coldOpen/createColdOpen";
-import { setSound, soundPlaying } from "../lib/sound";
+import { setSound, soundOn } from "../lib/sound";
 
 /* The cold open (storyboard shots CO-01 to CO-07): a point of light, two
    heartbeats, the pull back through the network, the network becoming the
@@ -11,22 +11,24 @@ import { setSound, soundPlaying } from "../lib/sound";
    top of the page's own name (see coldOpen/sampleName.js), so when the layer
    lifts the page is simply there, and the hero's own entrance carries on.
 
-   `mode` is "full" on a first visit and "short" on a later one, which joins
-   at the name. Any click, key or scroll skips it. The scene itself is in
-   coldOpen/createColdOpen.js; this component is the page around it. */
+   It plays when the visitor presses Play (see FilmPoster), and the acts
+   follow it in the film player. Any click, key or scroll skips it to the
+   acts; Escape or "Skip to the site" (`onSkipFilm`) skips the whole film.
+   The scene itself is in coldOpen/createColdOpen.js; this component is the
+   page around it. */
 // Dev server only: ?at=5.2 freezes the film on that second.
 function heldSecond() {
   const at = parseFloat(new URLSearchParams(window.location.search).get("at"));
   return Number.isFinite(at) ? at : null;
 }
 
-export default function ColdOpen({ mode, since, onStart, onHandOver, onDone }) {
+export default function ColdOpen({ mode, since, onStart, onHandOver, onDone, onSkipFilm }) {
   const overlay = useRef(null);
   const canvas = useRef(null);
   const line = useRef(null);
   const [bars, setBars] = useState(true);
   const [handed, setHanded] = useState(false);
-  const [sound, setSoundState] = useState(soundPlaying);
+  const [sound, setSoundState] = useState(soundOn);
 
   useEffect(() => {
     let film;
@@ -58,18 +60,19 @@ export default function ColdOpen({ mode, since, onStart, onHandOver, onDone }) {
       if (event.type === "keydown" && ["Shift", "Control", "Alt", "Meta", "Tab"].includes(event.key)) return;
       // Turning the sound on is not a skip.
       if (event.target?.closest?.(".co-sound")) return;
+      if (event.key === "Escape" || event.target?.closest?.(".co-skip")) onSkipFilm?.();
       film.skip();
     };
     const events = ["pointerdown", "keydown", "wheel", "touchstart"];
     events.forEach((name) => window.addEventListener(name, skip, { passive: true }));
     return () => { events.forEach((name) => window.removeEventListener(name, skip)); film.dispose(); };
-  }, [mode, since, onStart, onHandOver, onDone]);
+  }, [mode, since, onStart, onHandOver, onDone, onSkipFilm]);
 
   return <div ref={overlay} className={`co ${handed ? "is-leaving" : ""}`} data-mode={mode}>
     <canvas ref={canvas} className="co-canvas" aria-hidden="true" />
     <div className={`co-bars ${bars ? "is-closed" : ""}`} aria-hidden="true"><span /><span /></div>
     <p ref={line} className="co-line" aria-hidden="true" />
     <button type="button" className={`co-sound ${sound ? "is-on" : ""}`} onClick={() => { setSound(true); setSoundState(true); }}><i aria-hidden="true"><b /><b /><b /></i>Play with sound</button>
-    <button type="button" className="co-skip">Skip intro</button>
+    <button type="button" className="co-skip">Skip to the site</button>
   </div>;
 }

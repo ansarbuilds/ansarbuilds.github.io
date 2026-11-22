@@ -26,6 +26,13 @@ export function setSmoothScroll(on) {
   lenis = new Lenis({ autoRaf: true, allowNestedScroll: true, stopInertiaOnNavigate: true });
 }
 
+// While the film plays over the page, the page does not scroll under it.
+export function holdScroll(held) {
+  if (typeof window === "undefined") return;
+  document.documentElement.classList.toggle("is-scroll-held", held);
+  if (held) lenis?.stop(); else lenis?.start();
+}
+
 // Jump straight there when the trip is long: a smooth scroll over many
 // screens is slow and makes every section on the way animate in.
 const farAway = (distance) => Math.abs(distance) > window.innerHeight * 1.25;

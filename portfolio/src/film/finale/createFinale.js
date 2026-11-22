@@ -2,7 +2,7 @@ import * as THREE from "three";
 import { poseAt } from "../rig.js";
 import { flareFragment, flareVertex } from "../coldOpen/shaders.js";
 import { additive } from "../actTwo/kit.js";
-import { FINALE, POINT, moments, timeAtProgress } from "./timeline.js";
+import { FINALE, POINT, moments } from "./timeline.js";
 import { attachFilm } from "../engine.js";
 
 /* The finale (FN-01 and FN-02) in plain three.js: one point of light on
@@ -10,7 +10,7 @@ import { attachFilm } from "../engine.js";
    shader, so the film ends where it began. Nothing else is in the scene. The
    type is in the DOM over the canvas, so the bloom cannot touch it. */
 
-export function createFinale(canvas, { getProgress, onFrame }) {
+export function createFinale(canvas, { getTime, onFrame }) {
   // The shared renderer (see engine.js): this act draws into it, and its
   // frames are copied onto this canvas. Bloom is higher than the portraits:
   // the point is supposed to bloom.
@@ -43,7 +43,7 @@ export function createFinale(canvas, { getProgress, onFrame }) {
     if (!active || disposed) return;
     frame = requestAnimationFrame(tick);
     clock += 1 / 60;
-    const t = timeAtProgress(getProgress());
+    const t = Math.min(FINALE.seconds, Math.max(0, getTime()));
     const pose = poseAt(FINALE, t);
     camera.position.fromArray(pose.pos);
     camera.lookAt(...pose.look);

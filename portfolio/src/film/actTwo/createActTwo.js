@@ -1,7 +1,7 @@
 import * as THREE from "three";
 import { poseAt } from "../rig.js";
 import { SETS } from "../shots.js";
-import { ACT_TWO, BUILT, moments, shotsFor, timeAtProgress } from "./timeline.js";
+import { ACT_TWO, BUILT, moments, shotsFor } from "./timeline.js";
 import { BONE, SIGNAL, points } from "./kit.js";
 import { buildHedwig } from "./sets/hedwig.js";
 import { buildSaywhen } from "./sets/saywhen.js";
@@ -14,7 +14,7 @@ import { attachFilm } from "../engine.js";
 
 /* Act II (the project sets) in plain three.js.
 
-   createActTwo(canvas, { getProgress, onFrame, media }) builds every set in
+   createActTwo(canvas, { getTime, onFrame, media }) builds every set in
    BUILT and returns { setActive, dispose }. Each set stands at its place in
    SETS, turned to face the camera's scene position, and is told each frame
    how far through its arrival and scene the film is. Only the set on screen
@@ -44,7 +44,7 @@ function buildDust(count) {
   return points(positions, colors, 0.08, { opacity: 0.5 });
 }
 
-export function createActTwo(canvas, { getProgress, onFrame, media }) {
+export function createActTwo(canvas, { getTime, onFrame, media }) {
   const quality = pickQuality();
   // The shared renderer (see engine.js): this act draws into it, and its
   // frames are copied onto this canvas.
@@ -89,7 +89,7 @@ export function createActTwo(canvas, { getProgress, onFrame, media }) {
     const dt = Math.min(0.1, (nowMs - last) / 1000);
     last = nowMs;
     clock += dt;
-    const t = timeAtProgress(getProgress());
+    const t = Math.min(ACT_TWO.seconds, Math.max(0, getTime()));
     const pose = poseAt(ACT_TWO, t);
     look.fromArray(pose.look);
     // A narrow screen sees less across, so the camera stands further back.
