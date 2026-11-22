@@ -5,7 +5,8 @@ import { UnrealBloomPass } from "three/examples/jsm/postprocessing/UnrealBloomPa
 import { ShaderPass } from "three/examples/jsm/postprocessing/ShaderPass.js";
 import { OutputPass } from "three/examples/jsm/postprocessing/OutputPass.js";
 import { poseAt } from "../rig.js";
-import { COLD_OPEN, SHORT_START, SUBTITLE, T, score } from "./score.js";
+import { COLD_OPEN, CUES, SHORT_START, SUBTITLE, T, score } from "./score.js";
+import { cue } from "../../lib/sound.js";
 import { sampleName } from "./sampleName.js";
 import { finishShader, flareFragment, flareVertex, lineFragment, lineVertex, particleFragment, particleVertex, raysFragment } from "./shaders.js";
 import { createAdaptive } from "../adaptive.js";
@@ -177,6 +178,8 @@ export function createColdOpen(canvas, { mode, waited = 0, holdAt = null, onVeil
   }
 
   const told = { bars: null, typed: -1, handed: false, done: false };
+  // Where the score has played up to; a cue exactly at the start still plays.
+  let heard = t - 0.001;
   let frame = 0;
   let last = performance.now();
   function tick(nowMs) {
@@ -189,6 +192,11 @@ export function createColdOpen(canvas, { mode, waited = 0, holdAt = null, onVeil
     last = nowMs;
     frames++;
     if (holdAt !== null) t = Math.min(T.end, holdAt);
+    // The score: each cue the playhead passed this frame, until a skip.
+    if (skippedAt === null && holdAt === null) {
+      for (const c of CUES) if ((!c.mode || c.mode === (short ? "short" : "full")) && c.at >= heard && c.at < t) cue(c.kind, c.length);
+    }
+    heard = t;
     // Read the page's name once its font has loaded and the hero has had a
     // few frames to set it mid-screen. If the font is very slow, go anyway
     // just after the name should have started forming.
@@ -234,7 +242,7 @@ export function createColdOpen(canvas, { mode, waited = 0, holdAt = null, onVeil
     const veil = Math.min(now.veil, skipFade);
     onVeil?.(veil);
     if (told.bars !== now.bars) { told.bars = now.bars; onBars?.(now.bars); }
-    if (told.typed !== now.typed) { told.typed = now.typed; onLine?.(short ? "" : SUBTITLE.slice(0, now.typed)); }
+    if (told.typed !== now.typed) { if (!short && now.typed > told.typed && told.typed >= 0 && skippedAt === null) cue("tick"); told.typed = now.typed; onLine?.(short ? "" : SUBTITLE.slice(0, now.typed)); }
     if (!told.handed && (t >= T.open || skippedAt !== null)) { told.handed = true; onHandOver?.(); }
     if (!told.done && veil <= 0.001) { told.done = true; onDone?.(); }
   }

@@ -4,7 +4,7 @@ import { trackQuiet } from "./quiet";
 import { useEffect, useRef, useState } from "react";
 import { ArrowUpRight } from "lucide-react";
 import { FINALE_CONTACT_AT, FINALE_SCREENS } from "./finale/screens";
-import { cueOnRise } from "../lib/sound";
+import { cueOnRise, showBed } from "../lib/sound";
 
 /* The finale on the home page, in place of the Contact section: one point of
    light, then the line, one button, the address and two quiet links. The long
@@ -54,7 +54,7 @@ export default function Finale({ contact, pitch, credit, onTop, fallback }) {
       }
     };
     const near = new IntersectionObserver(([entry]) => { if (entry.isIntersecting) { near.disconnect(); load(); } }, { rootMargin: "0px 0px 150% 0px" });
-    const seen = new IntersectionObserver(([entry]) => { onScreen = entry.isIntersecting; run(); });
+    const seen = new IntersectionObserver(([entry]) => { onScreen = entry.isIntersecting; showBed("finale", onScreen); run(); });
     near.observe(el);
     seen.observe(el);
     document.addEventListener("visibilitychange", run);
@@ -63,6 +63,7 @@ export default function Finale({ contact, pitch, credit, onTop, fallback }) {
       untrack();
       near.disconnect();
       seen.disconnect();
+      showBed("finale", false);
       document.removeEventListener("visibilitychange", run);
       film?.dispose();
     };
