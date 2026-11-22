@@ -139,7 +139,7 @@ export const raysFragment = /* glsl */ `
     float r = length(p), a = atan(p.y, p.x);
     float shafts = noise1(a * 9. + uTime * 0.22) * 0.55 + noise1(a * 23. - uTime * 0.31) * 0.45;
     shafts = pow(shafts, 2.6) * 2.4;
-    float reach = exp(-r * 2.3) * smoothstep(0.02, 0.2, r);
+    float reach = exp(-r * 2.8) * smoothstep(0.02, 0.2, r);
     float glow = exp(-p.y * p.y * 14.) * exp(-p.x * p.x * 0.9) * 0.2;
     vec3 warm = vec3(1., 0.5, 0.3);
     gl_FragColor = vec4(warm * (shafts * reach * 0.9 + glow) * uRays, 1.);

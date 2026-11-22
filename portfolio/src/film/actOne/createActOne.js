@@ -1,7 +1,7 @@
 import * as THREE from "three";
 import { poseAt } from "../rig.js";
 import { ACT_ONE, LAYOUT, countAt, numberProgress, overlays, timeAtProgress } from "./timeline.js";
-import { pointFragment, pointVertex, riverFragment, riverVertex } from "./shaders.js";
+import { digitsFragment, digitsVertex, pointFragment, pointVertex, riverFragment, riverVertex } from "./shaders.js";
 import { CODE_LINES } from "./codeLines.js";
 import { attachFilm } from "../engine.js";
 
@@ -24,8 +24,8 @@ const DIM_BONE = new THREE.Color(0.66, 0.63, 0.6);
 function pickQuality() {
   const low = window.matchMedia("(max-width: 760px)").matches || (navigator.hardwareConcurrency || 8) <= 4;
   return low
-    ? { name: 9000, dust: 6000, dpr: Math.min(window.devicePixelRatio, 1.25) }
-    : { name: 26000, dust: 16000, dpr: Math.min(window.devicePixelRatio, 1.75) };
+    ? { name: 12000, dust: 6000, dpr: Math.min(window.devicePixelRatio, 1.25) }
+    : { name: 30000, dust: 16000, dpr: Math.min(window.devicePixelRatio, 1.75) };
 }
 
 const additive = (options) => new THREE.ShaderMaterial({ blending: THREE.AdditiveBlending, depthTest: false, depthWrite: false, transparent: true, ...options });
@@ -38,7 +38,7 @@ function pointsFrom(positions, colors, size) {
   geometry.setAttribute("position", new THREE.BufferAttribute(positions, 3));
   geometry.setAttribute("aColor", new THREE.BufferAttribute(colors, 3));
   geometry.setAttribute("aSeed", new THREE.BufferAttribute(seeds, 2));
-  const uniforms = { uTime: { value: 0 }, uScale: { value: 1 }, uSize: { value: size }, uPart: { value: 0 }, uOpacity: { value: 1 }, uFar: { value: 170 }, uWobble: { value: 0.22 } };
+  const uniforms = { uTime: { value: 0 }, uScale: { value: 1 }, uSize: { value: size }, uPart: { value: 0 }, uOpacity: { value: 1 }, uFar: { value: 170 }, uWobble: { value: 0.22 }, uSteady: { value: 0 } };
   const points = new THREE.Points(geometry, additive({ uniforms, vertexShader: pointVertex, fragmentShader: pointFragment }));
   points.frustumCulled = false;
   return { points, uniforms };
@@ -79,8 +79,12 @@ function buildName(count) {
   ink.pixels.forEach((pixels, line) => {
     const share = line === ink.pixels.length - 1 ? count - written : Math.round(count * shares[line]);
     const color = line === 0 ? BONE : SIGNAL;
+    // Even coverage, not random picks: random picks clump and leave holes,
+    // and the letters read as static. Walk the ink in strides instead, each
+    // point jittered inside its own stretch.
+    const inked = pixels.length / 2, stride = inked / share;
     for (let i = 0; i < share; i++) {
-      const pick = Math.floor(Math.random() * (pixels.length / 2)) * 2;
+      const pick = Math.min(inked - 1, Math.floor((i + Math.random()) * stride)) * 2;
       positions[written * 3] = (pixels[pick] + Math.random() - ink.pad - ink.width / 2) * scale + LAYOUT.name.at[0];
       positions[written * 3 + 1] = -(pixels[pick + 1] + Math.random() - ink.height / 2) * scale + LAYOUT.name.at[1];
       positions[written * 3 + 2] = (Math.random() - 0.5) * 0.4 + LAYOUT.name.at[2];
@@ -88,7 +92,9 @@ function buildName(count) {
       written++;
     }
   });
-  return pointsFrom(positions, colors, 0.075);
+  const name = pointsFrom(positions, colors, 0.1);
+  name.uniforms.uSteady.value = 1;
+  return name;
 }
 
 // Dust in a loose tube around the path, with a clear core for the camera.
@@ -140,24 +146,22 @@ function buildRiver(renderer) {
   return { mesh, uniforms, dispose: () => { geometry.dispose(); map.dispose(); mesh.material.dispose(); } };
 }
 
-// A cube per cell of the digits, from the text drawn small on a canvas.
-const CELL = 0.3;
-function cellsFor(text) {
+// The digits as crisp type on a plane, one texture per value the count
+// shows, so the count never draws text mid-flight. 1px of the canvas is
+// 0.03 units: a number is 18 units wide, as the old cube digits were.
+const DIGITS = { width: 600, height: 260, unit: 0.03 };
+function digitsTexture(text) {
   const canvas = document.createElement("canvas");
-  canvas.width = 300; canvas.height = 130;
-  const context = canvas.getContext("2d", { willReadFrequently: true });
-  context.font = "400 108px Anton";
+  canvas.width = DIGITS.width; canvas.height = DIGITS.height;
+  const context = canvas.getContext("2d");
+  context.font = "400 216px Anton";
   context.textAlign = "center";
   context.textBaseline = "middle";
   context.fillStyle = "#fff";
-  context.fillText(text, 150, 68);
-  const { data } = context.getImageData(0, 0, 300, 130);
-  const cells = [];
-  const step = 5;
-  for (let y = 0; y < 130; y += step) for (let x = 0; x < 300; x += step) {
-    if (data[((y + 2) * 300 + x + 2) * 4 + 3] > 120) cells.push(((x - 150) / step) * CELL, (-(y - 65) / step) * CELL);
-  }
-  return cells;
+  context.fillText(text, DIGITS.width / 2, DIGITS.height / 2 + 6);
+  const map = new THREE.CanvasTexture(canvas);
+  map.anisotropy = 4;
+  return map;
 }
 
 function labelSprite(text, { font, color, height }) {
@@ -180,16 +184,19 @@ function labelSprite(text, { font, color, height }) {
 }
 
 function buildNumbers(receipts) {
-  const cube = new THREE.BoxGeometry(CELL * 0.8, CELL * 0.8, CELL * 0.8);
+  const plane = new THREE.PlaneGeometry(DIGITS.width * DIGITS.unit, DIGITS.height * DIGITS.unit);
   const numbers = receipts.slice(0, LAYOUT.numbers.length).map(({ value, label }, index) => {
-    // Every string it will show on the way up, so the count never builds a layout mid-flight.
-    const layouts = new Map();
-    for (let i = 0; i <= 1; i += 0.001) { const text = countAt(value, i); if (!layouts.has(text)) layouts.set(text, cellsFor(text)); }
-    layouts.set(value, cellsFor(value));
-    const most = Math.max(...[...layouts.values()].map((cells) => cells.length / 2));
-    const material = new THREE.MeshBasicMaterial({ color: index === 0 ? SIGNAL.clone().multiplyScalar(0.62) : BONE.clone().multiplyScalar(0.46), transparent: true });
-    const mesh = new THREE.InstancedMesh(cube, material, most);
-    mesh.count = 0;
+    // Every string it will show on the way up, drawn once up front.
+    const textures = new Map();
+    for (let i = 0; i <= 1; i += 0.001) { const text = countAt(value, i); if (!textures.has(text)) textures.set(text, digitsTexture(text)); }
+    if (!textures.has(value)) textures.set(value, digitsTexture(value));
+    const uniforms = {
+      uMap: { value: textures.get(value) },
+      // Kept under the bloom threshold: only the seam glows.
+      uColor: { value: index === 0 ? SIGNAL.clone().multiplyScalar(0.5) : BONE.clone().multiplyScalar(0.42) },
+      uRise: { value: 0 }, uOpacity: { value: 0 },
+    };
+    const mesh = new THREE.Mesh(plane, new THREE.ShaderMaterial({ uniforms, vertexShader: digitsVertex, fragmentShader: digitsFragment, transparent: true, depthWrite: false }));
     mesh.frustumCulled = false;
     const group = new THREE.Group();
     group.position.fromArray(LAYOUT.numbers[index]);
@@ -197,29 +204,23 @@ function buildNumbers(receipts) {
     const caption = labelSprite(label.toUpperCase(), { font: "500 30px JetBrains Mono", color: "#a39a8f", height: 0.5 });
     caption.position.set(0, -3.8, 0);
     group.add(caption);
-    // Each cube rises out of the river from its own depth.
-    const seeds = Float32Array.from({ length: most }, () => Math.random());
-    return { value, group, mesh, caption, layouts, seeds, shown: null, progress: -1, opacity: 0, captionOpacity: 0, baseY: LAYOUT.numbers[index][1] };
+    return { value, group, mesh, uniforms, caption, textures, shown: null, progress: -1, opacity: 0, captionOpacity: 0, baseY: LAYOUT.numbers[index][1] };
   });
-  return { numbers, dispose: () => { cube.dispose(); numbers.forEach((n) => { n.mesh.material.dispose(); n.caption.material.map.dispose(); n.caption.material.dispose(); }); } };
+  const dispose = () => {
+    plane.dispose();
+    numbers.forEach((n) => { n.textures.forEach((map) => map.dispose()); n.mesh.material.dispose(); n.caption.material.map.dispose(); n.caption.material.dispose(); });
+  };
+  return { numbers, dispose };
 }
 
-const dummy = new THREE.Object3D();
-function drawNumber(number, progress, time) {
+// A number is lit from the bottom up, a hot seam climbing through it, while
+// it lifts the last stretch out of the river.
+function drawNumber(number, progress) {
   const text = countAt(number.value, progress);
-  const cells = number.layouts.get(text) ?? number.layouts.get(number.value);
   const rise = 1 - (1 - Math.min(1, progress * 2.2)) ** 3;
-  number.mesh.count = cells.length / 2;
-  for (let i = 0; i < number.mesh.count; i++) {
-    const late = number.seeds[i];
-    const up = Math.min(1, Math.max(0, rise * 1.4 - late * 0.4));
-    dummy.position.set(cells[i * 2], cells[i * 2 + 1] - (1 - up) * (7 + late * 6), Math.sin(time * 1.3 + late * 30) * 0.06);
-    dummy.rotation.set((1 - up) * late * 3, (1 - up) * 2, 0);
-    dummy.scale.setScalar(Math.max(0.001, up));
-    dummy.updateMatrix();
-    number.mesh.setMatrixAt(i, dummy.matrix);
-  }
-  number.mesh.instanceMatrix.needsUpdate = true;
+  number.uniforms.uMap.value = number.textures.get(text) ?? number.textures.get(number.value);
+  number.uniforms.uRise.value = rise;
+  number.mesh.position.y = -(1 - rise) * 1.6;
   number.opacity = Math.min(1, progress * 3);
   number.captionOpacity = Math.max(0, Math.min(1, (progress - 0.55) * 3));
   number.shown = text;
@@ -248,7 +249,7 @@ function buildTools(tools) {
   glowCanvas.width = glowCanvas.height = 128;
   const g = glowCanvas.getContext("2d");
   const gradient = g.createRadialGradient(64, 64, 0, 64, 64, 64);
-  gradient.addColorStop(0, "rgba(255,240,225,1)"); gradient.addColorStop(0.2, "rgba(255,150,105,.6)"); gradient.addColorStop(1, "rgba(255,138,95,0)");
+  gradient.addColorStop(0, "rgba(255,240,225,1)"); gradient.addColorStop(0.08, "rgba(255,170,120,.55)"); gradient.addColorStop(0.35, "rgba(255,138,95,.1)"); gradient.addColorStop(1, "rgba(255,138,95,0)");
   g.fillStyle = gradient; g.fillRect(0, 0, 128, 128);
   const glowMap = new THREE.CanvasTexture(glowCanvas);
   const glow = new THREE.Sprite(new THREE.SpriteMaterial({ map: glowMap, transparent: true, depthWrite: false, blending: THREE.AdditiveBlending }));
@@ -263,6 +264,9 @@ export function createActOne(canvas, { receipts, tools, getProgress, onFrame }) 
   // The shared renderer (see engine.js): this act draws into it, and its
   // frames are copied onto this canvas.
   const film = attachFilm(canvas, { clear: 0x070605, bloom: [0.42, 0.45, 0.55], grain: 0.008 });
+  // Almost no colour fringing here: on dots this small it splits each one
+  // into red and blue and the name turns to purple static.
+  film.finish.uniforms.uAberration.value = 0.00006;
   const renderer = film.renderer;
   const scene = new THREE.Scene();
   const camera = new THREE.PerspectiveCamera(36, 1, 0.1, 600);
@@ -337,11 +341,11 @@ export function createActOne(canvas, { receipts, tools, getProgress, onFrame }) 
 
     for (const number of numbers) {
       const progress = numberProgress(camera.position.z, number.group.position.z);
-      if (progress !== number.progress || progress < 1) { drawNumber(number, progress, clock); number.progress = progress; }
+      if (progress !== number.progress) { drawNumber(number, progress); number.progress = progress; }
       number.group.position.y = number.baseY + Math.sin(clock * 0.8 + number.group.position.z) * 0.15;
       // Gone before the camera reaches it, so it never fills the lens.
       const near = Math.min(1, Math.max(0, (camera.position.z - number.group.position.z - 5) / 12));
-      number.mesh.material.opacity = number.opacity * near;
+      number.uniforms.uOpacity.value = number.opacity * near;
       number.caption.material.opacity = number.captionOpacity * near;
     }
 
@@ -361,9 +365,13 @@ export function createActOne(canvas, { receipts, tools, getProgress, onFrame }) 
       item.sprite.position.copy(orbit).lerp(toCamera, item.pull * 0.38);
       item.sprite.scale.copy(item.sprite.userData.base).multiplyScalar(1 + item.pull * 0.35);
       item.sprite.material.color.copy(DIM_BONE).lerp(SIGNAL, item.pull);
-      item.sprite.material.opacity = show.tools;
+      // The far side of the orbit sits back in the dark, so words that cross
+      // read as near and far instead of colliding.
+      const near = Math.min(1, Math.max(0, 0.5 + orbit.z / (2 * item.ring.radius)));
+      item.sprite.material.opacity = show.tools * Math.max(item.pull, 0.28 + 0.72 * near * near);
+      item.sprite.renderOrder = Math.round(orbit.z * 10);
     }
-    toolOrbit.glow.material.opacity = 0.18 + show.tools * 0.3;
+    toolOrbit.glow.material.opacity = 0.12 + show.tools * 0.25;
 
     // Before the act starts or after it ends only ambient motion is left (dust,
     // a caret), often while the next section plays beside it: a quarter of

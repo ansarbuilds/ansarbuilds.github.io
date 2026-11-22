@@ -47,7 +47,15 @@ export default function ActTwo({ projects }) {
       cut(Math.max(...moments.map((x) => x.cut)));
       moments.forEach((m, i) => {
         chimes[i](m.card);
-        show(titles.current[i], m.title, 10);
+        // The title resolves like a film title: out of focus and a touch
+        // large, settling sharp as it lands.
+        const title = titles.current[i];
+        if (title) {
+          title.style.opacity = m.title;
+          title.style.transform = `scale(${1.06 - 0.06 * m.title})`;
+          title.style.filter = m.title < 0.99 ? `blur(${(1 - m.title) * 10}px)` : "none";
+          title.style.visibility = m.title > 0.02 ? "visible" : "hidden";
+        }
         show(cards.current[i], m.card, 22);
         closed ||= m.bars;
       });

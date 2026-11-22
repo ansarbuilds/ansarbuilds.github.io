@@ -5,7 +5,7 @@
 export const pointVertex = /* glsl */ `
   attribute vec3 aColor;
   attribute vec2 aSeed;
-  uniform float uTime, uScale, uSize, uPart, uOpacity, uFar, uWobble;
+  uniform float uTime, uScale, uSize, uPart, uOpacity, uFar, uWobble, uSteady;
   varying vec3 vColor;
   varying float vAlpha;
   void main() {
@@ -18,8 +18,11 @@ export const pointVertex = /* glsl */ `
     vec4 view = modelViewMatrix * vec4(p, 1.);
     gl_Position = projectionMatrix * view;
     float depth = -view.z;
-    gl_PointSize = clamp(uSize * (0.55 + aSeed.y) * uScale / depth, 1., 6.);
-    float twinkle = 0.7 + 0.3 * sin(uTime * (1. + aSeed.x * 3.) + aSeed.y * 50.);
+    // Dust twinkles and varies in size; the name (uSteady 1) holds even
+    // dots, so its letters read as type, not static.
+    float sized = mix(0.55 + aSeed.y, 0.85 + 0.3 * aSeed.y, uSteady);
+    gl_PointSize = clamp(uSize * sized * uScale / depth, 1., 6.);
+    float twinkle = mix(0.7 + 0.3 * sin(uTime * (1. + aSeed.x * 3.) + aSeed.y * 50.), 0.92, uSteady);
     vColor = aColor;
     vAlpha = uOpacity * twinkle * smoothstep(0.8, 7., depth) * smoothstep(uFar, uFar * 0.3, depth);
   }
@@ -52,7 +55,33 @@ export const riverFragment = /* glsl */ `
   void main() {
     vec3 code = texture2D(uMap, vec2(vUv.x, vUv.y * uRepeat + uFlow)).rgb;
     float banks = smoothstep(0., 0.22, vUv.x) * smoothstep(1., 0.78, vUv.x);
-    float fade = smoothstep(150., 30., vDepth) * smoothstep(2., 9., vDepth);
+    // Faded far off, and close to the lens too, where big glyphs would
+    // otherwise crowd the bottom of the frame.
+    float fade = smoothstep(150., 30., vDepth) * smoothstep(12., 40., vDepth);
     gl_FragColor = vec4(code * banks * fade * uOpacity, 1.);
+  }
+`;
+
+// The receipts' numbers: type on a plane, revealed bottom to top behind a
+// hot seam with a ragged edge, as if lit by something passing up through it.
+export const digitsVertex = /* glsl */ `
+  varying vec2 vUv;
+  void main() { vUv = uv; gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.); }
+`;
+export const digitsFragment = /* glsl */ `
+  uniform sampler2D uMap;
+  uniform vec3 uColor;
+  uniform float uRise, uOpacity;
+  varying vec2 vUv;
+  float hash(vec2 p) { return fract(sin(dot(p, vec2(12.9898, 78.233))) * 43758.5453); }
+  void main() {
+    float ink = texture2D(uMap, vUv).a;
+    float ragged = (hash(floor(vUv * vec2(120., 1.))) - 0.5) * 0.06;
+    float edge = (uRise * 1.3 - 0.15) - vUv.y + ragged;
+    float lit = smoothstep(0., 0.025, edge);
+    float moving = step(0.001, uRise) * (1. - step(0.999, uRise));
+    float seam = (1. - smoothstep(0., 0.06, abs(edge))) * moving;
+    vec3 color = uColor * lit + vec3(1., 0.62, 0.42) * seam * 1.4;
+    gl_FragColor = vec4(color, ink * uOpacity * max(lit, seam));
   }
 `;
