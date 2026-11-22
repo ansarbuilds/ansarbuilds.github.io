@@ -44,3 +44,26 @@ test('project links point to existing case studies and local pages', async () =>
     }
   }
 });
+
+// Repos and demos that are private, so a visitor would get a 404 or a
+// sign-in wall. A project can mention them, but must not link to them: it
+// shows a locked "walkthrough on request" link instead. If one is made
+// public again, take it off this list and link it.
+const PRIVATE = [
+  /github\.com\/ansarbuilds\/(CPL-Dream-Team|NLP-Project-Smart-Category|Spotify-Data-Analysis|ai_knowledge_assistant|amazon-fine-food-sentiment-analysis|authorized-web-exposure-audit|catalogue-checker|data-delivery|high-value-customer-predictor|integration-in-a-box|mcp-analytics-stub|mv3-sidepanel-starter|site-recon|sitescout|sql-playground|yahoo-finance-news-scraper)\b/,
+  /huggingface\.co\/spaces\/kmsmohamedansar\//,
+  /ansarbuilds\.github\.io\/sql-playground/,
+];
+
+test('no project links to a private repo or demo', () => {
+  const bad = [];
+  function walk(value, where) {
+    if (Array.isArray(value)) value.forEach((v) => walk(v, where));
+    else if (value && typeof value === 'object') {
+      if (typeof value.href === 'string' && !value.locked && PRIVATE.some((re) => re.test(value.href))) bad.push(`${where}: ${value.href}`);
+      Object.values(value).forEach((v) => walk(v, where));
+    }
+  }
+  for (const project of PROJECTS) walk(project, project.slug);
+  assert.deepEqual(bad, []);
+});
