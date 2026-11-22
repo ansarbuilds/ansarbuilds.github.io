@@ -131,7 +131,9 @@ function Think({ reduced }) {
             <Kicker>A real run · 13.8M model</Kicker>
             <h2 id="hw-think-h" className="hw-h2">Watch it think.</h2>
             <p className="hw-prompt"><span>You</span>{PROMPT}</p>
-            <p className="hw-story" aria-label={RUN.map((r) => r[0]).join("")}>
+            <p className="hw-story">
+              {/* The whole story for screen readers; the typing is for the eye. */}
+              <span className="sr-only">{RUN.map((r) => r[0]).join("")}</span>
               <span aria-hidden="true">
                 {RUN.slice(0, n).map(([p], i) => (
                   <span key={i} className={i === n - 1 ? "hw-now" : undefined}>{p}</span>

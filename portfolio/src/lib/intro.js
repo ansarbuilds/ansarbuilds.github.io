@@ -35,7 +35,8 @@ export const COLD_OPEN_SESSION_KEY = "cold-open-played";
 
 /* Whether the film's cold open should play over the home page, and which
    cut: "full" on a first visit (it then hands over to the hero's intro),
-   "short" the first time in a later session, null otherwise. Never with
+   "short" the first time in a later session or on a phone held upright,
+   null otherwise. Never with
    reduced motion, on Save-Data or a 2G/3G connection, without WebGL 2, when the link points at a
    section further down, or when storage is unavailable. */
 // Dev server only: ?coldopen=full or ?coldopen=short forces the cold open.
@@ -60,5 +61,8 @@ export function coldOpenMode() {
   } catch {
     return null;
   }
-  return seenBefore ? "short" : "full";
+  // On a phone held upright the full cut is a long wait in a thin strip of
+  // screen, so a phone gets the short cut, which joins at the name.
+  const phone = window.matchMedia?.("(max-width: 700px) and (orientation: portrait)").matches;
+  return seenBefore || phone ? "short" : "full";
 }

@@ -14,6 +14,9 @@
 .co-bars span:first-child { top: 0; transform: translateY(-101%); }
 .co-bars span:last-child { bottom: 0; transform: translateY(101%); }
 .co-bars.is-closed span { transform: none; }
+/* Held upright, a 2.39:1 strip would leave most of a phone black: the bars
+   only trim the top and bottom, and the frame keeps most of the screen. */
+@media (orientation: portrait) { .co-bars span { height: max(4vh, calc((100vh - max(100vw / 2.39, 72vh)) / 2)); } }
 /* The typed line, hung under the name (its place is set from the page). */
 .co-line { position: absolute; margin: clamp(14px, 2.4vh, 28px) 0 0; transform: translateX(-50%); width: max-content; max-width: 92vw; text-align: center; font: 500 clamp(.72rem, 1.5vw, 1.02rem)/1.4 var(--font-mono); letter-spacing: .06em; text-shadow: 0 0 18px #000; }
 .co-line:not(:empty)::after { content: ""; display: inline-block; width: .55em; height: 1.05em; margin-left: .2em; vertical-align: -.16em; background: #ff8a5f; }
