@@ -1,7 +1,7 @@
-/* The film's sound: off by default, and generated in the browser (no audio
-   files). A score in the manner of a launch film: each act has its own
-   chord progression (lib/score.js) played on warm pads, a bass and a soft
-   piano figure, in one reverb space. It moves to the next act's music on
+/* The film's sound, generated in the browser (no audio files). An original
+   score in the manner of a big space film: each act has its own chord
+   progression (lib/score.js) played on a church organ, a sub bass and a
+   high ticking figure, with a clock under it, all in one long hall. It moves to the next act's music on
    the next chord, and opens up and adds air as the visitor scrolls faster.
    Cues sit on top: the cold open's heartbeats, riser and hit, a tone on a
    cut, a chime as a card comes up. With no film on the page (reduced
@@ -36,7 +36,7 @@ export function setSound(next) {
 }
 
 // A hall: about three seconds of decaying stereo noise as the impulse.
-function hall(seconds = 3.2) {
+function hall(seconds = 5.2) {
   const rate = ctx.sampleRate, length = Math.floor(rate * seconds);
   const impulse = ctx.createBuffer(2, length, rate);
   for (let c = 0; c < 2; c++) {
@@ -67,6 +67,7 @@ function build() {
   verb = ctx.createGain();
   verb.gain.value = 0.55;
   const space = hall();
+  verb.gain.value = 0.7;
   verb.connect(space).connect(master);
   // The music bus: pads go through one low-pass that scrolling opens.
   music = ctx.createGain();
@@ -74,7 +75,7 @@ function build() {
   music.connect(master);
   padTone = ctx.createBiquadFilter();
   padTone.type = "lowpass";
-  padTone.frequency.value = 900;
+  padTone.frequency.value = 1500;
   padTone.Q.value = 0.5;
   padTone.connect(music);
   padTone.connect(verb);
@@ -106,10 +107,10 @@ function build() {
     const now = performance.now(), dy = Math.abs(window.scrollY - lastY), dt = Math.max(16, now - lastT);
     lastY = window.scrollY; lastT = now;
     const speed = Math.min(1, dy / dt / 3);
-    padTone.frequency.setTargetAtTime(900 + speed * 2200, ctx.currentTime, 0.15);
+    padTone.frequency.setTargetAtTime(1500 + speed * 2200, ctx.currentTime, 0.15);
     air.gain.setTargetAtTime(speed * 0.025, ctx.currentTime, 0.1);
     clearTimeout(settle);
-    settle = setTimeout(() => { padTone.frequency.setTargetAtTime(900, ctx.currentTime, 0.8); air.gain.setTargetAtTime(0, ctx.currentTime, 0.6); }, 160);
+    settle = setTimeout(() => { padTone.frequency.setTargetAtTime(1500, ctx.currentTime, 0.8); air.gain.setTargetAtTime(0, ctx.currentTime, 0.6); }, 160);
   }, { passive: true });
   document.addEventListener("visibilitychange", () => { if (document.visibilityState === "hidden") ctx.suspend(); else if (on && !paused) ctx.resume(); });
   setInterval(schedule, 50);
@@ -151,21 +152,64 @@ function release(at) {
   sounding.clear();
 }
 
-// A pad note: two detuned saws and a sine an octave down, slow in and out.
-function pad(midi, at, length, level) {
+// The organ: one pipe rank per drawbar (16', 8', 4', 2 2/3', 2'), sines in
+// tune with each other, a slow swell in and a long release into the hall,
+// and a slight drift between ranks so it breathes like air in pipes.
+const RANKS = [[0.5, 0.45], [1, 1], [2, 0.55], [3, 0.18], [4, 0.22]];
+function organ(midi, at, length, level) {
   const out = ctx.createGain();
-  const end = envelope(out, at, 0.022 * level, 1.4, Math.max(0, length - 1.4), 2.6);
+  const end = envelope(out, at, 0.016 * level, 1.1, Math.max(0, length - 1.1), 3.2);
   out.connect(padTone);
   ring(out, end);
-  for (const [type, detune, mul] of [["sawtooth", -7, 1], ["sawtooth", 7, 1], ["sine", 0, 0.5]]) {
-    const osc = ctx.createOscillator();
-    osc.type = type;
+  RANKS.forEach(([mul, weight], i) => {
+    const osc = ctx.createOscillator(), g = ctx.createGain();
+    osc.type = "sine";
     osc.frequency.value = hz(midi) * mul;
-    osc.detune.value = detune;
-    osc.connect(out);
+    osc.detune.value = (i % 2 ? 1 : -1) * (1.5 + i);
+    g.gain.value = weight;
+    osc.connect(g).connect(out);
     osc.start(at);
     osc.stop(end + 0.05);
+  });
+}
+
+// The high figure: a soft flute stop, quick to speak and quick to stop, so
+// a run of them ticks.
+function flute(midi, at, velocity = 1) {
+  const out = ctx.createGain();
+  out.gain.setValueAtTime(0, at);
+  out.gain.linearRampToValueAtTime(0.028 * velocity, at + 0.025);
+  out.gain.exponentialRampToValueAtTime(0.012 * velocity, at + 0.25);
+  out.gain.exponentialRampToValueAtTime(0.0001, at + 0.9);
+  out.connect(music);
+  const send = ctx.createGain();
+  send.gain.value = 1.1;
+  out.connect(send).connect(verb);
+  for (const [mul, level] of [[1, 1], [2, 0.35], [3, 0.08]]) {
+    const osc = ctx.createOscillator(), g = ctx.createGain();
+    osc.type = "sine";
+    osc.frequency.value = hz(midi) * mul;
+    g.gain.value = level;
+    osc.connect(g).connect(out);
+    osc.start(at);
+    osc.stop(at + 1);
   }
+}
+
+// The clock: a dry, tiny wooden click.
+function clock(at, level = 1) {
+  const src = ctx.createBufferSource();
+  src.buffer = noiseBuffer;
+  const band = ctx.createBiquadFilter();
+  band.type = "bandpass";
+  band.frequency.value = 3200;
+  band.Q.value = 6;
+  const out = ctx.createGain();
+  out.gain.setValueAtTime(0.05 * level, at);
+  out.gain.exponentialRampToValueAtTime(0.0001, at + 0.035);
+  src.connect(band).connect(out).connect(master);
+  src.start(at, Math.random());
+  src.stop(at + 0.05);
 }
 
 // The bass: a round sine with a little triangle for edge, under the chord.
@@ -273,7 +317,7 @@ function chord(at) {
   // A held last chord rings for a long time instead of looping.
   const length = held ? part.bar * 4 : part.bar;
   bass(notes[0] - 12, at, length);
-  for (const midi of notes.slice(1)) pad(midi, at, length, part.padLevel);
+  for (const midi of notes.slice(1)) organ(midi, at, length, part.padLevel);
   if (part.pulse === "drum") drum(at, 0.65);
 }
 
@@ -301,7 +345,8 @@ function schedule() {
     const finished = part.hold && chordAt(playing, bar) === part.chords.length - 1 && bar >= part.chords.length;
     if (!finished) {
       const midi = arpNote(playing, chordAt(playing, bar), inBar);
-      if (midi !== null) piano(midi, stepAt, inBar === 0 ? 1 : 0.75);
+      if (midi !== null) flute(midi, stepAt, inBar === 0 ? 1 : 0.7);
+      if (part.tick) clock(stepAt, inBar % 2 === 0 ? 1 : 0.55);
       if (part.pulse === "soft" && inBar % 2 === 0) drum(stepAt, inBar === 0 ? 0.5 : 0.28, 80, 45, 0.35);
       if (part.pulse === "drum" && inBar === part.steps / 2) drum(stepAt, 0.5);
     }
@@ -318,10 +363,27 @@ export function showBed(name, visible) {
   if (visible && SCORE[name]) showing.push(name);
 }
 
+/* A browser lets a page make sound only after a click, tap or key press.
+   Sound that is on but waiting starts with the first one. */
+const GESTURES = ["pointerdown", "keydown", "touchend"];
+function startOnGesture() {
+  const wake = () => {
+    GESTURES.forEach((name) => window.removeEventListener(name, wake, true));
+    if (on) { start(); listeners.forEach((fn) => fn(on)); }
+  };
+  GESTURES.forEach((name) => window.addEventListener(name, wake, true));
+}
 // If it was left on, it starts with the visitor's first click or key.
-if (on) {
-  const wake = () => { ["pointerdown", "keydown"].forEach((name) => window.removeEventListener(name, wake, true)); if (on) start(); };
-  ["pointerdown", "keydown"].forEach((name) => window.addEventListener(name, wake, true));
+if (on) startOnGesture();
+
+/* The film playing on its own as the page opens: the sound is on, and
+   starts at the visitor's first click, tap or key (see FilmPlayer's
+   "Tap for sound"). Not remembered: it is not the visitor's choice yet. */
+export function armSound() {
+  if (on) return;
+  on = true;
+  listeners.forEach((fn) => fn(on));
+  startOnGesture();
 }
 
 // The root of whatever is playing, for cues that should sit in its key.
@@ -340,7 +402,8 @@ const root = () => {
      riser      a build of `length` seconds into a hit
      hit        the impact: a boom, a crack and a wide chord
      tick       a quiet key press
-     bloom      the chord that opens the frame */
+     bloom      the chord that opens the frame
+     braam      a trailer hit, for a chapter card */
 export function cue(kind, length = 1.6) {
   if (!on || !ctx || ctx.state !== "running") return;
   const now = ctx.currentTime + 0.01;
@@ -379,9 +442,9 @@ export function cue(kind, length = 1.6) {
       drum(now, 1.6, 140, 32, 2.2);
       noise(now, 0.9, 6000, 600, 0.22, 0.02, 0.4);
       // The chord of the whole film, wide, ringing out in the hall.
-      bass(38, now, 1.5);
-      for (const midi of [50, 57, 62, 66, 69, 74]) pad(midi, now, 1.4, 1.6);
-      piano(74, now, 1.4); piano(81, now + 0.02, 0.9);
+      bass(33, now, 1.8);
+      for (const midi of [45, 52, 57, 60, 64, 69]) organ(midi, now, 2.4, 1.7);
+      flute(76, now + 0.02, 1.2);
       return;
     }
     case "tick": {
@@ -395,9 +458,27 @@ export function cue(kind, length = 1.6) {
       return;
     }
     case "bloom": {
-      bass(38, now, 2.5);
-      for (const midi of [57, 61, 64, 66]) pad(midi, now, 2.5, 1);
-      piano(78, now + 0.1, 0.8);
+      bass(33, now, 2.5);
+      for (const midi of [57, 60, 64, 71]) organ(midi, now, 2.5, 1.1);
+      flute(81, now + 0.1, 0.8);
+      return;
+    }
+    case "braam": {
+      // A trailer hit: a low organ cluster that swells, a drum under it.
+      drum(now, 1.4, 120, 30, 1.8);
+      for (const midi of [33, 40, 45, 52]) {
+        const osc = ctx.createOscillator(), out = ctx.createGain(), tone = ctx.createBiquadFilter();
+        osc.type = "sawtooth";
+        osc.frequency.value = hz(midi);
+        tone.type = "lowpass";
+        tone.frequency.setValueAtTime(180, now);
+        tone.frequency.exponentialRampToValueAtTime(1300, now + 0.35);
+        tone.frequency.exponentialRampToValueAtTime(220, now + 2.2);
+        envelope(out, now, 0.05, 0.06, 0.5, 1.9);
+        osc.connect(tone).connect(out).connect(master);
+        out.connect(verb);
+        osc.start(now); osc.stop(now + 2.6);
+      }
       return;
     }
     default:

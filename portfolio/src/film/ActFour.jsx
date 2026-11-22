@@ -1,6 +1,5 @@
 import "./actFour/actFour.css";
 import { useRef } from "react";
-import ActTitle from "./ActTitle";
 import { ArrowUpRight } from "lucide-react";
 import { cueOnRise } from "../lib/sound";
 import { show, useAct } from "./useAct";
@@ -16,7 +15,7 @@ export default function ActFour({ playback, experiments }) {
   const chimes = useRef(null);
   chimes.current ??= experiments.map(() => cueOnRise("chime"));
 
-  const { failed, titleUp } = useAct({
+  const { failed } = useAct({
     id: "act4",
     playback,
     load: async () => {
@@ -32,7 +31,6 @@ export default function ActFour({ playback, experiments }) {
   if (failed) return null;
   return <section className="act4 film-act" data-act="act4" aria-labelledby="act4-title">
     <div className="act4-stage">
-      <ActTitle up={titleUp}>IV. The playground</ActTitle>
       <canvas ref={canvas} className="act4-canvas" aria-hidden="true" />
       <div ref={title} className="act4-title">
         <p className="act4-kicker">05 · The playground</p>

@@ -1,6 +1,5 @@
 import "./actTwo/actTwo.css";
 import { useRef } from "react";
-import ActTitle from "./ActTitle";
 import { ArrowUpRight } from "lucide-react";
 import { media } from "../lib/media";
 import { cueOnRise } from "../lib/sound";
@@ -19,7 +18,7 @@ export default function ActTwo({ playback, projects }) {
   const cues = useRef(null);
   cues.current ??= { cut: cueOnRise("tone", 0.9), chimes: projects.map(() => cueOnRise("chime")) };
 
-  const { failed, titleUp } = useAct({
+  const { failed } = useAct({
     id: "act2",
     playback,
     load: async () => {
@@ -50,7 +49,6 @@ export default function ActTwo({ playback, projects }) {
   if (failed) return null;
   return <section className="act2 film-act" data-act="act2" aria-label="Selected work">
     <div className="act2-stage">
-      <ActTitle up={titleUp} as="h2">II. Seven builds</ActTitle>
       <canvas ref={canvas} className="act2-canvas" aria-hidden="true" />
       <div ref={bars} className="act2-bars" aria-hidden="true"><span /><span /></div>
       {projects.map((project, i) => <p key={project.slug} ref={(node) => { titles.current[i] = node; }} className="act2-title" aria-hidden="true">{project.name}</p>)}

@@ -17,7 +17,7 @@ test('chords are voiced low to high, in a playable range, with a bass under them
   }
 });
 
-test('the piano plays on every downbeat, in tune with its chord, and repeats exactly', () => {
+test('the figure plays on every downbeat, in tune with its chord, and repeats exactly', () => {
   for (const name of ACT_NAMES) {
     const part = SCORE[name];
     part.chords.forEach((chord, c) => {
@@ -35,6 +35,6 @@ test('the acts loop, and the finale comes home and stays', () => {
   assert.equal(chordAt('act1', 4), 0);
   const last = SCORE.finale.chords.length - 1;
   assert.equal(chordAt('finale', 99), last);
-  assert.deepEqual(SCORE.finale.chords[last][0] % 12, 2); // D
+  assert.deepEqual(SCORE.finale.chords[last][0] % 12, 9); // A
   assert.equal(Math.round(hz(69)), 440);
 });

@@ -6,32 +6,40 @@ import { ACT_TWO } from "./actTwo/timeline.js";
 import { ACT_THREE } from "./actThree/timeline.js";
 import { ACT_FOUR } from "./actFour/timeline.js";
 import { FINALE } from "./finale/timeline.js";
-import { holdSound, onSoundChange, setSound, showBed, soundOn } from "../lib/sound";
+import { cue, holdSound, onSoundChange, setSound, showBed, soundOn } from "../lib/sound";
 import { holdScroll } from "../lib/scroll";
 import { setQuiet } from "./quiet";
 
 /* The film, played rather than scrolled. After the cold open (which plays
    in its own layer, see ColdOpen.jsx) the acts run one after another on one
-   clock, full screen over the page, with the score: Act I slides up over
-   the hero, the rest join on the hard cuts they were built with, and when
-   the finale has held its last frame the film lifts off the page, which is
-   then an ordinary page to scroll.
+   clock, full screen over the page, with the score. Act I slides up over
+   the hero; each later act is announced by a chapter card, cut in on a
+   flash with a trailer hit; after the finale the credits roll, and then the
+   film lifts off the page, which is an ordinary page to scroll.
 
-   It mounts as soon as the visitor presses Play, so the acts' scenes load
-   while the cold open is on screen, and starts its clock once `rolling`.
+   It mounts as the film starts, so the acts' scenes load while the cold
+   open is on screen, and starts its clock once `rolling`.
    `children(playback)` renders the acts (FilmReel in Sections.jsx); each act
    asks `playback` where the film is in it (see useAct.js). Space pauses,
    the arrow keys step five seconds, M mutes and Escape skips to the page. */
 const SLIDE = 1; // Act I sliding up over the hero
-const END_HOLD = 2.6; // the finale's last frame, before the film lifts
+const END_HOLD = 1.4; // the finale's last frame, before the credits
+const CARD = 1.8; // a chapter card
+const CREDITS = 8.5; // the credits roll
 const LIFT = 0.8; // the film fading off the page
 const PREROLL = 0.4; // the next act starts drawing this early, out of sight
+// What plays, in order. A card or the credits are words on black (they are
+// in FilmReel too); `bed` is the music under them.
 const ACTS = [
   { id: "act1", seconds: ACT_ONE.seconds, lead: SLIDE },
+  { id: "card-act2", kind: "card", seconds: CARD, bed: "act2" },
   { id: "act2", seconds: ACT_TWO.seconds },
+  { id: "card-act3", kind: "card", seconds: CARD, bed: "act3" },
   { id: "act3", seconds: ACT_THREE.seconds },
+  { id: "card-act4", kind: "card", seconds: CARD, bed: "act4" },
   { id: "act4", seconds: ACT_FOUR.seconds },
   { id: "finale", seconds: FINALE.seconds, tail: END_HOLD },
+  { id: "credits", kind: "credits", seconds: CREDITS, bed: "finale" },
 ];
 // Each act on the film's clock: `start` it is on screen, `t0` its own time
 // starts, `end` the next one takes over.
@@ -50,6 +58,7 @@ const smooth = (u) => u * u * (3 - 2 * u);
 
 export default function FilmPlayer({ rolling, onEnd, children }) {
   const root = useRef(null);
+  const flashRef = useRef(null);
   const scrub = useRef(null);
   const time = useRef(null);
   const [playing, setPlaying] = useState(true);
@@ -83,7 +92,7 @@ export default function FilmPlayer({ rolling, onEnd, children }) {
   useEffect(() => {
     let frame = 0, last = performance.now(), told = -1;
     const s = state.current;
-    const sections = () => root.current?.querySelectorAll(".film-act") ?? [];
+    const sections = () => root.current?.querySelectorAll(".film-act, .film-chapter, .film-credits") ?? [];
     const tick = (now) => {
       frame = requestAnimationFrame(tick);
       const dt = Math.min(0.1, (now - last) / 1000);
@@ -95,18 +104,30 @@ export default function FilmPlayer({ rolling, onEnd, children }) {
       // An act that could not start is passed over.
       if (s.failed.has(segment.id) && s.elapsed < FILM_SECONDS) { s.elapsed = segment.end; segment = SEGMENTS.find((x) => s.elapsed < x.end) ?? SEGMENTS.at(-1); }
       if (segment.id !== s.current) {
+        const was = s.current;
         s.current = segment.id;
         sections().forEach((el) => { const on = el.dataset.act === segment.id; el.classList.toggle("is-on", on); el.toggleAttribute("inert", !on); });
-        SEGMENTS.forEach((x) => showBed(x.id, x.id === segment.id));
+        const bed = segment.bed ?? segment.id;
+        SEGMENTS.forEach((x) => showBed(x.id, x.id === bed));
+        // A cut onto a card, or from a card into its act: one flash frame.
+        if (was && (segment.kind === "card" || BY_ID[was]?.kind === "card")) {
+          const flash = flashRef.current;
+          if (flash) { flash.classList.remove("is-on"); void flash.offsetWidth; flash.classList.add("is-on"); }
+        }
+        if (segment.kind === "card" && s.playing) cue("braam");
       }
-      // Draw the act on screen, and the next one just before its cut so it
-      // already has a finished frame when it is shown.
+      // Draw the act on screen, and the next one just before its cut (all
+      // through a card) so it already has a finished frame when it is shown.
       const next = SEGMENTS[SEGMENTS.indexOf(segment) + 1];
+      const lead = segment.kind === "card" ? segment.seconds : PREROLL;
       const visible = document.visibilityState === "visible";
       for (const [id, film] of s.films) {
-        const want = visible && (id === segment.id || (next?.id === id && next.start - s.elapsed < PREROLL));
+        const want = visible && (id === segment.id || (next?.id === id && next.start - s.elapsed < lead));
         if (s.drawing.get(id) !== want) { s.drawing.set(id, want); film.setActive(want); }
       }
+      // The credits roll at the clock's pace, so scrubbing moves them too.
+      const roll = root.current?.querySelector(".film-credits-roll");
+      if (roll && segment.kind === "credits") roll.style.setProperty("--roll", String((s.elapsed - segment.start) / segment.seconds));
       // Act I comes up over the hero like a sheet of paper.
       const first = root.current?.querySelector('[data-act="act1"]');
       if (first) first.style.transform = s.elapsed < SLIDE ? `translateY(${(1 - smooth(s.elapsed / SLIDE)) * 100}%)` : "";
@@ -188,12 +209,12 @@ export default function FilmPlayer({ rolling, onEnd, children }) {
 
   return <div ref={root} className={`film-player ${rolling ? "is-rolling" : ""} ${idle ? "is-idle" : ""}`} role="region" aria-label="The film" tabIndex={-1} onClick={onClick}>
     {children(playback)}
+    <div ref={flashRef} className="film-flash" aria-hidden="true" />
     <div className="film-controls">
       <button type="button" className="film-button" onClick={togglePlay} aria-label={playing ? "Pause the film" : "Play the film"}>{playing ? <Pause size={16} aria-hidden="true" /> : <Play size={16} aria-hidden="true" />}</button>
       <input ref={scrub} className="film-scrub" type="range" min={0} max={FILM_SECONDS} step={0.1} defaultValue={0} aria-label="Where the film is" onInput={(event) => seek(Number(event.currentTarget.value))} />
       <span ref={time} className="film-time" aria-hidden="true">0:00 / {clock(FILM_SECONDS)}</span>
       <button type="button" className="film-button" onClick={() => setSound(!sound)} aria-pressed={sound} aria-label={sound ? "Mute the film" : "Turn the film's sound on"}>{sound ? <Volume2 size={16} aria-hidden="true" /> : <VolumeX size={16} aria-hidden="true" />}</button>
-      <button type="button" className="film-skip-film" onClick={finish}>Skip to the site</button>
     </div>
   </div>;
 }
