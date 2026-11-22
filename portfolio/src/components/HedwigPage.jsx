@@ -130,6 +130,61 @@ function Reveal({ children, className = "", i = 0, as = "div" }) {
 }
 
 /* ---------- 1. Hero ---------- */
+function SnowyOwl() {
+  return (
+    <svg className="hw-snowy" viewBox="-100 -100 200 200" aria-hidden="true">
+      <defs>
+        <radialGradient id="hwSnowyBody" cx="58%" cy="24%" r="76%">
+          <stop offset="0%" stopColor="#ffffff" /><stop offset="68%" stopColor="#f6f2ea" /><stop offset="100%" stopColor="#dcd4c5" />
+        </radialGradient>
+        <linearGradient id="hwSnowyWing" x1="82%" y1="12%" x2="10%" y2="96%">
+          <stop offset="0%" stopColor="#ffffff" /><stop offset="60%" stopColor="#f2ede3" /><stop offset="100%" stopColor="#cec5b5" />
+        </linearGradient>
+        <radialGradient id="hwSnowyEye" cx="38%" cy="38%" r="62%">
+          <stop offset="0%" stopColor="#ffd75e" /><stop offset="55%" stopColor="#db8700" /><stop offset="100%" stopColor="#693000" />
+        </radialGradient>
+      </defs>
+      <path d="M-38 78 Q-10 66 26 70 Q54 73 74 91 L66 97 Q28 84 -8 86 Q-28 89 -42 95 Z" fill="#1b243c" stroke="#314169" strokeWidth="1.4" />
+      <path d="M-38 78 Q-18 72 -4 76 L-8 87 Q-24 88 -40 94 Z" fill="#3a5280" opacity=".75" />
+      <g transform="rotate(6)">
+        <path d="M-36 52 L-62 96 Q-55 98 -48 92 L-24 58 Z M-26 56 L-50 98 Q-43 100 -36 93 L-16 62 Z" fill="#e6dfd0" stroke="#c3baa8" strokeWidth="1" />
+        <path d="M-50 78 q4 2 2 6 q-4 -2 -2 -6 Z M-40 82 q4 2 2 6 q-4 -2 -2 -6 Z" fill="#4e341b" opacity=".78" />
+      </g>
+      <path d="M-14 -50 C-2 -70 30 -70 42 -48 C48 -36 47 -22 46 -6 C48 24 34 56 -6 66 C-34 72 -52 46 -40 14 C-32 -8 -24 -34 -14 -50 Z" fill="url(#hwSnowyBody)" stroke="#9a9182" strokeWidth="1.35" />
+      <path d="M-10 48 C-14 66 -2 76 14 74 C24 73 28 60 22 48 Z" fill="#f7f4ec" stroke="#ddd4c4" strokeWidth="1" />
+      <path d="M2 72 Q-2 80 4 82 M10 73 Q10 82 16 82 M18 71 Q22 79 26 78" stroke="#22252e" strokeWidth="3.1" strokeLinecap="round" fill="none" />
+      <g className="hw-wing">
+        <path d="M8 -14 C26 4 12 36 -18 62 C-46 86 -72 98 -82 96 C-80 76 -64 42 -42 16 C-22 -8 -4 -22 8 -14 Z" fill="url(#hwSnowyWing)" stroke="#d5ccbc" strokeWidth="1.1" />
+        <path d="M-24 26 Q-52 58 -76 92 M-14 34 Q-40 62 -64 88" stroke="#c8bfb0" strokeWidth="1" fill="none" opacity=".7" />
+        <g fill="#4e341b" opacity=".82">
+          <path d="M-6 12 l5 1 l-3 4 Z" /><path d="M6 17 l4 1 l-2 4 Z" /><path d="M-18 22 l5 1 l-3 4 Z" />
+          <path d="M-4 26 l5 1 l-3 4 Z" /><path d="M9 28 l4 1 l-2 4 Z" /><path d="M-28 32 l5 2 l-3 4 Z" />
+          <path d="M-14 35 l5 1 l-3 4 Z" /><path d="M1 37 l4 1 l-2 4 Z" /><path d="M-36 42 l6 2 l-4 4 Z" />
+          <path d="M-22 45 l5 1 l-3 4 Z" /><path d="M-7 47 l4 1 l-2 4 Z" /><path d="M-44 52 l6 2 l-4 4 Z" />
+          <path d="M-30 55 l5 1 l-3 4 Z" /><path d="M-16 57 l4 1 l-2 4 Z" /><path d="M-50 62 l5 2 l-3 4 Z" />
+          <path d="M-37 64 l5 1 l-3 4 Z" /><path d="M-56 72 l5 2 l-3 4 Z" /><path d="M-43 74 l4 1 l-2 4 Z" />
+          <path d="M-60 81 l4 2 l-2 3 Z" />
+        </g>
+      </g>
+      <path d="M-6 -28 Q14 -16 34 -28 M-10 -46 Q14 -56 38 -46" stroke="#e6decb" strokeWidth="1.1" fill="none" opacity=".45" />
+      <g transform="rotate(10 2 -40)">
+        <ellipse cx="2" cy="-40" rx="7.6" ry="6.8" fill="url(#hwSnowyEye)" stroke="#241b11" strokeWidth="1.4" />
+        <circle cx="2" cy="-40" r="3.4" fill="#0c0905" /><circle cx=".5" cy="-41.8" r="1.4" fill="#fff" />
+        <ellipse className="hw-lid" cx="2" cy="-40" rx="8.2" ry="7.4" fill="#efe8d8" />
+        <path d="M-6 -41 Q2 -48.5 10 -41" stroke="#2a2015" strokeWidth="1.9" fill="none" opacity=".78" />
+      </g>
+      <g transform="rotate(-10 24 -40)">
+        <ellipse cx="24" cy="-40" rx="7.6" ry="6.8" fill="url(#hwSnowyEye)" stroke="#241b11" strokeWidth="1.4" />
+        <circle cx="24" cy="-40" r="3.4" fill="#0c0905" /><circle cx="22.5" cy="-41.8" r="1.4" fill="#fff" />
+        <ellipse className="hw-lid" cx="24" cy="-40" rx="8.2" ry="7.4" fill="#efe8d8" />
+        <path d="M16 -41 Q24 -48.5 32 -41" stroke="#2a2015" strokeWidth="1.9" fill="none" opacity=".78" />
+      </g>
+      <path d="M10 -34 Q13 -37 16 -34 L14 -24 Q13 -22 11 -24 Z" fill="#23252b" stroke="#0c0d10" strokeWidth="1" />
+      <path d="M6 -32 Q10 -30 11 -28 M20 -32 Q16 -30 15 -28" stroke="#ffffff" strokeWidth="2.1" strokeLinecap="round" />
+    </svg>
+  );
+}
+
 function Hero({ reduced }) {
   const ref = useRef(null);
   const { scrollYProgress } = useScroll({ target: ref, offset: ["start start", "end start"] });
@@ -145,22 +200,29 @@ function Hero({ reduced }) {
       <div className="hw-hero-shade" />
       <motion.div className="hw-hero-copy" style={{ opacity: fade }} initial="hidden" animate="shown">
         <a href="#card-hedwig" className="hw-back"><ArrowLeft size={13} /> All projects</a>
-        <motion.p className="hw-kicker" variants={fadeUp} custom={0}>My try at building an LLM from scratch · pure PyTorch</motion.p>
-        <h1 className="hw-title" aria-label="Hedwig">
-          {"Hedwig".split("").map((ch, i) => (
-            <span key={i} className="hw-mask" aria-hidden="true">
-              <motion.span className="inline-block" variants={maskReveal} custom={i + 1}>{ch}</motion.span>
-            </span>
-          ))}
-        </h1>
-        <motion.p className="hw-lede" variants={fadeUp} custom={3}>
-          I built a ChatGPT-style model from scratch on a MacBook Air, hit the laptop wall, and scaled to <b>286.7 million</b> knobs on rented GPUs for <b>$2.45</b>.
-        </motion.p>
-        <motion.div className="hw-ctas" variants={fadeUp} custom={4}>
-          <a className="hw-btn hw-btn-gold" href={DEMO} target="_blank" rel="noopener noreferrer">Try it live <ArrowUpRight size={15} /></a>
-          <a className="hw-btn" href="#hw-films"><Play size={14} /> Watch the film</a>
-          <a className="hw-btn" href={CODE} target="_blank" rel="noopener noreferrer">Code <ArrowUpRight size={15} /></a>
-        </motion.div>
+        <div className="hw-hero-row">
+          <div>
+            <motion.p className="hw-kicker" variants={fadeUp} custom={0}>My try at building an LLM from scratch · pure PyTorch</motion.p>
+            <h1 className="hw-title" aria-label="Hedwig">
+              {"Hedwig".split("").map((ch, i) => (
+                <span key={i} className="hw-mask" aria-hidden="true">
+                  <motion.span className="inline-block" variants={maskReveal} custom={i + 1}>{ch}</motion.span>
+                </span>
+              ))}
+            </h1>
+            <motion.p className="hw-lede" variants={fadeUp} custom={3}>
+              I built a ChatGPT-style model from scratch on a MacBook Air, hit the laptop wall, and scaled to <b>286.7 million</b> knobs on rented GPUs for <b>$2.45</b>.
+            </motion.p>
+            <motion.div className="hw-ctas" variants={fadeUp} custom={4}>
+              <a className="hw-btn hw-btn-gold" href={DEMO} target="_blank" rel="noopener noreferrer">Try it live <ArrowUpRight size={15} /></a>
+              <a className="hw-btn" href="#hw-films"><Play size={14} /> Watch the film</a>
+              <a className="hw-btn" href={CODE} target="_blank" rel="noopener noreferrer">Code <ArrowUpRight size={15} /></a>
+            </motion.div>
+          </div>
+          <motion.div variants={fadeUp} custom={2}>
+            <SnowyOwl />
+          </motion.div>
+        </div>
       </motion.div>
       <div className="hw-scroll-cue" aria-hidden="true"><span /></div>
     </header>

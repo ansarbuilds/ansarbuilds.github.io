@@ -25,20 +25,45 @@ function ellipsoid(out, colors, n, [cx, cy, cz], [rx, ry, rz], color, fill = 0.1
 
 function buildOwl() {
   const p = [], c = [];
-  const bone = () => BONE, belly = (u, a) => (Math.sin(a) > 0.3 ? BONE.clone().lerp(AMBER, 0.12) : BONE.clone().multiplyScalar(0.72));
-  ellipsoid(p, c, 2600, [0, 0, 0], [1.05, 1.45, 0.95], belly);                 // body
-  ellipsoid(p, c, 1900, [0, 1.75, 0.05], [0.95, 0.85, 0.85], bone);            // head
-  ellipsoid(p, c, 700, [-1.0, -0.05, -0.1], [0.32, 1.15, 0.7], () => BONE.clone().multiplyScalar(0.6)); // wings
-  ellipsoid(p, c, 700, [1.0, -0.05, -0.1], [0.32, 1.15, 0.7], () => BONE.clone().multiplyScalar(0.6));
-  for (const x of [-0.55, 0.55]) {                                              // ear tufts
-    for (let i = 0; i < 160; i++) { const t = Math.random(); p.push(x * (1 + t * 0.25) + (Math.random() - 0.5) * 0.25 * (1 - t), 2.35 + t * 0.6, (Math.random() - 0.5) * 0.25 * (1 - t)); c.push(BONE.r, BONE.g, BONE.b); }
+  const snow = new THREE.Color(0.98, 0.96, 0.92);
+  const speck = new THREE.Color(0.32, 0.21, 0.11);
+  const beakCol = new THREE.Color(0.14, 0.15, 0.18);
+  const perchCol = new THREE.Color(0.22, 0.30, 0.48);
+  const pureSnow = () => snow;
+  const chestSnow = (u, a) => (Math.sin(a) > 0.25 ? snow : BONE.clone().multiplyScalar(0.86));
+  const speckledWing = () => (Math.random() < 0.2 ? speck : snow.clone().multiplyScalar(0.92));
+  // Diagonal snowy-white body sweeping down-left, round crown without ear tufts
+  ellipsoid(p, c, 2400, [-0.15, -0.05, 0], [0.95, 1.38, 0.88], chestSnow);
+  ellipsoid(p, c, 2000, [0.22, 1.56, 0.08], [0.88, 0.78, 0.82], pureSnow);
+  // Folded diagonal white wing with dark-brown speckles on left side
+  ellipsoid(p, c, 1500, [-0.72, -0.42, 0.22], [0.46, 1.32, 0.56], speckledWing);
+  // Tail primary feathers extending bottom-left
+  for (let i = 0; i < 360; i++) {
+    const t = Math.random();
+    p.push(-0.65 - t * 0.72 + (Math.random() - 0.5) * 0.22, -1.05 - t * 0.65, -0.08 + (Math.random() - 0.5) * 0.14);
+    const col = Math.random() < 0.18 ? speck : snow.clone().multiplyScalar(0.82);
+    c.push(col.r, col.g, col.b);
   }
-  for (const x of [-0.37, 0.37]) {                                              // eyes: amber rings
-    for (let i = 0; i < 260; i++) { const a = Math.random() * Math.PI * 2, r = 0.16 + Math.random() * 0.12; p.push(x + Math.cos(a) * r, 1.85 + Math.sin(a) * r, 0.8); c.push(AMBER.r, AMBER.g, AMBER.b); }
+  // Golden-amber eyes (turned toward viewer)
+  for (const x of [-0.12, 0.52]) {
+    for (let i = 0; i < 260; i++) {
+      const a = Math.random() * Math.PI * 2, r = 0.14 + Math.random() * 0.11;
+      p.push(x + Math.cos(a) * r, 1.66 + Math.sin(a) * r * 0.85, 0.84);
+      c.push(AMBER.r, AMBER.g, AMBER.b);
+    }
   }
-  for (let i = 0; i < 90; i++) { const t = Math.random(); p.push((Math.random() - 0.5) * 0.18 * (1 - t), 1.6 - t * 0.28, 0.86 + t * 0.08); c.push(AMBER.r, AMBER.g, AMBER.b); } // beak
-  const branch = new THREE.Color(0.55, 0.42, 0.3);
-  for (let i = 0; i < 900; i++) { const t = Math.random(); p.push(-3.4 + t * 7, -1.55 + Math.sin(t * 3) * 0.12 + (Math.random() - 0.5) * 0.16, (Math.random() - 0.5) * 0.2); c.push(branch.r, branch.g, branch.b); }
+  // Short dark charcoal curved beak
+  for (let i = 0; i < 90; i++) {
+    const t = Math.random();
+    p.push(0.20 + (Math.random() - 0.5) * 0.14 * (1 - t), 1.48 - t * 0.24, 0.88 + t * 0.06);
+    c.push(beakCol.r, beakCol.g, beakCol.b);
+  }
+  // Dark blue-slate perch under feet
+  for (let i = 0; i < 900; i++) {
+    const t = Math.random();
+    p.push(-3.4 + t * 7, -1.55 + Math.sin(t * 3) * 0.12 + (Math.random() - 0.5) * 0.16, (Math.random() - 0.5) * 0.2);
+    c.push(perchCol.r, perchCol.g, perchCol.b);
+  }
   return points(new Float32Array(p), new Float32Array(c), 0.05, { opacity: 1, wobble: 0.01 });
 }
 

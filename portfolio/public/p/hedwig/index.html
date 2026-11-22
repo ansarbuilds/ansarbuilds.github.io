@@ -294,6 +294,13 @@ img,video{max-width:100%;display:block}
 @keyframes fly{to{transform:translateX(calc(100vw + 240px)) translateY(-40px)}}
 .flyer .w{transform-origin:50% 40%;animation:flap .4s ease-in-out infinite alternate}
 @keyframes flap{to{transform:scaleY(.35)}}
+.hero-row{display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;gap:24px}
+.snowy-owl{width:clamp(124px,16vw,196px);flex:none;filter:drop-shadow(0 0 36px rgba(245,184,65,.28));animation:sbob 5s ease-in-out infinite}
+@keyframes sbob{50%{transform:translateY(-7px) rotate(-1deg)}}
+.snowy-owl .lid{transform-origin:center;transform-box:fill-box;animation:sblink 6s infinite}
+@keyframes sblink{0%,94%,100%{transform:scaleY(0)}96%{transform:scaleY(1)}}
+.snowy-owl .wing{transform-origin:24px -10px;animation:swing 6s ease-in-out infinite}
+@keyframes swing{0%,100%{transform:translate(24px,-10px) rotate(0deg)}50%{transform:translate(24px,-10px) rotate(2.6deg)}}
 .finale h2{margin:0;font:400 clamp(52px,9vw,120px)/1 var(--serif);color:var(--ivory);text-shadow:0 10px 60px rgba(0,0,0,.6)}
 .finale p{margin:18px auto 0;max-width:46ch;font-size:17px}
 .finale .ctas{justify-content:center}
@@ -326,10 +333,33 @@ footer{padding:40px 20px;text-align:center;font-size:13px;border-top:1px solid v
   <video id="hero-video" src="https://ansarbuilds.dev/hedwig/site/hero-loop.mp4" poster="https://ansarbuilds.dev/hedwig/site/hero-poster.jpg" autoplay muted loop playsinline aria-hidden="true"></video>
   <div class="bars" aria-hidden="true"><i></i><i></i></div>
   <div class="wrap hero-copy">
-    <p class="k">My try at building an LLM from scratch · open source</p>
-    <h1 class="title" aria-label="Hedwig"><span><i style="--i:0">H</i></span><span><i style="--i:1">e</i></span><span><i style="--i:2">d</i></span><span><i style="--i:3">w</i></span><span><i style="--i:4">i</i></span><span><i style="--i:5">g</i></span></h1>
-    <p class="hero-line">From a MacBook Air to <em>286.7 million knobs</em> on rented GPUs for <em>$2.45</em>, and how it compares to GPT and Claude.</p>
-    <div class="ctas"><a class="btn gold" href="#act1">Watch it write ↓</a><a class="btn" href="https://github.com/ansarbuilds/hedwig" target="_blank" rel="noopener">Read the code ↗</a></div>
+    <div class="hero-row">
+      <div>
+        <p class="k">My try at building an LLM from scratch · open source</p>
+        <h1 class="title" aria-label="Hedwig"><span><i style="--i:0">H</i></span><span><i style="--i:1">e</i></span><span><i style="--i:2">d</i></span><span><i style="--i:3">w</i></span><span><i style="--i:4">i</i></span><span><i style="--i:5">g</i></span></h1>
+        <p class="hero-line">From a MacBook Air to <em>286.7 million knobs</em> on rented GPUs for <em>$2.45</em>, and how it compares to GPT and Claude.</p>
+        <div class="ctas"><a class="btn gold" href="#act1">Watch it write ↓</a><a class="btn" href="https://github.com/ansarbuilds/hedwig" target="_blank" rel="noopener">Read the code ↗</a></div>
+      </div>
+      <svg class="snowy-owl" viewBox="-100 -100 200 200" aria-hidden="true">
+        <defs>
+          <radialGradient id="pSnowyBody" cx="58%" cy="24%" r="76%"><stop offset="0%" stop-color="#ffffff"/><stop offset="68%" stop-color="#f6f2ea"/><stop offset="100%" stop-color="#dcd4c5"/></radialGradient>
+          <linearGradient id="pSnowyWing" x1="82%" y1="12%" x2="10%" y2="96%"><stop offset="0%" stop-color="#ffffff"/><stop offset="60%" stop-color="#f2ede3"/><stop offset="100%" stop-color="#cec5b5"/></linearGradient>
+          <radialGradient id="pSnowyEye" cx="38%" cy="38%" r="62%"><stop offset="0%" stop-color="#ffd75e"/><stop offset="55%" stop-color="#db8700"/><stop offset="100%" stop-color="#693000"/></radialGradient>
+        </defs>
+        <path d="M-38 78 Q-10 66 26 70 Q54 73 74 91 L66 97 Q28 84 -8 86 Q-28 89 -42 95 Z" fill="#1b243c" stroke="#314169" stroke-width="1.4"/>
+        <path d="M-38 78 Q-18 72 -4 76 L-8 87 Q-24 88 -40 94 Z" fill="#3a5280" opacity=".75"/>
+        <g transform="rotate(6)"><path d="M-36 52 L-62 96 Q-55 98 -48 92 L-24 58 Z M-26 56 L-50 98 Q-43 100 -36 93 L-16 62 Z" fill="#e6dfd0" stroke="#c3baa8" stroke-width="1"/><path d="M-50 78 q4 2 2 6 q-4 -2 -2 -6 Z M-40 82 q4 2 2 6 q-4 -2 -2 -6 Z" fill="#4e341b" opacity=".78"/></g>
+        <path d="M-14 -50 C-2 -70 30 -70 42 -48 C48 -36 47 -22 46 -6 C48 24 34 56 -6 66 C-34 72 -52 46 -40 14 C-32 -8 -24 -34 -14 -50 Z" fill="url(#pSnowyBody)" stroke="#9a9182" stroke-width="1.35"/>
+        <path d="M-10 48 C-14 66 -2 76 14 74 C24 73 28 60 22 48 Z" fill="#f7f4ec" stroke="#ddd4c4" stroke-width="1"/>
+        <path d="M2 72 Q-2 80 4 82 M10 73 Q10 82 16 82 M18 71 Q22 79 26 78" stroke="#22252e" stroke-width="3.1" stroke-linecap="round" fill="none"/>
+        <g class="wing"><path d="M8 -14 C26 4 12 36 -18 62 C-46 86 -72 98 -82 96 C-80 76 -64 42 -42 16 C-22 -8 -4 -22 8 -14 Z" fill="url(#pSnowyWing)" stroke="#d5ccbc" stroke-width="1.1"/><path d="M-24 26 Q-52 58 -76 92 M-14 34 Q-40 62 -64 88" stroke="#c8bfb0" stroke-width="1" fill="none" opacity=".7"/><g fill="#4e341b" opacity=".82"><path d="M-6 12 l5 1 l-3 4 Z"/><path d="M6 17 l4 1 l-2 4 Z"/><path d="M-18 22 l5 1 l-3 4 Z"/><path d="M-4 26 l5 1 l-3 4 Z"/><path d="M9 28 l4 1 l-2 4 Z"/><path d="M-28 32 l5 2 l-3 4 Z"/><path d="M-14 35 l5 1 l-3 4 Z"/><path d="M1 37 l4 1 l-2 4 Z"/><path d="M-36 42 l6 2 l-4 4 Z"/><path d="M-22 45 l5 1 l-3 4 Z"/><path d="M-7 47 l4 1 l-2 4 Z"/><path d="M-44 52 l6 2 l-4 4 Z"/><path d="M-30 55 l5 1 l-3 4 Z"/><path d="M-16 57 l4 1 l-2 4 Z"/><path d="M-50 62 l5 2 l-3 4 Z"/><path d="M-37 64 l5 1 l-3 4 Z"/><path d="M-56 72 l5 2 l-3 4 Z"/><path d="M-43 74 l4 1 l-2 4 Z"/><path d="M-60 81 l4 2 l-2 3 Z"/></g></g>
+        <path d="M-6 -28 Q14 -16 34 -28 M-10 -46 Q14 -56 38 -46" stroke="#e6decb" stroke-width="1.1" fill="none" opacity=".45"/>
+        <g transform="rotate(10 2 -40)"><ellipse cx="2" cy="-40" rx="7.6" ry="6.8" fill="url(#pSnowyEye)" stroke="#241b11" stroke-width="1.4"/><circle cx="2" cy="-40" r="3.4" fill="#0c0905"/><circle cx=".5" cy="-41.8" r="1.4" fill="#fff"/><ellipse class="lid" cx="2" cy="-40" rx="8.2" ry="7.4" fill="#efe8d8"/><path d="M-6 -41 Q2 -48.5 10 -41" stroke="#2a2015" stroke-width="1.9" fill="none" opacity=".78"/></g>
+        <g transform="rotate(-10 24 -40)"><ellipse cx="24" cy="-40" rx="7.6" ry="6.8" fill="url(#pSnowyEye)" stroke="#241b11" stroke-width="1.4"/><circle cx="24" cy="-40" r="3.4" fill="#0c0905"/><circle cx="22.5" cy="-41.8" r="1.4" fill="#fff"/><ellipse class="lid" cx="24" cy="-40" rx="8.2" ry="7.4" fill="#efe8d8"/><path d="M16 -41 Q24 -48.5 32 -41" stroke="#2a2015" stroke-width="1.9" fill="none" opacity=".78"/></g>
+        <path d="M10 -34 Q13 -37 16 -34 L14 -24 Q13 -22 11 -24 Z" fill="#23252b" stroke="#0c0d10" stroke-width="1"/>
+        <path d="M6 -32 Q10 -30 11 -28 M20 -32 Q16 -30 15 -28" stroke="#ffffff" stroke-width="2.1" stroke-linecap="round"/>
+      </svg>
+    </div>
   </div>
 </header>
 
@@ -586,7 +616,7 @@ footer{padding:40px 20px;text-align:center;font-size:13px;border-top:1px solid v
 <!-- FINALE -->
 <section class="finale" aria-labelledby="tfin">
   <div class="moon" aria-hidden="true"></div>
-  <svg class="flyer" viewBox="-40 -30 80 60" aria-hidden="true"><g class="w"><path d="M-4 0 Q-30 -22 -38 4 Q-22 -2 -6 8 Z M4 0 Q30 -22 38 4 Q22 -2 6 8 Z" fill="#e8dfcc"/></g><ellipse cx="0" cy="4" rx="9" ry="12" fill="#f3ecdc"/><circle cx="-3.5" cy="-1" r="2.6" fill="#f5b841"/><circle cx="3.5" cy="-1" r="2.6" fill="#f5b841"/></svg>
+  <svg class="flyer" viewBox="-45 -32 90 64" aria-hidden="true"><g class="w"><path d="M-4 0 Q-34 -24 -42 4 Q-24 0 -6 9 Z M4 0 Q34 -24 42 4 Q24 0 6 9 Z" fill="#f7f4ec"/><path d="M-24 -6 l4 2 l-2 3 Z M-16 -2 l3 2 l-2 3 Z M24 -6 l-4 2 l2 3 Z M16 -2 l-3 2 l2 3 Z" fill="#5a3d21" opacity=".75"/></g><ellipse cx="0" cy="4" rx="9" ry="12" fill="#ffffff"/><circle cx="-3.5" cy="-2" r="2.3" fill="#e59200"/><circle cx="3.5" cy="-2" r="2.3" fill="#e59200"/><path d="M-1.5 1 L1.5 1 L0 4 Z" fill="#23252b"/></svg>
   <div class="wrap">
     <h2 id="tfin" class="rv">Once upon a time,<br>there was a little owl.</h2>
     <p class="rv">Six days, three brains, $2.45, and a model that now lives in a browser tab. Built to understand how GPT and Claude work, one measured step at a time.</p>
