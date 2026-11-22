@@ -148,7 +148,7 @@ test('the cold open offers sound, and turning it on does not skip the film', asy
   test.setTimeout(90000);
   await page.goto('/?coldopen=full');
   await expect(page.locator('.co')).toBeVisible({ timeout: 20000 });
-  const sound = page.locator('.co').getByRole('button', { name: 'Play the film with sound' });
+  const sound = page.locator('.co').getByRole('button', { name: 'Play with sound' });
   await sound.click();
   expect(await page.evaluate(() => localStorage.getItem('film-sound'))).toBe('1');
   await expect(page.locator('.co-sound')).toHaveClass(/is-on/);

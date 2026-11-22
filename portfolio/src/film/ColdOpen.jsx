@@ -69,7 +69,7 @@ export default function ColdOpen({ mode, since, onStart, onHandOver, onDone }) {
     <canvas ref={canvas} className="co-canvas" aria-hidden="true" />
     <div className={`co-bars ${bars ? "is-closed" : ""}`} aria-hidden="true"><span /><span /></div>
     <p ref={line} className="co-line" aria-hidden="true" />
-    <button type="button" className={`co-sound ${sound ? "is-on" : ""}`} aria-label="Play the film with sound" onClick={() => { setSound(true); setSoundState(true); }}><i aria-hidden="true"><b /><b /><b /></i>Play with sound</button>
+    <button type="button" className={`co-sound ${sound ? "is-on" : ""}`} onClick={() => { setSound(true); setSoundState(true); }}><i aria-hidden="true"><b /><b /><b /></i>Play with sound</button>
     <button type="button" className="co-skip">Skip intro</button>
   </div>;
 }
