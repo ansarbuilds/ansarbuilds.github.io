@@ -1,60 +1,64 @@
 import "./player.css";
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { Pause, Play, Volume2, VolumeX } from "lucide-react";
-import { ACT_ONE } from "./actOne/timeline.js";
-import { ACT_TWO } from "./actTwo/timeline.js";
-import { ACT_THREE } from "./actThree/timeline.js";
-import { ACT_FOUR } from "./actFour/timeline.js";
+import { ACT_TWO, BUILT, shotsFor } from "./actTwo/timeline.js";
 import { FINALE } from "./finale/timeline.js";
 import { cue, holdSound, onSoundChange, setSound, showBed, soundOn } from "../lib/sound";
 import { holdScroll } from "../lib/scroll";
 import { setQuiet } from "./quiet";
 
-/* The film, played rather than scrolled. After the cold open (which plays
-   in its own layer, see ColdOpen.jsx) the acts run one after another on one
-   clock, full screen over the page, with the score. Act I slides up over
-   the hero; each later act is announced by a chapter card, cut in on a
-   flash with a trailer hit; after the finale the credits roll, and then the
+/* The film, cut as a trailer. After the cold open (which plays in its own
+   layer, see ColdOpen.jsx) the player runs a list of short clips on one
+   clock, full screen over the page, with the score: a few seconds of each
+   act, the project sets as a montage of one-second cuts, a chapter card
+   smashed in between the acts, and the finale's line to end on. Then the
    film lifts off the page, which is an ordinary page to scroll.
+
+   A clip plays a stretch of an act's own timeline (`from` to `to`, in the
+   act's seconds) in `seconds` of film, with a speed ramp: it leaves fast
+   and slows into the cut. Every cut punches in; a card cuts in on a flash.
 
    It mounts as the film starts, so the acts' scenes load while the cold
    open is on screen, and starts its clock once `rolling`.
    `children(playback)` renders the acts (FilmReel in Sections.jsx); each act
    asks `playback` where the film is in it (see useAct.js). Space pauses,
-   the arrow keys step five seconds, M mutes and Escape skips to the page. */
-const SLIDE = 1; // Act I sliding up over the hero
-const END_HOLD = 1.4; // the finale's last frame, before the credits
-const CARD = 1.8; // a chapter card
-const CREDITS = 8.5; // the credits roll
-const LIFT = 0.8; // the film fading off the page
-const PREROLL = 0.4; // the next act starts drawing this early, out of sight
-// What plays, in order. A card or the credits are words on black (they are
-// in FilmReel too); `bed` is the music under them.
-const ACTS = [
-  { id: "act1", seconds: ACT_ONE.seconds, lead: SLIDE },
-  { id: "card-act2", kind: "card", seconds: CARD, bed: "act2" },
-  { id: "act2", seconds: ACT_TWO.seconds },
-  { id: "card-act3", kind: "card", seconds: CARD, bed: "act3" },
-  { id: "act3", seconds: ACT_THREE.seconds },
-  { id: "card-act4", kind: "card", seconds: CARD, bed: "act4" },
-  { id: "act4", seconds: ACT_FOUR.seconds },
-  { id: "finale", seconds: FINALE.seconds, tail: END_HOLD },
-  { id: "credits", kind: "credits", seconds: CREDITS, bed: "finale" },
+   the arrow keys step two seconds, M mutes and Escape skips to the page. */
+const CARD = 0.5; // a chapter card
+const LIFT = 0.6; // the film fading off the page
+const PREROLL = 0.3; // the next act starts drawing this early, out of sight
+const linear = (u) => u;
+const ramp = (u) => 1 - (1 - u) ** 1.7;
+const arrival = (slug) => ACT_TWO.entries.find((entry) => entry.shot.id === shotsFor(slug)[0].id);
+const CLIPS = [
+  // Out of the cold open's last frame: the camera through the name.
+  { act: "act1", from: 0, to: 6.6, seconds: 3.4, ease: linear },
+  { card: "act2", seconds: CARD },
+  // Each project's name as its set cuts in.
+  // (The name is up from about a fifth of the arrival to three quarters:
+  // the clip lands on it and slows while it reads.)
+  ...BUILT.map((slug) => { const a = arrival(slug), d = a.t1 - a.t0; return { act: "act2", from: a.t0 + 0.1 * d, to: a.t0 + 0.74 * d, seconds: 1, ease: ramp }; }),
+  { card: "act3", seconds: CARD },
+  { act: "act3", from: 0, to: 7.5, seconds: 3, ease: ramp },
+  { card: "act4", seconds: CARD },
+  { act: "act4", from: 0, to: 9.6, seconds: 3.4, ease: ramp },
+  { act: "finale", from: 0.3, to: FINALE.seconds, seconds: 2.4, ease: linear, hold: 0.8 },
 ];
-// Each act on the film's clock: `start` it is on screen, `t0` its own time
-// starts, `end` the next one takes over.
+// Each clip on the film's clock, `start` to `end`; `show` is the element
+// on screen (an act, or a card), `bed` the music under it.
 const SEGMENTS = [];
-for (const act of ACTS) {
-  const start = SEGMENTS.at(-1)?.end ?? 0, t0 = start + (act.lead ?? 0);
-  SEGMENTS.push({ ...act, start, t0, end: t0 + act.seconds + (act.tail ?? 0) });
+for (const [index, clip] of CLIPS.entries()) {
+  const start = SEGMENTS.at(-1)?.end ?? 0;
+  SEGMENTS.push({ ...clip, index, start, end: start + clip.seconds + (clip.hold ?? 0), show: clip.act ?? `card-${clip.card}`, bed: clip.act ?? clip.card });
 }
-const BY_ID = Object.fromEntries(SEGMENTS.map((segment) => [segment.id, segment]));
 export const FILM_SECONDS = SEGMENTS.at(-1).end;
-const STEP = 5;
-const IDLE_MS = 2400;
+const STEP = 2;
+const IDLE_MS = 1800;
+const clamp01 = (u) => Math.min(1, Math.max(0, u));
+// Where an act's own timeline is, at a moment of a clip.
+const actTime = (segment, elapsed) => segment.from + (segment.to - segment.from) * segment.ease(clamp01((elapsed - segment.start) / segment.seconds));
+const restart = (el, name) => { if (!el) return; el.classList.remove(name); void el.offsetWidth; el.classList.add(name); };
 
 const clock = (seconds) => { const s = Math.max(0, Math.floor(seconds)); return `${Math.floor(s / 60)}:${String(s % 60).padStart(2, "0")}`; };
-const smooth = (u) => u * u * (3 - 2 * u);
 
 export default function FilmPlayer({ rolling, onEnd, children }) {
   const root = useRef(null);
@@ -67,11 +71,17 @@ export default function FilmPlayer({ rolling, onEnd, children }) {
   const end = useRef(onEnd);
   useLayoutEffect(() => { end.current = onEnd; });
   // Everything the frame loop reads, kept out of React so a frame is cheap.
-  const state = useRef({ elapsed: 0, playing: true, rolling: false, current: null, films: new Map(), drawing: new Map(), failed: new Set(), ended: false });
+  const state = useRef({ elapsed: 0, playing: true, rolling: false, segment: null, films: new Map(), drawing: new Map(), failed: new Set(), ended: false });
 
   const [playback] = useState(() => ({
-    timeOf: (id) => state.current.elapsed - BY_ID[id].t0,
-    isOn: (id) => state.current.current === id,
+    timeOf: (id) => {
+      const { segment, elapsed } = state.current;
+      if (segment?.act === id) return actTime(segment, elapsed);
+      // Not on: held on where its next clip starts, ready for the cut.
+      const next = SEGMENTS.find((x) => x.act === id && x.start >= (segment?.start ?? -1));
+      return (next ?? SEGMENTS.find((x) => x.act === id)).from;
+    },
+    isOn: (id) => state.current.segment?.act === id,
     attach: (id, film) => {
       const { films, drawing } = state.current;
       if (film) films.set(id, film); else { films.delete(id); drawing.delete(id); }
@@ -92,7 +102,7 @@ export default function FilmPlayer({ rolling, onEnd, children }) {
   useEffect(() => {
     let frame = 0, last = performance.now(), told = -1;
     const s = state.current;
-    const sections = () => root.current?.querySelectorAll(".film-act, .film-chapter, .film-credits") ?? [];
+    const sections = () => root.current?.querySelectorAll(".film-act, .film-chapter") ?? [];
     const tick = (now) => {
       frame = requestAnimationFrame(tick);
       const dt = Math.min(0.1, (now - last) / 1000);
@@ -102,35 +112,30 @@ export default function FilmPlayer({ rolling, onEnd, children }) {
       if (s.playing) s.elapsed = Math.min(FILM_SECONDS + LIFT, s.elapsed + dt);
       let segment = SEGMENTS.find((x) => s.elapsed < x.end) ?? SEGMENTS.at(-1);
       // An act that could not start is passed over.
-      if (s.failed.has(segment.id) && s.elapsed < FILM_SECONDS) { s.elapsed = segment.end; segment = SEGMENTS.find((x) => s.elapsed < x.end) ?? SEGMENTS.at(-1); }
-      if (segment.id !== s.current) {
-        const was = s.current;
-        s.current = segment.id;
-        sections().forEach((el) => { const on = el.dataset.act === segment.id; el.classList.toggle("is-on", on); el.toggleAttribute("inert", !on); });
-        const bed = segment.bed ?? segment.id;
-        SEGMENTS.forEach((x) => showBed(x.id, x.id === bed));
-        // A cut onto a card, or from a card into its act: one flash frame.
-        if (was && (segment.kind === "card" || BY_ID[was]?.kind === "card")) {
-          const flash = flashRef.current;
-          if (flash) { flash.classList.remove("is-on"); void flash.offsetWidth; flash.classList.add("is-on"); }
+      while (segment.act && s.failed.has(segment.act) && s.elapsed < FILM_SECONDS) { s.elapsed = segment.end; segment = SEGMENTS.find((x) => s.elapsed < x.end) ?? SEGMENTS.at(-1); }
+      if (segment !== s.segment) {
+        const was = s.segment;
+        s.segment = segment;
+        let on = null;
+        sections().forEach((el) => { const here = el.dataset.act === segment.show; el.classList.toggle("is-on", here); el.toggleAttribute("inert", !here); if (here) on = el; });
+        SEGMENTS.forEach((x) => showBed(x.bed, false));
+        showBed(segment.bed, true);
+        if (was) {
+          // A card cuts in on a flash frame with a trailer hit; every other
+          // cut punches in on the frame, its colours split for an instant.
+          if (segment.card) { restart(flashRef.current, "is-on"); if (s.playing) cue("braam"); }
+          else { restart(on, "is-cut"); if (s.playing && was.act === segment.act) cue("whoosh"); }
         }
-        if (segment.kind === "card" && s.playing) cue("braam");
       }
       // Draw the act on screen, and the next one just before its cut (all
       // through a card) so it already has a finished frame when it is shown.
-      const next = SEGMENTS[SEGMENTS.indexOf(segment) + 1];
-      const lead = segment.kind === "card" ? segment.seconds : PREROLL;
+      const next = SEGMENTS[segment.index + 1];
+      const lead = segment.card ? segment.seconds : PREROLL;
       const visible = document.visibilityState === "visible";
       for (const [id, film] of s.films) {
-        const want = visible && (id === segment.id || (next?.id === id && next.start - s.elapsed < lead));
+        const want = visible && (id === segment.act || (next?.act === id && next.start - s.elapsed < lead));
         if (s.drawing.get(id) !== want) { s.drawing.set(id, want); film.setActive(want); }
       }
-      // The credits roll at the clock's pace, so scrubbing moves them too.
-      const roll = root.current?.querySelector(".film-credits-roll");
-      if (roll && segment.kind === "credits") roll.style.setProperty("--roll", String((s.elapsed - segment.start) / segment.seconds));
-      // Act I comes up over the hero like a sheet of paper.
-      const first = root.current?.querySelector('[data-act="act1"]');
-      if (first) first.style.transform = s.elapsed < SLIDE ? `translateY(${(1 - smooth(s.elapsed / SLIDE)) * 100}%)` : "";
       if (scrub.current && document.activeElement !== scrub.current) scrub.current.value = Math.min(FILM_SECONDS, s.elapsed);
       const whole = Math.floor(s.elapsed);
       if (whole !== told && time.current) { told = whole; time.current.textContent = `${clock(Math.min(s.elapsed, FILM_SECONDS))} / ${clock(FILM_SECONDS)}`; }
@@ -159,7 +164,7 @@ export default function FilmPlayer({ rolling, onEnd, children }) {
 
   // Leaving: the music goes, and every scene stops drawing.
   useEffect(() => () => {
-    SEGMENTS.forEach((x) => showBed(x.id, false));
+    SEGMENTS.forEach((x) => showBed(x.bed, false));
     holdSound(false);
   }, []);
 
@@ -185,7 +190,12 @@ export default function FilmPlayer({ rolling, onEnd, children }) {
       wake();
       if (event.metaKey || event.ctrlKey || event.altKey) return;
       const onScrub = event.target === scrub.current;
-      if (event.key === " " || event.key === "k") { if (event.target.closest?.("a, button") && event.key === " ") return; event.preventDefault(); togglePlay(); }
+      if (event.key === " " || event.key === "k") {
+        // Space on one of the film's own buttons presses that button.
+        if (event.key === " " && event.target.closest?.("a, button") && root.current?.contains(event.target)) return;
+        event.preventDefault();
+        togglePlay();
+      }
       else if (event.key === "ArrowRight" && !onScrub) { event.preventDefault(); seek(state.current.elapsed + STEP); }
       else if (event.key === "ArrowLeft" && !onScrub) { event.preventDefault(); seek(state.current.elapsed - STEP); }
       else if (event.key === "m") setSound(!soundOn());

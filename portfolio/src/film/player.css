@@ -5,12 +5,24 @@
 .film-player.is-idle { cursor: none; }
 /* An act off screen is see-through and inert (out of the keyboard order):
    its cards set their own visibility, so hiding the act alone would not. */
-.film-player :is(.film-act, .film-chapter, .film-credits) { position: absolute; inset: 0; height: auto; overflow: hidden; opacity: 0; pointer-events: none; }
-.film-player.is-rolling :is(.film-act, .film-chapter, .film-credits).is-on { opacity: 1; pointer-events: auto; }
+.film-player :is(.film-act, .film-chapter) { position: absolute; inset: 0; height: auto; overflow: hidden; opacity: 0; pointer-events: none; }
+.film-player.is-rolling :is(.film-act, .film-chapter).is-on { opacity: 1; pointer-events: auto; }
 .film-player .film-act > [class$="-stage"] { position: absolute; inset: 0; height: 100%; }
-/* Act I slides up over the hero (the player moves it); it casts a shadow
-   up onto the page as it comes. */
-.film-player [data-act="act1"] { box-shadow: 0 -30px 60px rgb(0 0 0 / .45); will-change: transform; }
+/* A trailer is wider than the screen: letterbox bars over every act. */
+.film-player.is-rolling::before, .film-player.is-rolling::after { content: ""; position: absolute; left: 0; right: 0; z-index: 30; height: 7vh; background: #000; pointer-events: none; }
+.film-player.is-rolling::before { top: 0; }
+.film-player.is-rolling::after { bottom: 0; }
+/* A trailer has no time to read: the act's cards and captions stay off
+   (the page has them, links and all); its titles and names stay on. */
+.film-player :is(.act1-tools, .act2-card, .act3-card, .act4-card) { display: none !important; }
+/* The punch-in on a cut: the frame lands a touch large, its colours split
+   red and blue for an instant, and settles. */
+.film-player .film-act.is-cut > [class$="-stage"] { animation: film-punch .42s cubic-bezier(.2, .8, .2, 1) both; }
+@keyframes film-punch {
+  0% { transform: scale(1.07); filter: drop-shadow(6px 0 0 rgb(255 40 80 / .55)) drop-shadow(-6px 0 0 rgb(40 200 255 / .55)) brightness(1.35); }
+  40% { filter: drop-shadow(2px 0 0 rgb(255 40 80 / .3)) drop-shadow(-2px 0 0 rgb(40 200 255 / .3)) brightness(1.08); }
+  100% { transform: none; filter: none; }
+}
 
 .film-controls { position: absolute; left: 0; right: 0; bottom: 0; z-index: 50; display: flex; align-items: center; gap: 12px; padding: 40px clamp(14px, 2.6vw, 34px) clamp(12px, 2.2vw, 24px); background: linear-gradient(to top, rgb(0 0 0 / .62), rgb(0 0 0 / 0)); transition: opacity .5s var(--ease-out, ease), transform .5s var(--ease-out, ease); }
 .film-player.is-idle .film-controls { opacity: 0; transform: translateY(8px); pointer-events: none; }
@@ -41,18 +53,18 @@ html.is-scroll-held, html.is-scroll-held body { overflow: hidden; }
    small capitals and its name large, sharpening out of a blur while the
    frame creeps closer, and a light leak drifting across the lens. */
 .film-chapter { display: grid; place-content: center; justify-items: center; gap: clamp(10px, 1.6vw, 18px); padding: 0 24px; background: #030303; text-align: center; }
-.film-chapter::before, .film-chapter::after { content: ""; position: absolute; left: 0; right: 0; height: 0; background: #000; border-color: rgb(239 230 216 / .08); border-style: solid; border-width: 0; transition: height .6s var(--ease-out, ease); z-index: 1; }
+.film-chapter::before, .film-chapter::after { content: ""; position: absolute; left: 0; right: 0; height: 0; background: #000; border-color: rgb(239 230 216 / .08); border-style: solid; border-width: 0; transition: height .35s var(--ease-out, ease); z-index: 1; }
 .film-chapter::before { top: 0; border-bottom-width: 1px; }
 .film-chapter::after { bottom: 0; border-top-width: 1px; }
-.film-chapter.is-on::before, .film-chapter.is-on::after { height: 11vh; }
+.film-chapter.is-on::before, .film-chapter.is-on::after { height: 16vh; }
 .film-chapter-kicker { position: relative; z-index: 2; margin: 0; font: 500 clamp(.62rem, 1vw, .8rem)/1 var(--font-mono); letter-spacing: .5em; text-transform: uppercase; color: #ff8a5f; }
 .film-chapter-title { position: relative; z-index: 2; margin: 0; font: 400 clamp(3rem, 11vw, 10rem)/.9 var(--font-condensed); letter-spacing: .02em; text-transform: uppercase; color: #f3ece2; text-shadow: 0 0 40px rgb(255 160 110 / .25); }
-.film-chapter.is-on .film-chapter-kicker { animation: film-chapter-in .9s var(--ease-out, ease) both; }
-.film-chapter.is-on .film-chapter-title { animation: film-chapter-in 1.1s var(--ease-out, ease) both .08s, film-chapter-creep 2.2s linear both; }
+.film-chapter.is-on .film-chapter-kicker { animation: film-chapter-in .35s var(--ease-out, ease) both; }
+.film-chapter.is-on .film-chapter-title { animation: film-chapter-in .4s var(--ease-out, ease) both, film-chapter-creep .6s linear both; }
 .film-chapter > .film-chapter-kicker::after { content: ""; position: fixed; inset: -20%; z-index: -1; pointer-events: none; background: radial-gradient(40% 50% at 50% 50%, rgb(255 120 60 / .28), transparent 70%), radial-gradient(25% 35% at 50% 50%, rgb(255 210 160 / .18), transparent 70%); mix-blend-mode: screen; opacity: 0; }
-.film-chapter.is-on > .film-chapter-kicker::after { animation: film-leak 1.8s ease-in-out both; }
+.film-chapter.is-on > .film-chapter-kicker::after { animation: film-leak .6s ease-in-out both; }
 @keyframes film-chapter-in { from { opacity: 0; filter: blur(14px); transform: scale(1.08); letter-spacing: .3em; } }
-@keyframes film-chapter-creep { from { scale: 1; } to { scale: 1.05; } }
+@keyframes film-chapter-creep { from { scale: 1; } to { scale: 1.08; } }
 @keyframes film-leak { 0% { opacity: 0; transform: translateX(-45%); } 35% { opacity: 1; } 100% { opacity: 0; transform: translateX(45%); } }
 
 /* The flash frame on a cut. */
@@ -60,17 +72,6 @@ html.is-scroll-held, html.is-scroll-held body { overflow: hidden; }
 .film-flash.is-on { animation: film-flash .32s ease-out both; }
 @keyframes film-flash { 0% { opacity: .7; } 100% { opacity: 0; } }
 
-/* The credits: a roll on black, moved by the player's clock (--roll, 0 to
-   1), from below the frame to off its top. */
-.film-credits { background: #020202; }
-.film-credits-roll { position: absolute; left: 0; right: 0; top: 0; display: grid; justify-items: center; gap: clamp(26px, 4.5vh, 48px); padding: 0 24px; text-align: center; transform: translateY(calc((1 - var(--roll, 0)) * 100vh - var(--roll, 0) * 100%)); }
-.film-credits-lead { display: grid; gap: 10px; margin: 0 0 4vh; font: 500 .72rem/1 var(--font-mono); letter-spacing: .4em; text-transform: uppercase; color: rgb(239 230 216 / .6); }
-.film-credits-lead strong { font: 400 clamp(2.6rem, 8vw, 6.4rem)/.95 var(--font-condensed); letter-spacing: .03em; color: #f3ece2; }
-.film-credits-line { display: grid; gap: 8px; max-width: 34rem; margin: 0; font: 400 clamp(1.05rem, 2vw, 1.4rem)/1.35 var(--font-serif); color: #efe6d8; }
-.film-credits-line span { font: 500 .62rem/1 var(--font-mono); letter-spacing: .32em; text-transform: uppercase; color: #ff8a5f; }
-.film-credits-joke { margin: 4vh 0 0; font: italic 400 1rem/1.4 var(--font-serif); color: rgb(239 230 216 / .55); }
-.film-credits-end { margin: 0 0 8vh; font: 500 .7rem/1 var(--font-mono); letter-spacing: .3em; text-transform: uppercase; color: rgb(239 230 216 / .45); }
-
 @media (prefers-reduced-motion: reduce) {
-  .film-chapter.is-on :is(.film-chapter-kicker, .film-chapter-title), .film-flash.is-on, .film-chapter.is-on > .film-chapter-kicker::after { animation: none; }
+  .film-chapter.is-on :is(.film-chapter-kicker, .film-chapter-title), .film-flash.is-on, .film-chapter.is-on > .film-chapter-kicker::after, .film-player .film-act.is-cut > [class$="-stage"] { animation: none; }
 }

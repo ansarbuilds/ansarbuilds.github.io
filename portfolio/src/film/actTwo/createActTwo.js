@@ -66,6 +66,10 @@ export function createActTwo(canvas, { getTime, onFrame, media }) {
     return { slug, group, set: BUILDERS[slug]({ group, media, renderer }), playing: false };
   });
 
+  // The film cuts between the sets quickly, a second each: every set
+  // fetches its heavier pieces now, while the film's opening plays.
+  setTimeout(() => { if (!disposed) sets.forEach((item) => item.set.prepare?.()); }, 0);
+
   const finish = film.finish;
 
   let width = 1, height = 1, fit = 1;

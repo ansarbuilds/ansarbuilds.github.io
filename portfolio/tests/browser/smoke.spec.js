@@ -232,8 +232,12 @@ test('a returning visitor can watch the film from the nav, and pause it', async 
   await expect.poll(() => page.evaluate(() => window.scrollY)).toBe(0);
   await expect(page.locator('.co')).toBeVisible({ timeout: 20000 });
   await expect(page.locator('.film-player.is-rolling')).toBeVisible({ timeout: 40000 });
-  await page.getByRole('button', { name: 'Pause the film' }).click();
+  // Once the clock is running, Space pauses (the controls tuck away while
+  // the film plays untouched).
   const scrub = page.getByRole('slider', { name: 'Where the film is' });
+  await expect.poll(async () => Number(await scrub.inputValue()), { timeout: 20000 }).toBeGreaterThan(0.3);
+  await page.keyboard.press('Space');
+  await expect(page.getByRole('button', { name: 'Play the film', exact: true })).toBeAttached();
   const at = await scrub.inputValue();
   await page.waitForTimeout(1200);
   expect(await scrub.inputValue()).toBe(at);
@@ -258,6 +262,17 @@ test('with reduced motion there is no film to watch', async ({ page }) => {
   await expect(page.locator('.sc-receipts dt')).toHaveCount(4);
 });
 
+test('the whole film runs under 30 seconds, landing to page', async ({ page }) => {
+  // The player's code can take a while on a dev server still building three.js.
+  test.setTimeout(90000);
+  await page.goto('/?coldopen=full');
+  // The player's own running time, on its scrub bar...
+  const player = Number(await page.getByRole('slider', { name: 'Where the film is' }).getAttribute('max', { timeout: 60000 }));
+  // ...plus what plays before it: the ident and the cold open's short cut.
+  const before = 1.2 + await page.evaluate(async () => { const { T, SHORT_START } = await import('/src/film/coldOpen/score.js'); return T.open - SHORT_START; });
+  expect(player + before).toBeLessThan(30);
+});
+
 test('the film keeps its words as real text and its links real, and what is off screen is out of reach', async ({ page }) => {
   test.setTimeout(90000);
   await page.goto('/?coldopen=full');
@@ -271,9 +286,8 @@ test('the film keeps its words as real text and its links real, and what is off 
   await expect(reel.locator('a.act4-cta[href="/playground/emet/"]')).toHaveCount(1);
   await expect(reel.locator('a.fin-email')).toHaveAttribute('href', /^mailto:/);
   await expect(reel.locator('.fin-credit')).toHaveText('Directed, designed and built by Mohamed Ansar');
-  await expect(reel.locator('.film-credits')).toContainText('Pair programmer');
   await expect(page.locator('.film-player .film-act.is-on')).toHaveAttribute('data-act', 'act1', { timeout: 40000 });
-  for (const act of ['act2', 'act3', 'act4', 'finale', 'card-act2', 'credits']) await expect(page.locator(`.film-player [data-act="${act}"]`)).toHaveAttribute('inert', '');
+  for (const act of ['act2', 'act3', 'act4', 'finale', 'card-act2']) await expect(page.locator(`.film-player [data-act="${act}"]`)).toHaveAttribute('inert', '');
 });
 
 test('the command palette lists every project, works by keyboard and gives focus back', async ({ page, isMobile }) => {
