@@ -26,6 +26,7 @@ import { setQuiet } from "./quiet";
 const CARD = 0.5; // a chapter card
 const LIFT = 0.6; // the film fading off the page
 const PREROLL = 0.3; // the next act starts drawing this early, out of sight
+const SWELL = 0.7; // the rise into a chapter card's hit
 const linear = (u) => u;
 const ramp = (u) => 1 - (1 - u) ** 1.7;
 const arrival = (slug) => ACT_TWO.entries.find((entry) => entry.shot.id === shotsFor(slug)[0].id);
@@ -71,7 +72,7 @@ export default function FilmPlayer({ rolling, onEnd, children }) {
   const end = useRef(onEnd);
   useLayoutEffect(() => { end.current = onEnd; });
   // Everything the frame loop reads, kept out of React so a frame is cheap.
-  const state = useRef({ elapsed: 0, playing: true, rolling: false, segment: null, films: new Map(), drawing: new Map(), failed: new Set(), ended: false });
+  const state = useRef({ elapsed: 0, playing: true, rolling: false, segment: null, swelled: -1, films: new Map(), drawing: new Map(), failed: new Set(), ended: false });
 
   const [playback] = useState(() => ({
     timeOf: (id) => {
@@ -130,6 +131,11 @@ export default function FilmPlayer({ rolling, onEnd, children }) {
       // Draw the act on screen, and the next one just before its cut (all
       // through a card) so it already has a finished frame when it is shown.
       const next = SEGMENTS[segment.index + 1];
+      // The music rises into a card's hit.
+      if (next?.card && s.playing && s.swelled !== next.index && next.start - s.elapsed < SWELL) {
+        s.swelled = next.index;
+        cue("swell", Math.max(0.2, next.start - s.elapsed));
+      }
       const lead = segment.card ? segment.seconds : PREROLL;
       const visible = document.visibilityState === "visible";
       for (const [id, film] of s.films) {

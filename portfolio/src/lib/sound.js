@@ -53,13 +53,22 @@ function hall(seconds = 5.2) {
 
 function build() {
   ctx = new (window.AudioContext || window.webkitAudioContext)();
-  // Master, with a gentle compressor to glue the score and the cues.
+  // Master: a compressor to glue the score and the cues, then a limiter so
+  // the big hits can be loud without clipping.
   const glue = ctx.createDynamicsCompressor();
-  glue.threshold.value = -18;
-  glue.ratio.value = 3;
-  glue.attack.value = 0.02;
-  glue.release.value = 0.3;
-  glue.connect(ctx.destination);
+  glue.threshold.value = -20;
+  glue.ratio.value = 4;
+  glue.attack.value = 0.01;
+  glue.release.value = 0.25;
+  const limit = ctx.createDynamicsCompressor();
+  limit.threshold.value = -4;
+  limit.knee.value = 0;
+  limit.ratio.value = 20;
+  limit.attack.value = 0.001;
+  limit.release.value = 0.1;
+  const makeup = ctx.createGain();
+  makeup.gain.value = 1.5;
+  glue.connect(makeup).connect(limit).connect(ctx.destination);
   master = ctx.createGain();
   master.gain.value = 0;
   master.connect(glue);
@@ -120,7 +129,7 @@ function start() {
   if (!ctx) build();
   if (!paused) ctx.resume();
   master.gain.cancelScheduledValues(ctx.currentTime);
-  master.gain.setTargetAtTime(0.7, ctx.currentTime, 0.4);
+  master.gain.setTargetAtTime(1, ctx.currentTime, 0.4);
 }
 function stop() {
   if (!ctx) return;
@@ -212,6 +221,43 @@ function clock(at, level = 1) {
   src.stop(at + 0.05);
 }
 
+// The strings' drive: a low, bowed sawtooth pair, short and accented, the
+// engine of a trailer cue.
+function strings(midi, at, accent = 1) {
+  const out = ctx.createGain(), tone = ctx.createBiquadFilter();
+  tone.type = "lowpass";
+  tone.frequency.setValueAtTime(700 + accent * 900, at);
+  tone.frequency.exponentialRampToValueAtTime(420, at + 0.22);
+  tone.Q.value = 1.2;
+  out.gain.setValueAtTime(0.0001, at);
+  out.gain.exponentialRampToValueAtTime(0.06 * accent, at + 0.012);
+  out.gain.exponentialRampToValueAtTime(0.0001, at + 0.26);
+  out.connect(tone).connect(music);
+  const send = ctx.createGain();
+  send.gain.value = 0.25;
+  tone.connect(send).connect(verb);
+  for (const detune of [-9, 9]) {
+    const osc = ctx.createOscillator();
+    osc.type = "sawtooth";
+    osc.frequency.value = hz(midi);
+    osc.detune.value = detune;
+    osc.connect(out);
+    osc.start(at);
+    osc.stop(at + 0.3);
+  }
+}
+
+// The trailer drums: a big low skin with a long tail in the hall, and a
+// cracking hit on the backbeat.
+function taiko(at, level = 1) {
+  drum(at, 1.25 * level, 120, 38, 0.9);
+  noise(at, 0.18, 900, 200, 0.18 * level, 0.05, 0.8);
+}
+function crack(at, level = 1) {
+  noise(at, 0.32, 2600, 900, 0.3 * level, 0.03, 0.9);
+  drum(at, 0.5 * level, 220, 120, 0.14);
+}
+
 // The bass: a round sine with a little triangle for edge, under the chord.
 function bass(midi, at, length) {
   const out = ctx.createGain();
@@ -298,6 +344,12 @@ function noise(at, length, from, to, peak, peakAt = 0.4, q = 1.2) {
 
 /* ---- The score: which act's music plays, scheduled a little ahead. ---- */
 
+// Drum patterns, one level per step of a bar (0 for none).
+const DRUMS = {
+  build: [1, 0, 0, 0, 0, 0, 0.5, 0],
+  full: [1, 0, 0, 0.6, 0, 0.7, 0, 0.4],
+};
+
 // Which acts are on screen, most recent last. The music follows the last.
 const showing = [];
 let playing = null, bar = 0, step = 0, stepAt = 0;
@@ -349,6 +401,20 @@ function schedule() {
       if (part.tick) clock(stepAt, inBar % 2 === 0 ? 1 : 0.55);
       if (part.pulse === "soft" && inBar % 2 === 0) drum(stepAt, inBar === 0 ? 0.5 : 0.28, 80, 45, 0.35);
       if (part.pulse === "drum" && inBar === part.steps / 2) drum(stepAt, 0.5);
+      // The drive: the chord's root in the low strings on every half step,
+      // leaning on the beats.
+      if (part.drive) {
+        const root = part.chords[chordAt(playing, bar)][0] + 12;
+        const half = stepLength / 2;
+        strings(root, stepAt, inBar % 2 === 0 ? 1 : 0.7);
+        strings(root + (inBar % 4 === 3 ? 7 : 0), stepAt + half, 0.55);
+      }
+      // The drums: a hit on the downbeat, more as the act builds.
+      if (part.drums) {
+        const level = DRUMS[part.drums][inBar % 8];
+        if (level) taiko(stepAt, level);
+        if (part.drums === "full" && inBar % 4 === 2) crack(stepAt, 0.8);
+      }
     }
     step += 1;
     stepAt += stepLength;
@@ -403,7 +469,8 @@ const root = () => {
      hit        the impact: a boom, a crack and a wide chord
      tick       a quiet key press
      bloom      the chord that opens the frame
-     braam      a trailer hit, for a chapter card */
+     braam      a trailer hit, for a chapter card
+     swell      a rise of `length` seconds into a hit */
 export function cue(kind, length = 1.6) {
   if (!on || !ctx || ctx.state !== "running") return;
   const now = ctx.currentTime + 0.01;
@@ -439,7 +506,8 @@ export function cue(kind, length = 1.6) {
       return;
     }
     case "hit": {
-      drum(now, 1.6, 140, 32, 2.2);
+      drum(now, 2.2, 140, 28, 2.6);
+      taiko(now + 0.01, 1.2);
       noise(now, 0.9, 6000, 600, 0.22, 0.02, 0.4);
       // The chord of the whole film, wide, ringing out in the hall.
       bass(33, now, 1.8);
@@ -465,7 +533,8 @@ export function cue(kind, length = 1.6) {
     }
     case "braam": {
       // A trailer hit: a low organ cluster that swells, a drum under it.
-      drum(now, 1.4, 120, 30, 1.8);
+      drum(now, 2, 120, 28, 2);
+      crack(now, 1);
       for (const midi of [33, 40, 45, 52]) {
         const osc = ctx.createOscillator(), out = ctx.createGain(), tone = ctx.createBiquadFilter();
         osc.type = "sawtooth";
@@ -474,11 +543,17 @@ export function cue(kind, length = 1.6) {
         tone.frequency.setValueAtTime(180, now);
         tone.frequency.exponentialRampToValueAtTime(1300, now + 0.35);
         tone.frequency.exponentialRampToValueAtTime(220, now + 2.2);
-        envelope(out, now, 0.05, 0.06, 0.5, 1.9);
+        envelope(out, now, 0.08, 0.05, 0.5, 1.9);
         osc.connect(tone).connect(out).connect(master);
         out.connect(verb);
         osc.start(now); osc.stop(now + 2.6);
       }
+      return;
+    }
+    case "swell": {
+      // Into a hit: noise rising and a cymbal played backwards, `length` long.
+      noise(now, length, 300, 9000, 0.22, 0.96, 0.7);
+      noise(now + length * 0.4, length * 0.6, 6000, 12000, 0.12, 0.98, 0.5);
       return;
     }
     default:
