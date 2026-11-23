@@ -39,17 +39,18 @@ export function coldOpenForced() {
   return new URLSearchParams(window.location.search).get("coldopen") === "full";
 }
 
-/* Whether the film plays on its own as the home page opens: on a first
-   visit, where the film can play, and not when the link points at a
-   section further down. Its sound starts at the visitor's first click, tap
-   or key (a browser allows no sooner). Everyone else gets the page, with
-   "Watch the film" in the nav and the hero. */
+/* Whether the film plays on its own as the home page opens: once per
+   visit (a new tab or window), where the film can play, and not when the
+   link points at a section further down. A reload, or coming back to the
+   home page in the same visit, gets the page, with "Watch the film" in the
+   nav and the hero. Its sound starts at the visitor's first click, tap or
+   key (a browser allows no sooner). */
 export function filmAutoplayWanted() {
   if (typeof window === "undefined") return false;
   if (coldOpenForced()) return true;
   if (window.location.hash || !filmEnabled()) return false;
   try {
-    return !window.localStorage.getItem(INTRO_SESSION_KEY) && !window.sessionStorage.getItem(INTRO_SESSION_KEY) && !window.sessionStorage.getItem(COLD_OPEN_SESSION_KEY);
+    return !window.sessionStorage.getItem(INTRO_SESSION_KEY) && !window.sessionStorage.getItem(COLD_OPEN_SESSION_KEY);
   } catch {
     return false;
   }
