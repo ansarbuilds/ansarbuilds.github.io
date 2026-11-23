@@ -17,12 +17,20 @@ const ramp = (t, from, to) => clamp01((t - from) / (to - from));
 const smooth = (u) => u * u * (3 - 2 * u);
 export const timeAtProgress = (progress) => timeAtScroll(FINALE, clamp01(progress) * FINALE.screens);
 
+// The moment the line lands and the point bursts.
+export const LAND = entry("FN-02").t0 + 0.3;
+
 export function moments(t) {
-  const signal = entry("FN-01"), contact = entry("FN-02");
+  const signal = entry("FN-01");
+  const shock = (t - LAND) / 1.2;
   return {
-    // The point: the same first signal as the open, then it holds.
+    // The point: the same first signal as the open, gathering itself...
     core: smooth(ramp(t, signal.t0, signal.t0 + 0.5)),
     flare: smooth(ramp(t, signal.t0, signal.t0 + 0.6)),
-    contact: smooth(ramp(t, contact.t0 + 0.3, contact.t0 + 1.3)),
+    gather: ramp(t, LAND - 0.7, LAND),
+    // ...then bursting as the line lands: a flare, a shockwave, a jolt.
+    burst: t >= LAND ? Math.exp(-(t - LAND) * 2.6) : 0,
+    shock: shock >= 0 && shock <= 1 ? shock : -1,
+    contact: smooth(ramp(t, LAND, LAND + 1)),
   };
 }

@@ -470,7 +470,8 @@ const root = () => {
      tick       a quiet key press
      bloom      the chord that opens the frame
      braam      a trailer hit, for a chapter card
-     swell      a rise of `length` seconds into a hit */
+     swell      a rise of `length` seconds into a hit
+     finale     the last hit, on the home chord */
 export function cue(kind, length = 1.6) {
   if (!on || !ctx || ctx.state !== "running") return;
   const now = ctx.currentTime + 0.01;
@@ -560,6 +561,14 @@ export function cue(kind, length = 1.6) {
         out.connect(verb);
         osc.start(now); osc.stop(now + 2.6);
       }
+      return;
+    }
+    case "finale": {
+      // The last hit: the impact again, landing on A major, home.
+      cue("hit");
+      for (const midi of [45, 52, 57, 61, 64, 69]) organ(midi, now + 0.02, 3.2, 1.9);
+      flute(81, now + 0.05, 1.2);
+      flute(76, now + 0.35, 0.8);
       return;
     }
     case "swell": {
