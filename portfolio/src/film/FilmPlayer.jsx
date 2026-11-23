@@ -16,7 +16,10 @@ import { setQuiet } from "./quiet";
 
    A clip plays a stretch of an act's own timeline (`from` to `to`, in the
    act's seconds) in `seconds` of film, with a speed ramp: it leaves fast
-   and slows into the cut. Every cut punches in; a card cuts in on a flash.
+   and slows into the cut. Where one act (or card) gives way to another it
+   is a zoom dissolve: the old frame pushes on and brightens as it fades,
+   the new one settles in from a touch large, both moving. Cuts inside an
+   act (the project montage) punch in.
 
    It mounts as the film starts, so the acts' scenes load while the cold
    open is on screen, and starts its clock once `rolling`.
@@ -27,6 +30,7 @@ const CARD = 0.5; // a chapter card
 const LIFT = 0.6; // the film fading off the page
 const PREROLL = 0.3; // the next act starts drawing this early, out of sight
 const SWELL = 0.7; // the rise into a chapter card's hit
+const DISSOLVE = 0.45; // one act (or card) dissolving into the next
 const linear = (u) => u;
 const ramp = (u) => 1 - (1 - u) ** 1.7;
 const arrival = (slug) => ACT_TWO.entries.find((entry) => entry.shot.id === shotsFor(slug)[0].id);
@@ -72,12 +76,15 @@ export default function FilmPlayer({ rolling, onEnd, children }) {
   const end = useRef(onEnd);
   useLayoutEffect(() => { end.current = onEnd; });
   // Everything the frame loop reads, kept out of React so a frame is cheap.
-  const state = useRef({ elapsed: 0, playing: true, rolling: false, segment: null, swelled: -1, films: new Map(), drawing: new Map(), failed: new Set(), ended: false });
+  const state = useRef({ elapsed: 0, playing: true, rolling: false, segment: null, prev: null, swelled: -1, films: new Map(), drawing: new Map(), failed: new Set(), ended: false });
 
   const [playback] = useState(() => ({
     timeOf: (id) => {
       const { segment, elapsed } = state.current;
       if (segment?.act === id) return actTime(segment, elapsed);
+      // Dissolving out: it keeps moving a little past its clip.
+      const { prev } = state.current;
+      if (prev?.act === id) return actTime(prev, elapsed) + (prev.to - prev.from) / prev.seconds * Math.max(0, elapsed - prev.end) * (prev.ease === linear ? 1 : 0.2);
       // Not on: held on where its next clip starts, ready for the cut.
       const next = SEGMENTS.find((x) => x.act === id && x.start >= (segment?.start ?? -1));
       return (next ?? SEGMENTS.find((x) => x.act === id)).from;
@@ -104,6 +111,14 @@ export default function FilmPlayer({ rolling, onEnd, children }) {
     let frame = 0, last = performance.now(), told = -1;
     const s = state.current;
     const sections = () => root.current?.querySelectorAll(".film-act, .film-chapter") ?? [];
+    const sectionFor = (show) => root.current?.querySelector(`[data-act="${show}"]`);
+    // Back to the stylesheet's say once a dissolve is done.
+    const clearDissolve = (segment) => {
+      const outgoing = sectionFor(segment.show);
+      if (outgoing) for (const key of ["opacity", "transform", "filter", "zIndex"]) outgoing.style[key] = "";
+      const incoming = sectionFor(s.segment?.show);
+      if (incoming) incoming.style.transform = "";
+    };
     const tick = (now) => {
       frame = requestAnimationFrame(tick);
       const dt = Math.min(0.1, (now - last) / 1000);
@@ -117,16 +132,32 @@ export default function FilmPlayer({ rolling, onEnd, children }) {
       if (segment !== s.segment) {
         const was = s.segment;
         s.segment = segment;
+        // A change of act or card dissolves; the old one stays up for it.
+        if (s.prev) clearDissolve(s.prev);
+        s.prev = was && was.show !== segment.show && segment.start - s.elapsed > -DISSOLVE ? was : null;
         let on = null;
         sections().forEach((el) => { const here = el.dataset.act === segment.show; el.classList.toggle("is-on", here); el.toggleAttribute("inert", !here); if (here) on = el; });
         SEGMENTS.forEach((x) => showBed(x.bed, false));
         showBed(segment.bed, true);
-        if (was) {
-          // A card cuts in on a flash frame with a trailer hit; every other
-          // cut punches in on the frame, its colours split for an instant.
-          if (segment.card) { restart(flashRef.current, "is-on"); if (s.playing) cue("braam"); }
-          else { restart(on, "is-cut"); if (s.playing && was.act === segment.act) cue("whoosh"); }
+        if (was && s.playing) {
+          // A card lands with a soft glow and a trailer hit; a cut inside
+          // an act punches in; a dissolve carries air past the lens.
+          if (segment.card) { restart(flashRef.current, "is-on"); cue("braam"); }
+          else if (was.act === segment.act) { restart(on, "is-cut"); cue("whoosh"); }
+          else cue("whoosh");
         }
+      }
+      // The dissolve: the outgoing frame pushes on and brightens as it
+      // fades; the incoming one settles in from a touch large.
+      const incoming = sectionFor(segment.show);
+      if (s.prev) {
+        const u = Math.min(1, Math.max(0, (s.elapsed - segment.start) / DISSOLVE));
+        const e = u * u * (3 - 2 * u);
+        const outgoing = sectionFor(s.prev.show);
+        if (outgoing) { outgoing.style.opacity = String(1 - e); outgoing.style.transform = `scale(${1 + 0.09 * e})`; outgoing.style.filter = `brightness(${1 + 0.7 * e})`; outgoing.style.zIndex = "2"; }
+        // (It is fully there under the old frame, so the dissolve never dips.)
+        if (incoming) incoming.style.transform = `scale(${1.06 - 0.06 * e})`;
+        if (u >= 1) { clearDissolve(s.prev); s.prev = null; }
       }
       // Draw the act on screen, and the next one just before its cut (all
       // through a card) so it already has a finished frame when it is shown.
@@ -139,7 +170,7 @@ export default function FilmPlayer({ rolling, onEnd, children }) {
       const lead = segment.card ? segment.seconds : PREROLL;
       const visible = document.visibilityState === "visible";
       for (const [id, film] of s.films) {
-        const want = visible && (id === segment.act || (next?.act === id && next.start - s.elapsed < lead));
+        const want = visible && (id === segment.act || s.prev?.act === id || (next?.act === id && next.start - s.elapsed < lead));
         if (s.drawing.get(id) !== want) { s.drawing.set(id, want); film.setActive(want); }
       }
       if (scrub.current && document.activeElement !== scrub.current) scrub.current.value = Math.min(FILM_SECONDS, s.elapsed);
