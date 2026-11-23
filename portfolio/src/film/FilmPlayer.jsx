@@ -46,7 +46,7 @@ const CLIPS = [
   { act: "act3", from: 0, to: 7.5, seconds: 3, ease: ramp },
   { card: "act4", seconds: CARD },
   { act: "act4", from: 0, to: 9.6, seconds: 3.4, ease: ramp },
-  { act: "finale", from: 0.3, to: FINALE.seconds, seconds: 2.4, ease: linear, hold: 0.8 },
+  { act: "finale", from: 0.3, to: FINALE.seconds, seconds: 2.8, ease: linear, hold: 1 },
 ];
 // Each clip on the film's clock, `start` to `end`; `show` is the element
 // on screen (an act, or a card), `bed` the music under it.
@@ -176,8 +176,12 @@ export default function FilmPlayer({ rolling, onEnd, children }) {
       if (scrub.current && document.activeElement !== scrub.current) scrub.current.value = Math.min(FILM_SECONDS, s.elapsed);
       const whole = Math.floor(s.elapsed);
       if (whole !== told && time.current) { told = whole; time.current.textContent = `${clock(Math.min(s.elapsed, FILM_SECONDS))} / ${clock(FILM_SECONDS)}`; }
-      // The end: the film lifts off the page.
-      if (root.current) root.current.style.opacity = s.elapsed > FILM_SECONDS ? String(1 - (s.elapsed - FILM_SECONDS) / LIFT) : "";
+      // The end: the last frame brightens as it lifts off the page.
+      if (root.current) {
+        const u = s.elapsed > FILM_SECONDS ? Math.min(1, (s.elapsed - FILM_SECONDS) / LIFT) : 0;
+        root.current.style.opacity = u ? String(1 - u) : "";
+        root.current.style.filter = u ? `brightness(${1 + 0.9 * u})` : "";
+      }
       if (s.elapsed >= FILM_SECONDS + LIFT) finish();
     };
     frame = requestAnimationFrame(tick);

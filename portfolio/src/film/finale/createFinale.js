@@ -21,7 +21,7 @@ export function createFinale(canvas, { getTime, onFrame }) {
   const point = new THREE.Vector3().fromArray(POINT);
 
   // The signal: the cold open's flare, on a card held in front of the lens.
-  const flareUniforms = { uCore: { value: 0 }, uFlare: { value: 0 }, uBeat1: { value: -1 }, uBeat2: { value: -1 }, uAspect: { value: 1 } };
+  const flareUniforms = { uCore: { value: 0 }, uFlare: { value: 0 }, uBeat1: { value: -1 }, uBeat2: { value: -1 }, uAspect: { value: 1 }, uShock: { value: -1 } };
   const cardGeometry = new THREE.PlaneGeometry(2, 2);
   const flare = new THREE.Mesh(cardGeometry, additive({ uniforms: flareUniforms, vertexShader: flareVertex, fragmentShader: flareFragment }));
   flare.frustumCulled = false;
@@ -48,8 +48,14 @@ export function createFinale(canvas, { getTime, onFrame }) {
     camera.position.fromArray(pose.pos);
     camera.lookAt(...pose.look);
     if (camera.fov !== pose.fov) { camera.fov = pose.fov; camera.updateProjectionMatrix(); }
-    camera.updateMatrixWorld();
     const m = moments(t);
+    // The burst jolts the camera, and it settles.
+    if (m.burst > 0.001) {
+      camera.position.x += (Math.sin(t * 87) + 0.6 * Math.sin(t * 129)) * 0.05 * m.burst;
+      camera.position.y += (Math.cos(t * 93) + 0.5 * Math.sin(t * 59)) * 0.04 * m.burst;
+      camera.rotateZ(Math.sin(t * 71) * 0.01 * m.burst);
+    }
+    camera.updateMatrixWorld();
 
     // Keep the flare card filling the frame, at the point. Half again the
     // frame: the shared flare shader is drawn for a card that size.
@@ -58,9 +64,14 @@ export function createFinale(canvas, { getTime, onFrame }) {
     flare.position.copy(point);
     flare.quaternion.copy(camera.quaternion);
     flare.scale.set(distance * half * camera.aspect * 1.5, distance * half * 1.5, 1);
-    flareUniforms.uCore.value = m.core * (0.9 + 0.1 * Math.sin(clock * 2.2));
-    flareUniforms.uFlare.value = m.flare * 0.8;
+    // It gathers (a quickening pulse), then bursts.
+    const pulse = 0.9 + (0.1 + 0.25 * m.gather) * Math.sin(clock * (2.2 + 14 * m.gather));
+    flareUniforms.uCore.value = m.core * pulse * (1 + 0.6 * m.gather) + m.burst * 1.4;
+    flareUniforms.uFlare.value = m.flare * (0.8 + 0.7 * m.gather) + m.burst * 2.8;
+    flareUniforms.uShock.value = m.shock;
     flareUniforms.uAspect.value = camera.aspect;
+    film.bloom[0] = 0.5 + 0.25 * m.gather + m.burst * 0.9;
+    finish.uniforms.uAberration.value = 0.0002 + m.burst * 0.006;
 
     // Before the act starts or after it ends the frame does not change.
     if ((t <= 0 || t >= FINALE.seconds) && settledFrames++ % 4) return;

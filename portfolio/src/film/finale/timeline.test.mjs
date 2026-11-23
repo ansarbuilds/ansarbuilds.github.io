@@ -15,8 +15,19 @@ test('the page sizes the finale, and finds its contact beat, from the real timel
 test('the signal comes first, then the line, and it ends settled', () => {
   for (const t of steps) {
     const m = moments(t);
-    for (const v of Object.values(m)) assert.ok(v >= 0 && v <= 1);
+    // (shock is -1 while there is none.)
+    for (const [key, v] of Object.entries(m)) assert.ok(key === 'shock' ? v === -1 || (v >= 0 && v <= 1) : v >= 0 && v <= 1, key);
     if (m.contact > 0) assert.equal(m.core, 1);
   }
   assert.equal(moments(FINALE.seconds).contact, 1);
+});
+
+test('the point gathers, then bursts once as the line lands, and settles', async () => {
+  const { LAND } = await import('./timeline.js');
+  assert.equal(moments(LAND - 0.01).burst, 0);
+  assert.ok(moments(LAND - 0.1).gather > 0.8);
+  assert.equal(moments(LAND).burst, 1);
+  assert.ok(moments(LAND + 0.4).shock > 0);
+  assert.equal(moments(FINALE.seconds).shock, -1);
+  assert.ok(moments(FINALE.seconds).burst < 0.01);
 });

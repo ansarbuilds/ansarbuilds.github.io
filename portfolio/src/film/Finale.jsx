@@ -9,8 +9,10 @@ import { useAct } from "./useAct";
 export default function Finale({ playback, contact, credit }) {
   const canvas = useRef(null);
   const block = useRef(null);
-  const tone = useRef(null);
-  tone.current ??= cueOnRise("tone");
+  const title = useRef(null);
+  const cues = useRef(null);
+  // A rise into the landing, then the final hit.
+  cues.current ??= { swell: cueOnRise("swell", 0.35), land: cueOnRise("finale", 0.01) };
 
   const { failed } = useAct({
     id: "finale",
@@ -20,11 +22,20 @@ export default function Finale({ playback, contact, credit }) {
       return (options) => createFinale(canvas.current, options);
     },
     onFrame: (t, m) => {
-      tone.current(m.core);
+      cues.current.swell(m.gather);
+      cues.current.land(m.burst);
+      // The frame keeps pushing in on the last shot.
+      if (canvas.current) canvas.current.style.transform = `scale(${1 + 0.07 * m.contact})`;
       if (!block.current) return;
-      block.current.style.opacity = m.contact;
+      block.current.style.opacity = Math.min(1, m.contact * 2.5);
       block.current.style.visibility = m.contact > 0.02 ? "visible" : "hidden";
-      block.current.style.transform = `translateY(${(1 - m.contact) * 16}px)`;
+      // The line slams in: large and out of focus, landing sharp.
+      if (title.current) {
+        const u = 1 - m.contact;
+        title.current.style.transform = `scale(${1 + 0.32 * u * u})`;
+        title.current.style.filter = u > 0.01 ? `blur(${u * u * 14}px)` : "none";
+        title.current.style.textShadow = `0 0 ${20 + 60 * m.burst}px rgb(255 160 110 / ${0.25 + 0.5 * m.burst})`;
+      }
     },
   });
 
@@ -33,7 +44,7 @@ export default function Finale({ playback, contact, credit }) {
     <div className="fin-stage">
       <canvas ref={canvas} className="fin-canvas" aria-hidden="true" />
       <div ref={block} className="fin-block">
-        <h2 id="fin-title">Let's build <em>something.</em></h2>
+        <h2 ref={title} id="fin-title">Let's build <em>something.</em></h2>
         <a className="fin-email" href={`mailto:${contact.email}`}>Email me<ArrowUpRight size={20} aria-hidden="true" /></a>
         <p className="fin-address">{contact.email}</p>
         <p className="fin-links"><a href={contact.github} target="_blank" rel="noopener noreferrer">GitHub</a><a href={contact.linkedin} target="_blank" rel="noopener noreferrer">LinkedIn</a></p>
