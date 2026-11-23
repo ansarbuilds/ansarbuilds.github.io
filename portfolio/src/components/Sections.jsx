@@ -430,8 +430,12 @@ export function FilmReel({ playback }) {
     <ActFour playback={playback} experiments={FILM_EXPERIMENTS} />
     <Finale playback={playback} contact={CONTACT} credit={CREDIT} />
     {CHAPTERS.map(([act, number, name]) => <section key={act} className="film-chapter" data-act={`card-${act}`} aria-label={`Chapter ${number}: ${name}`}>
-      <p className="film-chapter-kicker">Chapter {number}</p>
-      <h2 className="film-chapter-title">{name}</h2>
+      <div className="film-chapter-frame">
+        <span className="film-chapter-numeral" aria-hidden="true">{number}</span>
+        <p className="film-chapter-kicker">Chapter {number}</p>
+        <h2 className="film-chapter-title">{name}</h2>
+        <span className="film-chapter-streak" aria-hidden="true" />
+      </div>
     </section>)}
   </>;
 }
