@@ -433,27 +433,10 @@ export function FilmReel({ playback }) {
       <p className="film-chapter-kicker">Chapter {number}</p>
       <h2 className="film-chapter-title">{name}</h2>
     </section>)}
-    <section className="film-credits" data-act="credits" aria-label="Credits">
-      <div className="film-credits-roll">
-        <p className="film-credits-lead">A film by<strong>Mohamed Ansar</strong></p>
-        {CREDITS.map(([role, names]) => <p key={role} className="film-credits-line"><span>{role}</span>{names}</p>)}
-        <p className="film-credits-line"><span>Starring</span>{FILM_PROJECTS.map((project) => project.name).join(" · ")}</p>
-        <p className="film-credits-joke">No GPUs were harmed in the making of this film.</p>
-        <p className="film-credits-end">ansarbuilds.dev</p>
-      </div>
-    </section>
   </>;
 }
-// The chapter cards between the acts, and the credits at the end.
+// The chapter cards between the acts.
 const CHAPTERS = [["act2", "II", "Seven builds"], ["act3", "III", "What I bring"], ["act4", "IV", "The playground"]];
-const CREDITS = [
-  ["Directed by", "Mohamed Ansar"],
-  ["Written, designed and built by", "Mohamed Ansar"],
-  ["Pair programmer", "AI"],
-  ["Original score", "Composed in code, played live in your browser"],
-  ["Shot on", "three.js, on your own graphics card"],
-  ["Special thanks", "You, for watching to the end"],
-];
 
 function PlainContact() {
   const { navigate } = useRoute();

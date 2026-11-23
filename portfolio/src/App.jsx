@@ -630,20 +630,18 @@ function ColdOpenLayer({ mode, onStarted, onHandOver, onDone }) {
   </ColdOpenBoundary>;
 }
 
-// How long the hero's entrance has, between the cold open lifting and Act I
-// sliding up over it.
-const HERO_BEAT_MS = 1400;
 
 // The studio ident, before the cold open.
-const IDENT_MS = 2800;
+const IDENT_MS = 1200;
 
 /* The film's place in the app, start to end:
      ident     a first visit opens on the film, playing on its own: the
                studio ident over black (FilmIdent), its sound waiting for
                the visitor's first tap
-     cold open its own layer (ColdOpen), building its name on the hero's
-     acts      the film player (FilmPlayer), over the page, on one clock,
-               with chapter cards between the acts and the credits at the end
+     cold open its own layer (ColdOpen), its short cut: the network
+               becoming the name, built on the hero's
+     acts      the film player (FilmPlayer), over the page, on one clock: a
+               trailer cut of the acts, under 30 seconds in all
      the page  an ordinary page to scroll, with "Watch the film" in the nav
                and the hero to play it again
    A big skip button (FilmSkip) is up the whole time, and so is Escape.
@@ -694,7 +692,9 @@ export default function App() {
   const release = useCallback(() => {
     setCover(false);
     setHeld(false);
-    setTimeout(() => { if (running.current) setRolling(true); }, HERO_BEAT_MS);
+    // The player takes over on the cold open's last frame: Act I opens on
+    // the same shot, so the cut is invisible.
+    if (running.current) setRolling(true);
   }, []);
   const closeColdOpen = useCallback(() => setColdOpenUp(false), []);
   const endFilm = useCallback(() => { setFilmUp(false); setRolling(false); }, []);
@@ -743,7 +743,7 @@ export default function App() {
           {filmUp && <ColdOpenBoundary key={`film-${take}`} onFail={endFilm}><Suspense fallback={null}>
             <FilmPlayer rolling={rolling} onEnd={endFilm}>{(playback) => <FilmReel playback={playback} />}</FilmPlayer>
           </Suspense></ColdOpenBoundary>}
-          {coldOpenUp && <ColdOpenLayer key={`co-${take}`} mode="full" onStarted={onStarted} onHandOver={release} onDone={closeColdOpen} />}
+          {coldOpenUp && <ColdOpenLayer key={`co-${take}`} mode="short" onStarted={onStarted} onHandOver={release} onDone={closeColdOpen} />}
           {cover && <FilmIdent />}
           {filmUp && <FilmSkip onSkip={skipFilm} />}
         </SandboxProvider>
