@@ -232,10 +232,12 @@ test('a returning visitor can watch the film from the nav, and pause it', async 
   await expect.poll(() => page.evaluate(() => window.scrollY)).toBe(0);
   await expect(page.locator('.co')).toBeVisible({ timeout: 20000 });
   await expect(page.locator('.film-player.is-rolling')).toBeVisible({ timeout: 40000 });
-  // Space pauses (the controls tuck away while the film plays untouched).
+  // Once the clock is running, Space pauses (the controls tuck away while
+  // the film plays untouched).
+  const scrub = page.getByRole('slider', { name: 'Where the film is' });
+  await expect.poll(async () => Number(await scrub.inputValue()), { timeout: 20000 }).toBeGreaterThan(0.3);
   await page.keyboard.press('Space');
   await expect(page.getByRole('button', { name: 'Play the film', exact: true })).toBeAttached();
-  const scrub = page.getByRole('slider', { name: 'Where the film is' });
   const at = await scrub.inputValue();
   await page.waitForTimeout(1200);
   expect(await scrub.inputValue()).toBe(at);
