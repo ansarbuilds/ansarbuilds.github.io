@@ -190,7 +190,12 @@ export default function FilmPlayer({ rolling, onEnd, children }) {
       wake();
       if (event.metaKey || event.ctrlKey || event.altKey) return;
       const onScrub = event.target === scrub.current;
-      if (event.key === " " || event.key === "k") { if (event.target.closest?.("a, button") && event.key === " ") return; event.preventDefault(); togglePlay(); }
+      if (event.key === " " || event.key === "k") {
+        // Space on one of the film's own buttons presses that button.
+        if (event.key === " " && event.target.closest?.("a, button") && root.current?.contains(event.target)) return;
+        event.preventDefault();
+        togglePlay();
+      }
       else if (event.key === "ArrowRight" && !onScrub) { event.preventDefault(); seek(state.current.elapsed + STEP); }
       else if (event.key === "ArrowLeft" && !onScrub) { event.preventDefault(); seek(state.current.elapsed - STEP); }
       else if (event.key === "m") setSound(!soundOn());
