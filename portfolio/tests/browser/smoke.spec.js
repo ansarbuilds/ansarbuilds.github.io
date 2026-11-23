@@ -232,11 +232,9 @@ test('a returning visitor can watch the film from the nav, and pause it', async 
   await expect.poll(() => page.evaluate(() => window.scrollY)).toBe(0);
   await expect(page.locator('.co')).toBeVisible({ timeout: 20000 });
   await expect(page.locator('.film-player.is-rolling')).toBeVisible({ timeout: 40000 });
-  // The controls tuck away while the film plays untouched; moving the
-  // pointer brings them back.
-  await page.mouse.move(300, 300);
-  await page.mouse.move(320, 320);
-  await page.getByRole('button', { name: 'Pause the film' }).click({ timeout: 5000 });
+  // Space pauses (the controls tuck away while the film plays untouched).
+  await page.keyboard.press('Space');
+  await expect(page.getByRole('button', { name: 'Play the film', exact: true })).toBeAttached();
   const scrub = page.getByRole('slider', { name: 'Where the film is' });
   const at = await scrub.inputValue();
   await page.waitForTimeout(1200);
@@ -263,9 +261,11 @@ test('with reduced motion there is no film to watch', async ({ page }) => {
 });
 
 test('the whole film runs under 30 seconds, landing to page', async ({ page }) => {
+  // The player's code can take a while on a dev server still building three.js.
+  test.setTimeout(90000);
   await page.goto('/?coldopen=full');
   // The player's own running time, on its scrub bar...
-  const player = Number(await page.getByRole('slider', { name: 'Where the film is' }).getAttribute('max', { timeout: 20000 }));
+  const player = Number(await page.getByRole('slider', { name: 'Where the film is' }).getAttribute('max', { timeout: 60000 }));
   // ...plus what plays before it: the ident and the cold open's short cut.
   const before = 1.2 + await page.evaluate(async () => { const { T, SHORT_START } = await import('/src/film/coldOpen/score.js'); return T.open - SHORT_START; });
   expect(player + before).toBeLessThan(30);
