@@ -5,7 +5,7 @@ import { UnrealBloomPass } from "three/examples/jsm/postprocessing/UnrealBloomPa
 import { ShaderPass } from "three/examples/jsm/postprocessing/ShaderPass.js";
 import { OutputPass } from "three/examples/jsm/postprocessing/OutputPass.js";
 import { finishShader } from "./coldOpen/shaders.js";
-import { createAdaptive } from "./adaptive.js";
+import { createAdaptive, lensWanted } from "./adaptive.js";
 
 /* One WebGL renderer for the film's acts (I to IV and the finale), instead
    of one each. A browser keeps only so many contexts alive (Chrome: 16) and
@@ -59,7 +59,8 @@ function createEngine() {
   };
   const views = new Set();
   // Steps quality down for every act at once if the device cannot keep up.
-  const adaptive = createAdaptive({ quality, bloom, apply: () => views.forEach((view) => view.resize()) });
+  const lens = { on: lensWanted(renderer) };
+  const adaptive = createAdaptive({ quality, bloom, lens, apply: () => views.forEach((view) => view.resize()) });
   return {
     renderer, quality, views,
     draw(view, scene, camera, { now, skip }) {
@@ -69,6 +70,7 @@ function createEngine() {
       renderer.setClearColor(view.clear, 1);
       [bloom.strength, bloom.radius, bloom.threshold] = view.bloom;
       for (const key of ["uTime", "uAberration", "uGrain", "uGrade", "uStreak", "uHalation"]) finish.uniforms[key].value = view.finish.uniforms[key].value;
+      if (!lens.on) { finish.uniforms.uStreak.value = 0; finish.uniforms.uHalation.value = 0; }
       // Two acts can draw in one animation frame during a handoff: count
       // the frame once.
       if (now !== lastFrame) { lastFrame = now; adaptive.frame(now, skip); }

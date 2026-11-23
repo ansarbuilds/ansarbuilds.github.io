@@ -185,22 +185,22 @@ export const finishShader = {
       vec3 streak = vec3(0.);
       if (uStreak > 0.) {
         float jitter = hash2(vUv * vec2(1931., 1171.) + fract(uTime * 7.));
-        for (int i = 0; i < 16; i++) {
-          float d = (float(i) + jitter) / 16.;
+        for (int i = 0; i < 10; i++) {
+          float d = (float(i) + jitter) / 10.;
           float w = (1. - d) * (1. - d);
           vec2 step = vec2(d * 0.13, 0.);
           streak += (bright(uv + step, 0.85) + bright(uv - step, 0.85)) * w;
         }
-        color += streak * vec3(0.3, 0.55, 1.) * 0.15 * uStreak;
+        color += streak * vec3(0.3, 0.55, 1.) * 0.18 * uStreak;
       }
       // Halation: a red bleed round the highlights.
       if (uHalation > 0.) {
         vec3 halo = vec3(0.);
-        for (int i = 0; i < 8; i++) {
-          float a = float(i) * 0.785398;
+        for (int i = 0; i < 6; i++) {
+          float a = float(i) * 1.047198;
           halo += bright(uv + vec2(cos(a), sin(a)) * vec2(0.0045, 0.008), 0.6);
         }
-        color += halo / 8. * vec3(1., 0.32, 0.12) * 0.55 * uHalation;
+        color += halo / 6. * vec3(1., 0.32, 0.12) * 0.55 * uHalation;
       }
 
       // The film's one grade, the same in every act. (Linear light:

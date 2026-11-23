@@ -31,3 +31,13 @@ test('frames that are slow on purpose, and stalls, are not counted', () => {
   run(a, 1000, 50);
   assert.equal(quality.dpr, 1.5);
 });
+
+test('a slow device drops the lens effects before anything else', () => {
+  const quality = { dpr: 1.75 }, bloom = { enabled: true }, lens = { on: true };
+  run.t = 0;
+  const a = createAdaptive({ quality, bloom, lens, apply: () => {} });
+  run(a, 40, 91);
+  assert.equal(lens.on, false);
+  assert.equal(quality.dpr, 1.75);
+  assert.equal(bloom.enabled, true);
+});

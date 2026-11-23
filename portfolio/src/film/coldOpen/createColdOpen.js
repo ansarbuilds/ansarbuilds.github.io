@@ -9,7 +9,7 @@ import { COLD_OPEN, CUES, SHORT_START, SUBTITLE, T, score } from "./score.js";
 import { cue } from "../../lib/sound.js";
 import { sampleName } from "./sampleName.js";
 import { finishShader, flareFragment, flareVertex, lineFragment, lineVertex, particleFragment, particleVertex, raysFragment } from "./shaders.js";
-import { createAdaptive } from "../adaptive.js";
+import { createAdaptive, lensWanted } from "../adaptive.js";
 import { pickQuality } from "./quality.js";
 
 /* The cold open's scene and its frame loop, in plain three.js.
@@ -129,7 +129,8 @@ export function createColdOpen(canvas, { mode, waited = 0, holdAt = null, onVeil
   composer.addPass(finish);
   composer.addPass(new OutputPass());
   // Steps quality down if this device cannot keep up (see adaptive.js).
-  const adaptive = createAdaptive({ quality, bloom, apply: () => { renderer.setPixelRatio(quality.dpr); resize(); } });
+  const lens = { on: lensWanted(renderer) };
+  const adaptive = createAdaptive({ quality, bloom, lens, apply: () => { renderer.setPixelRatio(quality.dpr); resize(); } });
 
   let width = 1, height = 1;
   const resize = () => {
@@ -234,6 +235,7 @@ export function createColdOpen(canvas, { mode, waited = 0, holdAt = null, onVeil
     bloom.strength = now.bloom;
     finish.uniforms.uTime.value = t;
     finish.uniforms.uAberration.value = now.aberration;
+    finish.uniforms.uStreak.value = finish.uniforms.uHalation.value = lens.on ? 1 : 0;
     adaptive.frame(nowMs);
     composer.render();
 
