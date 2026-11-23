@@ -105,8 +105,16 @@ export function createActThree(canvas, { pillars, getTime, onFrame }) {
     const pool = keep(glow(9, 6, SIGNAL, { opacity: 0 }));
     pool.mesh.position.set(Math.sin(pillar.yaw) * 3.5 + pillar.x, 0.03, Math.cos(pillar.yaw) * 3.5);
     world.add(pool.mesh);
-    disposers.push(() => { geometry.dispose(); map.dispose(); glowMap.dispose(); front.dispose(); });
-    return { pillar, mesh, front, pool };
+    // The shockwave across the ground when it slams home.
+    const waveGeometry = new THREE.RingGeometry(0.85, 1, 96);
+    const waveMaterial = new THREE.MeshBasicMaterial({ color: SIGNAL.clone().lerp(BONE, 0.35), transparent: true, opacity: 0, blending: THREE.AdditiveBlending, depthWrite: false, side: THREE.DoubleSide });
+    const wave = new THREE.Mesh(waveGeometry, waveMaterial);
+    wave.rotation.x = -Math.PI / 2;
+    wave.position.set(pillar.x, 0.05, 0);
+    wave.visible = false;
+    world.add(wave);
+    disposers.push(() => { geometry.dispose(); map.dispose(); glowMap.dispose(); front.dispose(); waveGeometry.dispose(); waveMaterial.dispose(); });
+    return { pillar, mesh, front, pool, wave };
   });
 
   const finish = film.finish;
@@ -145,14 +153,30 @@ export function createActThree(canvas, { pillars, getTime, onFrame }) {
     camera.lookAt(look);
 
     const m = moments(t);
-    monoliths.forEach(({ pillar, mesh, front, pool }, i) => {
+    // Each slam shakes the camera, and it settles.
+    if (m.slam > 0.001) {
+      camera.position.x += (Math.sin(t * 89) + 0.6 * Math.sin(t * 133)) * 0.35 * m.slam;
+      camera.position.y += (Math.cos(t * 101) + 0.5 * Math.sin(t * 67)) * 0.3 * m.slam;
+      camera.rotateZ(Math.sin(t * 73) * 0.01 * m.slam);
+    }
+    film.bloom[0] = 0.5 + 0.5 * m.slam;
+    finish.uniforms.uAberration.value = 0.0002 + 0.004 * m.slam;
+    monoliths.forEach(({ pillar, mesh, front, pool, wave }, i) => {
       const rise = m.rise[i];
       mesh.position.y = pillar.height / 2 - (1 - rise) * (pillar.height + 0.4);
       // Under the floor it would show through the grid: not there until it rises.
       mesh.visible = rise > 0;
       // A shudder as it breaks the surface.
       mesh.position.x = rise > 0 && rise < 1 ? Math.sin(clock * 60 + i) * 0.04 * (1 - rise) : 0;
-      front.emissiveIntensity = 1.8 * m.glow[i];
+      // Its carving flares as it lands.
+      const landed = m.wave[i] >= 0 ? (1 - m.wave[i]) ** 2 : 0;
+      front.emissiveIntensity = 1.8 * m.glow[i] + 2.2 * landed;
+      wave.visible = m.wave[i] >= 0;
+      if (wave.visible) {
+        const u = m.wave[i];
+        wave.scale.setScalar(1 + (1 - (1 - u) ** 3) * 26);
+        wave.material.opacity = 0.9 * (1 - u) ** 2;
+      }
       pool.mesh.material.uniforms.uOpacity.value = 0.45 * m.glow[i];
     });
     dust.uniforms.uTime.value = clock;

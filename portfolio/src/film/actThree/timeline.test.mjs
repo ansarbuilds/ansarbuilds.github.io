@@ -63,3 +63,16 @@ test('the held match cut is flagged for its sound, only while it is held', () =>
   assert.equal(moments(0).held, 1);
   assert.equal(moments(end + 1e-6).held, 0);
 });
+
+test('each rising monolith slams home once, with a jolt and a shockwave that settle', async () => {
+  const { landAt } = await import('./timeline.js');
+  for (const i of [0, 2]) {
+    const at = landAt(i);
+    assert.ok(moments(at - 0.05).rise[i] < 1 && moments(at).rise[i] === 1);
+    assert.ok(moments(at + 0.01).slam > 0.9);
+    assert.ok(moments(at + 0.3).wave[i] > 0 && moments(at + 0.3).wave[i] < 1);
+    assert.equal(moments(at + 1).wave[i], -1);
+  }
+  assert.equal(moments(0).slam, 0);
+  assert.deepEqual(moments(0).wave, [-1, -1, -1]);
+});
