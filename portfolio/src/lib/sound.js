@@ -508,6 +508,18 @@ export function cue(kind, length = 1.6) {
     case "hit": {
       drum(now, 2.2, 140, 28, 2.6);
       taiko(now + 0.01, 1.2);
+      // A sub drop under it: felt in the chest more than heard.
+      {
+        const osc = ctx.createOscillator(), out = ctx.createGain();
+        osc.type = "sine";
+        osc.frequency.setValueAtTime(72, now);
+        osc.frequency.exponentialRampToValueAtTime(24, now + 1.8);
+        out.gain.setValueAtTime(0.0001, now);
+        out.gain.exponentialRampToValueAtTime(0.55, now + 0.03);
+        out.gain.exponentialRampToValueAtTime(0.0001, now + 2.2);
+        osc.connect(out).connect(master);
+        osc.start(now); osc.stop(now + 2.3);
+      }
       noise(now, 0.9, 6000, 600, 0.22, 0.02, 0.4);
       // The chord of the whole film, wide, ringing out in the hall.
       bass(33, now, 1.8);

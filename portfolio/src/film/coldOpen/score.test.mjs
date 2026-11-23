@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { BEATS, COLD_OPEN, IMPACT, SHORT_START, SUBTITLE, T, score } from './score.js';
+import { BEATS, COLD_OPEN, IMPACT, SHORT_START, SUBTITLE, T, TRAILER_START, score } from './score.js';
 import { SHOTS } from '../shots.js';
 
 const steps = Array.from({ length: 821 }, (_, i) => (T.end * i) / 820);
@@ -10,6 +10,7 @@ test('the beats come in order and fit inside their shots', () => {
   assert.ok(BEATS.every((at) => at > T.heart && at < T.pull));
   assert.ok(IMPACT > T.name && IMPACT < T.line);
   assert.ok(SHORT_START > T.pull && SHORT_START < T.name);
+  assert.ok(TRAILER_START > T.heart && TRAILER_START < T.pull);
   assert.equal(COLD_OPEN.seconds, T.end);
 });
 
@@ -60,4 +61,12 @@ test('the sound cues fall inside the cold open, and the riser lands on the hit',
   const hit = CUES.find((c) => c.kind === 'hit');
   assert.equal(hit.at, IMPACT);
   for (const riser of CUES.filter((c) => c.kind === 'riser')) assert.ok(Math.abs(riser.at + riser.length - IMPACT) < 1e-9);
+});
+
+test('the impact sends out one shockwave and shakes the camera, then settles', () => {
+  assert.equal(score(IMPACT - 0.01).shock, -1);
+  assert.ok(score(IMPACT + 0.3).shock > 0 && score(IMPACT + 0.3).shock < 1);
+  assert.equal(score(IMPACT + 1).shock, -1);
+  assert.ok(score(IMPACT + 0.02).shake > 0.8);
+  assert.ok(score(IMPACT + 1.2).shake < 0.01);
 });
