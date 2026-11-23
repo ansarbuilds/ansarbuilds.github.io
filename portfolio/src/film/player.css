@@ -15,12 +15,12 @@
 /* A trailer has no time to read: the act's cards and captions stay off
    (the page has them, links and all); its titles and names stay on. */
 .film-player :is(.act1-tools, .act2-card, .act3-card, .act4-card) { display: none !important; }
-/* The punch-in on a cut: the frame lands a touch large, its colours split
-   red and blue for an instant, and settles. */
-.film-player .film-act.is-cut > [class$="-stage"] { animation: film-punch .42s cubic-bezier(.2, .8, .2, 1) both; }
+/* The punch-in on a cut inside an act: the frame lands a touch large and
+   a touch bright, its colours barely split, and eases home. */
+.film-player .film-act.is-cut > [class$="-stage"] { animation: film-punch .55s cubic-bezier(.2, .8, .2, 1) both; }
 @keyframes film-punch {
-  0% { transform: scale(1.07); filter: drop-shadow(6px 0 0 rgb(255 40 80 / .55)) drop-shadow(-6px 0 0 rgb(40 200 255 / .55)) brightness(1.35); }
-  40% { filter: drop-shadow(2px 0 0 rgb(255 40 80 / .3)) drop-shadow(-2px 0 0 rgb(40 200 255 / .3)) brightness(1.08); }
+  0% { transform: scale(1.035); filter: drop-shadow(3px 0 0 rgb(255 40 80 / .3)) drop-shadow(-3px 0 0 rgb(40 200 255 / .3)) brightness(1.18); }
+  50% { filter: drop-shadow(1px 0 0 rgb(255 40 80 / .12)) drop-shadow(-1px 0 0 rgb(40 200 255 / .12)) brightness(1.04); }
   100% { transform: none; filter: none; }
 }
 
@@ -87,8 +87,8 @@ html.is-scroll-held, html.is-scroll-held body { overflow: hidden; }
 
 /* The flash frame on a cut. */
 .film-flash { position: absolute; inset: 0; z-index: 40; pointer-events: none; background: radial-gradient(circle at 50% 50%, #fff4e8, #ffd2b0 60%, #ff9a6a); opacity: 0; mix-blend-mode: screen; }
-.film-flash.is-on { animation: film-flash .32s ease-out both; }
-@keyframes film-flash { 0% { opacity: .7; } 100% { opacity: 0; } }
+.film-flash.is-on { animation: film-flash .6s cubic-bezier(.2, .7, .3, 1) both; }
+@keyframes film-flash { 0% { opacity: 0; } 18% { opacity: .24; } 100% { opacity: 0; } }
 
 @media (prefers-reduced-motion: reduce) {
   .film-player .film-act canvas, .film-atmos::before, .film-atmos::after, .film-chapter.is-on :is(.film-chapter-kicker, .film-chapter-title), .film-flash.is-on, .film-chapter.is-on > .film-chapter-kicker::after, .film-player .film-act.is-cut > [class$="-stage"] { animation: none; }
