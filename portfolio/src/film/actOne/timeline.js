@@ -51,6 +51,9 @@ export function overlays(t) {
     tools: smooth(ramp(t, startOf("A1-03") + 0.2, startOf("A1-03") + 1)),
     // The name parts for the camera on its way through.
     part: smooth(ramp(t, startOf("A1-01") + 0.6, startOf("A1-01") + 2.2)),
+    // Through the name at speed: the lens kicks wide and back, peaking as
+    // the camera passes between the letters.
+    warp: Math.sin(Math.PI * ramp(t, startOf("A1-01") + 0.4, startOf("A1-01") + 2.5)),
   };
 }
 

@@ -71,7 +71,7 @@ export const digitsVertex = /* glsl */ `
 export const digitsFragment = /* glsl */ `
   uniform sampler2D uMap;
   uniform vec3 uColor;
-  uniform float uRise, uOpacity;
+  uniform float uRise, uOpacity, uFlash;
   varying vec2 vUv;
   float hash(vec2 p) { return fract(sin(dot(p, vec2(12.9898, 78.233))) * 43758.5453); }
   void main() {
@@ -81,7 +81,8 @@ export const digitsFragment = /* glsl */ `
     float lit = smoothstep(0., 0.025, edge);
     float moving = step(0.001, uRise) * (1. - step(0.999, uRise));
     float seam = (1. - smoothstep(0., 0.06, abs(edge))) * moving;
-    vec3 color = uColor * lit + vec3(1., 0.62, 0.42) * seam * 1.4;
+    // As it lands it flares white-hot, and cools to its colour.
+    vec3 color = mix(uColor, vec3(0.95, 0.7, 0.52), uFlash * 0.55) * lit * (1. + uFlash * 0.35) + vec3(1., 0.62, 0.42) * seam * 1.4;
     gl_FragColor = vec4(color, ink * uOpacity * max(lit, seam));
   }
 `;

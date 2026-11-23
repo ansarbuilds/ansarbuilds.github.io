@@ -66,3 +66,11 @@ test('overlays stay in range and the statement leaves before the tools arrive', 
 test('the page sizes the act from the real timeline', () => {
   assert.ok(Math.abs(ACT_ONE.screens - ACT_ONE_SCREENS) < 1e-9, `screens.js says ${ACT_ONE_SCREENS}, the timeline ${ACT_ONE.screens}`);
 });
+
+test('the warp through the name rises and falls back to nothing', async () => {
+  const { overlays, startOf, ACT_ONE } = await import('./timeline.js');
+  assert.equal(overlays(0).warp, 0);
+  const peak = overlays(startOf('A1-01') + 1.45).warp;
+  assert.ok(peak > 0.95, `${peak}`);
+  assert.ok(Math.abs(overlays(ACT_ONE.seconds).warp) < 1e-9);
+});

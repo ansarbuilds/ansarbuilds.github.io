@@ -2,6 +2,7 @@ import "./actOne/actOne.css";
 import { useRef } from "react";
 import ActTitle from "./ActTitle";
 import { useAct } from "./useAct";
+import { cue, cueOnRise } from "../lib/sound";
 
 /* Act I (storyboard A1-01 to A1-03) in the film player: it slides up over
    the hero, and the camera goes through the name and past the numbers.
@@ -11,6 +12,9 @@ export default function ActOne({ playback, receipts, tools, lead, rest }) {
   const card = useRef(null);
   const toolsCaption = useRef(null);
   const canvas = useRef(null);
+  const cues = useRef(null);
+  // A rush of air through the name, and a drum as each number lands.
+  cues.current ??= { warp: cueOnRise("whoosh", 0.7), landed: 0 };
   const { failed, titleUp } = useAct({
     id: "act1",
     playback,
@@ -23,9 +27,16 @@ export default function ActOne({ playback, receipts, tools, lead, rest }) {
       return (options) => createActOne(canvas.current, { receipts, tools, ...options });
     },
     onFrame: (t, show) => {
+      cues.current.warp(show.warp);
+      if (show.landed > cues.current.landed) cue("drum");
+      cues.current.landed = show.landed;
+      // The statement slams in: large and out of focus, landing sharp.
       if (card.current) {
-        card.current.style.opacity = show.statement;
-        card.current.style.transform = `translateY(${(1 - show.statement) * 18}px)`;
+        const u = 1 - show.statement;
+        card.current.style.opacity = Math.min(1, show.statement * 1.6);
+        card.current.style.transform = `scale(${1 + 0.28 * u * u})`;
+        card.current.style.transformOrigin = "left center";
+        card.current.style.filter = u > 0.01 ? `blur(${u * u * 12}px)` : "none";
       }
       if (toolsCaption.current) toolsCaption.current.style.opacity = show.tools;
     },
