@@ -47,7 +47,10 @@ const CLIPS = [
   // the clip lands on it and slows while it reads.)
   ...BUILT.map((slug, i) => { const a = arrival(slug), d = a.t1 - a.t0; return { act: "act2", from: a.t0 + 0.1 * d, to: a.t0 + 0.74 * d, seconds: MONTAGE[i] ?? 1, ease: ramp, riser: i === 0, last: i === BUILT.length - 1 }; }),
   { card: "act3", seconds: CARD },
-  { act: "act3", from: 0, to: 7.5, seconds: 3, ease: ramp },
+  // The monoliths rising in real time, so both slams land on screen, then
+  // a whip into the orbit.
+  { act: "act3", from: 0.45, to: 2.95, seconds: 1.55, ease: linear },
+  { act: "act3", from: 3.1, to: 7.5, seconds: 1.55, ease: ramp },
   { card: "act4", seconds: CARD },
   { act: "act4", from: 0, to: 9.6, seconds: 3.4, ease: ramp },
   { act: "finale", from: 0.3, to: FINALE.seconds, seconds: 2.8, ease: linear, hold: 1 },

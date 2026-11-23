@@ -12,8 +12,9 @@ export default function ActThree({ playback, capabilities }) {
   const title = useRef(null);
   const cards = useRef([]);
   const cues = useRef(null);
-  // A low tone as the act lands on its held match cut, a chime per card.
-  cues.current ??= { cut: cueOnRise("tone", 0.9), chimes: capabilities.map(() => cueOnRise("chime")) };
+  // A low tone on the held match cut, an impact as each monolith slams
+  // home, and a drum as each carved face turns to the camera: three things.
+  cues.current ??= { cut: cueOnRise("tone", 0.9), slam: cueOnRise("impact", 0.97), faces: capabilities.map(() => cueOnRise("drum", 0.6)) };
 
   const { failed } = useAct({
     id: "act3",
@@ -28,8 +29,19 @@ export default function ActThree({ playback, capabilities }) {
     },
     onFrame: (t, m) => {
       cues.current.cut(m.held);
-      show(title.current, m.title, 16);
-      m.card.forEach((amount, i) => { show(cards.current[i], amount, 22); cues.current.chimes[i]?.(amount); });
+      cues.current.slam(m.slam);
+      m.glow.forEach((amount, i) => cues.current.faces[i]?.(amount));
+      // The title slams in: large and out of focus, landing sharp.
+      const node = title.current;
+      if (node) {
+        const u = 1 - m.title;
+        node.style.opacity = Math.min(1, m.title * 1.6);
+        node.style.transform = `scale(${1 + 0.3 * u * u})`;
+        node.style.transformOrigin = "left bottom";
+        node.style.filter = u > 0.01 ? `blur(${u * u * 14}px)` : "none";
+        node.style.visibility = m.title > 0.02 ? "visible" : "hidden";
+      }
+      m.card.forEach((amount, i) => show(cards.current[i], amount, 22));
     },
   });
 

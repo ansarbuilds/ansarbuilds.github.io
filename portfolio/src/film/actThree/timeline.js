@@ -86,6 +86,10 @@ function baseCameraAt(t) {
 // How squarely a monolith faces the camera, -1 to 1.
 export const facing = (angle, pillar) => Math.cos(angle - pillar.yaw);
 
+// When each rising monolith starts, and when it lands.
+const riseStart = (i) => matchEnd() + i * 0.2;
+export const landAt = (i) => matchEnd() + 1.4 + i * 0.2;
+
 export function moments(t) {
   const { angle } = cameraAt(t);
   const orbiting = t >= orbitEntry.t0;
@@ -94,10 +98,14 @@ export function moments(t) {
   return {
     // 1 while the opening match cut is held, for the sound of the cut.
     held: t < matchEnd() ? 1 : 0,
-    // Each rises in turn, out of the ground.
-    // The middle one is the match and already stands; the other two rise
-    // beside it once the held cut is over.
-    rise: PILLARS.map((_, i) => (i === MIDDLE ? 1 : smooth(ramp(t, matchEnd() + i * 0.2, matchEnd() + 1.4 + i * 0.2)))),
+    // Each rises in turn, out of the ground, gathering speed, and slams to
+    // a stop. The middle one is the match and already stands; the other two
+    // rise beside it once the held cut is over.
+    rise: PILLARS.map((_, i) => (i === MIDDLE ? 1 : ramp(t, riseStart(i), landAt(i)) ** 2)),
+    // The slams: a jolt that dies away, and a shockwave across the ground
+    // from each one's foot (0 to 1 as it spreads, -1 when there is none).
+    slam: Math.max(0, ...PILLARS.map((_, i) => (i !== MIDDLE && t >= landAt(i) ? Math.exp(-(t - landAt(i)) * 6) : 0))),
+    wave: PILLARS.map((_, i) => { const u = (t - landAt(i)) / 0.9; return i !== MIDDLE && u >= 0 && u <= 1 ? u : -1; }),
     // Carved names glow as their monolith faces the camera.
     glow: faces.map((face) => smooth(ramp(face, 0.55, 0.95)) * (orbiting ? 1 : 0.25)),
     title: smooth(ramp(t, riseEntry.t0 + 0.6, riseEntry.t0 + 1.3)) * (1 - smooth(ramp(t, orbitEntry.t0 - 0.2, orbitEntry.t0 + 0.4))),
