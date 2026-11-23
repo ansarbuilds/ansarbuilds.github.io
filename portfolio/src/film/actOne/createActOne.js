@@ -194,7 +194,7 @@ function buildNumbers(receipts) {
       uMap: { value: textures.get(value) },
       // Kept under the bloom threshold: only the seam glows.
       uColor: { value: index === 0 ? SIGNAL.clone().multiplyScalar(0.5) : BONE.clone().multiplyScalar(0.42) },
-      uRise: { value: 0 }, uOpacity: { value: 0 },
+      uRise: { value: 0 }, uOpacity: { value: 0 }, uFlash: { value: 0 },
     };
     const mesh = new THREE.Mesh(plane, new THREE.ShaderMaterial({ uniforms, vertexShader: digitsVertex, fragmentShader: digitsFragment, transparent: true, depthWrite: false }));
     mesh.frustumCulled = false;
@@ -320,6 +320,7 @@ export function createActOne(canvas, { receipts, tools, getTime, onFrame }) {
 
   let active = false, frame = 0, last = performance.now(), clock = 0, disposed = false, settledFrames = 0;
   const toCamera = new THREE.Vector3(), orbit = new THREE.Vector3();
+  let jolt = 0;
   function tick(nowMs) {
     if (!active || disposed) return;
     frame = requestAnimationFrame(tick);
@@ -328,11 +329,21 @@ export function createActOne(canvas, { receipts, tools, getTime, onFrame }) {
     clock += dt;
     const t = Math.min(ACT_ONE.seconds, Math.max(0, getTime()));
     const pose = poseAt(ACT_ONE, t);
+    const show = overlays(t);
     camera.position.fromArray(pose.pos);
     camera.lookAt(...pose.look);
-    if (camera.fov !== pose.fov) { camera.fov = pose.fov; camera.updateProjectionMatrix(); }
+    // The warp: the lens kicks wide through the name, the colours smear
+    // and the glow lifts; each number landing jolts the camera.
+    const fov = pose.fov + show.warp * 26;
+    if (camera.fov !== fov) { camera.fov = fov; camera.updateProjectionMatrix(); }
+    if (jolt > 0.001) {
+      camera.position.x += (Math.sin(clock * 89) + 0.6 * Math.sin(clock * 131)) * 0.3 * jolt;
+      camera.position.y += (Math.cos(clock * 97) + 0.5 * Math.sin(clock * 61)) * 0.25 * jolt;
+    }
+    jolt *= Math.exp(-dt * 7);
     camera.updateMatrixWorld();
-    const show = overlays(t);
+    film.finish.uniforms.uAberration.value = 0.00006 + show.warp * 0.007 + jolt * 0.002;
+    film.bloom[0] = 0.42 + show.warp * 0.35 + jolt * 0.08;
     const scale = film.pixelHeight / (2 * Math.tan(THREE.MathUtils.degToRad(camera.fov / 2)));
 
     for (const { uniforms } of [name, dust]) { uniforms.uTime.value = clock; uniforms.uScale.value = scale; }
@@ -341,7 +352,13 @@ export function createActOne(canvas, { receipts, tools, getTime, onFrame }) {
 
     for (const number of numbers) {
       const progress = numberProgress(camera.position.z, number.group.position.z);
-      if (progress !== number.progress) { drawNumber(number, progress); number.progress = progress; }
+      if (progress !== number.progress) {
+        // It lands: a white-hot flare and a jolt.
+        if (progress >= 1 && number.progress < 1 && number.progress !== undefined) { number.landedAt = clock; jolt = 1; }
+        drawNumber(number, progress);
+        number.progress = progress;
+      }
+      number.uniforms.uFlash.value = number.landedAt !== undefined ? Math.exp(-(clock - number.landedAt) * 3.5) : 0;
       number.group.position.y = number.baseY + Math.sin(clock * 0.8 + number.group.position.z) * 0.15;
       // Gone before the camera reaches it, so it never fills the lens.
       const near = Math.min(1, Math.max(0, (camera.position.z - number.group.position.z - 5) / 12));
@@ -379,6 +396,7 @@ export function createActOne(canvas, { receipts, tools, getTime, onFrame }) {
     if ((t <= 0 || t >= ACT_ONE.seconds) && settledFrames++ % 4) return;
     if (t > 0 && t < ACT_ONE.seconds) settledFrames = 0;
     film.render(scene, camera, { now: nowMs, skip: t <= 0 || t >= ACT_ONE.seconds });
+    show.landed = numbers.filter((number) => number.progress >= 1).length;
     onFrame?.(t, show);
   }
   // Scroll position is read every frame, not from scroll events, so the
