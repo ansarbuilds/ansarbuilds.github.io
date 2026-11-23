@@ -225,6 +225,7 @@ export default function FilmPlayer({ rolling, onEnd, children }) {
 
   return <div ref={root} className={`film-player ${rolling ? "is-rolling" : ""} ${idle ? "is-idle" : ""}`} role="region" aria-label="The film" tabIndex={-1} onClick={onClick}>
     {children(playback)}
+    <div className="film-atmos" aria-hidden="true" />
     <div ref={flashRef} className="film-flash" aria-hidden="true" />
     <div className="film-controls">
       <button type="button" className="film-button" onClick={togglePlay} aria-label={playing ? "Pause the film" : "Play the film"}>{playing ? <Pause size={16} aria-hidden="true" /> : <Play size={16} aria-hidden="true" />}</button>

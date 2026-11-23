@@ -68,7 +68,7 @@ function createEngine() {
       pass.camera = camera;
       renderer.setClearColor(view.clear, 1);
       [bloom.strength, bloom.radius, bloom.threshold] = view.bloom;
-      for (const key of ["uTime", "uAberration", "uGrain", "uGrade"]) finish.uniforms[key].value = view.finish.uniforms[key].value;
+      for (const key of ["uTime", "uAberration", "uGrain", "uGrade", "uStreak", "uHalation"]) finish.uniforms[key].value = view.finish.uniforms[key].value;
       // Two acts can draw in one animation frame during a handoff: count
       // the frame once.
       if (now !== lastFrame) { lastFrame = now; adaptive.frame(now, skip); }
@@ -85,7 +85,7 @@ function createEngine() {
   };
 }
 
-export function attachFilm(target, { clear = 0x000000, bloom = [0.5, 0.5, 0.5], grain = 0.008 } = {}) {
+export function attachFilm(target, { clear = 0x000000, bloom = [0.5, 0.5, 0.5], grain = 0.014 } = {}) {
   engine ??= createEngine();
   const own = engine;
   const context = target.getContext("2d", { alpha: false });

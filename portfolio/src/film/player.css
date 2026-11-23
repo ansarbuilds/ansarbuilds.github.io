@@ -67,11 +67,29 @@ html.is-scroll-held, html.is-scroll-held body { overflow: hidden; }
 @keyframes film-chapter-creep { from { scale: 1; } to { scale: 1.08; } }
 @keyframes film-leak { 0% { opacity: 0; transform: translateX(-45%); } 35% { opacity: 1; } 100% { opacity: 0; transform: translateX(45%); } }
 
+/* The camera is held, not locked off: every act's frame drifts a little,
+   slowly, and sits a touch large so the drift never shows an edge. */
+.film-player .film-act canvas { animation: film-handheld 9s ease-in-out infinite alternate; }
+@keyframes film-handheld {
+  0% { transform: scale(1.025) translate(0, 0) rotate(0deg); }
+  25% { transform: scale(1.025) translate(-0.35%, 0.25%) rotate(-0.12deg); }
+  50% { transform: scale(1.025) translate(0.25%, -0.2%) rotate(0.08deg); }
+  75% { transform: scale(1.025) translate(-0.15%, -0.3%) rotate(0.1deg); }
+  100% { transform: scale(1.025) translate(0.3%, 0.15%) rotate(-0.06deg); }
+}
+/* Over the picture: a light leak drifting across the lens, and the slight
+   flicker of a projector's lamp. */
+.film-atmos { position: absolute; inset: 0; z-index: 20; pointer-events: none; overflow: hidden; }
+.film-atmos::before { content: ""; position: absolute; inset: -30%; background: radial-gradient(18% 24% at 12% 18%, rgb(255 110 50 / .55), transparent 70%), radial-gradient(14% 18% at 88% 82%, rgb(255 180 110 / .3), transparent 70%); mix-blend-mode: screen; opacity: .1; animation: film-leak-drift 14s ease-in-out infinite alternate; }
+.film-atmos::after { content: ""; position: absolute; inset: 0; background: #fff6ea; mix-blend-mode: overlay; opacity: 0; animation: film-flicker 2.3s steps(1) infinite; }
+@keyframes film-leak-drift { from { transform: translate(-6%, -4%) rotate(0deg); } to { transform: translate(8%, 5%) rotate(8deg); } }
+@keyframes film-flicker { 0% { opacity: 0; } 9% { opacity: .03; } 11% { opacity: 0; } 47% { opacity: .02; } 50% { opacity: 0; } 83% { opacity: .035; } 85% { opacity: 0; } }
+
 /* The flash frame on a cut. */
 .film-flash { position: absolute; inset: 0; z-index: 40; pointer-events: none; background: radial-gradient(circle at 50% 50%, #fff4e8, #ffd2b0 60%, #ff9a6a); opacity: 0; mix-blend-mode: screen; }
 .film-flash.is-on { animation: film-flash .32s ease-out both; }
 @keyframes film-flash { 0% { opacity: .7; } 100% { opacity: 0; } }
 
 @media (prefers-reduced-motion: reduce) {
-  .film-chapter.is-on :is(.film-chapter-kicker, .film-chapter-title), .film-flash.is-on, .film-chapter.is-on > .film-chapter-kicker::after, .film-player .film-act.is-cut > [class$="-stage"] { animation: none; }
+  .film-player .film-act canvas, .film-atmos::before, .film-atmos::after, .film-chapter.is-on :is(.film-chapter-kicker, .film-chapter-title), .film-flash.is-on, .film-chapter.is-on > .film-chapter-kicker::after, .film-player .film-act.is-cut > [class$="-stage"] { animation: none; }
 }

@@ -146,32 +146,79 @@ export const raysFragment = /* glsl */ `
   }
 `;
 
-/* The film finish, over the whole frame: colour fringing toward the edges
-   (stronger while the camera is moving fast), grain, and a vignette. */
+/* The film finish, over the whole frame, the look of a film shot on
+   anamorphic lenses and printed on film:
+     - colour fringing toward the edges (stronger while the camera moves)
+     - a long horizontal streak from every bright light, tinted blue, the
+       way an anamorphic lens draws one (uStreak)
+     - halation: highlights bleed a red glow into what is around them, as
+       light does through film stock (uHalation)
+     - the grade: blacks on the hero's carbon, shadows toward teal and
+       highlights toward warm bone, an S-curve, highlights rolling off
+     - gate weave, the frame drifting a hair as film does in a projector
+     - grain, and a deep vignette */
 export const finishShader = {
-  uniforms: { tDiffuse: { value: null }, uTime: { value: 0 }, uAberration: { value: 0.0002 }, uGrain: { value: 0.008 }, uGrade: { value: 1 } },
+  uniforms: { tDiffuse: { value: null }, uTime: { value: 0 }, uAberration: { value: 0.0002 }, uGrain: { value: 0.014 }, uGrade: { value: 1 }, uStreak: { value: 1 }, uHalation: { value: 1 } },
   vertexShader: /* glsl */ `varying vec2 vUv; void main() { vUv = uv; gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.); }`,
   fragmentShader: /* glsl */ `
     ${COMMON}
     uniform sampler2D tDiffuse;
-    uniform float uTime, uAberration, uGrain, uGrade;
+    uniform float uTime, uAberration, uGrain, uGrade, uStreak, uHalation;
     varying vec2 vUv;
+    // How much of a pixel is bright enough to throw light.
+    vec3 bright(vec2 uv, float from) {
+      vec3 c = texture2D(tDiffuse, uv).rgb;
+      float l = dot(c, vec3(0.2126, 0.7152, 0.0722));
+      return c * smoothstep(from, from + 0.6, l);
+    }
     void main() {
-      vec2 fromCentre = vUv - 0.5;
+      // Gate weave: the frame drifts a hair, slowly, as film in a gate does.
+      vec2 weave = vec2(noise1(uTime * 1.3) - 0.5, noise1(uTime * 1.1 + 17.) - 0.5) * 0.0012 * uGrade;
+      vec2 uv = vUv + weave;
+      vec2 fromCentre = uv - 0.5;
       vec2 shift = fromCentre * dot(fromCentre, fromCentre) * uAberration * 40.;
-      vec3 color = vec3(texture2D(tDiffuse, vUv + shift).r, texture2D(tDiffuse, vUv).g, texture2D(tDiffuse, vUv - shift).b);
-      // The film's one grade, the same in every act: blacks settle on the
-      // hero's carbon instead of pure black, shadows lean warm, highlights
-      // roll off toward bone instead of clipping to white, and a gentle
-      // S-curve holds the contrast. (Linear light: OutputPass converts.)
+      vec3 color = vec3(texture2D(tDiffuse, uv + shift).r, texture2D(tDiffuse, uv).g, texture2D(tDiffuse, uv - shift).b);
+
+      // The anamorphic streak: bright light smeared sideways, falling off.
+      // Only the hottest lights throw one, and each pixel samples at its own
+      // jittered offsets, so the streak is one smooth smear, not copies.
+      vec3 streak = vec3(0.);
+      if (uStreak > 0.) {
+        float jitter = hash2(vUv * vec2(1931., 1171.) + fract(uTime * 7.));
+        for (int i = 0; i < 16; i++) {
+          float d = (float(i) + jitter) / 16.;
+          float w = (1. - d) * (1. - d);
+          vec2 step = vec2(d * 0.13, 0.);
+          streak += (bright(uv + step, 0.85) + bright(uv - step, 0.85)) * w;
+        }
+        color += streak * vec3(0.3, 0.55, 1.) * 0.15 * uStreak;
+      }
+      // Halation: a red bleed round the highlights.
+      if (uHalation > 0.) {
+        vec3 halo = vec3(0.);
+        for (int i = 0; i < 8; i++) {
+          float a = float(i) * 0.785398;
+          halo += bright(uv + vec2(cos(a), sin(a)) * vec2(0.0045, 0.008), 0.6);
+        }
+        color += halo / 8. * vec3(1., 0.32, 0.12) * 0.55 * uHalation;
+      }
+
+      // The film's one grade, the same in every act. (Linear light:
+      // OutputPass converts.)
       float luma = dot(color, vec3(0.2126, 0.7152, 0.0722));
       color = mix(color, color * vec3(1.04, 1.0, 0.94), smoothstep(0.35, 0., luma) * uGrade);
       color = mix(color, 1. - exp(-color * 1.35), uGrade);
+      // Shadows lean teal, highlights warm: the two ends of the frame apart.
+      luma = dot(color, vec3(0.2126, 0.7152, 0.0722));
+      color = mix(color, color * vec3(0.72, 1.0, 1.18), smoothstep(0.36, 0.02, luma) * 0.8 * uGrade);
+      color = mix(color, color * vec3(1.14, 1.0, 0.82), smoothstep(0.3, 0.85, luma) * 0.65 * uGrade);
       color = mix(color, mix(color, vec3(0.86, 0.79, 0.69) * luma * 1.12, 0.18), smoothstep(0.45, 1., luma) * uGrade);
-      color = mix(color, color * color * (3. - 2. * color), 0.22 * uGrade);
+      color = mix(color, color * color * (3. - 2. * color), 0.38 * uGrade);
       color = max(color, vec3(0.0037, 0.0030, 0.0027) * uGrade);
-      color *= 1. - 0.55 * smoothstep(0.35, 0.95, length(fromCentre) * 1.25);
-      color += (hash2(vUv * 913. + fract(uTime) * 31.) - 0.5) * uGrain;
+      color *= 1. - 0.68 * smoothstep(0.3, 0.95, length(fromCentre) * 1.25);
+      // Grain, stronger in the mids, as film's is.
+      float g = hash2(vUv * 913. + fract(uTime * 24.) * 31.) - 0.5;
+      color += g * uGrain * (0.6 + 1.6 * luma * (1. - luma));
       gl_FragColor = vec4(color, 1.);
     }
   `,

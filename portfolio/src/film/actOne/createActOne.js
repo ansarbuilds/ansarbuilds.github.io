@@ -263,7 +263,7 @@ export function createActOne(canvas, { receipts, tools, getTime, onFrame }) {
   const quality = pickQuality();
   // The shared renderer (see engine.js): this act draws into it, and its
   // frames are copied onto this canvas.
-  const film = attachFilm(canvas, { clear: 0x070605, bloom: [0.42, 0.45, 0.55], grain: 0.008 });
+  const film = attachFilm(canvas, { clear: 0x070605, bloom: [0.42, 0.45, 0.55] });
   // Almost no colour fringing here: on dots this small it splits each one
   // into red and blue and the name turns to purple static.
   film.finish.uniforms.uAberration.value = 0.00006;
