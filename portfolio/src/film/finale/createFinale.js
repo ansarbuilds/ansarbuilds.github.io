@@ -14,7 +14,7 @@ export function createFinale(canvas, { getTime, onFrame }) {
   // The shared renderer (see engine.js): this act draws into it, and its
   // frames are copied onto this canvas. Bloom is higher than the portraits:
   // the point is supposed to bloom.
-  const film = attachFilm(canvas, { clear: 0x070605, bloom: [0.5, 0.6, 0.3], grain: 0.008 });
+  const film = attachFilm(canvas, { clear: 0x070605, bloom: [0.5, 0.6, 0.3] });
   const scene = new THREE.Scene();
   const camera = new THREE.PerspectiveCamera(32, 1, 0.05, 400);
   scene.add(camera);

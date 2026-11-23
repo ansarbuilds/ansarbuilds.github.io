@@ -54,7 +54,7 @@ export function createActThree(canvas, { pillars, getTime, onFrame }) {
   const quality = pickQuality();
   // The shared renderer (see engine.js): this act draws into it, and its
   // frames are copied onto this canvas.
-  const film = attachFilm(canvas, { clear: 0x060505, bloom: [0.5, 0.5, 0.55], grain: 0.008 });
+  const film = attachFilm(canvas, { clear: 0x060505, bloom: [0.5, 0.5, 0.55] });
   const scene = new THREE.Scene();
   scene.fog = new THREE.Fog(0x060505, 40, 120);
   const camera = new THREE.PerspectiveCamera(36, 1, 0.1, 400);
