@@ -5,7 +5,7 @@ import { UnrealBloomPass } from "three/examples/jsm/postprocessing/UnrealBloomPa
 import { ShaderPass } from "three/examples/jsm/postprocessing/ShaderPass.js";
 import { OutputPass } from "three/examples/jsm/postprocessing/OutputPass.js";
 import { poseAt } from "../rig.js";
-import { COLD_OPEN, CUES, SHORT_START, SUBTITLE, T, score } from "./score.js";
+import { COLD_OPEN, CUES, SHORT_START, SUBTITLE, T, TRAILER_SPEED, TRAILER_START, score } from "./score.js";
 import { cue } from "../../lib/sound.js";
 import { sampleName } from "./sampleName.js";
 import { finishShader, flareFragment, flareVertex, lineFragment, lineVertex, particleFragment, particleVertex, raysFragment } from "./shaders.js";
@@ -98,7 +98,7 @@ function buildScene(quality) {
   // Two screen-filling cards that always face the camera: the signal with
   // its flare, and the light behind the name.
   const card = new THREE.PlaneGeometry(2, 2);
-  const flareUniforms = { uCore: { value: 0 }, uFlare: { value: 0 }, uBeat1: { value: -1 }, uBeat2: { value: -1 }, uAspect: { value: 1 } };
+  const flareUniforms = { uCore: { value: 0 }, uFlare: { value: 0 }, uBeat1: { value: -1 }, uBeat2: { value: -1 }, uAspect: { value: 1 }, uShock: { value: -1 } };
   const flare = new THREE.Mesh(card, additive({ uniforms: flareUniforms, vertexShader: flareVertex, fragmentShader: flareFragment }));
   const raysUniforms = { uTime: { value: 0 }, uRays: { value: 0 }, uAspect: { value: 1 } };
   const rays = new THREE.Mesh(card, additive({ uniforms: raysUniforms, vertexShader: flareVertex, fragmentShader: raysFragment }));
@@ -146,9 +146,9 @@ export function createColdOpen(canvas, { mode, waited = 0, holdAt = null, onVeil
 
   // The black the visitor already sat through while this loaded counts
   // toward the opening beat of black. A return visit joins at the name.
-  const short = mode === "short";
-  let t = short ? SHORT_START : Math.min(T.ignite - 0.25, waited);
-  const speed = short ? SHORT_SPEED : 1;
+  const short = mode === "short", trailer = mode === "trailer";
+  let t = trailer ? TRAILER_START : short ? SHORT_START : Math.min(T.ignite - 0.25, waited);
+  const speed = trailer ? TRAILER_SPEED : short ? SHORT_SPEED : 1;
   let skippedAt = null;
   let fontsReady = false;
   let disposed = false;
@@ -195,7 +195,8 @@ export function createColdOpen(canvas, { mode, waited = 0, holdAt = null, onVeil
     if (holdAt !== null) t = Math.min(T.end, holdAt);
     // The score: each cue the playhead passed this frame, until a skip.
     if (skippedAt === null && holdAt === null) {
-      for (const c of CUES) if ((!c.mode || c.mode === (short ? "short" : "full")) && c.at >= heard && c.at < t) cue(c.kind, c.length);
+      // (A cue's length is film time; played faster, it is shorter.)
+      for (const c of CUES) if ((!c.mode || c.mode === mode) && c.at >= heard && c.at < t) cue(c.kind, c.length && c.length / speed);
     }
     heard = t;
     // Read the page's name once its font has loaded and the hero has had a
@@ -208,6 +209,12 @@ export function createColdOpen(canvas, { mode, waited = 0, holdAt = null, onVeil
     camera.position.fromArray(pose.pos);
     camera.lookAt(...pose.look);
     if (camera.fov !== pose.fov) { camera.fov = pose.fov; camera.updateProjectionMatrix(); }
+    // The impact hits the camera too: a hard shake that settles.
+    if (now.shake > 0.001) {
+      camera.position.x += (Math.sin(t * 83) + 0.6 * Math.sin(t * 131)) * 0.9 * now.shake;
+      camera.position.y += (Math.cos(t * 97) + 0.5 * Math.sin(t * 61)) * 0.7 * now.shake;
+      camera.rotateZ(Math.sin(t * 71) * 0.012 * now.shake);
+    }
     camera.updateMatrixWorld();
 
     const half = Math.tan(THREE.MathUtils.degToRad(camera.fov / 2));
@@ -219,7 +226,7 @@ export function createColdOpen(canvas, { mode, waited = 0, holdAt = null, onVeil
     const l = film.lineUniforms;
     l.uTime.value = t; l.uGrow.value = now.grow; l.uSpin.value = p.uSpin.value; l.uLines.value = now.lines; l.uSignals.value = now.signals;
     const f = film.flareUniforms;
-    f.uCore.value = now.core; f.uFlare.value = now.flare; f.uBeat1.value = now.beat1; f.uBeat2.value = now.beat2; f.uAspect.value = aspect;
+    f.uCore.value = now.core; f.uFlare.value = now.flare; f.uBeat1.value = now.beat1; f.uBeat2.value = now.beat2; f.uAspect.value = aspect; f.uShock.value = now.shock;
     const r = film.raysUniforms;
     // On a tall phone screen the rays fill the whole frame behind the name
     // and wash it out: they shine at about half strength there.

@@ -638,8 +638,8 @@ const IDENT_MS = 1200;
      ident     a first visit opens on the film, playing on its own: the
                studio ident over black (FilmIdent), its sound waiting for
                the visitor's first tap
-     cold open its own layer (ColdOpen), its short cut: the network
-               becoming the name, built on the hero's
+     cold open its own layer (ColdOpen), its trailer cut: the pull back
+               through the network into the name, built on the hero's
      acts      the film player (FilmPlayer), over the page, on one clock: a
                trailer cut of the acts, under 30 seconds in all
      the page  an ordinary page to scroll, with "Watch the film" in the nav
@@ -743,7 +743,7 @@ export default function App() {
           {filmUp && <ColdOpenBoundary key={`film-${take}`} onFail={endFilm}><Suspense fallback={null}>
             <FilmPlayer rolling={rolling} onEnd={endFilm}>{(playback) => <FilmReel playback={playback} />}</FilmPlayer>
           </Suspense></ColdOpenBoundary>}
-          {coldOpenUp && <ColdOpenLayer key={`co-${take}`} mode="short" onStarted={onStarted} onHandOver={release} onDone={closeColdOpen} />}
+          {coldOpenUp && <ColdOpenLayer key={`co-${take}`} mode="trailer" onStarted={onStarted} onHandOver={release} onDone={closeColdOpen} />}
           {cover && <FilmIdent />}
           {filmUp && <FilmSkip onSkip={skipFilm} />}
         </SandboxProvider>

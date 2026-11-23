@@ -26,6 +26,11 @@ const BEAT_SECONDS = 0.62;
 export const IMPACT = T.name + 1.22;
 // A returning visitor starts here, with the network already grown.
 export const SHORT_START = T.name - 0.75;
+// The cut the film plays now, as a trailer: from the point of light just
+// before the pull back, through the network into the name, a little faster
+// than life.
+export const TRAILER_START = T.pull - 0.15;
+export const TRAILER_SPEED = 1.25;
 
 /* The cold open's sound, cue by cue (lib/sound.js plays them): the point
    ignites, two heartbeats, a riser under the pull back that lands as the
@@ -37,6 +42,8 @@ export const CUES = [
   { at: BEATS[1], kind: "heartbeat", mode: "full" },
   { at: T.pull, kind: "riser", length: IMPACT - T.pull, mode: "full" },
   { at: SHORT_START, kind: "riser", length: IMPACT - SHORT_START, mode: "short" },
+  { at: TRAILER_START, kind: "ignite", mode: "trailer" },
+  { at: TRAILER_START, kind: "riser", length: IMPACT - TRAILER_START, mode: "trailer" },
   { at: IMPACT, kind: "hit" },
   { at: T.open, kind: "bloom" },
 ];
@@ -57,12 +64,14 @@ export function score(t) {
   const grow = firstNodes + 0.86 * outCubic(ramp(t, T.pull, T.pull + 1.45));
   const form = smooth(ramp(t, T.name + 0.08, IMPACT));
   const impact = decay(t, IMPACT, 5);
+  // The shockwave off the impact: 0 to 1 as it spreads, -1 before and after.
+  const shockAt = (t - IMPACT) / 0.9;
   const cut = t >= T.line; // the hard cut: the nebula is gone, only the name
   const open = smooth(ramp(t, T.open, T.end));
   return {
     // The point of light, and the streak of lens flare across it.
     core: lit * (0.8 + 0.7 * decay(t, T.ignite, 6)) * (1 - 0.92 * form) + thump * 0.8,
-    flare: lit * (0.5 + 1.3 * decay(t, T.ignite, 4)) * (1 - form) + thump * 0.45 + impact * 1.5,
+    flare: lit * (0.5 + 1.3 * decay(t, T.ignite, 4)) * (1 - form) + thump * 0.45 + impact * 2.4,
     beat1: beat(BEATS[0]),
     beat2: beat(BEATS[1]),
     grow,
@@ -76,8 +85,11 @@ export function score(t) {
     // letters stay readable against it.
     rays: smooth(ramp(t, IMPACT - 0.3, IMPACT + 0.1)) * (0.38 + 0.62 * decay(t, IMPACT + 0.1, 3.2)) * (cut ? 0.7 : 1) * (1 - open),
     impact,
-    aberration: 0.0005 + 0.0025 * Math.sin(Math.PI * ramp(t, T.pull, T.pull + 1.3)) + impact * 0.002,
-    bloom: 0.55 + thump * 0.35 + impact * 0.6,
+    shock: shockAt >= 0 && shockAt <= 1 ? shockAt : -1,
+    // The camera takes the blow and settles.
+    shake: decay(t, IMPACT, 4.5),
+    aberration: 0.0005 + 0.0025 * Math.sin(Math.PI * ramp(t, T.pull, T.pull + 1.3)) + impact * 0.007,
+    bloom: 0.55 + thump * 0.35 + impact * 1,
     // The name's particles let go as the real page takes over.
     gone: open,
     bars: t < T.open,

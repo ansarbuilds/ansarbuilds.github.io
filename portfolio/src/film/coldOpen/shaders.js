@@ -108,12 +108,18 @@ export const flareVertex = /* glsl */ `
   void main() { vUv = (uv * 2. - 1.) * 1.5; gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.); }
 `;
 export const flareFragment = /* glsl */ `
-  uniform float uCore, uFlare, uBeat1, uBeat2, uAspect;
+  uniform float uCore, uFlare, uBeat1, uBeat2, uAspect, uShock;
   varying vec2 vUv;
   float ring(float r, float beat) {
     if (beat < 0.) return 0.;
     float radius = 0.03 + beat * 0.34;
     return smoothstep(0.012, 0., abs(r - radius)) * (1. - beat) * (1. - beat);
+  }
+  // The shockwave off the impact: a wide ring racing out past the frame.
+  float shock(float r, float u) {
+    if (u < 0.) return 0.;
+    float radius = 0.04 + u * 1.6;
+    return smoothstep(0.05 + u * 0.12, 0., abs(r - radius)) * (1. - u) * (1. - u);
   }
   void main() {
     vec2 p = vUv; p.x *= uAspect;
@@ -124,7 +130,8 @@ export const flareFragment = /* glsl */ `
     vec3 warm = vec3(1., 0.56, 0.36), hot = vec3(1., 0.95, 0.9);
     vec3 color = mix(warm, hot, clamp(core * 0.6, 0., 1.)) * core * uCore
       + mix(warm, vec3(0.62, 0.72, 1.), 0.18) * streak * uFlare
-      + warm * rings * 0.7;
+      + warm * rings * 0.7
+      + mix(warm, hot, 0.45) * shock(r, uShock) * 1.4;
     gl_FragColor = vec4(color, 1.);
   }
 `;
