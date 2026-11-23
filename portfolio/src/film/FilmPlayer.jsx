@@ -31,6 +31,8 @@ const LIFT = 0.6; // the film fading off the page
 const PREROLL = 0.3; // the next act starts drawing this early, out of sight
 const SWELL = 0.7; // the rise into a chapter card's hit
 const DISSOLVE = 0.45; // one act (or card) dissolving into the next
+// The project montage: each cut a little quicker, the last held.
+const MONTAGE = [1.15, 1.05, 0.95, 0.88, 0.82, 0.78, 1.37];
 const linear = (u) => u;
 const ramp = (u) => 1 - (1 - u) ** 1.7;
 const arrival = (slug) => ACT_TWO.entries.find((entry) => entry.shot.id === shotsFor(slug)[0].id);
@@ -38,10 +40,12 @@ const CLIPS = [
   // Out of the cold open's last frame: the camera through the name.
   { act: "act1", from: 0, to: 6.6, seconds: 3.4, ease: linear },
   { card: "act2", seconds: CARD },
-  // Each project's name as its set cuts in.
+  // Each project's name as its set cuts in, the cuts coming faster and
+  // faster until the last one holds. A riser runs under the whole montage
+  // into the next chapter's hit.
   // (The name is up from about a fifth of the arrival to three quarters:
   // the clip lands on it and slows while it reads.)
-  ...BUILT.map((slug) => { const a = arrival(slug), d = a.t1 - a.t0; return { act: "act2", from: a.t0 + 0.1 * d, to: a.t0 + 0.74 * d, seconds: 1, ease: ramp }; }),
+  ...BUILT.map((slug, i) => { const a = arrival(slug), d = a.t1 - a.t0; return { act: "act2", from: a.t0 + 0.1 * d, to: a.t0 + 0.74 * d, seconds: MONTAGE[i] ?? 1, ease: ramp, riser: i === 0, last: i === BUILT.length - 1 }; }),
   { card: "act3", seconds: CARD },
   { act: "act3", from: 0, to: 7.5, seconds: 3, ease: ramp },
   { card: "act4", seconds: CARD },
@@ -76,7 +80,7 @@ export default function FilmPlayer({ rolling, onEnd, children }) {
   const end = useRef(onEnd);
   useLayoutEffect(() => { end.current = onEnd; });
   // Everything the frame loop reads, kept out of React so a frame is cheap.
-  const state = useRef({ elapsed: 0, playing: true, rolling: false, segment: null, prev: null, swelled: -1, films: new Map(), drawing: new Map(), failed: new Set(), ended: false });
+  const state = useRef({ elapsed: 0, playing: true, rolling: false, segment: null, prev: null, swelled: -1, risen: -1, films: new Map(), drawing: new Map(), failed: new Set(), ended: false });
 
   const [playback] = useState(() => ({
     timeOf: (id) => {
@@ -143,7 +147,13 @@ export default function FilmPlayer({ rolling, onEnd, children }) {
           // A card lands with a soft glow and a trailer hit; a cut inside
           // an act punches in; a dissolve carries air past the lens.
           if (segment.card) { restart(flashRef.current, "is-on"); cue("braam"); }
-          else if (was.act === segment.act) { restart(on, "is-cut"); cue("whoosh"); }
+          else if (was.act === segment.act) {
+            // A whip, alternating sides, on a drum hit; the last lands hard.
+            if (on) on.style.setProperty("--whip", segment.index % 2 ? "1" : "-1");
+            restart(on, "is-cut");
+            cue("whoosh");
+            cue(segment.last ? "impact" : "drum");
+          }
           else cue("whoosh");
         }
       }
@@ -162,6 +172,13 @@ export default function FilmPlayer({ rolling, onEnd, children }) {
       // Draw the act on screen, and the next one just before its cut (all
       // through a card) so it already has a finished frame when it is shown.
       const next = SEGMENTS[segment.index + 1];
+      // The montage's riser, from its first cut into the next card's hit.
+      if (segment.riser && s.playing && s.risen !== segment.index && s.elapsed - segment.start < 0.2) {
+        s.risen = segment.index;
+        const card = SEGMENTS.find((x) => x.card && x.start > segment.start);
+        if (card) cue("riser", card.start - s.elapsed);
+        cue("drum");
+      }
       // The music rises into a card's hit.
       if (next?.card && s.playing && s.swelled !== next.index && next.start - s.elapsed < SWELL) {
         s.swelled = next.index;

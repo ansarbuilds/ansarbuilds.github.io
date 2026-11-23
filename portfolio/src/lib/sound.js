@@ -471,7 +471,9 @@ const root = () => {
      bloom      the chord that opens the frame
      braam      a trailer hit, for a chapter card
      swell      a rise of `length` seconds into a hit
-     finale     the last hit, on the home chord */
+     finale     the last hit, on the home chord
+     drum       one big trailer drum
+     impact     a drum, a crack and a boom together */
 export function cue(kind, length = 1.6) {
   if (!on || !ctx || ctx.state !== "running") return;
   const now = ctx.currentTime + 0.01;
@@ -571,6 +573,8 @@ export function cue(kind, length = 1.6) {
       flute(76, now + 0.35, 0.8);
       return;
     }
+    case "drum": taiko(now, 1.1); return;
+    case "impact": taiko(now, 1.5); crack(now, 1.1); drum(now, 1.6, 130, 30, 1.6); return;
     case "swell": {
       // Into a hit: noise rising and a cymbal played backwards, `length` long.
       noise(now, length, 300, 9000, 0.22, 0.96, 0.7);
