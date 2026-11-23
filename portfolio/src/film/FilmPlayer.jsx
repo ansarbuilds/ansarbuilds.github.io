@@ -26,7 +26,7 @@ import { setQuiet } from "./quiet";
    `children(playback)` renders the acts (FilmReel in Sections.jsx); each act
    asks `playback` where the film is in it (see useAct.js). Space pauses,
    the arrow keys step two seconds, M mutes and Escape skips to the page. */
-const CARD = 0.5; // a chapter card
+const CARD = 0.75; // a chapter card
 const LIFT = 0.6; // the film fading off the page
 const PREROLL = 0.3; // the next act starts drawing this early, out of sight
 const SWELL = 0.7; // the rise into a chapter card's hit
@@ -145,7 +145,9 @@ export default function FilmPlayer({ rolling, onEnd, children }) {
         s.segment = segment;
         // A change of act or card dissolves; the old one stays up for it.
         if (s.prev) clearDissolve(s.prev);
-        s.prev = was && was.show !== segment.show && segment.start - s.elapsed > -DISSOLVE ? was : null;
+        // (Into a chapter card is a hard cut: a trailer title hits, it does
+        // not fade up. Out of one, it dissolves like any other change.)
+        s.prev = was && !segment.card && was.show !== segment.show && segment.start - s.elapsed > -DISSOLVE ? was : null;
         let on = null;
         sections().forEach((el) => { const here = el.dataset.act === segment.show; el.classList.toggle("is-on", here); el.toggleAttribute("inert", !here); if (here) on = el; });
         SEGMENTS.forEach((x) => showBed(x.bed, false));
@@ -153,7 +155,7 @@ export default function FilmPlayer({ rolling, onEnd, children }) {
         if (was && s.playing) {
           // A card lands with a soft glow and a trailer hit; a cut inside
           // an act punches in; a dissolve carries air past the lens.
-          if (segment.card) { restart(flashRef.current, "is-on"); cue("braam"); }
+          if (segment.card) { restart(flashRef.current, "is-on"); cue("braam"); cue("impact"); }
           else if (was.act === segment.act) {
             // A whip, alternating sides, on a drum hit; the last lands hard.
             if (on) on.style.setProperty("--whip", segment.index % 2 ? "1" : "-1");
