@@ -199,6 +199,16 @@ test('Escape during the cold open skips the whole film', async ({ page }) => {
   await expect(page.getByRole('heading', { name: 'Mohamed Ansar', level: 1 })).toBeVisible();
 });
 
+test('the film plays again on a later visit, but not on a reload in the same visit', async ({ page }) => {
+  // Been here before, in another visit: it still plays as the page opens.
+  await page.addInitScript((key) => localStorage.setItem(key, '1'), INTRO_SESSION_KEY);
+  await page.goto('/');
+  await expect(page.locator('.film-ident')).toBeVisible();
+  await page.getByRole('button', { name: 'Skip the movie' }).click();
+  await page.reload();
+  await expect(page.locator('.film-ident, .co')).toHaveCount(0);
+});
+
 test('the film does not play on its own for reduced motion, a section link, or a second page view', async ({ page }) => {
   await page.emulateMedia({ reducedMotion: 'reduce' });
   await page.goto('/');
