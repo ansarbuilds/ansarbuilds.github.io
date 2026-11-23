@@ -15,12 +15,13 @@
 /* A trailer has no time to read: the act's cards and captions stay off
    (the page has them, links and all); its titles and names stay on. */
 .film-player :is(.act1-tools, .act2-card, .act3-card, .act4-card) { display: none !important; }
-/* The punch-in on a cut inside an act: the frame lands a touch large and
-   a touch bright, its colours barely split, and eases home. */
-.film-player .film-act.is-cut > [class$="-stage"] { animation: film-punch .55s cubic-bezier(.2, .8, .2, 1) both; }
-@keyframes film-punch {
-  0% { transform: scale(1.035); filter: drop-shadow(3px 0 0 rgb(255 40 80 / .3)) drop-shadow(-3px 0 0 rgb(40 200 255 / .3)) brightness(1.18); }
-  50% { filter: drop-shadow(1px 0 0 rgb(255 40 80 / .12)) drop-shadow(-1px 0 0 rgb(40 200 255 / .12)) brightness(1.04); }
+/* A cut inside an act (the project montage) is a whip: the new frame
+   arrives sliding in from one side, smeared with speed and a touch bright,
+   and snaps into place. --whip picks the side; the player alternates it. */
+.film-player .film-act.is-cut > [class$="-stage"] { animation: film-whip .42s cubic-bezier(.15, .85, .25, 1) both; }
+@keyframes film-whip {
+  0% { transform: translateX(calc(var(--whip, 1) * 7%)) scale(1.06); filter: blur(10px) brightness(1.4) drop-shadow(4px 0 0 rgb(255 40 80 / .35)) drop-shadow(-4px 0 0 rgb(40 200 255 / .35)); }
+  45% { filter: blur(2px) brightness(1.08) drop-shadow(1px 0 0 rgb(255 40 80 / .12)) drop-shadow(-1px 0 0 rgb(40 200 255 / .12)); }
   100% { transform: none; filter: none; }
 }
 

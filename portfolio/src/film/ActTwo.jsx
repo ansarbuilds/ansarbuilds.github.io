@@ -30,13 +30,16 @@ export default function ActTwo({ playback, projects }) {
       cues.current.cut(Math.max(...moments.map((x) => x.cut)));
       moments.forEach((m, i) => {
         cues.current.chimes[i]?.(m.card);
-        // The title resolves like a film title: out of focus and a touch
-        // large, settling sharp as it lands.
+        // The name slams in like a trailer title: large and out of focus,
+        // landing sharp, with a flare of glow that dies away.
         const title = titles.current[i];
         if (title) {
-          title.style.opacity = m.title;
-          title.style.transform = `scale(${1.06 - 0.06 * m.title})`;
-          title.style.filter = m.title < 0.99 ? `blur(${(1 - m.title) * 10}px)` : "none";
+          const u = 1 - m.title;
+          title.style.opacity = Math.min(1, m.title * 1.6);
+          title.style.transform = `scale(${1 + 0.34 * u * u})`;
+          title.style.letterSpacing = `${0.08 + 0.12 * u}em`;
+          title.style.filter = u > 0.01 ? `blur(${u * u * 16}px)` : "none";
+          title.style.textShadow = `0 2px 40px #000, 0 0 ${8 + 34 * m.title * (1 - m.arrive)}px rgb(255 170 120 / ${0.5 * m.title * (1 - m.arrive * 0.7)})`;
           title.style.visibility = m.title > 0.02 ? "visible" : "hidden";
         }
         show(cards.current[i], m.card, 22);
@@ -51,7 +54,7 @@ export default function ActTwo({ playback, projects }) {
     <div className="act2-stage">
       <canvas ref={canvas} className="act2-canvas" aria-hidden="true" />
       <div ref={bars} className="act2-bars" aria-hidden="true"><span /><span /></div>
-      {projects.map((project, i) => <p key={project.slug} ref={(node) => { titles.current[i] = node; }} className="act2-title" aria-hidden="true">{project.name}</p>)}
+      {projects.map((project, i) => <p key={project.slug} ref={(node) => { titles.current[i] = node; }} className="act2-title" aria-hidden="true"><span className="act2-title-index">{String(i + 1).padStart(2, "0")} / {String(projects.length).padStart(2, "0")}</span>{project.name}</p>)}
       {projects.map((project, i) => <article key={project.slug} ref={(node) => { cards.current[i] = node; }} className="act2-card" aria-label={project.name}>
         <p className="act2-eyebrow">{String(i + 1).padStart(2, "0")} · {project.eyebrow}</p>
         <h3>{project.name}</h3>
