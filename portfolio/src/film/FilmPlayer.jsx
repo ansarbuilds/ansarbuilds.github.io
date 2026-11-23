@@ -52,7 +52,11 @@ const CLIPS = [
   { act: "act3", from: 0.45, to: 2.95, seconds: 1.55, ease: linear },
   { act: "act3", from: 3.1, to: 7.5, seconds: 1.55, ease: ramp },
   { card: "act4", seconds: CARD },
-  { act: "act4", from: 0, to: 9.6, seconds: 3.4, ease: ramp },
+  // The network falling into a star that ignites, in real time, then whips
+  // to the solar system and the ribbon.
+  { act: "act4", from: 0.2, to: 2.9, seconds: 1.45, ease: linear },
+  { act: "act4", from: 3.2, to: 6.2, seconds: 1, ease: ramp },
+  { act: "act4", from: 6.7, to: 9.5, seconds: 1.05, ease: ramp },
   { act: "finale", from: 0.3, to: FINALE.seconds, seconds: 2.8, ease: linear, hold: 1 },
 ];
 // Each clip on the film's clock, `start` to `end`; `show` is the element

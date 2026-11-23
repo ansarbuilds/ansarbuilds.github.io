@@ -1,11 +1,12 @@
 import * as THREE from "three";
 import { poseAt } from "../rig.js";
 import { SETS } from "../shots.js";
-import { BONE, SIGNAL, canvasCard, faceCamera, glow, points, ramp, smooth } from "../actTwo/kit.js";
+import { BONE, SIGNAL, additive, canvasCard, faceCamera, glow, points, ramp, smooth } from "../actTwo/kit.js";
 import { PLANETS, buildOrbitPoints, displayRadius, planetPosition } from "../../three/orbitalMechanics.js";
 import { getEmetEntry } from "../../emet/emetKnowledge.js";
 import { ACT_FOUR, moments } from "./timeline.js";
 import { attachFilm } from "../engine.js";
+import { flareFragment, flareVertex } from "../coldOpen/shaders.js";
 
 /* Act IV (A4-01 to A4-04), the playground reel, in plain three.js:
    the network collapses into a star; the solar system, on its real orbits;
@@ -202,6 +203,15 @@ export function createActFour(canvas, { getTime, onFrame }) {
   const { ribbon, head } = buildRibbon(quality.ribbon, at("ribbon"));
   const terminal = buildTerminal(at("head"));
   scene.add(network.mesh, solar.group, ribbon.mesh, head.mesh, terminal.dust.mesh, terminal.halo.mesh, terminal.panel.mesh);
+  // The ignition: the cold open's flare, burst over the new star, with its
+  // shockwave ring.
+  const flareUniforms = { uCore: { value: 0 }, uFlare: { value: 0 }, uBeat1: { value: -1 }, uBeat2: { value: -1 }, uAspect: { value: 1 }, uShock: { value: -1 } };
+  const flareCard = new THREE.PlaneGeometry(2, 2);
+  const flare = new THREE.Mesh(flareCard, additive({ uniforms: flareUniforms, vertexShader: flareVertex, fragmentShader: flareFragment }));
+  flare.frustumCulled = false;
+  flare.visible = false;
+  scene.add(flare);
+  disposers.push(() => { flareCard.dispose(); flare.material.dispose(); });
   disposers.push(network.dispose, solar.dispose, ribbon.dispose, head.dispose, terminal.panel.dispose, terminal.halo.dispose, terminal.dust.dispose);
 
   const finish = film.finish;
@@ -240,6 +250,27 @@ export function createActFour(canvas, { getTime, onFrame }) {
     const scale = film.pixelHeight / (2 * Math.tan(THREE.MathUtils.degToRad(camera.fov / 2)));
 
     const m = moments(t);
+    // The ignition jolts the camera, and it settles.
+    if (m.ignite > 0.001) {
+      camera.position.x += (Math.sin(t * 91) + 0.6 * Math.sin(t * 127)) * 0.25 * m.ignite;
+      camera.position.y += (Math.cos(t * 99) + 0.5 * Math.sin(t * 63)) * 0.2 * m.ignite;
+      camera.rotateZ(Math.sin(t * 77) * 0.012 * m.ignite);
+      camera.updateMatrixWorld();
+    }
+    flare.visible = m.ignite > 0.005 || m.shock >= 0;
+    if (flare.visible) {
+      const half = Math.tan(THREE.MathUtils.degToRad(camera.fov / 2));
+      const distance = camera.position.distanceTo(solar.group.position);
+      flare.position.copy(solar.group.position);
+      flare.quaternion.copy(camera.quaternion);
+      flare.scale.set(distance * half * camera.aspect * 1.5, distance * half * 1.5, 1);
+      flareUniforms.uCore.value = m.ignite * 2.2;
+      flareUniforms.uFlare.value = m.ignite * 3;
+      flareUniforms.uShock.value = m.shock;
+      flareUniforms.uAspect.value = camera.aspect;
+    }
+    film.bloom[0] = 0.55 + 0.9 * m.ignite;
+    finish.uniforms.uAberration.value = 0.0002 + 0.006 * m.ignite;
     // The collapse, and the star it leaves.
     if (m.collapse < 1 || network.mesh.visible) network.fold(m.collapse, clock);
     network.uniforms.uOpacity.value = 0.9 * (1 - smooth(ramp(m.collapse, 0.85, 1)));
