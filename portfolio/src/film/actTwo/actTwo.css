@@ -34,7 +34,3 @@
 @media (prefers-reduced-motion: reduce) {
   .act2-bars span, .act2-canvas { transition: none; }
 }
-
-/* Skip link: off screen until it has keyboard focus. */
-.film-skip { position: absolute; z-index: 5; top: 12px; left: 12px; padding: 10px 14px; border-radius: 999px; background: #efe6d8; color: #101010; font: 600 .82rem/1 var(--font-body); transform: translateY(-200%); }
-.film-skip:focus { position: sticky; transform: none; }

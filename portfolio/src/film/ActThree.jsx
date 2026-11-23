@@ -1,6 +1,5 @@
 import "./actThree/actThree.css";
 import { useRef } from "react";
-import ActTitle from "./ActTitle";
 import { ArrowUpRight } from "lucide-react";
 import { cueOnRise } from "../lib/sound";
 import { show, useAct } from "./useAct";
@@ -16,7 +15,7 @@ export default function ActThree({ playback, capabilities }) {
   // A low tone as the act lands on its held match cut, a chime per card.
   cues.current ??= { cut: cueOnRise("tone", 0.9), chimes: capabilities.map(() => cueOnRise("chime")) };
 
-  const { failed, titleUp } = useAct({
+  const { failed } = useAct({
     id: "act3",
     playback,
     load: async () => {
@@ -37,7 +36,6 @@ export default function ActThree({ playback, capabilities }) {
   if (failed) return null;
   return <section className="act3 film-act" data-act="act3" aria-labelledby="act3-title">
     <div className="act3-stage">
-      <ActTitle up={titleUp}>III. What I bring</ActTitle>
       <canvas ref={canvas} className="act3-canvas" aria-hidden="true" />
       <div ref={title} className="act3-title">
         <p className="act3-kicker">03 · What I bring</p>

@@ -20,15 +20,4 @@
 /* The typed line, hung under the name (its place is set from the page). */
 .co-line { position: absolute; margin: clamp(14px, 2.4vh, 28px) 0 0; transform: translateX(-50%); width: max-content; max-width: 92vw; text-align: center; font: 500 clamp(.72rem, 1.5vw, 1.02rem)/1.4 var(--font-mono); letter-spacing: .06em; text-shadow: 0 0 18px #000; }
 .co-line:not(:empty)::after { content: ""; display: inline-block; width: .55em; height: 1.05em; margin-left: .2em; vertical-align: -.16em; background: #ff8a5f; }
-.co-skip { position: absolute; right: clamp(14px, 2.4vw, 32px); bottom: clamp(14px, 2.4vw, 28px); z-index: 2; padding: 8px 12px; border: 1px solid rgb(239 230 216 / .22); border-radius: 999px; background: rgb(0 0 0 / .4); color: rgb(239 230 216 / .72); font: 500 .58rem/1 var(--font-mono); letter-spacing: .12em; text-transform: uppercase; }
-.co-skip:hover { color: #efe6d8; border-color: #efe6d8; }
 /* Sound is off until asked for: this starts it without skipping the film. */
-.co-sound { position: absolute; left: clamp(14px, 2.4vw, 32px); bottom: clamp(14px, 2.4vw, 28px); z-index: 2; display: inline-flex; align-items: center; gap: 8px; padding: 8px 12px; border: 1px solid rgb(239 230 216 / .22); border-radius: 999px; background: rgb(0 0 0 / .4); color: rgb(239 230 216 / .72); font: 500 .58rem/1 var(--font-mono); letter-spacing: .12em; text-transform: uppercase; transition: opacity .4s; }
-.co-sound:hover { color: #efe6d8; border-color: #efe6d8; }
-.co-sound.is-on { opacity: 0; pointer-events: none; }
-.co-sound i { display: inline-flex; gap: 2px; align-items: end; height: 9px; }
-.co-sound i b { width: 2px; background: currentColor; animation: co-eq 1s ease-in-out infinite alternate; }
-.co-sound i b:nth-child(1) { height: 40%; }
-.co-sound i b:nth-child(2) { height: 100%; animation-delay: -.3s; }
-.co-sound i b:nth-child(3) { height: 65%; animation-delay: -.6s; }
-@keyframes co-eq { to { transform: scaleY(.35); } }

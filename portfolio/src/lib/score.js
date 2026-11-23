@@ -2,59 +2,60 @@
    texture. lib/sound.js plays it with oscillators in the browser, so there
    are no audio files. Pure, tested (score.test.mjs).
 
-   The whole score lives around D major, the way a launch film sits in one
-   home key and colours it act by act:
-     act1    the receipts: warm and open, a slow piano figure
-     act2    seven builds: the relative minor, a soft pulse, more motion
+   An original score in the manner of a big space film: a church organ in
+   a long hall, a steady high figure that ticks like a clock, and the clock
+   itself, faintly, under it. The whole score sits around A minor:
+     act1    the receipts: the organ alone, opening up
+     act2    seven builds: the figure runs, the clock ticks, a soft pulse
      act3    three monoliths: low and wide, a drum on each chord
-     act4    the playground: lydian, floating, the piano up high
-     finale  comes home to D and holds there
+     act4    the playground: F lydian, floating, the figure up high
+     finale  climbs home and lands on A major, and holds there
 
    Chords are MIDI notes, lowest first. The lowest is the bass. */
 
 export const SCORE = {
   act1: {
-    bar: 5.2, steps: 8, density: 0.55, pulse: null, padLevel: 1, arpOctave: 12,
+    bar: 4.8, steps: 8, density: 0.6, pulse: null, tick: false, padLevel: 1, arpOctave: 12,
     chords: [
-      [50, 57, 61, 64, 66], // Dmaj9
-      [47, 54, 57, 61, 62], // Bm9
-      [43, 50, 54, 57, 61], // Gmaj7#11
-      [45, 52, 57, 59, 64], // Asus2
+      [45, 52, 57, 59, 64], // Am(add9)
+      [41, 48, 57, 60, 64], // Fmaj7
+      [48, 55, 60, 62, 64], // C(add9)
+      [43, 50, 55, 59, 62], // G
     ],
   },
   act2: {
-    bar: 4, steps: 8, density: 0.9, pulse: "soft", padLevel: 0.85, arpOctave: 12,
+    bar: 4, steps: 8, density: 1, pulse: "soft", tick: true, padLevel: 0.9, arpOctave: 12,
     chords: [
-      [47, 54, 59, 61, 62], // Bm(add9)
+      [45, 52, 57, 60, 64], // Am
+      [41, 48, 53, 57, 60], // F
+      [48, 52, 55, 60, 64], // C
       [43, 50, 55, 59, 62], // G
-      [42, 50, 57, 62, 66], // D/F#
-      [45, 52, 57, 61, 64], // A
     ],
   },
   act3: {
-    bar: 6, steps: 6, density: 0.45, pulse: "drum", padLevel: 1.1, arpOctave: 12,
+    bar: 6, steps: 6, density: 0.5, pulse: "drum", tick: false, padLevel: 1.15, arpOctave: 12,
     chords: [
-      [40, 47, 54, 55, 59], // Em9
-      [36, 43, 52, 55, 59], // Cmaj7
-      [43, 50, 55, 59, 62], // G
-      [42, 50, 54, 57, 62], // D/F#
+      [41, 48, 53, 57, 60], // F
+      [40, 48, 52, 55, 60], // C/E
+      [38, 45, 50, 53, 57], // Dm
+      [45, 52, 57, 60, 64], // Am
     ],
   },
   act4: {
-    bar: 5, steps: 8, density: 0.7, pulse: null, padLevel: 0.9, arpOctave: 24,
+    bar: 5, steps: 8, density: 0.75, pulse: null, tick: true, padLevel: 0.9, arpOctave: 24,
     chords: [
-      [43, 50, 54, 59, 61], // Gmaj7(#11 colour)
-      [45, 52, 57, 61, 64], // A/G feel
+      [41, 48, 55, 57, 59], // F(#11)
+      [43, 50, 55, 59, 62], // G
       [40, 47, 55, 59, 62], // Em7
-      [45, 49, 52, 57, 64], // A
+      [45, 52, 57, 60, 64], // Am
     ],
   },
   finale: {
-    bar: 4.5, steps: 8, density: 0.4, pulse: null, padLevel: 1, arpOctave: 12, hold: true,
+    bar: 4.5, steps: 8, density: 0.45, pulse: null, tick: false, padLevel: 1, arpOctave: 12, hold: true,
     chords: [
-      [43, 50, 55, 59, 66], // Gmaj7
-      [45, 52, 57, 61, 64], // A
-      [38, 50, 57, 61, 64, 66], // Dmaj9, home
+      [41, 48, 57, 60, 64], // Fmaj7
+      [43, 50, 55, 59, 62], // G
+      [45, 52, 57, 61, 64, 69], // A major, home
     ],
   },
 };
@@ -63,11 +64,12 @@ export const ACT_NAMES = Object.keys(SCORE);
 
 export const hz = (midi) => 440 * 2 ** ((midi - 69) / 12);
 
-// The piano figure: which chord tone each step of a bar plays, climbing and
-// turning back, so it reads as a melody and not a scale.
-const FIGURE = [0, 2, 4, 2, 1, 3, 4, 3];
+// The organ's high figure: which chord tone each step of a bar plays. It
+// rocks between a low and a high tone and walks the high one up, so it
+// ticks forward like a clock rather than running a scale.
+const FIGURE = [0, 3, 1, 3, 0, 4, 2, 4];
 
-/* The note the piano plays at a step of a chord, or null for a rest.
+/* The note the figure plays at a step of a chord, or null for a rest.
    Deterministic: the same step of the same chord always plays the same, so
    a visitor scrolling back hears the same music. */
 export function arpNote(act, chordIndex, step) {

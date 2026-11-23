@@ -5,18 +5,19 @@ import { test, expect } from '@playwright/test';
 
    This checks layout, which is the DOM's business, so it does not wait for
    the WebGL scenes (slow under software rendering in CI) and does not
-   throttle the CPU. Pressing Play mounts every act in the film player;
+   throttle the CPU. The film plays as the page opens, which mounts every act in the player;
    each act's cards and titles are then forced on screen at once (each is
    normally shown one at a time as the film plays) and measured. Frame rate on a phone is
    scripts/check-fps.mjs --mobile, on a real GPU. */
 
-const ACTS = ['act1', 'act2', 'act3', 'act4', 'finale'];
+const ACTS = ['act1', 'act2', 'act3', 'act4', 'finale', 'card-act2', 'card-act3', 'card-act4'];
 // Everything the film fades in and out, shown for the measurement.
 const SHOW_ALL = `
   .act1-card, .act1-statement, .act1-tools, .act2-title, .act2-card, .act3-title, .act3-card, .act4-title, .act4-card, .fin-block, .film-act-title, .film-act-word {
     opacity: 1 !important; visibility: visible !important; transform: none !important;
   }
-  .film-player, .film-player .film-act { visibility: visible !important; opacity: 1 !important; }
+  .film-player, .film-player :is(.film-act, .film-chapter) { visibility: visible !important; opacity: 1 !important; }
+  .film-chapter-kicker, .film-chapter-title { animation: none !important; }
   .bb8-edge { display: none !important; }
 `;
 
@@ -27,12 +28,11 @@ for (const width of [375, 390]) {
     test.skip(info.project.name !== 'mobile', 'one phone run is enough');
     await page.setViewportSize({ width, height: 844 });
     await page.goto('/?coldopen=full');
-    await page.getByRole('button', { name: 'Play the film', exact: true }).click();
-    await expect(page.locator('.film-player .film-act')).toHaveCount(ACTS.length, { timeout: 20000 });
+    await expect(page.locator('.film-player .film-act')).toHaveCount(5, { timeout: 20000 });
     await page.addStyleTag({ content: SHOW_ALL });
     const found = [];
     for (const act of ACTS) {
-      const section = page.locator(`.film-act[data-act="${act}"]`);
+      const section = page.locator(`.film-player [data-act="${act}"]`);
       await expect(section).toBeAttached();
       found.push(...await section.evaluate((el, label) => {
         const out = [], w = window.innerWidth;

@@ -7,10 +7,10 @@ import PaletteSwatch from "./components/PaletteSwatch";
 // on the dev server, or with ?palette in the address.
 const SHOW_SWATCH = typeof window !== "undefined" && (import.meta.env.DEV || new URLSearchParams(window.location.search).has("palette"));
 import Cursor from "./components/Cursor";
-import { COLD_OPEN_SESSION_KEY, WATCH_FILM, coldOpenForced, filmEnabled, filmPosterWanted, shouldPlayIntro, watchFilm } from "./lib/intro";
-import FilmPoster from "./components/FilmPoster";
+import { COLD_OPEN_SESSION_KEY, SKIP_FILM, WATCH_FILM, coldOpenForced, filmAutoplayWanted, filmEnabled, shouldPlayIntro, watchFilm } from "./lib/intro";
+import { FilmIdent, FilmSkip } from "./components/FilmChrome";
 import { Play } from "lucide-react";
-import { setSound } from "./lib/sound";
+import { armSound, setSound } from "./lib/sound";
 import { isRouteTransitioning, noteSource, runRouteChange } from "./lib/routeTransition";
 import { PREVIS, parseTarget, pathForRoute, readLocation, urlForTarget } from "./lib/routes";
 import { titleForRoute } from "./lib/routeTitle";
@@ -614,19 +614,18 @@ class ColdOpenBoundary extends Component {
   componentDidCatch() { this.props.onFail(); }
   render() { return this.state.failed ? null : this.props.children; }
 }
-function ColdOpenLayer({ mode, onStarted, onHandOver, onDone, onSkipFilm }) {
+function ColdOpenLayer({ mode, onStarted, onHandOver, onDone }) {
   const [since] = useState(() => performance.now());
   const started = useRef(false);
   const abandon = useCallback(() => { onHandOver(); onDone(); }, [onHandOver, onDone]);
   useEffect(() => {
-    try { window.sessionStorage.setItem(COLD_OPEN_SESSION_KEY, "1"); } catch { /* not remembered */ }
     const timer = setTimeout(() => { if (!started.current) { if (import.meta.env.DEV) console.warn("cold open: gave up waiting for its code"); abandon(); } }, COLD_OPEN_PATIENCE_MS);
     return () => clearTimeout(timer);
   }, [abandon]);
   const onStart = useCallback(() => { started.current = true; onStarted?.(); }, [onStarted]);
   return <ColdOpenBoundary onFail={abandon}>
     <Suspense fallback={null}>
-      <ColdOpen mode={mode} since={since} onStart={onStart} onHandOver={onHandOver} onDone={onDone} onSkipFilm={onSkipFilm} />
+      <ColdOpen mode={mode} since={since} onStart={onStart} onHandOver={onHandOver} onDone={onDone} />
     </Suspense>
   </ColdOpenBoundary>;
 }
@@ -635,53 +634,91 @@ function ColdOpenLayer({ mode, onStarted, onHandOver, onDone, onSkipFilm }) {
 // sliding up over it.
 const HERO_BEAT_MS = 1400;
 
+// The studio ident, before the cold open.
+const IDENT_MS = 2800;
+
 /* The film's place in the app, start to end:
-     poster    a first visit opens on it (FilmPoster); Play starts the film
-               with sound, "Skip to the site" just shows the page
+     ident     a first visit opens on the film, playing on its own: the
+               studio ident over black (FilmIdent), its sound waiting for
+               the visitor's first tap
      cold open its own layer (ColdOpen), building its name on the hero's
-     acts      the film player (FilmPlayer), over the page, on one clock
+     acts      the film player (FilmPlayer), over the page, on one clock,
+               with chapter cards between the acts and the credits at the end
      the page  an ordinary page to scroll, with "Watch the film" in the nav
                and the hero to play it again
+   A big skip button (FilmSkip) is up the whole time, and so is Escape.
    The hero's entrance plays as the cold open lifts. Until it hands over,
    `bootDone` is false: the nav stays out of the way and the companion does
    not load. `held` keeps the entrance waiting, with the name set large
    mid-screen for the cold open to build on. */
 export default function App() {
-  const [poster] = useState(() => readRoute() === "main" && filmPosterWanted());
-  // The black over the page: the poster itself, then plain black from a
-  // Play press until the cold open's first frame.
-  const [cover, setCover] = useState(poster ? "poster" : null);
-  const [bootDone, setBootDone] = useState(() => !poster && !(shouldPlayIntro() && readRoute() === "main"));
+  const [autoplay] = useState(() => readRoute() === "main" && filmAutoplayWanted());
+  // The ident over the page until the cold open's first frame.
+  const [cover, setCover] = useState(autoplay);
+  const [bootDone, setBootDone] = useState(() => !autoplay && !(shouldPlayIntro() && readRoute() === "main"));
   const onBoot = useCallback(() => setBootDone(true), []);
-  const [held, setHeld] = useState(poster);
+  const [held, setHeld] = useState(autoplay);
   const [heroRun, setHeroRun] = useState(0);
-  // Each press of Play is a new take: the film's layers mount fresh for it.
-  const [take, setTake] = useState(0);
-  const [filmUp, setFilmUp] = useState(false);
+  // Each start of the film is a new take: its layers mount fresh for it.
+  const [take, setTake] = useState(autoplay ? 1 : 0);
+  const [filmUp, setFilmUp] = useState(autoplay);
   const [coldOpenUp, setColdOpenUp] = useState(false);
   const [rolling, setRolling] = useState(false);
   const running = useRef(false);
+  const coldOpenStarted = useRef(false);
+  const identTimer = useRef(0);
   useEffect(() => { running.current = filmUp; }, [filmUp]);
 
-  const play = useCallback(() => {
-    // Pressing Play is the click a browser waits for before any sound.
-    setSound(true);
+  // What starting the film sets going outside React. `chosen`: the visitor
+  // pressed something to start it, which lets the sound start now;
+  // otherwise it waits for their first tap. The cold open comes on after
+  // the ident.
+  const roll = useCallback((chosen) => {
+    if (chosen) setSound(true); else armSound();
     loadFilmPlayer().catch(() => {});
-    setCover("black");
+    import("./film/ColdOpen").catch(() => {});
+    try { window.sessionStorage.setItem(COLD_OPEN_SESSION_KEY, "1"); } catch { /* not remembered */ }
+    coldOpenStarted.current = false;
+    clearTimeout(identTimer.current);
+    identTimer.current = setTimeout(() => setColdOpenUp(true), IDENT_MS);
+  }, []);
+  const start = useCallback(() => {
+    roll(true);
+    setCover(true);
     setRolling(false);
-    setColdOpenUp(true);
+    setColdOpenUp(false);
     setFilmUp(true);
     setTake((n) => n + 1);
-  }, []);
-  const skipPoster = useCallback(() => { setCover(null); setHeld(false); }, []);
-  const onStarted = useCallback(() => { setTimeout(() => setCover(null), 250); }, []);
+  }, [roll]);
+  const onStarted = useCallback(() => { coldOpenStarted.current = true; setTimeout(() => setCover(false), 250); }, []);
   const release = useCallback(() => {
-    setCover(null);
+    setCover(false);
     setHeld(false);
     setTimeout(() => { if (running.current) setRolling(true); }, HERO_BEAT_MS);
   }, []);
   const closeColdOpen = useCallback(() => setColdOpenUp(false), []);
   const endFilm = useCallback(() => { setFilmUp(false); setRolling(false); }, []);
+  const skipFilm = useCallback(() => {
+    clearTimeout(identTimer.current);
+    endFilm();
+    setCover(false);
+    // A cold open on screen fades itself out and hands over to the hero;
+    // one that has not started yet is simply not shown.
+    if (coldOpenStarted.current) window.dispatchEvent(new Event(SKIP_FILM));
+    else { setColdOpenUp(false); setHeld(false); }
+  }, [endFilm]);
+
+  // The film plays as a first visit lands.
+  useEffect(() => { if (autoplay) roll(false); }, [autoplay, roll]);
+  useEffect(() => () => clearTimeout(identTimer.current), []);
+
+  // Escape skips, from anywhere in the film.
+  useEffect(() => {
+    if (!filmUp) return undefined;
+    const onKey = (event) => { if (event.key === "Escape") skipFilm(); };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [filmUp, skipFilm]);
 
   // "Watch the film", from the nav or the hero: back to the top, the hero
   // set up again for its entrance, and the film from the start.
@@ -692,11 +729,11 @@ export default function App() {
       setBootDone(false);
       setHeld(true);
       setHeroRun((n) => n + 1);
-      play();
+      start();
     };
     window.addEventListener(WATCH_FILM, watch);
     return () => window.removeEventListener(WATCH_FILM, watch);
-  }, [play]);
+  }, [start]);
 
   return (
     <ErrorBoundary>
@@ -706,8 +743,9 @@ export default function App() {
           {filmUp && <ColdOpenBoundary key={`film-${take}`} onFail={endFilm}><Suspense fallback={null}>
             <FilmPlayer rolling={rolling} onEnd={endFilm}>{(playback) => <FilmReel playback={playback} />}</FilmPlayer>
           </Suspense></ColdOpenBoundary>}
-          {coldOpenUp && <ColdOpenLayer key={`co-${take}`} mode="full" onStarted={onStarted} onHandOver={release} onDone={closeColdOpen} onSkipFilm={endFilm} />}
-          {cover && <FilmPoster cover={cover === "black"} onPlay={play} onSkip={skipPoster} />}
+          {coldOpenUp && <ColdOpenLayer key={`co-${take}`} mode="full" onStarted={onStarted} onHandOver={release} onDone={closeColdOpen} />}
+          {cover && <FilmIdent />}
+          {filmUp && <FilmSkip onSkip={skipFilm} />}
         </SandboxProvider>
       </ThemeProvider>
     </ErrorBoundary>

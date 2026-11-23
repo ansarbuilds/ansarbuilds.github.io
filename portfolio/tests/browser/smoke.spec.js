@@ -152,62 +152,63 @@ test('the pre-vis follows the scrollbar from the first shot to the last', async 
 // A visitor who has been here before: the page, without the poster.
 const RETURNING = (key) => { sessionStorage.setItem(key, '1'); sessionStorage.setItem('cold-open-played', '1'); };
 
-test('a first visit opens on the poster, and Play runs the film with sound, then the page', async ({ page }) => {
+test('a first visit plays the film on its own, with a big way out and sound on the first tap', async ({ page }) => {
   test.setTimeout(120000);
   await page.goto('/?coldopen=full');
-  const play = page.getByRole('button', { name: 'Play the film', exact: true });
-  await expect(play).toBeFocused();
-  await play.click();
-  // Pressing Play is the click a browser needs before it allows sound.
-  expect(await page.evaluate(() => localStorage.getItem('film-sound'))).toBe('1');
+  await expect(page.locator('.film-ident')).toBeVisible();
+  const skip = page.getByRole('button', { name: 'Skip the movie' });
+  await expect(skip).toBeVisible();
+  await expect(skip).toContainText('You can skip this.');
+  // A browser plays no sound before a tap: the film asks for one, and a
+  // tap does not skip anything.
+  await expect(page.locator('.film-tap')).toBeVisible();
+  await page.mouse.click(400, 400);
   await expect(page.locator('.co')).toBeVisible({ timeout: 20000 });
-  await expect(page.locator('.co-sound')).toHaveClass(/is-on/);
-  // A click skips the cold open only: the acts carry on in the player.
-  await page.waitForTimeout(800);
-  await page.mouse.click(20, 200);
-  await expect(page.locator('.film-player.is-rolling')).toBeVisible({ timeout: 20000 });
-  await expect(page.locator('.film-act.is-on')).toHaveAttribute('data-act', 'act1');
+  await expect(page.locator('.film-player.is-rolling')).toBeVisible({ timeout: 40000 });
+  await expect(page.locator('.film-player .film-act.is-on')).toHaveAttribute('data-act', 'act1');
   // The page under the film holds still and is out of reach.
   await expect(page.locator('#main-content')).toHaveAttribute('inert', '');
   await expect(page.getByRole('button', { name: 'Pause the film' })).toBeAttached();
   await expect(page.getByRole('slider', { name: 'Where the film is' })).toBeAttached();
-  // Escape skips to the page, which then scrolls as usual.
-  await page.keyboard.press('Escape');
-  await expect(page.locator('.film-player')).toHaveCount(0);
+  // The skip lands on the page, which then scrolls as usual.
+  await skip.click();
+  await expect(page.locator('.film-player, .film-skip')).toHaveCount(0);
   await expect(page.locator('#main-content')).not.toHaveAttribute('inert', '');
   await page.evaluate(() => window.scrollTo(0, 1200));
   await expect.poll(() => page.evaluate(() => window.scrollY)).toBeGreaterThan(1000);
 });
 
-test('the poster can be skipped straight to the page', async ({ page }) => {
+test('the skip button lifts the film straight off the page, even before the cold open', async ({ page }) => {
   await page.goto('/?coldopen=full');
-  await page.getByRole('button', { name: 'Skip to the site' }).click();
-  await expect(page.locator('.film-poster, .co, .film-player')).toHaveCount(0);
+  await page.getByRole('button', { name: 'Skip the movie' }).click();
+  await expect(page.locator('.film-ident, .co, .film-player, .film-skip')).toHaveCount(0);
   await expect(page.getByRole('heading', { name: 'Mohamed Ansar', level: 1 })).toBeVisible();
   await expect(page.locator('.ed-nav')).toHaveCSS('opacity', '1');
+  // And it does not come back on its own.
+  await page.waitForTimeout(3500);
+  await expect(page.locator('.co')).toHaveCount(0);
 });
 
-test('"Skip to the site" during the cold open skips the whole film', async ({ page }) => {
+test('Escape during the cold open skips the whole film', async ({ page }) => {
   test.setTimeout(90000);
   await page.goto('/?coldopen=full');
-  await page.getByRole('button', { name: 'Play the film', exact: true }).click();
   await expect(page.locator('.co')).toBeVisible({ timeout: 20000 });
   await page.waitForTimeout(800);
-  await page.locator('.co').getByRole('button', { name: 'Skip to the site' }).click();
-  await expect(page.locator('.co, .film-player')).toHaveCount(0, { timeout: 4000 });
+  await page.keyboard.press('Escape');
+  await expect(page.locator('.co, .film-player, .film-skip')).toHaveCount(0, { timeout: 4000 });
   await expect(page.getByRole('heading', { name: 'Mohamed Ansar', level: 1 })).toBeVisible();
 });
 
-test('the poster does not show for reduced motion, a section link, or a second page view', async ({ page }) => {
+test('the film does not play on its own for reduced motion, a section link, or a second page view', async ({ page }) => {
   await page.emulateMedia({ reducedMotion: 'reduce' });
   await page.goto('/');
-  await expect(page.locator('.film-poster')).toHaveCount(0);
+  await expect(page.locator('.film-ident, .co')).toHaveCount(0);
   await page.emulateMedia({ reducedMotion: 'no-preference' });
   await page.goto('/#contact');
-  await expect(page.locator('.film-poster')).toHaveCount(0);
+  await expect(page.locator('.film-ident, .co')).toHaveCount(0);
   await page.evaluate(() => sessionStorage.setItem('cold-open-played', '1'));
   await page.goto('/');
-  await expect(page.locator('.film-poster')).toHaveCount(0);
+  await expect(page.locator('.film-ident, .co')).toHaveCount(0);
 });
 
 test('a returning visitor can watch the film from the nav, and pause it', async ({ page, isMobile }) => {
@@ -217,17 +218,16 @@ test('a returning visitor can watch the film from the nav, and pause it', async 
   await page.goto('/');
   await page.evaluate(() => window.scrollTo(0, 1500));
   await page.locator('.ed-nav').getByRole('button', { name: 'Watch the film' }).click();
-  await expect(page.locator('.co')).toBeVisible({ timeout: 20000 });
+  await expect(page.locator('.film-ident')).toBeVisible();
   await expect.poll(() => page.evaluate(() => window.scrollY)).toBe(0);
-  await page.waitForTimeout(800);
-  await page.keyboard.press('Enter');
-  await expect(page.locator('.film-player.is-rolling')).toBeVisible({ timeout: 20000 });
+  await expect(page.locator('.co')).toBeVisible({ timeout: 20000 });
+  await expect(page.locator('.film-player.is-rolling')).toBeVisible({ timeout: 40000 });
   await page.getByRole('button', { name: 'Pause the film' }).click();
   const scrub = page.getByRole('slider', { name: 'Where the film is' });
   const at = await scrub.inputValue();
   await page.waitForTimeout(1200);
   expect(await scrub.inputValue()).toBe(at);
-  await page.getByRole('button', { name: 'Skip to the site' }).click();
+  await page.getByRole('button', { name: 'Skip the movie' }).click();
   await expect(page.locator('.film-player')).toHaveCount(0);
 });
 
@@ -248,26 +248,22 @@ test('with reduced motion there is no film to watch', async ({ page }) => {
   await expect(page.locator('.sc-receipts dt')).toHaveCount(4);
 });
 
-test('the film keeps its words as real text and its links real, and an act off screen is out of reach', async ({ page }) => {
+test('the film keeps its words as real text and its links real, and what is off screen is out of reach', async ({ page }) => {
   test.setTimeout(90000);
   await page.goto('/?coldopen=full');
-  await page.getByRole('button', { name: 'Play the film', exact: true }).click();
   const reel = page.locator('.film-player');
   await expect(reel.locator('.film-act')).toHaveCount(5, { timeout: 20000 });
-  await expect(reel.locator('.film-act-title')).toHaveText(['I. The receipts', 'II. Seven builds', 'III. What I bring', 'IV. The playground']);
-  for (const title of await reel.locator('.film-act-title').all()) {
-    await expect(title).not.toHaveAttribute('aria-hidden');
-    expect(await title.locator('a, button, [tabindex]').count()).toBe(0);
-  }
+  await expect(reel.locator('.film-act-title')).toHaveText(['I. The receipts']);
+  await expect(reel.locator('.film-chapter-title')).toHaveText(['Seven builds', 'What I bring', 'The playground']);
   await expect(reel.getByText('Most AI demos stop at the demo.')).toBeAttached();
   await expect(reel.locator('article.act2-card a.act2-primary').first()).toHaveAttribute('href', '/work/hedwig/');
   await expect(reel.locator('article.act3-card a[href="/work/jarvis/"]')).toHaveCount(1);
   await expect(reel.locator('a.act4-cta[href="/playground/emet/"]')).toHaveCount(1);
   await expect(reel.locator('a.fin-email')).toHaveAttribute('href', /^mailto:/);
   await expect(reel.locator('.fin-credit')).toHaveText('Directed, designed and built by Mohamed Ansar');
-  await page.mouse.click(20, 200);
-  await expect(page.locator('.film-act.is-on')).toHaveAttribute('data-act', 'act1', { timeout: 20000 });
-  for (const act of ['act2', 'act3', 'act4', 'finale']) await expect(page.locator(`.film-act[data-act="${act}"]`)).toHaveAttribute('inert', '');
+  await expect(reel.locator('.film-credits')).toContainText('Pair programmer');
+  await expect(page.locator('.film-player .film-act.is-on')).toHaveAttribute('data-act', 'act1', { timeout: 40000 });
+  for (const act of ['act2', 'act3', 'act4', 'finale', 'card-act2', 'credits']) await expect(page.locator(`.film-player [data-act="${act}"]`)).toHaveAttribute('inert', '');
 });
 
 test('the command palette lists every project, works by keyboard and gives focus back', async ({ page, isMobile }) => {

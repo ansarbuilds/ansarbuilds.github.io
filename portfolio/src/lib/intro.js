@@ -33,18 +33,18 @@ export function filmEnabled() {
 
 export const COLD_OPEN_SESSION_KEY = "cold-open-played";
 
-// Dev server only: ?coldopen=full forces the film's poster on every load.
+// Dev server only: ?coldopen=full plays the film on every load.
 export function coldOpenForced() {
   if (typeof window === "undefined" || !import.meta.env?.DEV) return false;
   return new URLSearchParams(window.location.search).get("coldopen") === "full";
 }
 
-/* Whether the home page opens on the film's poster (a Play button over
-   black, see FilmPoster): on a first visit, where the film can play, and
-   not when the link points at a section further down. Pressing Play starts
-   the film with sound: a browser lets a page make sound only after a click.
-   Everyone else gets the page, with "Watch the film" in the nav and hero. */
-export function filmPosterWanted() {
+/* Whether the film plays on its own as the home page opens: on a first
+   visit, where the film can play, and not when the link points at a
+   section further down. Its sound starts at the visitor's first click, tap
+   or key (a browser allows no sooner). Everyone else gets the page, with
+   "Watch the film" in the nav and the hero. */
+export function filmAutoplayWanted() {
   if (typeof window === "undefined") return false;
   if (coldOpenForced()) return true;
   if (window.location.hash || !filmEnabled()) return false;
@@ -54,6 +54,9 @@ export function filmPosterWanted() {
     return false;
   }
 }
+
+// Skips the rest of the film, wherever it is (the cold open listens).
+export const SKIP_FILM = "film:skip";
 
 // Asks the app to play the film from the start (the nav and hero buttons).
 export const WATCH_FILM = "film:watch";
