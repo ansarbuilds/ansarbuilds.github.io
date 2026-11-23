@@ -39,3 +39,13 @@ test('the network has fully collapsed before the solar system', () => {
 test('the solar system is gone before the ribbon\'s card', () => {
   for (let i = 0; i <= 400; i++) { const m = moments((ACT_FOUR.seconds * i) / 400); if (m.cards[1] > 0) assert.equal(m.solar, 0); }
 });
+
+test('the star ignites once as the network finishes falling in, and settles', async () => {
+  const { ignition, moments } = await import('./timeline.js');
+  const at = ignition();
+  assert.equal(moments(at - 0.01).ignite, 0);
+  assert.ok(moments(at - 0.01).collapse > 0.99);
+  assert.ok(moments(at + 0.01).ignite > 0.9);
+  assert.ok(moments(at + 0.5).shock > 0 && moments(at + 0.5).shock < 1);
+  assert.equal(moments(at + 1.2).shock, -1);
+});

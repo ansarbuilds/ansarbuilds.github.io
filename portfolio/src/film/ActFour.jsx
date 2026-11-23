@@ -12,8 +12,9 @@ export default function ActFour({ playback, experiments }) {
   const canvas = useRef(null);
   const title = useRef(null);
   const cards = useRef([]);
-  const chimes = useRef(null);
-  chimes.current ??= experiments.map(() => cueOnRise("chime"));
+  const cues = useRef(null);
+  // The star igniting is the act's big hit.
+  cues.current ??= { ignite: cueOnRise("hit", 0.9) };
 
   const { failed } = useAct({
     id: "act4",
@@ -23,8 +24,18 @@ export default function ActFour({ playback, experiments }) {
       return (options) => createActFour(canvas.current, options);
     },
     onFrame: (t, m) => {
-      show(title.current, m.title, 16);
-      m.cards.forEach((amount, i) => { show(cards.current[i], amount, 22); chimes.current[i]?.(amount); });
+      cues.current.ignite(m.ignite);
+      // The title slams in: large and out of focus, landing sharp.
+      const node = title.current;
+      if (node) {
+        const u = 1 - m.title;
+        node.style.opacity = Math.min(1, m.title * 1.6);
+        node.style.transform = `scale(${1 + 0.3 * u * u})`;
+        node.style.transformOrigin = "center bottom";
+        node.style.filter = u > 0.01 ? `blur(${u * u * 14}px)` : "none";
+        node.style.visibility = m.title > 0.02 ? "visible" : "hidden";
+      }
+      m.cards.forEach((amount, i) => show(cards.current[i], amount, 22));
     },
   });
 

@@ -26,6 +26,8 @@ export const SCENES = [
 const clamp01 = (value) => Math.min(1, Math.max(0, value));
 const ramp = (t, from, to) => clamp01((t - from) / (to - from));
 const smooth = (u) => u * u * (3 - 2 * u);
+// When the star ignites: the moment the network has fallen in.
+export const ignition = () => entry("A4-01").t1 - 0.4;
 export const timeAtProgress = (progress) => timeAtScroll(ACT_FOUR, clamp01(progress) * ACT_FOUR.screens);
 
 export function moments(t) {
@@ -34,6 +36,10 @@ export function moments(t) {
   return {
     progress,
     collapse: smooth(ramp(t, collapse.t0, collapse.t1 - 0.4)),
+    // The star ignites as the network finishes falling in: a burst that
+    // dies away, and a shockwave ring off it (0 to 1, -1 when there is none).
+    ignite: t >= ignition() ? Math.exp(-(t - ignition()) * 3.2) : 0,
+    shock: (() => { const u = (t - ignition()) / 1.1; return u >= 0 && u <= 1 ? u : -1; })(),
     // The planets and their orbits appear round the new sun.
     planets: smooth(ramp(t, collapse.t1 - 0.3, collapse.t1 + 1.2)),
     // The solar system fades once the camera has left it (on a phone the
