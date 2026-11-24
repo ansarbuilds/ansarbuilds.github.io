@@ -27,7 +27,7 @@ export const CODE_LINES = [
   "mcp.tool(\"timeline\", handler=read_timeline)",
   "if gaze.facing and speech.active:",
   "    typer.send(preview.text, enter=mode.enter)",
-  "glTF.load(\"digital_double.glb\", meshopt)",
+  "orb.pulse(voice.level, decay=0.8)",
   "uniform float uGrow, uForm, uTime;",
   "gl_PointSize = uSize * uScale / -view.z;",
   "git commit -m \"ship it, with the numbers\"",

@@ -9,7 +9,6 @@ import { buildJarvis } from "./sets/jarvis.js";
 import { buildFlightRecorder } from "./sets/flightRecorder.js";
 import { buildPrhJepa } from "./sets/prhJepa.js";
 import { buildHaloscript } from "./sets/haloscript.js";
-import { buildDigitalDouble } from "./sets/digitalDouble.js";
 import { attachFilm } from "../engine.js";
 
 /* Act II (the project sets) in plain three.js.
@@ -20,7 +19,7 @@ import { attachFilm } from "../engine.js";
    how far through its arrival and scene the film is. Only the set on screen
    plays its footage. */
 
-const BUILDERS = { hedwig: buildHedwig, saywhen: buildSaywhen, jarvis: buildJarvis, "agent-flight-recorder": buildFlightRecorder, "prh-jepa": buildPrhJepa, haloscript: buildHaloscript, "digital-double": buildDigitalDouble };
+const BUILDERS = { hedwig: buildHedwig, saywhen: buildSaywhen, jarvis: buildJarvis, "agent-flight-recorder": buildFlightRecorder, "prh-jepa": buildPrhJepa, haloscript: buildHaloscript };
 
 function pickQuality() {
   const low = window.matchMedia("(max-width: 760px)").matches || (navigator.hardwareConcurrency || 8) <= 4;

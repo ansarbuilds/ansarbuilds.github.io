@@ -89,8 +89,6 @@ export const TOOL_INFO = {
   Cursor: "A code editor with an AI assistant built in. It suggests and writes code that I review.",
   "Claude Code": "Anthropic's AI coding assistant, which works in a terminal and can run tools on your behalf.",
   Blender: "Free, open-source 3D software for modelling, texturing and rendering.",
-  "KeenTools FaceBuilder": "A Blender add-on that builds a 3D head from a few photos.",
-  "Apple Object Capture": "Apple's tool for turning a set of photos into a 3D model (photogrammetry).",
   Brush: "A free app that trains a Gaussian splat: a 3D scene made of millions of soft coloured dots.",
   OpenClaw: "An open-source framework for running AI agents: a model plus tools, on a schedule.",
   "DuckDuckGo search": "A privacy-focused search engine, used here as a free web search tool.",

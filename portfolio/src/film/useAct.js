@@ -8,7 +8,7 @@ import { useEffect, useLayoutEffect, useRef, useState } from "react";
 
    `load()` resolves to a function that builds the scene from
    { getTime, onFrame }. Returns whether the act failed to start, and whether
-   its title card ("II. Seven builds") is up: for its first seconds. */
+   its title card ("II. Six builds") is up: for its first seconds. */
 const TITLE_FROM = 0.1, TITLE_UNTIL = 2.4;
 
 export function useAct({ id, playback, load, onFrame }) {

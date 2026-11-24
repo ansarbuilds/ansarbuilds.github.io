@@ -41,15 +41,15 @@ const END = polar(orbitShot.camera.pos);
 
 /* The way in: a match back to the last thing Act II showed. The act opens
    on a hard cut, held, with the middle monolith already standing exactly
-   where the digital double's head stood, the same size in frame. Then the
+   where the last set's subject stood, in the same framing. Then the
    camera drops back to the low angle and the other two rise beside it. The
    hold is a small share of the rise, so the join is shorter than the shots
    it joins, and both its ends are finished frames. */
 export const MATCH_SHARE = 0.18;
 const MIDDLE = 1;
-// The middle monolith's centre takes the head's place. It is far bigger
-// than a head, so the head's framing is scaled up to keep the same size in
-// frame (the head, with its neck, is about 3.6 units tall).
+// The middle monolith's centre takes the last subject's place. It is far
+// bigger, so that set's closing framing is scaled up (by its height over
+// 3.6 units, the subject's size in the set) to keep the same size in frame.
 const FACE = [CENTRE[0] + PILLARS[MIDDLE].x, CENTRE[1] + PILLARS[MIDDLE].height * 0.5, CENTRE[2]];
 const SCALE = PILLARS[MIDDLE].height / 3.6;
 const yawTurn = ([x, y, z], yaw) => [x * Math.cos(yaw) + z * Math.sin(yaw), y, -x * Math.sin(yaw) + z * Math.cos(yaw)];

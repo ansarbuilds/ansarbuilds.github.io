@@ -20,7 +20,6 @@ const PROJECT_ALIASES = {
   "rea-study": ["rea", "reverse engineering", "decompiler"],
   "prh-jepa": ["prh", "jepa", "platonic", "lejepa", "dinov2", "lecun"],
   storyera: ["story era", "novel", "continuity"],
-  "digital-double": ["digital double", "digital me", "3d head", "avatar"],
   reptrack: ["rep track", "workout app", "gym app", "fitness app"],
   jarvis: ["personal agent", "job agent", "personal assistant"],
   haloscript: ["halo script", "handwriting", "ipad app"],

@@ -7,7 +7,7 @@
    driving under it and trailer drums. The whole score sits around A minor,
    and every act is a few seconds of a trailer, so the chords move fast:
      act1    the receipts: the strings start, a drum on each bar
-     act2    seven builds: everything at full drive, the clock ticking
+     act2    six builds: everything at full drive, the clock ticking
      act3    three monoliths: the organ at its biggest
      act4    the playground: F lydian, the figure up high
      finale  climbs home and lands on A major, and holds there

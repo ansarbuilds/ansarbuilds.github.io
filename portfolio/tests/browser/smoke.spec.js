@@ -77,17 +77,6 @@ test('homepage has no critical or serious automated accessibility violations', a
   expect(bad.map((v) => `${v.id}: ${v.nodes.map((n) => n.target.join(' ')).join(', ')}`)).toEqual([]);
 });
 
-test('data saver visitors choose whether to load the 3D model', async ({ page }) => {
-  await page.addInitScript(() => Object.defineProperty(navigator, 'connection', { value: { saveData: true }, configurable: true }));
-  let modelRequested = false;
-  page.on('request', (request) => { if (request.url().includes('digital_double.glb')) modelRequested = true; });
-  await page.goto('/playground/digital-double/');
-  await expect(page.getByRole('button', { name: 'Load the 3D model (about 3 MB)' })).toBeVisible();
-  expect(modelRequested).toBe(false);
-  await page.getByRole('button', { name: 'Load the 3D model (about 3 MB)' }).click();
-  await expect.poll(() => modelRequested).toBe(true);
-});
-
 test('Jarvis project page renders and links its sample-data demo', async ({ page }) => {
   await page.goto('/work/jarvis/');
   await expect(page.getByRole('heading', { name: 'Jarvis', level: 1 })).toBeVisible();
@@ -279,7 +268,7 @@ test('the film keeps its words as real text and its links real, and what is off 
   const reel = page.locator('.film-player');
   await expect(reel.locator('.film-act')).toHaveCount(5, { timeout: 20000 });
   await expect(reel.locator('.film-act-title')).toHaveText(['I. The receipts']);
-  await expect(reel.locator('.film-chapter-title')).toHaveText(['Seven builds', 'What I bring', 'The playground']);
+  await expect(reel.locator('.film-chapter-title')).toHaveText(['Six builds', 'What I bring', 'The playground']);
   await expect(reel.getByText('Most AI demos stop at the demo.')).toBeAttached();
   await expect(reel.locator('article.act2-card a.act2-primary').first()).toHaveAttribute('href', '/work/hedwig/');
   await expect(reel.locator('article.act3-card a[href="/work/jarvis/"]')).toHaveCount(1);
@@ -302,7 +291,7 @@ test('the command palette lists every project, works by keyboard and gives focus
   const box = dialog.getByRole('combobox');
   await expect(box).toBeFocused();
   // Every flagship is there, including the two the old list left out.
-  for (const name of ['saywhen', 'Agent Flight Recorder', 'Jarvis', 'Digital Me']) await expect(dialog.getByRole('option', { name: new RegExp(name) })).toHaveCount(1);
+  for (const name of ['saywhen', 'Agent Flight Recorder', 'Jarvis', 'Haloscript']) await expect(dialog.getByRole('option', { name: new RegExp(name) })).toHaveCount(1);
   // The highlighted result is announced through aria-activedescendant.
   await page.keyboard.press('ArrowDown');
   const active = await box.getAttribute('aria-activedescendant');

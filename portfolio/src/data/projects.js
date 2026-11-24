@@ -915,50 +915,6 @@ export const PROJECTS = [
       { label: "Source is private. Walkthrough on request.", href: "#contact", locked: true },
     ],
   },
-  {
-    slug: "digital-double",
-    featured: true,
-    title: "Digital Me",
-    kind: "AI + 3D · my digital double",
-    accent: "rose",
-    status: "Live demo · full write-up",
-    spotlightArt: "/shots/refined/digital-double.webp",
-    shots: ["/shots/digital-double.jpg"],
-    hook: "A 3D model of my own head that looks back at you. I directed the build from phone photos and a 13-second video, tried 12 approaches, and chose the version you can explore here.",
-    stats: [
-      { value: "12", label: "stages tried, most of them failed in useful ways", short: "stages, most failed" },
-      { value: "13 s", label: "of phone video, plus a handful of photos", short: "of phone video" },
-      { value: "$0", label: "spent: every tool used is free", short: "spent, all free tools" },
-      { value: "2", label: "real eyeballs that follow your cursor", short: "eyes that follow you" },
-    ],
-    role: "Directed the AI, reviewed every result, made the decisions.",
-    tags: ["Claude Code", "Blender", "MCP", "three.js"],
-    stack: ["Claude Code", "Blender", "KeenTools FaceBuilder", "Apple Object Capture", "Brush", "three.js"],
-    stackUsage: {
-      "Claude Code": "An AI coding assistant. I told it what I wanted; it controlled Blender directly, writing and running small programs for each fix.",
-      Blender: "Free 3D modelling software, where the head was shaped, coloured and saved.",
-      "KeenTools FaceBuilder": "A Blender add-on that fits a head shape to photos of a face.",
-      "Apple Object Capture": "Apple's tool for turning photos into a 3D model. One of the attempts.",
-      Brush: "Built a 3D scan made of millions of soft dots, known as a Gaussian splat, on my laptop.",
-      "three.js": "A toolkit for 3D on web pages. It shows the finished head on this site, with eyes that follow your mouse.",
-    },
-    story: ["Twelve attempts, most of which failed in ways I learned from, from a head shaped entirely in code to a 3D scan made of millions of soft dots, created on my laptop. The final model has real eyeballs that follow your mouse."],
-    how: ["Claude Code, an AI coding assistant, controlled Blender (3D modelling software) directly, writing and running small programs for every fix."],
-    learned: ["AI is a fast pair of hands. Judging whether it actually looked like me stayed my job."],
-    flow: {
-      caption: "From phone to web page.",
-      columns: [
-        { label: "Capture", nodes: ["Photos", "13-second video"] },
-        { label: "Rebuild in 3D", nodes: ["Face from photos", "3D scan from video"] },
-        { label: "Build", nodes: ["Blender, controlled by Claude Code"] },
-        { label: "Show", nodes: ["3D model on this website"] },
-      ],
-    },
-    links: [
-      { label: "Meet the model", href: "/playground/digital-double/", primary: true },
-      { label: "Full write-up", href: "https://github.com/ansarbuilds/ai-digital-double", external: true },
-    ],
-  },
   /* ───────────── spotlight: two-column grid ───────────── */
   {
     slug: "sitescout",
@@ -2211,8 +2167,7 @@ export const EARLIER_PROJECTS = PROJECTS.filter((p) => !p.featured && isEarlier(
 export const LISTED_PROJECTS = PROJECTS.filter(listed);
 export const getProject = (slug) => PROJECTS.find((p) => p.slug === slug);
 
-/* Things I built with AI as a sparring partner, mostly to see how far it goes.
-   The digital double has its own spotlight project, so it isn't repeated here. */
+/* Things I built with AI as a sparring partner, mostly to see how far it goes. */
 export const EXPERIMENTS = [
   {
     id: "emet",

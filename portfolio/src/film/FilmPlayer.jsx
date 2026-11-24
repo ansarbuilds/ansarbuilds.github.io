@@ -32,7 +32,7 @@ const PREROLL = 0.3; // the next act starts drawing this early, out of sight
 const SWELL = 0.7; // the rise into a chapter card's hit
 const DISSOLVE = 0.45; // one act (or card) dissolving into the next
 // The project montage: each cut a little quicker, the last held.
-const MONTAGE = [1.15, 1.05, 0.95, 0.88, 0.82, 0.78, 1.37];
+const MONTAGE = [1.15, 1.05, 0.95, 0.88, 0.82, 1.37];
 const linear = (u) => u;
 const ramp = (u) => 1 - (1 - u) ** 1.7;
 const arrival = (slug) => ACT_TWO.entries.find((entry) => entry.shot.id === shotsFor(slug)[0].id);

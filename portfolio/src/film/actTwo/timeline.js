@@ -29,7 +29,6 @@ export const SUBJECTS = {
   "agent-flight-recorder": [0.6, 0.9, -1.2],
   "prh-jepa": [1.6, 1.4, -2.5],
   haloscript: [3, 0, -4],
-  "digital-double": [2.6, 1.3, 0.4],
 };
 // Pairs that share a shape: the black box resolves into the cloud of points.
 export const MATCHES = { "prh-jepa": "agent-flight-recorder" };
@@ -59,7 +58,7 @@ export function openingCamera(slug) {
 
 // How a set's closing shot frames its subject, in the set's own space: the
 // camera and the look as offsets from the subject. Act III opens by putting
-// a monolith where the last set's head stood (see actThree/timeline.js).
+// a monolith where the last set's subject stood (see actThree/timeline.js).
 export function closingFraming(slug) {
   const [, last] = shotsFor(slug);
   const local = (point) => turn(sub(point, subjectAt(slug)), -yawOf(slug));
