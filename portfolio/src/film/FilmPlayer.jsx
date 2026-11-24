@@ -1,4 +1,5 @@
 import "./player.css";
+import "./actTitle.css";
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { Pause, Play, Volume2, VolumeX } from "lucide-react";
 import { ACT_TWO, BUILT, shotsFor } from "./actTwo/timeline.js";

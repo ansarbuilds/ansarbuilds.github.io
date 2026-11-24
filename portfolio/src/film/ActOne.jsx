@@ -45,7 +45,7 @@ export default function ActOne({ playback, receipts, tools, lead, rest }) {
   if (failed) return null;
   return <section className="act1 film-act" data-act="act1" aria-label="The short version">
     <div className="act1-stage">
-      <ActTitle up={titleUp}>I. The receipts</ActTitle>
+      <ActTitle up={titleUp} numeral="I">The receipts</ActTitle>
       <canvas ref={canvas} className="act1-canvas" aria-hidden="true" />
       <div ref={card} className="act1-card"><p className="act1-statement">{lead} <em>{rest}</em></p></div>
       <p ref={toolsCaption} className="act1-tools" aria-hidden="true">Tools I build with <span>· point at one</span></p>
