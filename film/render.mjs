@@ -12,8 +12,10 @@ mkdirSync(out, { recursive: true });
 writeFileSync("../portfolio/src/film/filmCuts.json", JSON.stringify({ seconds: +(TOTAL / FPS).toFixed(3), chapters: CHAPTERS.map(({ id, seconds, numeral, name }) => ({ id, seconds: +seconds.toFixed(3), numeral, name })) }, null, 2) + "\n");
 
 const browser = process.env.REMOTION_BROWSER ? ["--browser-executable", process.env.REMOTION_BROWSER] : [];
-for (const [id, file] of [["Film", "film-wide.mp4"], ["FilmUpright", "film-upright.mp4"]]) {
-  execFileSync("npx", ["remotion", "render", "src/index.js", id, `${out}/${file}`, "--codec", "h264", "--crf", "28", "--audio-bitrate", "96k", "--x264-preset", "slow", "--log", "error", ...browser], { stdio: "inherit" });
+// The upright cut plays on a phone's small screen and speaker, so it is
+// squeezed a step harder, to keep the site in its size budget.
+for (const [id, file, crf, audio] of [["Film", "film-wide.mp4", "28", "96k"], ["FilmUpright", "film-upright.mp4", "29", "80k"]]) {
+  execFileSync("npx", ["remotion", "render", "src/index.js", id, `${out}/${file}`, "--codec", "h264", "--crf", crf, "--audio-bitrate", audio, "--x264-preset", "slow", "--log", "error", ...browser], { stdio: "inherit" });
   execFileSync("npx", ["remotion", "still", "src/index.js", id, `${out}/${file.replace(".mp4", "-poster.jpg")}`, "--frame", "0", "--jpeg-quality", "80", "--log", "error", ...browser], { stdio: "inherit" });
   console.log(`${file}: ${(statSync(`${out}/${file}`).size / 1e6).toFixed(2)} MB`);
 }

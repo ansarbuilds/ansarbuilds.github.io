@@ -10,7 +10,7 @@ export const FPS = 30;
 // project's title card), clip (footage), stat (a number slammed), device
 // (a screenshot in its frame), trio (all three devices), end. Each
 // project's own shots: train, tokens and receipts (Hedwig); listen, clean
-// and send (saywhen); halo, morph and sync (Haloscript).
+// and send (saywhen); halo, morph and sync (Haloscript); more (the end).
 // hit: the sound on the cut (drum, braam, impact, tick, whoosh, hit).
 const SHOTS = [
   // Open: who, and what. A terminal boots and answers, the name slams in,
@@ -60,8 +60,11 @@ const SHOTS = [
   { chapter: "haloscript", kind: "trio", frames: 32, stamp: "Live on the App Store", stampAt: 12, tint: "#c9b8ff", hit: "drum", cues: [[12, "impact"]] },
 
   // The end.
-  { chapter: "end", kind: "type", frames: 18, text: "THERE'S MORE.", hit: "drum" },
-  { chapter: "end", kind: "end", frames: 48, hit: "finale" },
+  // The end, the opening's mirror: out of the tunnel, the terminal asked
+  // again, the name slams in over the three projects, and the screen
+  // switches off like an old tube.
+  { chapter: "end", kind: "more", frames: 22, small: "THERE'S", big: "MORE.", riser: 0.7, hit: "impact" },
+  { chapter: "end", kind: "end", frames: 54, command: "whoami", name: "MOHAMED ANSAR", slamAt: 14, url: "ansarbuilds.dev", projects: [["01", "Hedwig", "#e8b04a"], ["02", "saywhen", "#f2a93b"], ["03", "Haloscript", "#c9b8ff"]], hit: "tick", cues: [[14, "finale"]] },
 ];
 
 // Each shot with where it starts.
