@@ -605,7 +605,7 @@ const IDENT_BURST_MS = 420;
                studio ident over black (FilmIdent), its sound waiting for
                the visitor's first tap
      film      the film player (FilmPlayer) over the page: a rendered
-               trailer (the repo's film/ folder), about 21 seconds
+               trailer (the repo's film/ folder), about 22 seconds
      the page  an ordinary page to scroll, with "Watch the film" in the nav
                and the hero to play it again
    A big skip button (FilmSkip) is up the whole time, and so is Escape.

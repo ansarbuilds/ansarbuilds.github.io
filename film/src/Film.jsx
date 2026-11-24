@@ -203,7 +203,150 @@ function EndShot({ shot }) {
   </Cut>;
 }
 
-const SHOT = { type: TypeShot, term: TermShot, title: TitleShot, clip: ClipShot, stat: StatShot, device: DeviceShot, trio: TrioShot, end: EndShot };
+/* ---- The opening ---- */
+
+// A rushing tunnel of speed lines behind the opening's words.
+function Tunnel({ tint = CORAL, speed = 1 }) {
+  const f = useCurrentFrame();
+  const { width, height } = useVideoConfig();
+  const r = Math.hypot(width, height) / 2;
+  const lines = Array.from({ length: 36 }, (_, i) => {
+    const a = (i / 36) * Math.PI * 2 + random(`a${i}`) * 0.12;
+    const u = ((f * 0.07 * speed + random(`o${i}`)) % 1);
+    const from = r * (0.08 + u * 0.9), to = from + r * (0.12 + 0.25 * u);
+    return <line key={i} x1={width / 2 + Math.cos(a) * from} y1={height / 2 + Math.sin(a) * from} x2={width / 2 + Math.cos(a) * to} y2={height / 2 + Math.sin(a) * to} stroke={tint} strokeWidth={1 + 2.5 * u} strokeOpacity={0.15 + 0.45 * u} strokeLinecap="round" />;
+  });
+  return <AbsoluteFill><svg width={width} height={height}>{lines}</svg></AbsoluteFill>;
+}
+
+// A ring of light thrown out from the middle of the frame (an SVG circle
+// that grows, with a soft wide stroke under a bright thin one).
+function Shockwave({ at = 0, tint = "#ffd9b8", frames = 14 }) {
+  const f = useCurrentFrame();
+  const { width, height } = useVideoConfig();
+  const u = interpolate(f, [at, at + frames], [0, 1], clamp);
+  if (f < at || u >= 1) return null;
+  const r = 20 + ease(u) * Math.hypot(width, height) * 0.55;
+  const fade = 1 - u;
+  return <AbsoluteFill><svg width={width} height={height}>
+    <circle cx={width / 2} cy={height / 2} r={r} fill="none" stroke={tint} strokeOpacity={0.18 * fade} strokeWidth={40 * fade + 6} />
+    <circle cx={width / 2} cy={height / 2} r={r} fill="none" stroke={tint} strokeOpacity={0.9 * fade} strokeWidth={6 * fade + 1} />
+  </svg></AbsoluteFill>;
+}
+
+// The terminal boots and answers.
+function BootShot({ shot }) {
+  const f = useCurrentFrame();
+  const unit = useUnit();
+  const on = ease(interpolate(f, [0, 5], [0, 1], clamp));
+  const typedBy = 6 + shot.command.length * 1.4;
+  const answer = Math.max(0, Math.min(shot.answer.length, Math.floor((f - typedBy - 3) * 1.4)));
+  const tear = interpolate(f, [shot.frames - 5, shot.frames], [0, 1], clamp);
+  const size = 7 * unit;
+  const screen = <div style={{ display: "grid", gap: 1.6 * unit, filter: "drop-shadow(0 0 14px rgb(255 150 100 / .45))" }}>
+    <Prompt text={shot.command} from={6} perChar={1.4} size={size} />
+    <div style={{ font: `500 ${size}px/1.2 ${MONO}`, color: "#ffd9b8", textShadow: "0 0 18px rgb(255 160 110 / .8)", minHeight: "1.2em" }}>{shot.answer.slice(0, answer)}</div>
+  </div>;
+  return <Cut still hit={shot.hit}>
+    <AbsoluteFill style={{ alignItems: "center", justifyContent: "center", transform: `scaleY(${0.02 + 0.98 * on})`, filter: `brightness(${1 + (1 - on) * 2})` }}>
+      {tear > 0 ? [0, 1, 2, 3, 4, 5].map((i) => {
+        const shift = (random(`t${i}${Math.floor(f / 2)}`) - 0.5) * 30 * unit * tear;
+        return <AbsoluteFill key={i} style={{ alignItems: "center", justifyContent: "center", clipPath: `inset(${i * 16.6}% 0 ${100 - (i + 1) * 16.6}% 0)`, transform: `translateX(${shift}px)` }}>{screen}</AbsoluteFill>;
+      }) : screen}
+    </AbsoluteFill>
+    {/* A tube's scanlines and glow. */}
+    <AbsoluteFill style={{ background: "repeating-linear-gradient(0deg, rgb(0 0 0 / .28) 0 2px, transparent 2px 4px)", mixBlendMode: "multiply" }} />
+    <AbsoluteFill style={{ background: "radial-gradient(ellipse at 50% 50%, rgb(255 140 90 / .1), transparent 60%)" }} />
+  </Cut>;
+}
+
+// The name slams in letter by letter, and the frame shakes.
+function SlamShot({ shot }) {
+  const f = useCurrentFrame();
+  const unit = useUnit();
+  const portrait = usePortrait();
+  const land = 7;
+  const shake = f >= land ? Math.exp(-(f - land) / 4) : 0;
+  const sx = (random(`sx${f}`) - 0.5) * 3 * unit * shake, sy = (random(`sy${f}`) - 0.5) * 3 * unit * shake;
+  const rays = interpolate(f, [land - 1, land + 2, shot.frames], [0, 0.9, 0.25], clamp);
+  const size = (portrait ? 15 : 13.5) * unit;
+  return <Cut still hit={shot.hit}>
+    <AbsoluteFill style={{ background: "radial-gradient(circle at 50% 50%, #2a140b, #08070a 60%)" }} />
+    <AbsoluteFill style={{ opacity: rays, background: "repeating-conic-gradient(from 0deg, rgb(255 190 140 / .22) 0deg 2deg, transparent 2deg 9deg)", WebkitMaskImage: "radial-gradient(circle, #000 0%, transparent 55%)", maskImage: "radial-gradient(circle, #000 0%, transparent 55%)", transform: `rotate(${f * 0.4}deg) scale(1.6)` }} />
+    <Shockwave at={land} />
+    <AbsoluteFill style={{ alignItems: "center", justifyContent: "center", flexDirection: "column", gap: 2.4 * unit, transform: `translate(${sx}px, ${sy}px)` }}>
+      <div style={{ display: "flex", flexWrap: "wrap", justifyContent: "center", maxWidth: "92%", font: `400 ${size}px/0.92 ${ANTON}`, color: BONE, letterSpacing: "0.03em", textShadow: "0 0 60px rgb(255 160 110 / .45)" }}>
+        {shot.text.split(" ").map((word, w, words) => <span key={w} style={{ display: "inline-flex", whiteSpace: "nowrap", marginRight: w < words.length - 1 ? "0.25em" : 0 }}>{Array.from(word).map((ch, k) => {
+          const i = words.slice(0, w).join("").length + w + k;
+          const u = ease(interpolate(f, [i * 0.5, i * 0.5 + 5], [0, 1], clamp));
+          return <span key={k} style={{ display: "inline-block", opacity: u, transform: `scale(${2 - u}) translateY(${(1 - u) * -16}px)`, filter: u < 1 ? `blur(${(1 - u) * 8}px)` : "none" }}>{ch}</span>;
+        })}</span>)}
+      </div>
+      <div style={{ font: `500 ${2.2 * unit}px/1 ${MONO}`, letterSpacing: "0.5em", textTransform: "uppercase", color: CORAL, opacity: interpolate(f, [land + 2, land + 8], [0, 0.9], clamp) }}>ansarbuilds</div>
+    </AbsoluteFill>
+  </Cut>;
+}
+
+// One word on the drum, each hitting its own way, over the tunnel.
+function WordShot({ shot }) {
+  const f = useCurrentFrame();
+  const unit = useUnit();
+  const portrait = usePortrait();
+  const size = (portrait ? 22 : 26) * unit;
+  const u = ease(interpolate(f, [0, 5], [0, 1], clamp));
+  const fill = shot.accent ? { color: "transparent", background: "linear-gradient(170deg, #fff4e6 15%, #ffc79a 50%, #d5360c 100%)", WebkitBackgroundClip: "text", backgroundClip: "text" } : { color: BONE };
+  const base = { font: `400 ${size}px/0.9 ${ANTON}`, letterSpacing: "0.03em", textAlign: "center", padding: `0 ${4 * unit}px`, ...fill };
+  let word;
+  if (shot.style === "zoom") {
+    const stroke = f < 4;
+    word = <div style={{ ...base, color: stroke ? "transparent" : BONE, WebkitTextStroke: stroke ? `2px ${BONE}` : undefined, transform: `scale(${0.4 + 0.65 * u})` }}>{shot.text}</div>;
+  } else if (shot.style === "slice") {
+    const slices = 5;
+    word = <div style={{ position: "relative" }}>{Array.from({ length: slices }, (_, i) => {
+      const off = (random(`sl${i}`) - 0.5) * 40 * unit * (1 - u);
+      return <div key={i} style={{ ...base, position: i ? "absolute" : "relative", inset: i ? 0 : undefined, clipPath: `inset(${(i / slices) * 100}% 0 ${100 - ((i + 1) / slices) * 100}% 0)`, transform: `translateX(${off}px)` }}>{shot.text}</div>;
+    })}</div>;
+  } else if (shot.style === "drop") {
+    word = <div style={{ ...base, transform: `translateY(${(1 - u) * -60}%) scaleY(${1 + (1 - u) * 0.6})`, filter: `blur(${(1 - u) * 6}px)` }}>{shot.text}</div>;
+  } else {
+    word = <div style={{ ...base, transform: `scale(${2.6 - 1.6 * u})`, filter: `blur(${(1 - u) * 10}px)` }}>{shot.text}</div>;
+  }
+  return <Cut hit={shot.hit}>
+    <AbsoluteFill style={{ background: "radial-gradient(circle at 50% 50%, #1d0f09, #08070a 70%)" }} />
+    <Tunnel speed={1.6} tint={shot.accent ? CORAL : BONE} />
+    <Shockwave at={0} frames={10} tint={shot.accent ? CORAL : BONE} />
+    <AbsoluteFill style={{ alignItems: "center", justifyContent: "center" }}>{word}</AbsoluteFill>
+  </Cut>;
+}
+
+// "Here are three", and the three named before they play.
+function ThreeShot({ shot }) {
+  const f = useCurrentFrame();
+  const unit = useUnit();
+  const portrait = usePortrait();
+  const slam = ease(interpolate(f, [0, 6], [0, 1], clamp));
+  const watch = interpolate(f, [26, 31], [0, 1], clamp);
+  return <Cut still hit={shot.hit}>
+    <AbsoluteFill style={{ background: "radial-gradient(circle at 50% 45%, #24120a, #08070a 65%)" }} />
+    <Tunnel speed={0.5} />
+    <Shockwave at={1} />
+    <AbsoluteFill style={{ alignItems: "center", justifyContent: "center", flexDirection: "column", gap: 3 * unit }}>
+      <div style={{ font: `400 ${(portrait ? 15 : 16) * unit}px/0.9 ${ANTON}`, color: BONE, textAlign: "center", padding: `0 ${4 * unit}px`, textShadow: "0 0 60px rgb(255 160 110 / .45)", transform: `scale(${1.6 - 0.6 * slam})`, filter: `blur(${(1 - slam) * 14}px)`, opacity: slam }}>{shot.text}</div>
+      <div style={{ display: "flex", flexDirection: portrait ? "column" : "row", gap: (portrait ? 1.6 : 2.4) * unit, alignItems: "center" }}>
+        {shot.names.map((name, i) => {
+          const u = ease(interpolate(f, [9 + i * 5, 15 + i * 5], [0, 1], clamp));
+          return <div key={name} style={{ display: "flex", alignItems: "baseline", gap: 1.2 * unit, padding: `${1.2 * unit}px ${2.4 * unit}px`, border: `1px solid rgb(255 200 160 / ${0.2 + 0.4 * u})`, borderRadius: 999, background: "rgb(20 12 8 / .7)", opacity: u, transform: `translateY(${(1 - u) * 30}px)` }}>
+            <span style={{ font: `500 ${2.2 * unit}px/1 ${MONO}`, color: CORAL }}>0{i + 1}</span>
+            <span style={{ font: `400 ${4.4 * unit}px/1 ${ANTON}`, color: BONE, letterSpacing: "0.04em", textTransform: "uppercase" }}>{name}</span>
+          </div>;
+        })}
+      </div>
+      <div style={{ font: `italic 400 ${6 * unit}px/1 ${SERIF}`, color: CORAL, opacity: watch }}>{shot.serif}</div>
+    </AbsoluteFill>
+  </Cut>;
+}
+
+const SHOT = { boot: BootShot, slam: SlamShot, word: WordShot, three: ThreeShot, type: TypeShot, term: TermShot, title: TitleShot, clip: ClipShot, stat: StatShot, device: DeviceShot, trio: TrioShot, end: EndShot };
 
 // Over every shot: the project's tag at the corner, grain and a vignette.
 function Chrome() {
@@ -217,7 +360,7 @@ function Chrome() {
       <span style={{ width: 1.2 * unit, height: 1.2 * unit, borderRadius: "50%", background: Math.floor(f / 8) % 2 ? CORAL : "#7a2a14" }} />{title.number} / {title.name}
     </div>}
     <AbsoluteFill style={{ background: "radial-gradient(circle at 50% 50%, transparent 55%, rgb(0 0 0 / .55))", pointerEvents: "none" }} />
-    <AbsoluteFill style={{ opacity: 0.11, mixBlendMode: "overlay" }}>
+    <AbsoluteFill style={{ opacity: 0.07, mixBlendMode: "overlay" }}>
       <svg width="100%" height="100%"><filter id="g"><feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="2" seed={Math.floor(random(`g${f}`) * 1000)} /></filter><rect width="100%" height="100%" filter="url(#g)" /></svg>
     </AbsoluteFill>
   </>;

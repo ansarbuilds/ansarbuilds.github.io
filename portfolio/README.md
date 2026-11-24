@@ -46,7 +46,7 @@ Clicking a project opens `/work/<slug>/`: the story, a flow diagram, what I took
 
 ## The film
 
-A first visit opens on a short film: the studio ident, then a 21-second trailer of three projects (Hedwig, saywhen, Haloscript) in hard jump cuts, then the page. "Watch the film" in the nav plays it again.
+A first visit opens on a short film: the studio ident, then a 22-second trailer of three projects (Hedwig, saywhen, Haloscript) in hard jump cuts, then the page. "Watch the film" in the nav plays it again.
 
 - **It is a rendered video**, made in the repo's `film/` folder with [Remotion](https://www.remotion.dev): `film/src/cuts.js` is the cut list (every shot, its length and the sound on its cut), `film/src/Film.jsx` the shots. `node render.mjs` there renders `public/film/film-wide.mp4` (1280×720) and `film-upright.mp4` (720×1280, for a phone held upright), their posters, and `src/film/filmCuts.json` (length and chapters, for the player). See `film/README.md`.
 - **The player** (`src/film/FilmPlayer.jsx`) plays it full screen over the page with the controls bar (chapters on the timeline), Space, the arrows, M and Escape. It plays muted until the visitor's first tap wakes the sound. The ident, skip button and tap-for-sound badge are `components/FilmChrome.jsx`.

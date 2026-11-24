@@ -165,7 +165,7 @@ export default function FilmPlayer({ rolling, onEnd, onStarted }) {
   }, [rolling]);
 
   return <div ref={root} className={`film-player ${rolling ? "is-rolling" : ""} ${idle ? "is-idle" : ""}`} role="region" aria-label="The film" tabIndex={-1}>
-    <video ref={video} className="film-video" src={cut.src} poster={cut.poster} muted playsInline preload="auto" aria-label="A 21-second trailer: who I am, then three of my projects, Hedwig, saywhen and Haloscript" />
+    <video ref={video} className="film-video" src={cut.src} poster={cut.poster} muted playsInline preload="auto" aria-label={`A ${Math.round(FILM_SECONDS)}-second trailer: who I am, then three of my projects, Hedwig, saywhen and Haloscript`} />
     <div className="film-controls">
       <button type="button" className="film-button film-play" onClick={togglePlay} aria-label={playing ? "Pause the film" : "Play the film"}>
         <span className="film-play-ring" aria-hidden="true" />
