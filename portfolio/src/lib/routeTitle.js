@@ -13,8 +13,6 @@ const VIEW_TITLES = {
   "lineage-demo": "Data lineage explorer",
   infinity: "Infinity loop",
   work: "Selected work",
-  storyboard: "Storyboard",
-  previs: "Pre-vis",
 };
 
 export function titleForRoute(route) {

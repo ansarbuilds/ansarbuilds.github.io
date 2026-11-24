@@ -44,19 +44,14 @@ Clicking a project opens `/work/<slug>/`: the story, a flow diagram, what I took
 
 `FABLE_REDESIGN_BRIEF.md` is the audit and the plan for the redesign this groundwork is for.
 
-## The film (pre-vis)
+## The film
 
-The redesign treats the site as one film the visitor plays by scrolling. `src/film/` holds its pre-production, and none of it is in a production build:
+A first visit opens on a short film: the studio ident, then a 21-second trailer of three projects (Hedwig, saywhen, Haloscript) in hard jump cuts, then the page. "Watch the film" in the nav plays it again.
 
-- `shots.js` is the film, shot by shot: order, timing, camera, what happens, sound. It is the single source for the two pages below.
-- `/storyboard/` (dev server only) draws one frame per shot with its notes. This is the page to mark up: refer to shots by code, such as `A2-03b`.
-- `/previs/` (dev server only) flies the real camera path through a grey-box world. The scrollbar is the playhead; Space plays it at real speed and the arrow keys step through shots.
-- **The cold open** (`ColdOpen.jsx`, `coldOpen/`) is the first piece built for real. It plays over the home page once per session: the full eight seconds on a first visit, a short cut joining at the name on a later one. It is skipped for reduced motion, Save-Data, slow connections, no WebGL 2 and links to a section. `score.js` says what every moment looks like, `shaders.js` draws it, and `sampleName.js` reads the hero's name off the page so the particles land exactly on it before the layer lifts. On the dev server, `/?coldopen=full` (or `short`) forces it and `&at=6.3` freezes it on one moment.
-- **Act I** (`ActOne.jsx`, `actOne/`) is the sheet that slides up over the hero. It is as tall as the act's scrolling plus a screen and pins a full-screen stage; the scrollbar is the camera's playhead. The camera flies through the name, past the four numbers (cubes that count up, values from `RECEIPTS`) over a river of code, to the tools (`STACK_MARQUEE`) in orbit; pointing at a tool pulls it closer. The statement is a real-text title card, and the numbers and tools are listed for screen readers. Where the film is off (`filmEnabled()` in `lib/intro.js`), or the scene fails to start, the plain section is shown. `actOne/screens.js` holds the act's length so the page can size it without loading the shot list.
-- **Act II** (`ActTwo.jsx`, `actTwo/`) plays just above the hands-on work stage, one set per flagship project. Each project is a cut into a light-speed streak, an arrival under the letterbox with its name as a title card, then its scene with a card of real text and links. `actTwo/built.js` lists the sets built so far; each new set is a module in `actTwo/sets/` plus one entry there and in `createActTwo.js`. `actTwo/kit.js` has the shared pieces (points, floor, light, canvas cards).
-- **The finale** (`Finale.jsx`, `finale/`) is the Contact section: everything recedes into the cold open's signal, then the contact line and links, then the credits into the footer.
-- **Quality:** every scene steps its resolution down, and then drops its glow, if the device cannot keep up (`film/adaptive.js`).
-- **Sound** (`lib/sound.js`, the switch in the nav) is off by default and generated in the browser: an ambient pad that opens up with scroll speed, a whoosh on Act II's streaks, a chime per card, a tone for the finale.
+- **It is a rendered video**, made in the repo's `film/` folder with [Remotion](https://www.remotion.dev): `film/src/cuts.js` is the cut list (every shot, its length and the sound on its cut), `film/src/Film.jsx` the shots. `node render.mjs` there renders `public/film/film-wide.mp4` (1280×720) and `film-upright.mp4` (720×1280, for a phone held upright), their posters, and `src/film/filmCuts.json` (length and chapters, for the player). See `film/README.md`.
+- **The player** (`src/film/FilmPlayer.jsx`) plays it full screen over the page with the controls bar (chapters on the timeline), Space, the arrows, M and Escape. It plays muted until the visitor's first tap wakes the sound. The ident, skip button and tap-for-sound badge are `components/FilmChrome.jsx`.
+- It is skipped for reduced motion and on Save-Data or slow connections. Browser tests run in real Chrome (`channel: 'chrome'`), since Playwright's own Chromium cannot play H.264.
+- **Sound** (`lib/sound.js`, the switch in the nav) is off by default and generated in the browser: an ambient pad that opens up with scroll speed, and the hits on the ident and the skip button. The film's soundtrack is recorded from the same engine (`film/score/record.mjs`).
 - **Project data on the home page** comes from `src/data/projectIndex.js`, a generated slim copy of `projects.js` (titles, hooks, links, covers). After editing `projects.js`, run `node scripts/make-project-index.mjs`; a unit test fails if you forget.
 - `rig.js` turns the shot list into a camera pose for any moment. It is plain maths with tests (`rig.test.mjs`), and it is the piece the real film reuses.
 

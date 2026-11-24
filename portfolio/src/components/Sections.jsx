@@ -8,12 +8,6 @@ import { EXPERIMENTS, LISTED_PROJECTS, getProject } from "../data/projectIndex";
 import { CAPABILITIES, FLAGSHIPS, MORE_WORK, STACK_MARQUEE } from "../data/showcase";
 import { EASE, STAGGER, tween } from "../lib/motion";
 import { INTRO_SESSION_KEY, filmEnabled, watchFilm } from "../lib/intro";
-import ActOne from "../film/ActOne";
-import ActTwo from "../film/ActTwo";
-import ActThree from "../film/ActThree";
-import ActFour from "../film/ActFour";
-import Finale from "../film/Finale";
-import { BUILT as FILM_SETS } from "../film/actTwo/built";
 import { media } from "../lib/media";
 import Count from "./Count";
 import MagneticLink from "./Magnetic";
@@ -147,9 +141,8 @@ export function Hero({ ready = true, hold = false, onReady }) {
 
   useEffect(() => {
     if (!intro) { onReady?.(); return undefined; }
-    // The film's cold open is playing over the page. The name waits, set
-    // large mid-screen (the cold open builds its own name on top of it), and
-    // this intro starts the moment that hands over.
+    // The film is playing over the page. The name waits, set large
+    // mid-screen, and this intro starts as the film lifts off.
     if (hold) return undefined;
     try {
       window.sessionStorage.setItem(INTRO_SESSION_KEY, "1");
@@ -301,17 +294,6 @@ function Sheet({ children }) {
 }
 
 const coverOf = (project) => project.spotlightArt || project.cardArt || project.cardShot || project.shots?.[0];
-// What each set's screens are, said on its card: nothing in the film
-// passes for more than it is.
-const FILM_NOTES = { saywhen: "Screen: the launch animation", jarvis: "Screens: the real dashboard, sample data", "agent-flight-recorder": "Illustration of a recorded run", "prh-jepa": "Illustration of the finding", haloscript: "Screens: the real app" };
-
-// The projects Act II has sets for, with what their cards say.
-const FILM_PROJECTS = FILM_SETS.map((slug) => {
-  const flag = FLAGSHIPS.find((item) => item.slug === slug);
-  const project = getProject(slug);
-  return { slug, name: project.title, eyebrow: flag.eyebrow, headline: flag.headline, stats: flag.stats, note: FILM_NOTES[slug], links: project.links.filter((link) => !link.locked && link.href !== `/work/${slug}/`).slice(0, 2) };
-});
-
 export function ProjectsSection() {
   return <><section id="projects" className="ed-projects ed-light ed-section" data-palette="bloom">
     <div className="ed-section-watermark" aria-hidden="true">WORK</div>
@@ -321,13 +303,6 @@ export function ProjectsSection() {
     </div>
   </section></>;
 }
-
-// What Act III's monoliths and cards say: each capability, and the titles and
-// pages of the projects that prove it.
-const FILM_CAPABILITIES = CAPABILITIES.map((cap) => {
-  const projects = cap.proof.map(getProject).filter(Boolean);
-  return { ...cap, projects: projects.map((p) => p.title), links: projects.map((p) => ({ name: p.title, href: `/work/${p.slug}/` })) };
-});
 
 export function CapabilitiesSection() {
   return <PlainCapabilities />;
@@ -387,8 +362,8 @@ function ExperimentImage({ experiment }) {
   return <img className="ed-lazy-media" src={media(!artBroken && experiment.cardArt ? experiment.cardArt : experiment.shot)} alt="" width={1200} height={900} loading="lazy" onLoad={revealImage} onError={() => setArtBroken(true)} />;
 }
 
-// The playground on the home page: a row of the experiments Act IV plays,
-// each a way into the real thing.
+// The playground on the home page: a row of experiments, each a way into
+// the real thing.
 const FILM_EXPERIMENTS = ["solar", "stars", "emet"].map((id) => EXPERIMENTS.find((e) => e.id === id)).filter(Boolean);
 export function PlaygroundSection() {
   return <section id="ai" className="ed-projects ed-light ed-section" aria-labelledby="playground-title" data-palette="neon">
@@ -414,33 +389,10 @@ export function ExperimentsSection() {
 /* The last shot: the address itself is the biggest thing in the section,
    and the network behind it sends its signals in to that address once,
    then goes quiet. */
-const CREDIT = "Directed, designed and built by Mohamed Ansar";
 
 export function ContactSection() {
   return <PlainContact />;
 }
-
-/* The film's acts, in order, for the film player (film/FilmPlayer.jsx).
-   Each is given the player's clock and the words it puts over its frames. */
-export function FilmReel({ playback }) {
-  return <>
-    <ActOne playback={playback} receipts={RECEIPT_VALUES} tools={STACK_MARQUEE} lead={STATEMENT.lead} rest={STATEMENT.rest} />
-    <ActTwo playback={playback} projects={FILM_PROJECTS} />
-    <ActThree playback={playback} capabilities={FILM_CAPABILITIES} />
-    <ActFour playback={playback} experiments={FILM_EXPERIMENTS} />
-    <Finale playback={playback} contact={CONTACT} credit={CREDIT} />
-    {CHAPTERS.map(([act, number, name]) => <section key={act} className="film-chapter" data-act={`card-${act}`} aria-label={`Chapter ${number}: ${name}`}>
-      <div className="film-chapter-frame">
-        <span className="film-chapter-numeral" aria-hidden="true">{number}</span>
-        <p className="film-chapter-kicker">Chapter {number}</p>
-        <h2 className="film-chapter-title">{name}</h2>
-        <span className="film-chapter-streak" aria-hidden="true" />
-      </div>
-    </section>)}
-  </>;
-}
-// The chapter cards between the acts.
-const CHAPTERS = [["act2", "II", "Six builds"], ["act3", "III", "What I bring"], ["act4", "IV", "The playground"]];
 
 function PlainContact() {
   const { navigate } = useRoute();

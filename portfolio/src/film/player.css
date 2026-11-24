@@ -1,29 +1,9 @@
-/* The film player (FilmPlayer.jsx): the acts stacked full screen over the
-   page, one on at a time, with the controls along the bottom. */
-.film-player { position: fixed; inset: 0; z-index: 8000; visibility: hidden; pointer-events: none; outline: none; color: #efe6d8; }
+/* The film player (FilmPlayer.jsx): the video full screen over the page,
+   with the controls along the bottom. */
+.film-player { position: fixed; inset: 0; z-index: 8000; visibility: hidden; pointer-events: none; outline: none; color: #efe6d8; background: #000; }
 .film-player.is-rolling { visibility: visible; pointer-events: auto; }
 .film-player.is-idle { cursor: none; }
-/* An act off screen is see-through and inert (out of the keyboard order):
-   its cards set their own visibility, so hiding the act alone would not. */
-.film-player :is(.film-act, .film-chapter) { position: absolute; inset: 0; height: auto; overflow: hidden; opacity: 0; pointer-events: none; }
-.film-player.is-rolling :is(.film-act, .film-chapter).is-on { opacity: 1; pointer-events: auto; }
-.film-player .film-act > [class$="-stage"] { position: absolute; inset: 0; height: 100%; }
-/* A trailer is wider than the screen: letterbox bars over every act. */
-.film-player.is-rolling::before, .film-player.is-rolling::after { content: ""; position: absolute; left: 0; right: 0; z-index: 30; height: 7vh; background: #000; pointer-events: none; }
-.film-player.is-rolling::before { top: 0; }
-.film-player.is-rolling::after { bottom: 0; }
-/* A trailer has no time to read: the act's cards and captions stay off
-   (the page has them, links and all); its titles and names stay on. */
-.film-player :is(.act1-tools, .act2-card, .act3-card, .act4-card) { display: none !important; }
-/* A cut inside an act (the project montage) is a whip: the new frame
-   arrives sliding in from one side, smeared with speed and a touch bright,
-   and snaps into place. --whip picks the side; the player alternates it. */
-.film-player .film-act.is-cut > [class$="-stage"] { animation: film-whip .42s cubic-bezier(.15, .85, .25, 1) both; }
-@keyframes film-whip {
-  0% { transform: translateX(calc(var(--whip, 1) * 7%)) scale(1.06); filter: blur(10px) brightness(1.4) drop-shadow(4px 0 0 rgb(255 40 80 / .35)) drop-shadow(-4px 0 0 rgb(40 200 255 / .35)); }
-  45% { filter: blur(2px) brightness(1.08) drop-shadow(1px 0 0 rgb(255 40 80 / .12)) drop-shadow(-1px 0 0 rgb(40 200 255 / .12)); }
-  100% { transform: none; filter: none; }
-}
+.film-video { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: contain; background: #000; }
 
 /* The controls: a glass bar along the bottom, like a cinema's. A timeline
    marked with the chapters, a glowing fill and a playhead like a comet; the
@@ -97,65 +77,3 @@
 
 /* The page does not scroll under the film. */
 html.is-scroll-held, html.is-scroll-held body { overflow: hidden; }
-
-/* A chapter card, cut like a trailer title: black, letterbox bars closing
-   in, a huge faint numeral drifting behind; the title smashes in from
-   large with a blur and lands with a jolt of the frame, in metal that a
-   sheen of light sweeps across, while a blue anamorphic streak flashes
-   through it and a light leak drifts over the lens. */
-.film-chapter { display: grid; place-content: center; justify-items: center; padding: 0 24px; background: #030303; text-align: center; }
-.film-chapter::before, .film-chapter::after { content: ""; position: absolute; left: 0; right: 0; height: 0; background: #000; border-color: rgb(239 230 216 / .08); border-style: solid; border-width: 0; transition: height .35s var(--ease-out, ease); z-index: 3; }
-.film-chapter::before { top: 0; border-bottom-width: 1px; }
-.film-chapter::after { bottom: 0; border-top-width: 1px; }
-.film-chapter.is-on::before, .film-chapter.is-on::after { height: 16vh; }
-.film-chapter-frame { position: relative; z-index: 2; display: grid; justify-items: center; gap: clamp(10px, 1.6vw, 18px); }
-.film-chapter-numeral { position: absolute; left: 50%; top: 50%; z-index: -1; translate: -50% -50%; font: 400 clamp(12rem, 44vw, 36rem)/1 var(--font-condensed); color: rgb(239 230 216 / .035); -webkit-text-stroke: 1.5px rgb(239 230 216 / .3); pointer-events: none; opacity: 0; }
-.film-chapter-kicker { position: relative; margin: 0; font: 500 clamp(.62rem, 1vw, .8rem)/1 var(--font-mono); letter-spacing: .5em; text-transform: uppercase; color: #ff8a5f; }
-.film-chapter-title { position: relative; margin: 0; padding: 0 .06em; font: 400 clamp(3rem, 11vw, 10rem)/.9 var(--font-condensed); letter-spacing: .02em; text-transform: uppercase; color: transparent; background: linear-gradient(100deg, #e8c98e 0%, #f3ece2 30%, #f3ece2 40%, #fffaf2 47%, #ffe1bd 50%, #f3ece2 56%, #f3ece2 72%, #d9b27a 100%); background-size: 260% 100%; background-position: 100% 0; -webkit-background-clip: text; background-clip: text; filter: drop-shadow(0 0 30px rgb(255 160 110 / .3)); }
-.film-chapter-streak { position: absolute; left: -12vw; right: -12vw; top: 58%; height: 2px; background: linear-gradient(90deg, transparent, rgb(150 190 255 / .5) 20%, rgb(190 215 255 / .95) 46%, #fff 50%, rgb(190 215 255 / .95) 54%, rgb(150 190 255 / .5) 80%, transparent); box-shadow: 0 0 22px 5px rgb(120 170 255 / .45); opacity: 0; pointer-events: none; }
-.film-chapter.is-on .film-chapter-frame { animation: film-chapter-jolt .34s linear both .16s; }
-.film-chapter.is-on .film-chapter-numeral { animation: film-chapter-numeral .75s ease-out both; }
-.film-chapter.is-on .film-chapter-kicker { animation: film-chapter-in .35s var(--ease-out, ease) both .1s; }
-.film-chapter.is-on .film-chapter-title { animation: film-chapter-smash .3s cubic-bezier(.3, .9, .3, 1.15) both, film-chapter-creep .75s linear both, film-chapter-sheen .6s ease-out both .14s; }
-.film-chapter.is-on .film-chapter-streak { animation: film-chapter-streak .5s ease-out both .13s; }
-.film-chapter > .film-chapter-frame > .film-chapter-kicker::after { content: ""; position: fixed; inset: -20%; z-index: -1; pointer-events: none; background: radial-gradient(40% 50% at 50% 50%, rgb(255 120 60 / .28), transparent 70%), radial-gradient(25% 35% at 50% 50%, rgb(255 210 160 / .18), transparent 70%); mix-blend-mode: screen; opacity: 0; }
-.film-chapter.is-on > .film-chapter-frame > .film-chapter-kicker::after { animation: film-leak .75s ease-in-out both; }
-@keyframes film-chapter-in { from { opacity: 0; filter: blur(14px); transform: scale(1.08); letter-spacing: .3em; } }
-@keyframes film-chapter-smash {
-  0% { opacity: 0; transform: scale(1.7); letter-spacing: .22em; filter: blur(20px) drop-shadow(0 0 30px rgb(255 160 110 / .3)); }
-  60% { opacity: 1; filter: blur(0) drop-shadow(0 0 60px rgb(255 180 130 / .7)); }
-  100% { opacity: 1; transform: scale(1); letter-spacing: .02em; filter: blur(0) drop-shadow(0 0 30px rgb(255 160 110 / .3)); }
-}
-@keyframes film-chapter-creep { from { scale: 1; } to { scale: 1.07; } }
-@keyframes film-chapter-sheen { from { background-position: 100% 0; } to { background-position: 0% 0; } }
-@keyframes film-chapter-streak { 0% { opacity: 0; transform: scaleX(.05); } 18% { opacity: 1; transform: scaleX(1); } 100% { opacity: 0; transform: scaleX(1.25); } }
-@keyframes film-chapter-numeral { from { opacity: 0; transform: scale(1.4); } 30% { opacity: 1; } to { opacity: 1; transform: scale(1.12); } }
-@keyframes film-chapter-jolt { 0% { transform: translate(0, 0); } 15% { transform: translate(-6px, 4px); } 30% { transform: translate(5px, -3px); } 45% { transform: translate(-3px, 2px); } 60% { transform: translate(2px, -1px); } 100% { transform: none; } }
-@keyframes film-leak { 0% { opacity: 0; transform: translateX(-45%); } 35% { opacity: 1; } 100% { opacity: 0; transform: translateX(45%); } }
-
-/* The camera is held, not locked off: every act's frame drifts a little,
-   slowly, and sits a touch large so the drift never shows an edge. */
-.film-player .film-act canvas { animation: film-handheld 9s ease-in-out infinite alternate; }
-@keyframes film-handheld {
-  0% { transform: scale(1.025) translate(0, 0) rotate(0deg); }
-  25% { transform: scale(1.025) translate(-0.35%, 0.25%) rotate(-0.12deg); }
-  50% { transform: scale(1.025) translate(0.25%, -0.2%) rotate(0.08deg); }
-  75% { transform: scale(1.025) translate(-0.15%, -0.3%) rotate(0.1deg); }
-  100% { transform: scale(1.025) translate(0.3%, 0.15%) rotate(-0.06deg); }
-}
-/* Over the picture: a light leak drifting across the lens, and the slight
-   flicker of a projector's lamp. */
-.film-atmos { position: absolute; inset: 0; z-index: 20; pointer-events: none; overflow: hidden; }
-.film-atmos::before { content: ""; position: absolute; inset: -30%; background: radial-gradient(18% 24% at 12% 18%, rgb(255 110 50 / .55), transparent 70%), radial-gradient(14% 18% at 88% 82%, rgb(255 180 110 / .3), transparent 70%); mix-blend-mode: screen; opacity: .1; animation: film-leak-drift 14s ease-in-out infinite alternate; }
-.film-atmos::after { content: ""; position: absolute; inset: 0; background: #fff6ea; mix-blend-mode: overlay; opacity: 0; animation: film-flicker 2.3s steps(1) infinite; }
-@keyframes film-leak-drift { from { transform: translate(-6%, -4%) rotate(0deg); } to { transform: translate(8%, 5%) rotate(8deg); } }
-@keyframes film-flicker { 0% { opacity: 0; } 9% { opacity: .03; } 11% { opacity: 0; } 47% { opacity: .02; } 50% { opacity: 0; } 83% { opacity: .035; } 85% { opacity: 0; } }
-
-/* The flash frame on a cut. */
-.film-flash { position: absolute; inset: 0; z-index: 40; pointer-events: none; background: radial-gradient(circle at 50% 50%, #fff4e8, #ffd2b0 60%, #ff9a6a); opacity: 0; mix-blend-mode: screen; }
-.film-flash.is-on { animation: film-flash .6s cubic-bezier(.2, .7, .3, 1) both; }
-@keyframes film-flash { 0% { opacity: 0; } 18% { opacity: .24; } 100% { opacity: 0; } }
-
-@media (prefers-reduced-motion: reduce) {
-  .film-player .film-act canvas, .film-atmos::before, .film-atmos::after, .film-chapter.is-on :is(.film-chapter-frame, .film-chapter-numeral, .film-chapter-kicker, .film-chapter-title, .film-chapter-streak), .film-flash.is-on, .film-chapter.is-on > .film-chapter-frame > .film-chapter-kicker::after, .film-player .film-act.is-cut > [class$="-stage"] { animation: none; }
-}

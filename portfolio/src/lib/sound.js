@@ -3,10 +3,10 @@
    progression (lib/score.js) played on a church organ, a sub bass and a
    high ticking figure, with a clock under it, all in one long hall. It moves to the next act's music on
    the next chord, and opens up and adds air as the visitor scrolls faster.
-   Cues sit on top: the cold open's heartbeats, riser and hit, a tone on a
-   cut, a chime as a card comes up. With no film on the page (reduced
-   motion, or a device that cannot play it) no act asks for music, so there
-   is none.
+   Cues sit on top: hits, drums, whooshes, risers. The film is now a video
+   with its own soundtrack, recorded from this engine along its cut list
+   (film/score/record.mjs in the repo); on the page, the cues play the
+   ident's hit and the skip button's.
 
    The choice is remembered in this browser. Browsers start audio only after
    a click or key press, which suits a switch that is off until pressed. */

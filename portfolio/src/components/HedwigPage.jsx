@@ -3,7 +3,7 @@ import { motion, useInView, useMotionValueEvent, useReducedMotion, useScroll, us
 import { ArrowLeft, ArrowUpRight, Play } from "lucide-react";
 import Count from "./Count";
 import { LISTED_PROJECTS } from "../data/projects";
-import { PROMPT, RUN } from "../film/actTwo/sets/hedwigRun";
+import { PROMPT, RUN } from "../data/hedwigRun";
 import { STAGGER, fadeUp, maskReveal, tween } from "../lib/motion";
 import "./HedwigPage.css";
 
