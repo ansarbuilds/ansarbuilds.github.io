@@ -144,7 +144,7 @@ function StatShot({ shot }) {
 }
 
 // A screenshot in its device's frame.
-const SHAPE = { mac: { ratio: 16 / 10, radius: 1.2, pad: 0.8 }, ipad: { ratio: 4 / 3, radius: 3, pad: 2.2 }, iphone: { ratio: 9 / 19.5, radius: 6, pad: 1.2 } };
+const SHAPE = { mac: { ratio: 16 / 10, radius: 1.2, pad: 0.8 }, ipad: { ratio: 4 / 3, radius: 3, pad: 2.2 }, ipadUp: { ratio: 3 / 4, radius: 3, pad: 2.2 }, iphone: { ratio: 9 / 19.5, radius: 6, pad: 1.2 } };
 function Device({ src, device, width, tilt = 0 }) {
   const unit = useUnit();
   const shape = SHAPE[device];
@@ -173,16 +173,21 @@ function TrioShot({ shot }) {
   const { width, height } = useVideoConfig();
   const portrait = usePortrait();
   const land = (i) => ease(interpolate(f, [i * 3, i * 3 + 7], [0, 1], clamp));
-  const stamp = ease(interpolate(f, [12, 17], [0, 1], clamp));
+  const at = shot.stampAt ?? 12;
+  const stamp = ease(interpolate(f, [at, at + 5], [0, 1], clamp));
+  const rays = interpolate(f, [at - 1, at + 2, shot.frames], [0, 0.7, 0.2], clamp);
   const scale = portrait ? width / 980 : height / 720;
   return <Cut still hit={shot.hit}>
-    <AbsoluteFill style={{ alignItems: "center", justifyContent: "center", background: "radial-gradient(circle at 50% 45%, #3b2f25, #0d0b0a 70%)" }}>
+    <AbsoluteFill style={{ background: `radial-gradient(circle at 50% 45%, ${shot.tint ? "#2a2145" : "#3b2f25"}, #0d0b0a 70%)` }} />
+    <AbsoluteFill style={{ opacity: rays, background: "repeating-conic-gradient(from 0deg, rgb(220 205 255 / .18) 0deg 2deg, transparent 2deg 9deg)", WebkitMaskImage: "radial-gradient(circle, #000 0%, transparent 60%)", maskImage: "radial-gradient(circle, #000 0%, transparent 60%)", transform: `rotate(${f * 0.3}deg) scale(1.6)` }} />
+    <AbsoluteFill style={{ alignItems: "center", justifyContent: "center" }}>
       <div style={{ position: "relative", width: 900 * scale, height: 520 * scale, marginLeft: portrait ? 60 * scale : 0 }}>
         {[["halo-storybible-mac.jpg", "mac", 640, 0, 20, -1], ["halo-corkboard-ipad.jpg", "ipad", 300, 560, 170, 3], ["halo-write-iphone.jpg", "iphone", 150, -40, 230, -4]].map(([src, device, w, x, y, tilt], i) =>
           <div key={src} style={{ position: "absolute", left: x * scale, top: y * scale, opacity: land(i), transform: `translateY(${(1 - land(i)) * 120}px) scale(${1.2 - 0.2 * land(i)})` }}><Device src={src} device={device} width={w * scale} tilt={tilt} /></div>)}
       </div>
-      <div style={{ position: "absolute", bottom: (portrait ? 18 : 7) * unit, padding: `${1.4 * unit}px ${3 * unit}px`, border: `2px solid ${CORAL}`, borderRadius: 999, font: `600 ${2.8 * unit}px/1 ${MONO}`, letterSpacing: "0.2em", textTransform: "uppercase", color: BONE, background: "rgb(8 7 10 / .7)", opacity: stamp, transform: `scale(${1.6 - 0.6 * stamp}) rotate(-2deg)` }}>{shot.stamp}</div>
+      <div style={{ position: "absolute", bottom: (portrait ? 18 : 7) * unit, padding: `${1.4 * unit}px ${3 * unit}px`, border: `2px solid ${CORAL}`, borderRadius: 999, font: `600 ${2.8 * unit}px/1 ${MONO}`, letterSpacing: "0.2em", textTransform: "uppercase", color: BONE, background: "rgb(8 7 10 / .7)", opacity: stamp, transform: `scale(${1.6 - 0.6 * stamp}) rotate(-2deg)`, boxShadow: stamp > 0.9 ? `0 0 ${4 * unit}px ${shot.tint ?? CORAL}88` : "none" }}>{shot.stamp}</div>
     </AbsoluteFill>
+    <Shockwave at={at} tint={shot.tint ?? CORAL} />
   </Cut>;
 }
 
@@ -567,15 +572,138 @@ function SendShot({ shot }) {
   </Cut>;
 }
 
-const SHOT = { listen: ListenShot, clean: CleanShot, send: SendShot, train: TrainShot, tokens: TokensShot, receipts: ReceiptsShot, boot: BootShot, slam: SlamShot, word: WordShot, three: ThreeShot, type: TypeShot, term: TermShot, title: TitleShot, clip: ClipShot, stat: StatShot, device: DeviceShot, trio: TrioShot, end: EndShot };
+/* ---- Haloscript ---- */
+
+const NIGHT = "#100c1f";
+
+/* The app opens: its icon pops in, the halo from the icon draws itself
+   around it and throws out a ring of light, and the name slams in. */
+function HaloShot({ shot }) {
+  const f = useCurrentFrame();
+  const unit = useUnit();
+  const { width, height } = useVideoConfig();
+  const portrait = usePortrait();
+  const c = portrait ? { x: width / 2, y: height * 0.27 } : { x: width * 0.72, y: height * 0.44 };
+  const tile = (portrait ? 30 : 26) * unit;
+  const pop = interpolate(f, [5, 9, 12], [0, 1.12, 1], clamp);
+  const draw = ease(interpolate(f, [8, 20], [0, 1], clamp));
+  const glow = interpolate(f, [18, 22, shot.frames], [0, 1, 0.6], clamp);
+  const slam = ease(interpolate(f, [24, 30], [0, 1], clamp));
+  const line = interpolate(f, [29, 35], [0, 1], clamp);
+  const ring = { rx: tile * 1.15, ry: tile * 0.3, cy: c.y + tile * 0.42 };
+  const length = Math.PI * (3 * (ring.rx + ring.ry) - Math.sqrt((3 * ring.rx + ring.ry) * (ring.rx + 3 * ring.ry)));
+  const wave = interpolate(f, [20, 34], [0, 1], clamp);
+  return <Cut still hit={shot.hit}>
+    <AbsoluteFill style={{ background: `radial-gradient(circle at ${portrait ? "50% 27%" : "72% 44%"}, #2a1f4a, ${NIGHT} 60%)` }} />
+    <AbsoluteFill style={{ opacity: glow * 0.8, background: "repeating-conic-gradient(from 0deg at " + (portrait ? "50% 27%" : "72% 44%") + ", rgb(220 205 255 / .16) 0deg 2deg, transparent 2deg 10deg)", WebkitMaskImage: `radial-gradient(circle at ${portrait ? "50% 27%" : "72% 44%"}, #000 0%, transparent 45%)`, maskImage: `radial-gradient(circle at ${portrait ? "50% 27%" : "72% 44%"}, #000 0%, transparent 45%)` }} />
+    <AbsoluteFill><svg width={width} height={height}>
+      {/* The halo, drawn around the icon, then a ring of it thrown out. */}
+      <ellipse cx={c.x} cy={ring.cy} rx={ring.rx} ry={ring.ry} fill="none" stroke={shot.tint} strokeWidth={unit * 1.6} strokeOpacity={0.25} strokeDasharray={length} strokeDashoffset={length * (1 - draw)} style={{ filter: `blur(${unit * 0.8}px)` }} />
+      <ellipse cx={c.x} cy={ring.cy} rx={ring.rx} ry={ring.ry} fill="none" stroke="#f3eeff" strokeWidth={unit * 0.5} strokeDasharray={length} strokeDashoffset={length * (1 - draw)} strokeLinecap="round" style={{ filter: `drop-shadow(0 0 ${unit * 1.2}px ${shot.tint})` }} />
+      {f >= 20 && wave < 1 && <ellipse cx={c.x} cy={ring.cy} rx={ring.rx * (1 + 2.6 * ease(wave))} ry={ring.ry * (1 + 2.6 * ease(wave))} fill="none" stroke={shot.tint} strokeWidth={unit * (0.2 + 1.4 * (1 - wave))} strokeOpacity={0.9 * (1 - wave)} />}
+    </svg></AbsoluteFill>
+    <div style={{ position: "absolute", left: c.x - tile / 2, top: c.y - tile / 2 - tile * 0.12, width: tile, height: tile, borderRadius: tile * 0.23, overflow: "hidden", transform: `scale(${pop})`, boxShadow: `0 ${2 * unit}px ${6 * unit}px rgb(0 0 0 / .6), 0 0 ${8 * unit * glow}px ${shot.tint}88` }}>
+      <Img src={staticFile("halo-icon.png")} style={{ width: "100%", height: "100%", display: "block" }} />
+    </div>
+    <AbsoluteFill style={{ padding: portrait ? `${height * 0.53}px ${7 * unit}px 0` : `${9 * unit}px ${8 * unit}px`, gap: 2.2 * unit }}>
+      <Prompt text={shot.command} from={0} perChar={0.3} size={3 * unit} />
+      <div style={{ display: "flex", alignItems: "baseline", gap: 3 * unit, marginTop: (portrait ? 3 : 14) * unit, transform: `scale(${1.6 - 0.6 * slam})`, transformOrigin: "left center", opacity: slam, filter: `blur(${(1 - slam) * 12}px)` }}>
+        <span style={{ font: `500 ${6 * unit}px/1 ${MONO}`, color: shot.tint }}>{shot.number}</span>
+        <span style={{ font: `400 ${(portrait ? Math.min(20, 118 / shot.name.length) : 17) * unit}px/0.9 ${ANTON}`, color: BONE, textShadow: `0 0 50px ${shot.tint}88` }}>{shot.name}</span>
+      </div>
+      <div style={{ font: `italic 400 ${(portrait ? 6 : 5) * unit}px/1.1 ${SERIF}`, color: BONE, opacity: line * 0.9 }}>{shot.line}</div>
+    </AbsoluteFill>
+    <Shockwave at={24} tint={shot.tint} />
+  </Cut>;
+}
+
+/* One app, three screens: the frame turns from a Mac into an iPad into an
+   iPhone, its screen changing with it, on two beats. */
+function MorphShot({ shot }) {
+  const f = useCurrentFrame();
+  const unit = useUnit();
+  const { width, height } = useVideoConfig();
+  const portrait = usePortrait();
+  const turns = [[8, 13], [19, 24]];
+  // How far along the three screens it is: 0 the Mac, 1 the iPad, 2 the iPhone.
+  const along = turns.reduce((sum, [a, b]) => sum + ease(interpolate(f, [a, b], [0, 1], clamp)), 0);
+  const shapes = shot.screens.map(([, device]) => SHAPE[device]);
+  const mix = (key) => { const i = Math.min(1, Math.floor(along)), u = along - i; return shapes[i][key] + (shapes[Math.min(2, i + 1)][key] - shapes[i][key]) * u; };
+  const ratio = Math.exp(mix("ratioLog"));
+  const maxW = portrait ? width * 0.84 : width * 0.62, maxH = portrait ? height * 0.56 : height * 0.66;
+  const w = Math.min(maxW, maxH * ratio), h = w / ratio;
+  const spin = turns.reduce((sum, [a, b]) => sum + Math.sin(Math.PI * interpolate(f, [a, b], [0, 1], clamp)), 0);
+  const now = Math.round(along);
+  return <Cut hit={shot.hit}>
+    <AbsoluteFill style={{ background: `radial-gradient(circle at 50% 45%, #2a2145, ${NIGHT} 65%)` }} />
+    <AbsoluteFill style={{ alignItems: "center", justifyContent: "center", flexDirection: "column", gap: 3.5 * unit }}>
+      <div style={{ font: `italic 400 ${(portrait ? 6.5 : 5) * unit}px/1 ${SERIF}`, color: BONE, opacity: interpolate(f, [2, 7], [0, 0.9], clamp) }}>{shot.line}</div>
+      <div style={{ width: w, height: h, padding: mix("pad") * unit, borderRadius: mix("radius") * unit, background: "linear-gradient(160deg, #2e2a3a, #0c0c10)", boxShadow: `0 40px 80px rgb(0 0 0 / .6), inset 0 0 0 1px rgb(255 255 255 / .08), 0 0 ${6 * unit * spin}px ${shot.tint}66`, transform: `perspective(1400px) rotateY(${spin * 18}deg) scale(${1 + 0.06 * spin})`, boxSizing: "border-box" }}>
+        <div style={{ position: "relative", width: "100%", height: "100%", borderRadius: (mix("radius") - mix("pad") / 2) * unit, overflow: "hidden" }}>
+          {shot.screens.map(([src], i) => <Img key={src} src={staticFile(src)} style={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "cover", objectPosition: "top", opacity: Math.max(0, 1 - Math.abs(along - i)) }} />)}
+        </div>
+      </div>
+      <div style={{ display: "flex", gap: 3 * unit, font: `600 ${2.4 * unit}px/1 ${MONO}`, letterSpacing: "0.2em", textTransform: "uppercase" }}>
+        {shot.screens.map(([, , name], i) => <span key={name} style={{ color: i === now ? "#f3eeff" : "rgb(239 230 216 / .3)", textShadow: i === now ? `0 0 ${1.5 * unit}px ${shot.tint}` : "none", borderBottom: `2px solid ${i === now ? shot.tint : "transparent"}`, paddingBottom: 0.6 * unit }}>{name}</span>)}
+      </div>
+    </AbsoluteFill>
+  </Cut>;
+}
+for (const shape of Object.values(SHAPE)) shape.ratioLog = Math.log(shape.ratio);
+
+/* A word written on the Mac goes up to the writer's own iCloud and comes
+   down on the iPad and the iPhone; then what is not in the way. */
+function SyncShot({ shot }) {
+  const f = useCurrentFrame();
+  const unit = useUnit();
+  const { width, height } = useVideoConfig();
+  const portrait = usePortrait();
+  const s = portrait ? width / 720 : width / 1280;
+  const L = portrait
+    ? { cloud: [360, 250], mac: [360, 560, 520], ipad: [235, 905, 210], iphone: [500, 905, 132], promises: 1130 }
+    : { cloud: [640, 150], mac: [330, 430, 400], ipad: [800, 440, 200], iphone: [1010, 440, 124], promises: 650 };
+  const dev = (key, src, device) => { const [x, y, w] = L[key]; const h = w / SHAPE[device].ratio; return { x: x * s, y: y * s, w: w * s, h: h * s, src, device }; };
+  const mac = dev("mac", "halo-home-mac.jpg", "mac"), ipad = dev("ipad", "halo-write-ipad.jpg", "ipadUp"), iphone = dev("iphone", "halo-write-iphone.jpg", "iphone");
+  const cloud = { x: L.cloud[0] * s, y: L.cloud[1] * s };
+  const [upAt, downAt] = shot.cues.map(([at]) => at);
+  const typed = Math.floor(interpolate(f, [1, upAt - 4], [0, shot.word.length], clamp));
+  const up = interpolate(f, [upAt - 4, upAt], [0, 1], clamp);
+  const down = interpolate(f, [upAt, downAt], [0, 1], clamp);
+  const got = f >= downAt;
+  const pulse = (from, to, u, key) => u > 0 && u < 1 && <g key={key}>
+    <line x1={from[0]} y1={from[1]} x2={from[0] + (to[0] - from[0]) * u} y2={from[1] + (to[1] - from[1]) * u} stroke={shot.tint} strokeWidth={unit * 0.4} strokeOpacity={0.6} />
+    <circle cx={from[0] + (to[0] - from[0]) * u} cy={from[1] + (to[1] - from[1]) * u} r={unit * 1.1} fill="#f3eeff" style={{ filter: `drop-shadow(0 0 ${unit}px ${shot.tint})` }} />
+  </g>;
+  const top = (d) => [d.x, d.y - d.h / 2 - 5 * unit];
+  const chip = (d, on, key) => <div key={key} style={{ position: "absolute", left: d.x, top: d.y - d.h / 2 - 5.5 * unit, transform: `translate(-50%, -50%) scale(${on ? 1 : 0.6})`, opacity: on ? 1 : 0, padding: `${0.8 * unit}px ${1.6 * unit}px`, borderRadius: 999, border: `1px solid ${shot.tint}`, background: "rgb(16 12 31 / .9)", font: `italic 400 ${2.8 * unit}px/1 ${SERIF}`, color: "#f3eeff", whiteSpace: "nowrap", boxShadow: `0 0 ${2 * unit}px ${shot.tint}66` }}>{key === "mac" ? shot.word.slice(0, typed) : shot.word}</div>;
+  return <Cut still hit={shot.hit}>
+    <AbsoluteFill style={{ background: `radial-gradient(circle at 50% 20%, #2a2145, ${NIGHT} 65%)` }} />
+    {[mac, ipad, iphone].map((d, i) => <div key={d.src} style={{ position: "absolute", left: d.x - d.w / 2, top: d.y - d.h / 2, filter: i && got ? `drop-shadow(0 0 ${3 * unit}px ${shot.tint})` : "none" }}><Device src={d.src} device={d.device} width={d.w} /></div>)}
+    <AbsoluteFill><svg width={width} height={height}>
+      <g transform={`translate(${cloud.x} ${cloud.y}) scale(${unit * 0.11})`} style={{ filter: `drop-shadow(0 0 ${unit * (up >= 1 ? 2 : 0.6)}px ${shot.tint})` }}>
+        <path d="M -60 25 A 25 25 0 0 1 -48 -18 A 38 38 0 0 1 22 -32 A 30 30 0 0 1 62 25 Z" fill="#1d1638" stroke="#f3eeff" strokeWidth={4} strokeLinejoin="round" />
+      </g>
+      {pulse(top(mac), [cloud.x, cloud.y + 1.5 * unit], up, "up")}
+      {pulse([cloud.x, cloud.y + 1.5 * unit], top(ipad), down, "a")}
+      {pulse([cloud.x, cloud.y + 1.5 * unit], top(iphone), down, "b")}
+    </svg></AbsoluteFill>
+    <div style={{ position: "absolute", left: cloud.x, top: cloud.y + 8 * unit, transform: "translateX(-50%)", font: `600 ${1.9 * unit}px/1 ${MONO}`, letterSpacing: "0.22em", textTransform: "uppercase", color: shot.tint, whiteSpace: "nowrap" }}>Your own iCloud</div>
+    {chip(mac, typed > 0, "mac")}{chip(ipad, got, "ipad")}{chip(iphone, got, "iphone")}
+    <div style={{ position: "absolute", left: 0, right: 0, top: L.promises * s, display: "flex", flexWrap: "wrap", justifyContent: "center", gap: 1.6 * unit, padding: `0 ${5 * unit}px` }}>
+      {shot.promises.map((p, i) => { const v = ease(interpolate(f, [downAt + 2 + i * 3, downAt + 6 + i * 3], [0, 1], clamp)); return <span key={p} style={{ font: `600 ${2.2 * unit}px/1 ${MONO}`, letterSpacing: "0.16em", textTransform: "uppercase", color: BONE, padding: `${1 * unit}px ${1.8 * unit}px`, border: "1px solid rgb(201 184 255 / .5)", borderRadius: 999, opacity: v, transform: `translateY(${(1 - v) * 14}px)` }}>{p}</span>; })}
+    </div>
+  </Cut>;
+}
+
+const SHOT = { halo: HaloShot, morph: MorphShot, sync: SyncShot, listen: ListenShot, clean: CleanShot, send: SendShot, train: TrainShot, tokens: TokensShot, receipts: ReceiptsShot, boot: BootShot, slam: SlamShot, word: WordShot, three: ThreeShot, type: TypeShot, term: TermShot, title: TitleShot, clip: ClipShot, stat: StatShot, device: DeviceShot, trio: TrioShot, end: EndShot };
 
 // Over every shot: the project's tag at the corner, grain and a vignette.
 function Chrome() {
   const f = useCurrentFrame();
   const unit = useUnit();
   const cut = CUTS.find((c) => f >= c.start && f < c.end) ?? CUTS.at(-1);
-  const title = CUTS.find((c) => c.chapter === cut.chapter && ["title", "train", "listen"].includes(c.kind));
-  const showTag = title && !["title", "train", "listen"].includes(cut.kind);
+  const title = CUTS.find((c) => c.chapter === cut.chapter && ["title", "train", "listen", "halo"].includes(c.kind));
+  const showTag = title && !["title", "train", "listen", "halo"].includes(cut.kind);
   return <>
     {showTag && <div style={{ position: "absolute", left: 4 * unit, top: 4 * unit, display: "flex", alignItems: "center", gap: 1.2 * unit, font: `600 ${1.9 * unit}px/1 ${MONO}`, letterSpacing: "0.2em", textTransform: "uppercase", color: BONE, textShadow: "0 1px 8px #000" }}>
       <span style={{ width: 1.2 * unit, height: 1.2 * unit, borderRadius: "50%", background: Math.floor(f / 8) % 2 ? CORAL : "#7a2a14" }} />{title.number} / {title.name}
