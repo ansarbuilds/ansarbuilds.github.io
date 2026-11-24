@@ -7,7 +7,7 @@ import { cue, onSoundChange, soundOn, soundPlaying } from "../lib/sound";
    FilmIdent  the studio ident it opens on, over black: a point of light
               ignites into a streak and bursts, rays fan out, and the name
               pulls together out of the light in gold. It holds the screen
-              until the cold open's first frame.
+              until the film's first frame.
    FilmSkip   the way out, big enough that nobody has to look for it, and
               the nudge to tap for sound (a browser plays none before a
               click, tap or key). */

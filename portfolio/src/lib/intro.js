@@ -16,24 +16,20 @@ export function shouldPlayIntro() {
   }
 }
 
-/* Whether this visitor gets the film's 3D scenes at all: not with reduced
-   motion, on Save-Data or a 2G/3G connection, or without WebGL 2. The page
+/* Whether this visitor gets the film at all: not with reduced motion, or on
+   Save-Data or a 2G/3G connection (it is a few megabytes of video). The page
    shows its plain version instead. */
 export function filmEnabled() {
   if (typeof window === "undefined") return false;
   if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return false;
   const connection = navigator.connection;
-  if (connection?.saveData || /(^|-)(2g|3g)$/.test(connection?.effectiveType ?? "")) return false;
-  try {
-    return !!document.createElement("canvas").getContext("webgl2");
-  } catch {
-    return false;
-  }
+  return !(connection?.saveData || /(^|-)(2g|3g)$/.test(connection?.effectiveType ?? ""));
 }
 
 export const COLD_OPEN_SESSION_KEY = "cold-open-played";
 
-// Dev server only: ?coldopen=full plays the film on every load.
+// Dev server only: ?coldopen=full plays the film on every load (the name
+// is from the film's old cold open; tests and notes use it).
 export function coldOpenForced() {
   if (typeof window === "undefined" || !import.meta.env?.DEV) return false;
   return new URLSearchParams(window.location.search).get("coldopen") === "full";
@@ -55,9 +51,6 @@ export function filmAutoplayWanted() {
     return false;
   }
 }
-
-// Skips the rest of the film, wherever it is (the cold open listens).
-export const SKIP_FILM = "film:skip";
 
 // Asks the app to play the film from the start (the nav and hero buttons).
 export const WATCH_FILM = "film:watch";
