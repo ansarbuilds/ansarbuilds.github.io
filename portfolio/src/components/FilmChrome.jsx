@@ -70,6 +70,35 @@ export function FilmSkip({ onSkip }) {
       <span className="film-skip-ff" aria-hidden="true"><i /><i /><i /></span>
       {leaving && <span className="film-skip-ring" aria-hidden="true" />}
     </button>
-    {waiting && <p className="film-tap" aria-hidden="true"><i><b /><b /><b /></i>Tap anywhere for sound</p>}
+    <FilmTap waiting={waiting} />
   </>;
+}
+
+// How long "Sound on" stays up once the tap wakes the sound.
+const WOKE_MS = 1100;
+
+/* Tap for sound: a speaker sending out waves, sonar rings off the badge and
+   a five-band meter, until the first tap wakes the sound. Then it answers:
+   the meter jumps, the rings blast out, it says "Sound on", and goes. */
+function FilmTap({ waiting }) {
+  const [woke, setWoke] = useState(false);
+  const was = useRef(waiting);
+  useEffect(() => {
+    const before = was.current;
+    was.current = waiting;
+    if (!before || waiting) return undefined;
+    setWoke(true);
+    const timer = setTimeout(() => setWoke(false), WOKE_MS);
+    return () => clearTimeout(timer);
+  }, [waiting]);
+  if (!waiting && !woke) return null;
+  return <p className={`film-tap${woke ? " is-woke" : ""}`} aria-hidden="true">
+    <span className="film-tap-ring" /><span className="film-tap-ring is-late" />
+    <span className="film-tap-speaker"><span className="film-tap-cone" /><span className="film-tap-arc" /><span className="film-tap-arc" /><span className="film-tap-arc" /></span>
+    <span className="film-tap-text">
+      <span className="film-tap-ask">Tap anywhere for sound</span>
+      <span className="film-tap-on">Sound on</span>
+    </span>
+    <i className="film-tap-eq"><b /><b /><b /><b /><b /></i>
+  </p>;
 }
