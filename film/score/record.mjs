@@ -35,8 +35,10 @@ window.play = () => new Promise((done) => {
       // Keys ticking under a shot, evenly through it.
       for (let k = 1; k <= (cut.ticks ?? 0); k++) setTimeout(() => cue("tick"), (k * cut.frames / (cut.ticks + 1) / FPS) * 1000);
     });
+    // Sounds inside a shot, each at its own frame.
+    for (const [frame, name] of cut.cues ?? []) at((cut.start + frame) / FPS, () => cue(name));
     // The music rises into each project's title.
-    if (cut.kind === "title" && s > 0.7) at(s - 0.7, () => cue("swell", 0.7));
+    if (["title", "listen"].includes(cut.kind) && s > 0.7) at(s - 0.7, () => cue("swell", 0.7));
   }
   at(CUTS.at(-1).end / FPS + 1.2, done);
 });
