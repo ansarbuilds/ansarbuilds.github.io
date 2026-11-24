@@ -13,9 +13,11 @@ import { test, expect } from '@playwright/test';
 const ACTS = ['act1', 'act2', 'act3', 'act4', 'finale', 'card-act2', 'card-act3', 'card-act4'];
 // Everything the film fades in and out, shown for the measurement.
 const SHOW_ALL = `
-  .act1-card, .act1-statement, .act1-tools, .act2-title, .act2-card, .act3-title, .act3-card, .act4-title, .act4-card, .fin-block, .film-act-title, .film-act-word {
+  .act1-card, .act1-statement, .act1-tools, .act2-title, .act2-card, .act3-title, .act3-card, .act4-title, .act4-card, .fin-block, .film-act-title, .film-act-letter, .film-act-num {
     opacity: 1 !important; visibility: visible !important; transform: none !important;
   }
+  /* An act title's letters and numeral, where they land. */
+  .film-act-letter, .film-act-num { translate: none !important; scale: none !important; filter: none !important; animation: none !important; transition: none !important; }
   .film-player, .film-player :is(.film-act, .film-chapter) { visibility: visible !important; opacity: 1 !important; }
   .film-chapter-kicker, .film-chapter-title { animation: none !important; }
   .bb8-edge { display: none !important; }

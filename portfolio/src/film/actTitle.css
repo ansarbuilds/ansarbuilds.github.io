@@ -1,8 +1,46 @@
-/* An act's title card: the display face, kerned, each word rising out of a
-   mask in reading order (timings from motion.js, via the CSS tokens). */
-.film-act-title { position: absolute; z-index: 3; top: clamp(82px, 10vh, 92px); left: max(20px, calc((100vw - 1200px) / 2)); right: 20px; margin: 0; pointer-events: none; font: 400 clamp(1.5rem, 3.6vw, 3rem)/1 var(--font-condensed); letter-spacing: .015em; font-kerning: normal; font-feature-settings: "kern" 1; color: #efe6d8; text-shadow: 0 4px 40px #000; overflow: hidden; padding-bottom: .08em; }
-.film-act-word { display: inline-block; opacity: 0; transform: translateY(108%); transition: transform var(--dur-slow) var(--ease-out), opacity var(--dur-slow) var(--ease-out); transition-delay: calc(var(--i) * var(--stagger-loose)); }
-.film-act-title.is-up .film-act-word { opacity: 1; transform: none; }
-/* Leaving: quicker, all together. */
-.film-act-title:not(.is-up) .film-act-word { transition-duration: var(--dur-base); transition-timing-function: var(--ease-exit); transition-delay: 0s; }
-@media (prefers-reduced-motion: reduce) { .film-act-word { transform: none; transition-property: opacity; } }
+/* An act's title, like a trailer's. Coming up (in about half a second, for
+   the trailer's quick cut): a flare streaks across behind it, the numeral
+   slams in out of a blur and a flash, the name's letters close in from wide
+   and blurred one after another, a rule draws out under it, and a sheen
+   crosses the gold. Going: the letters fly apart and blur, all at once. */
+.film-act-title { position: absolute; z-index: 3; top: clamp(92px, 13vh, 118px); left: max(20px, calc((100vw - 1200px) / 2)); right: 20px; margin: 0; padding: 1.1em 0 .5em; pointer-events: none; display: flex; align-items: baseline; gap: .32em; flex-wrap: wrap; font: 400 clamp(1.7rem, 4.2vw, 3.6rem)/1 var(--font-condensed); letter-spacing: .02em; font-kerning: normal; font-feature-settings: "kern" 1; color: #efe6d8; text-shadow: 0 4px 40px #000; white-space: nowrap; }
+/* "Chapter", above. */
+.film-act-title::before { content: "Chapter"; position: absolute; top: 0; left: .06em; font: 600 clamp(.56rem, .9vw, .7rem)/1 var(--font-mono); letter-spacing: .5em; text-transform: uppercase; color: #ff8a5f; opacity: 0; translate: -12px 0; transition: opacity .3s, translate .5s cubic-bezier(.2, .8, .2, 1); }
+.film-act-title.is-up::before { opacity: .9; translate: 0 0; transition-delay: .18s; }
+
+/* The numeral: gold, slamming in. */
+.film-act-num { position: relative; display: inline-block; font-size: 1.6em; color: transparent; background: linear-gradient(170deg, #fff4e6 10%, #ffc79a 45%, #d5360c 100%); -webkit-background-clip: text; background-clip: text; filter: drop-shadow(0 0 18px rgb(255 140 90 / .45)); opacity: 0; transform-origin: 40% 60%; }
+.film-act-title.is-out .film-act-num { animation: film-act-out .32s cubic-bezier(.5, 0, .9, .4) both; }
+@keyframes film-act-out { from { opacity: 1; scale: 1; filter: drop-shadow(0 0 18px rgb(255 140 90 / .45)); } to { opacity: 0; scale: 1.3; filter: blur(8px); } }
+.film-act-title.is-up .film-act-num { opacity: 1; scale: 1; animation: film-act-slam .55s cubic-bezier(.2, .9, .25, 1) both; }
+@keyframes film-act-slam {
+  0% { opacity: 0; scale: 2.4; filter: blur(14px) brightness(2.6) drop-shadow(0 0 30px rgb(255 200 160 / .9)); }
+  35% { opacity: 1; scale: .94; filter: blur(0) brightness(1.8) drop-shadow(0 0 34px rgb(255 170 120 / .9)); }
+  60% { scale: 1.03; }
+  100% { scale: 1; filter: drop-shadow(0 0 18px rgb(255 140 90 / .45)); }
+}
+
+/* The name: letters closing in. */
+.film-act-name { position: relative; display: inline-block; }
+.film-act-letter, .film-act-gap { display: inline-block; white-space: pre; }
+.film-act-letter { color: transparent; background: linear-gradient(100deg, #d9b27a 0%, #f3ece2 30%, #fffaf2 44%, #ffe1bd 50%, #f3ece2 60%, #d9b27a 100%); background-size: calc(var(--n) * 100%) 100%; background-position: calc(var(--i) / var(--n) * 100%) 0; -webkit-background-clip: text; background-clip: text; opacity: 0; translate: calc((var(--i) - var(--n) / 2) * .28em) 0; filter: blur(10px); transition: opacity .35s ease-out, translate .55s cubic-bezier(.16, .9, .2, 1), filter .45s ease-out; transition-delay: calc(.12s + var(--i) * 18ms); }
+.film-act-title.is-up .film-act-letter { opacity: 1; translate: 0 0; filter: blur(0); }
+.film-act-title.is-up .film-act-name { animation: film-act-sheen 1.4s ease-in-out .5s both; }
+@keyframes film-act-sheen { from { filter: brightness(1); } 40% { filter: brightness(1.35) drop-shadow(0 0 12px rgb(255 200 160 / .5)); } to { filter: brightness(1); } }
+
+/* The flare behind it, and the rule under it. */
+.film-act-flare { position: absolute; left: -10%; top: 58%; width: 120%; height: 2px; translate: 0 -50%; background: linear-gradient(90deg, transparent, rgb(150 190 255 / .5) 20%, rgb(255 220 190 / .95) 46%, #fff 50%, rgb(255 220 190 / .95) 54%, rgb(150 190 255 / .5) 80%, transparent); box-shadow: 0 0 22px 4px rgb(255 150 100 / .45); opacity: 0; transform: scaleX(0); transform-origin: 0 50%; }
+.film-act-title.is-up .film-act-flare { animation: film-act-flare .9s cubic-bezier(.2, .7, .2, 1) both; }
+@keyframes film-act-flare { 0% { opacity: 0; transform: scaleX(0); } 15% { opacity: 1; } 45% { opacity: .9; transform: scaleX(1); } 100% { opacity: 0; transform: scaleX(1) translateX(18%); } }
+.film-act-rule { position: absolute; left: 0; bottom: 0; width: min(100%, 9.5em); height: 2px; background: linear-gradient(90deg, #ff8a5f, rgb(255 138 95 / 0)); transform: scaleX(0); transform-origin: 0 50%; transition: transform .6s cubic-bezier(.2, .8, .2, 1) .25s; }
+.film-act-title.is-up .film-act-rule { transform: scaleX(1); }
+
+/* Leaving: quicker, all together, the letters flying apart. */
+.film-act-title:not(.is-up) .film-act-letter { translate: calc((var(--i) - var(--n) / 2) * .4em) 0; transition-duration: .3s; transition-timing-function: cubic-bezier(.5, 0, .9, .4); transition-delay: 0s; }
+.film-act-title:not(.is-up) .film-act-rule { transition: transform .25s ease-in; transform-origin: 100% 50%; }
+
+@media (prefers-reduced-motion: reduce) {
+  .film-act-num, .film-act-letter, .film-act-title::before { translate: none; scale: none; filter: none; transition-property: opacity; }
+  .film-act-title.is-up .film-act-num, .film-act-title.is-out .film-act-num, .film-act-title.is-up .film-act-name, .film-act-title.is-up .film-act-flare { animation: none; }
+  .film-act-flare, .film-act-rule { display: none; }
+}
