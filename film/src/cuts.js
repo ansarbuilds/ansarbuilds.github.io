@@ -8,7 +8,9 @@ export const FPS = 30;
 
 // kind: type (a word slammed full screen), term (a command typed), title (a
 // project's title card), clip (footage), stat (a number slammed), device
-// (a screenshot in its frame), trio (all three devices), end.
+// (a screenshot in its frame), trio (all three devices), end. Each
+// project's own shots: train, tokens and receipts (Hedwig); listen, clean
+// and send (saywhen).
 // hit: the sound on the cut (drum, braam, impact, tick, whoosh, hit).
 const SHOTS = [
   // Open: who, and what. A terminal boots and answers, the name slams in,
@@ -35,15 +37,17 @@ const SHOTS = [
   { chapter: "hedwig", kind: "clip", frames: 14, src: "hedwig-reel.mp4", from: 15.1, hit: "drum" },
   { chapter: "hedwig", kind: "clip", frames: 22, src: "hedwig-reel.mp4", from: 16.9, hit: "whoosh" },
 
-  // saywhen.
-  { chapter: "saywhen", kind: "title", frames: 32, command: "saywhen --listen", number: "02", name: "saywhen", line: "Hands-free voice input for developers", tint: "#f2a93b", hit: "braam" },
-  { chapter: "saywhen", kind: "clip", frames: 16, src: "saywhen-demo.mp4", from: 2.6, hit: "drum" },
-  { chapter: "saywhen", kind: "clip", frames: 24, src: "saywhen-demo.mp4", from: 6.4, hit: "drum" },
-  { chapter: "saywhen", kind: "clip", frames: 20, src: "saywhen-demo.mp4", from: 18.4, hit: "drum" },
-  { chapter: "saywhen", kind: "clip", frames: 12, src: "saywhen-demo.mp4", from: 20.9, hit: "drum" },
-  { chapter: "saywhen", kind: "clip", frames: 22, src: "saywhen-demo.mp4", from: 33.4, hit: "drum" },
-  { chapter: "saywhen", kind: "stat", frames: 18, value: "34/34", label: "spoken commands cleaned exactly", tint: "#f2a93b", hit: "impact" },
-  { chapter: "saywhen", kind: "clip", frames: 22, src: "saywhen-demo.mp4", from: 53.2, hit: "whoosh" },
+  // saywhen: the camera and the microphone agreeing before it listens, the
+  // film's own shots, spoken words cleaned into commands, and the send.
+  // `cues` are extra sounds inside a shot, at a frame.
+  { chapter: "saywhen", kind: "listen", frames: 44, command: "saywhen --listen", number: "02", name: "saywhen", line: "Hands-free voice input for developers", signals: ["FACE", "LIPS", "VOICE"], states: ["Waiting", "Ready", "Listening"], tint: "#f2a93b", riser: 1.0, hit: "braam", cues: [[8, "tick"], [13, "tick"], [18, "tick"]] },
+  { chapter: "saywhen", kind: "clip", frames: 14, src: "saywhen-demo.mp4", from: 2.6, hit: "drum" },
+  { chapter: "saywhen", kind: "clip", frames: 16, src: "saywhen-demo.mp4", from: 6.4, hit: "drum" },
+  { chapter: "saywhen", kind: "clean", frames: 42, rows: [["cargo test dash dash release", "cargo test --release", "dash dash release", "--release"], ["cubectal get pods", "kubectl get pods", "cubectal", "kubectl"], ["git push dash dash force", "git push --force", "dash dash force", "--force", "typed with a warning, never sent"]], tint: "#f2a93b", hit: "whoosh", cues: [[11, "tick"], [23, "tick"], [35, "tick"]] },
+  { chapter: "saywhen", kind: "clip", frames: 14, src: "saywhen-demo.mp4", from: 18.4, hit: "drum" },
+  { chapter: "saywhen", kind: "send", frames: 30, app: "Terminal", text: "cargo test --release", enterAt: 19, tint: "#f2a93b", hit: "drum", cues: [[19, "impact"]] },
+  { chapter: "saywhen", kind: "stat", frames: 16, value: "34/34", label: "spoken commands cleaned exactly", tint: "#f2a93b", hit: "drum" },
+  { chapter: "saywhen", kind: "clip", frames: 18, src: "saywhen-demo.mp4", from: 53.2, hit: "whoosh" },
 
   // Haloscript.
   { chapter: "haloscript", kind: "title", frames: 32, command: "open Haloscript.app", number: "03", name: "Haloscript", line: "A writing studio for novelists", tint: "#efe2ce", hit: "braam" },

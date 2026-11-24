@@ -438,15 +438,144 @@ function ReceiptsShot({ shot }) {
   </Cut>;
 }
 
-const SHOT = { train: TrainShot, tokens: TokensShot, receipts: ReceiptsShot, boot: BootShot, slam: SlamShot, word: WordShot, three: ThreeShot, type: TypeShot, term: TermShot, title: TitleShot, clip: ClipShot, stat: StatShot, device: DeviceShot, trio: TrioShot, end: EndShot };
+/* ---- saywhen ---- */
+
+const DUSK = "#140d05";
+
+/* It listens only when the camera and the microphone agree: a face found
+   and locked, lips moving, a voice heard, each lighting in turn as the state
+   moves from Waiting to Listening and the waveform wakes. Then the name
+   slams in. (An illustration of the idea, like the project's own film.) */
+function ListenShot({ shot }) {
+  const f = useCurrentFrame();
+  const unit = useUnit();
+  const { width, height } = useVideoConfig();
+  const portrait = usePortrait();
+  const [face, lips, voice] = shot.cues.map(([at]) => at);
+  const lit = [face, lips, voice].map((at) => ease(interpolate(f, [at, at + 4], [0, 1], clamp)));
+  const state = f >= voice ? 2 : f >= lips ? 1 : 0;
+  const slam = ease(interpolate(f, [26, 32], [0, 1], clamp));
+  const line = interpolate(f, [31, 37], [0, 1], clamp);
+  const dim = 1 - slam * 0.55;
+  // The reticle locks onto the face.
+  const c = portrait ? { x: width / 2, y: height * 0.26, s: width * 0.42 } : { x: width * 0.73, y: height * 0.4, s: height * 0.46 };
+  const lock = ease(interpolate(f, [face - 4, face + 1], [0, 1], clamp));
+  const half = (c.s / 2) * (1.5 - 0.5 * lock), arm = c.s * 0.16;
+  const talk = f >= lips ? Math.abs(Math.sin(f * 1.4)) * (0.6 + 0.4 * random(`m${f}`)) : 0;
+  const corners = [[-1, -1], [1, -1], [-1, 1], [1, 1]].map(([dx, dy], i) => <path key={i} d={`M ${c.x + dx * half} ${c.y + dy * (half - arm)} L ${c.x + dx * half} ${c.y + dy * half} L ${c.x + dx * (half - arm)} ${c.y + dy * half}`} fill="none" stroke={lock > 0.9 ? shot.tint : BONE} strokeWidth={unit * 0.45} strokeOpacity={0.5 + 0.5 * lock} />);
+  // The waveform along the bottom: a murmur, then a voice.
+  const bars = 56, wave = { y: portrait ? height * 0.9 : height * 0.88, h: portrait ? height * 0.06 : height * 0.1, x: width * 0.06, w: width * 0.88 };
+  const loud = interpolate(f, [voice - 1, voice + 4], [0.08, 1], clamp);
+  return <Cut still hit={shot.hit}>
+    <AbsoluteFill style={{ background: `radial-gradient(circle at ${portrait ? "50% 26%" : "73% 40%"}, #3a2408, ${DUSK} 60%)` }} />
+    <AbsoluteFill style={{ opacity: dim }}><svg width={width} height={height}>
+      {corners}
+      <g stroke={BONE} strokeOpacity={0.25 + 0.5 * lock} fill="none" strokeWidth={unit * 0.25}>
+        <ellipse cx={c.x} cy={c.y} rx={c.s * 0.27} ry={c.s * 0.36} />
+        {[-0.3, -0.1, 0.1, 0.3].map((v) => <line key={v} x1={c.x - c.s * 0.26} x2={c.x + c.s * 0.26} y1={c.y + v * c.s * 0.9} y2={c.y + v * c.s * 0.9} strokeOpacity={0.12} />)}
+        <line x1={c.x} x2={c.x} y1={c.y - c.s * 0.36} y2={c.y + c.s * 0.36} strokeOpacity={0.12} />
+      </g>
+      <circle cx={c.x - c.s * 0.1} cy={c.y - c.s * 0.06} r={unit * 0.6} fill={BONE} opacity={lock} />
+      <circle cx={c.x + c.s * 0.1} cy={c.y - c.s * 0.06} r={unit * 0.6} fill={BONE} opacity={lock} />
+      <ellipse cx={c.x} cy={c.y + c.s * 0.17} rx={c.s * 0.08} ry={c.s * (0.008 + 0.045 * talk)} fill="none" stroke={f >= lips ? shot.tint : BONE} strokeWidth={unit * 0.35} opacity={0.4 + 0.6 * lock} />
+      {Array.from({ length: bars }, (_, i) => {
+        const amp = loud * (0.25 + 0.75 * Math.abs(Math.sin(i * 0.5 + f * 0.9) * Math.sin(i * 0.17 - f * 0.4))) * (0.6 + 0.4 * random(`w${i}${f}`));
+        const h = Math.max(unit * 0.3, wave.h * amp), x = wave.x + (i / (bars - 1)) * wave.w;
+        return <rect key={i} x={x - unit * 0.35} y={wave.y - h / 2} width={unit * 0.7} height={h} rx={unit * 0.35} fill={loud > 0.5 ? shot.tint : BONE} opacity={0.35 + 0.55 * loud} />;
+      })}
+    </svg></AbsoluteFill>
+    {/* The three signals, under the face. */}
+    <div style={{ position: "absolute", left: c.x, top: c.y + c.s * (portrait ? 0.72 : 0.7), transform: "translateX(-50%)", display: "flex", gap: 1.4 * unit, opacity: dim }}>
+      {shot.signals.map((name, i) => <div key={name} style={{ display: "flex", alignItems: "center", gap: 0.8 * unit, padding: `${0.9 * unit}px ${1.6 * unit}px`, borderRadius: 999, border: `1px solid ${lit[i] > 0.5 ? shot.tint : "rgb(239 230 216 / .25)"}`, background: `rgb(242 169 59 / ${0.18 * lit[i]})`, font: `600 ${2 * unit}px/1 ${MONO}`, letterSpacing: "0.18em", color: lit[i] > 0.5 ? "#fff4e6" : "rgb(239 230 216 / .45)", transform: `scale(${1 + 0.25 * (1 - lit[i]) * (lit[i] > 0)})`, boxShadow: lit[i] > 0.5 ? `0 0 ${2 * unit}px ${shot.tint}66` : "none" }}>
+        <span style={{ width: unit, height: unit, borderRadius: "50%", background: lit[i] > 0.5 ? shot.tint : "rgb(239 230 216 / .25)" }} />{name}
+      </div>)}
+    </div>
+    <AbsoluteFill style={{ padding: portrait ? `${height * 0.56}px ${7 * unit}px 0` : `${9 * unit}px ${8 * unit}px`, gap: 2.2 * unit }}>
+      <Prompt text={shot.command} from={0} perChar={0.3} size={3 * unit} />
+      <div style={{ display: "flex", gap: 2 * unit, font: `600 ${2.2 * unit}px/1 ${MONO}`, letterSpacing: "0.14em", textTransform: "uppercase", marginTop: 2 * unit }}>
+        {shot.states.map((name, i) => <span key={name} style={{ color: i === state ? "#fff4e6" : "rgb(239 230 216 / .3)", textShadow: i === state ? `0 0 ${1.5 * unit}px ${shot.tint}` : "none", borderBottom: `2px solid ${i === state ? shot.tint : "transparent"}`, paddingBottom: 0.6 * unit }}>{name}</span>)}
+      </div>
+      <div style={{ display: "flex", alignItems: "baseline", gap: 3 * unit, marginTop: (portrait ? 3 : 8) * unit, transform: `scale(${1.6 - 0.6 * slam})`, transformOrigin: "left center", opacity: slam, filter: `blur(${(1 - slam) * 12}px)` }}>
+        <span style={{ font: `500 ${6 * unit}px/1 ${MONO}`, color: shot.tint }}>{shot.number}</span>
+        <span style={{ font: `400 ${(portrait ? 20 : 22) * unit}px/0.9 ${ANTON}`, color: BONE, textShadow: `0 0 50px ${shot.tint}88` }}>{shot.name}</span>
+      </div>
+      <div style={{ font: `italic 400 ${(portrait ? 6 : 5) * unit}px/1.1 ${SERIF}`, color: BONE, opacity: line * 0.9 }}>{shot.line}</div>
+    </AbsoluteFill>
+    <Shockwave at={26} tint={shot.tint} />
+  </Cut>;
+}
+
+/* What you say, and what it types: each spoken line, its wrong words struck
+   through, and the command that lands under it. The rows are the project's
+   own examples of its clean-up pass. */
+function CleanShot({ shot }) {
+  const f = useCurrentFrame();
+  const unit = useUnit();
+  const portrait = usePortrait();
+  const strike = (text, part, u) => {
+    const at = text.indexOf(part);
+    return <>{text.slice(0, at)}<span style={{ color: shot.tint, textDecoration: u > 0 ? "line-through" : "underline", textDecorationThickness: 3, textUnderlineOffset: "0.15em" }}>{part}</span>{text.slice(at + part.length)}</>;
+  };
+  return <Cut hit={shot.hit}>
+    <AbsoluteFill style={{ background: `radial-gradient(circle at 30% 30%, #2c1b06, ${DUSK} 65%)` }} />
+    <AbsoluteFill style={{ padding: portrait ? `0 ${7 * unit}px` : `0 ${9 * unit}px`, justifyContent: "center", gap: (portrait ? 4.5 : 3) * unit }}>
+      <div style={{ font: `600 ${2 * unit}px/1 ${MONO}`, letterSpacing: "0.24em", textTransform: "uppercase", color: shot.tint }}>You say <span style={{ color: BONE, opacity: 0.5 }}>→</span> saywhen types</div>
+      {shot.rows.map(([said, typed, wrong, right, warn], i) => {
+        const s = 2 + i * 12;
+        const appear = ease(interpolate(f, [s, s + 4], [0, 1], clamp));
+        const fix = ease(interpolate(f, [s + 6, s + 10], [0, 1], clamp));
+        const warned = warn && ease(interpolate(f, [s + 11, s + 15], [0, 1], clamp));
+        const at = typed.indexOf(right);
+        return <div key={said} style={{ display: "grid", gridTemplateColumns: portrait ? "1fr" : "1fr 1fr", alignItems: "center", gap: (portrait ? 0.8 : 3) * unit, opacity: appear, transform: `translateY(${(1 - appear) * 20}px)` }}>
+          <div style={{ font: `italic 400 ${(portrait ? 5.6 : 5.4) * unit}px/1.1 ${SERIF}`, color: BONE, opacity: 1 - 0.45 * fix }}>“{strike(said, wrong, fix)}”</div>
+          <div style={{ display: "flex", flexWrap: "wrap", alignItems: "center", gap: 1.4 * unit, opacity: fix, transform: `scale(${1.25 - 0.25 * fix})`, transformOrigin: "left center" }}>
+            <span style={{ font: `500 ${(portrait ? 3.8 : 4) * unit}px/1.2 ${MONO}`, color: BONE, whiteSpace: "nowrap" }}><span style={{ color: CORAL }}>$ </span>{typed.slice(0, at)}<span style={{ color: "#fff4e6", textShadow: `0 0 ${2 * unit}px ${shot.tint}` }}>{right}</span>{typed.slice(at + right.length)}</span>
+            {warn && <span style={{ font: `600 ${1.7 * unit}px/1 ${MONO}`, letterSpacing: "0.12em", textTransform: "uppercase", color: "#ffb4a0", padding: `${0.7 * unit}px ${1.2 * unit}px`, border: "1px solid #ff6a4a", borderRadius: 999, opacity: warned, transform: `scale(${1.4 - 0.4 * warned})` }}>⚠ {warn}</span>}
+          </div>
+        </div>;
+      })}
+    </AbsoluteFill>
+  </Cut>;
+}
+
+/* The send: the preview card, its countdown draining with every way to stop
+   it named, then Enter pressed, in a trusted app. */
+function SendShot({ shot }) {
+  const f = useCurrentFrame();
+  const unit = useUnit();
+  const portrait = usePortrait();
+  const left = interpolate(f, [2, shot.enterAt], [1, 0], clamp);
+  const hit = ease(interpolate(f, [shot.enterAt, shot.enterAt + 4], [0, 1], clamp));
+  const sent = f >= shot.enterAt;
+  const shake = sent ? Math.exp(-(f - shot.enterAt) / 3) : 0;
+  const sx = (random(`ss${f}`) - 0.5) * 2 * unit * shake;
+  return <Cut still hit={shot.hit}>
+    <AbsoluteFill style={{ background: `radial-gradient(circle at 50% 45%, #33200a, ${DUSK} 62%)` }} />
+    <AbsoluteFill style={{ alignItems: "center", justifyContent: "center", flexDirection: "column", gap: 4 * unit, transform: `translateX(${sx}px)` }}>
+      <div style={{ width: portrait ? "86%" : "64%", padding: 3 * unit, borderRadius: 2 * unit, background: "rgb(30 20 10 / .85)", border: `1px solid ${sent ? shot.tint : "rgb(239 230 216 / .18)"}`, boxShadow: sent ? `0 0 ${6 * unit}px ${shot.tint}55, 0 30px 80px rgb(0 0 0 / .6)` : "0 30px 80px rgb(0 0 0 / .6)", display: "grid", gap: 2.4 * unit }}>
+        <div style={{ display: "flex", alignItems: "center", gap: unit, font: `600 ${1.8 * unit}px/1 ${MONO}`, letterSpacing: "0.18em", textTransform: "uppercase", color: "rgb(239 230 216 / .7)" }}>
+          <span style={{ width: unit, height: unit, borderRadius: "50%", background: shot.tint }} />{shot.app} · trusted
+          <span style={{ marginLeft: "auto", color: sent ? shot.tint : "rgb(239 230 216 / .5)" }}>{sent ? "Sent" : "Preview"}</span>
+        </div>
+        <div style={{ font: `500 ${(portrait ? 4.6 : 5.2) * unit}px/1.2 ${MONO}`, color: BONE, whiteSpace: "nowrap" }}><span style={{ color: CORAL }}>$ </span>{shot.text}</div>
+        <div style={{ height: 0.8 * unit, borderRadius: unit, background: "rgb(239 230 216 / .1)", overflow: "hidden" }}><div style={{ height: "100%", width: `${left * 100}%`, background: shot.tint }} /></div>
+        <div style={{ font: `italic 400 ${(portrait ? 3.6 : 3) * unit}px/1.1 ${SERIF}`, color: BONE, opacity: sent ? 0.3 : 0.8 }}>Esc, shake your head, or say “cancel”.</div>
+      </div>
+      <div style={{ display: "flex", alignItems: "center", gap: 1.6 * unit, padding: `${1.8 * unit}px ${3.6 * unit}px`, borderRadius: 1.4 * unit, background: "linear-gradient(180deg, #fff4e6, #f2c27a)", boxShadow: `0 ${(1 - hit) * 1.4 * unit + 0.3 * unit}px 0 #8a5a1a, 0 0 ${5 * unit * hit}px ${shot.tint}`, font: `400 ${(portrait ? 5 : 6.5) * unit}px/1 ${ANTON}`, letterSpacing: "0.08em", color: INK, opacity: interpolate(f, [shot.enterAt - 6, shot.enterAt - 2], [0, 1], clamp), transform: `translateY(${hit * 1.2 * unit}px) scale(${sent ? 1.08 - 0.08 * hit : 1.15})` }}>↵ ENTER</div>
+    </AbsoluteFill>
+    <Shockwave at={shot.enterAt} tint={shot.tint} frames={12} />
+  </Cut>;
+}
+
+const SHOT = { listen: ListenShot, clean: CleanShot, send: SendShot, train: TrainShot, tokens: TokensShot, receipts: ReceiptsShot, boot: BootShot, slam: SlamShot, word: WordShot, three: ThreeShot, type: TypeShot, term: TermShot, title: TitleShot, clip: ClipShot, stat: StatShot, device: DeviceShot, trio: TrioShot, end: EndShot };
 
 // Over every shot: the project's tag at the corner, grain and a vignette.
 function Chrome() {
   const f = useCurrentFrame();
   const unit = useUnit();
   const cut = CUTS.find((c) => f >= c.start && f < c.end) ?? CUTS.at(-1);
-  const title = CUTS.find((c) => c.chapter === cut.chapter && (c.kind === "title" || c.kind === "train"));
-  const showTag = title && cut.kind !== "title" && cut.kind !== "train";
+  const title = CUTS.find((c) => c.chapter === cut.chapter && ["title", "train", "listen"].includes(c.kind));
+  const showTag = title && !["title", "train", "listen"].includes(cut.kind);
   return <>
     {showTag && <div style={{ position: "absolute", left: 4 * unit, top: 4 * unit, display: "flex", alignItems: "center", gap: 1.2 * unit, font: `600 ${1.9 * unit}px/1 ${MONO}`, letterSpacing: "0.2em", textTransform: "uppercase", color: BONE, textShadow: "0 1px 8px #000" }}>
       <span style={{ width: 1.2 * unit, height: 1.2 * unit, borderRadius: "50%", background: Math.floor(f / 8) % 2 ? CORAL : "#7a2a14" }} />{title.number} / {title.name}
