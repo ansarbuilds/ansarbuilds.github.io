@@ -67,6 +67,14 @@ for (const [index, clip] of CLIPS.entries()) {
   SEGMENTS.push({ ...clip, index, start, end: start + clip.seconds + (clip.hold ?? 0), show: clip.act ?? `card-${clip.card}`, bed: clip.act ?? clip.card });
 }
 export const FILM_SECONDS = SEGMENTS.at(-1).end;
+// The chapters on the timeline: where each starts, its numeral and name.
+const NAMES = { act1: ["I", "The receipts"], act2: ["II", "Six builds"], act3: ["III", "What I bring"], act4: ["IV", "The playground"], finale: ["V", "The last word"] };
+const CHAPTERS = [];
+for (const x of SEGMENTS) {
+  const id = x.card ?? x.act;
+  if (!CHAPTERS.some((c) => c.id === id) && NAMES[id]) CHAPTERS.push({ id, at: x.start / FILM_SECONDS, numeral: NAMES[id][0], name: NAMES[id][1] });
+}
+const chapterAt = (u) => CHAPTERS.reduce((found, c, i) => (u >= c.at - 1e-6 ? i : found), 0);
 const STEP = 2;
 const IDLE_MS = 1800;
 const clamp01 = (u) => Math.min(1, Math.max(0, u));
@@ -81,6 +89,7 @@ export default function FilmPlayer({ rolling, onEnd, children }) {
   const flashRef = useRef(null);
   const scrub = useRef(null);
   const time = useRef(null);
+  const chapterRef = useRef(null);
   const [playing, setPlaying] = useState(true);
   const [idle, setIdle] = useState(false);
   const [sound, setSoundState] = useState(soundOn);
@@ -119,7 +128,7 @@ export default function FilmPlayer({ rolling, onEnd, children }) {
 
   // The frame loop: the clock, which act is on, which acts draw, the bar.
   useEffect(() => {
-    let frame = 0, last = performance.now(), told = -1;
+    let frame = 0, last = performance.now(), told = -1, toldChapter = -1;
     const s = state.current;
     const sections = () => root.current?.querySelectorAll(".film-act, .film-chapter") ?? [];
     const sectionFor = (show) => root.current?.querySelector(`[data-act="${show}"]`);
@@ -201,12 +210,21 @@ export default function FilmPlayer({ rolling, onEnd, children }) {
       }
       if (scrub.current && document.activeElement !== scrub.current) scrub.current.value = Math.min(FILM_SECONDS, s.elapsed);
       const whole = Math.floor(s.elapsed);
+      // The bar: how far the film is, and the chapter it is in.
+      const u = Math.min(1, s.elapsed / FILM_SECONDS);
+      root.current?.style.setProperty("--p", u.toFixed(4));
+      const chapter = chapterAt(u);
+      if (chapter !== toldChapter && root.current) {
+        toldChapter = chapter;
+        root.current.querySelectorAll(".film-mark").forEach((el, i) => { el.classList.toggle("is-past", i <= chapter); el.classList.toggle("is-now", i === chapter); });
+        if (chapterRef.current) { chapterRef.current.textContent = `${CHAPTERS[chapter].numeral} · ${CHAPTERS[chapter].name}`; restart(chapterRef.current, "is-new"); }
+      }
       if (whole !== told && time.current) { told = whole; time.current.textContent = `${clock(Math.min(s.elapsed, FILM_SECONDS))} / ${clock(FILM_SECONDS)}`; }
       // The end: the last frame brightens as it lifts off the page.
       if (root.current) {
-        const u = s.elapsed > FILM_SECONDS ? Math.min(1, (s.elapsed - FILM_SECONDS) / LIFT) : 0;
-        root.current.style.opacity = u ? String(1 - u) : "";
-        root.current.style.filter = u ? `brightness(${1 + 0.9 * u})` : "";
+        const lift = s.elapsed > FILM_SECONDS ? Math.min(1, (s.elapsed - FILM_SECONDS) / LIFT) : 0;
+        root.current.style.opacity = lift ? String(1 - lift) : "";
+        root.current.style.filter = lift ? `brightness(${1 + 0.9 * lift})` : "";
       }
       if (s.elapsed >= FILM_SECONDS + LIFT) finish();
     };
@@ -289,10 +307,26 @@ export default function FilmPlayer({ rolling, onEnd, children }) {
     <div className="film-atmos" aria-hidden="true" />
     <div ref={flashRef} className="film-flash" aria-hidden="true" />
     <div className="film-controls">
-      <button type="button" className="film-button" onClick={togglePlay} aria-label={playing ? "Pause the film" : "Play the film"}>{playing ? <Pause size={16} aria-hidden="true" /> : <Play size={16} aria-hidden="true" />}</button>
-      <input ref={scrub} className="film-scrub" type="range" min={0} max={FILM_SECONDS} step={0.1} defaultValue={0} aria-label="Where the film is" onInput={(event) => seek(Number(event.currentTarget.value))} />
-      <span ref={time} className="film-time" aria-hidden="true">0:00 / {clock(FILM_SECONDS)}</span>
-      <button type="button" className="film-button" onClick={() => setSound(!sound)} aria-pressed={sound} aria-label={sound ? "Mute the film" : "Turn the film's sound on"}>{sound ? <Volume2 size={16} aria-hidden="true" /> : <VolumeX size={16} aria-hidden="true" />}</button>
+      <button type="button" className="film-button film-play" onClick={togglePlay} aria-label={playing ? "Pause the film" : "Play the film"}>
+        <span className="film-play-ring" aria-hidden="true" />
+        {playing ? <Pause size={16} aria-hidden="true" /> : <Play size={16} aria-hidden="true" />}
+      </button>
+      <div className="film-timeline">
+        <div className="film-track" aria-hidden="true">
+          <span className="film-fill" />
+          {CHAPTERS.map((c) => <span key={c.id} className="film-mark" style={{ "--at": c.at }}><b>{c.numeral}</b></span>)}
+          <span className="film-head" />
+        </div>
+        <input ref={scrub} className="film-scrub" type="range" min={0} max={FILM_SECONDS} step={0.1} defaultValue={0} aria-label="Where the film is" onInput={(event) => seek(Number(event.currentTarget.value))} />
+      </div>
+      <span className="film-readout" aria-hidden="true">
+        <span ref={chapterRef} className="film-chapter-now">{`${CHAPTERS[0].numeral} · ${CHAPTERS[0].name}`}</span>
+        <span ref={time} className="film-time">0:00 / {clock(FILM_SECONDS)}</span>
+      </span>
+      <button type="button" className="film-button film-sound" onClick={() => setSound(!sound)} aria-pressed={sound} aria-label={sound ? "Mute the film" : "Turn the film's sound on"}>
+        {sound ? <Volume2 size={16} aria-hidden="true" /> : <VolumeX size={16} aria-hidden="true" />}
+        <i className="film-sound-eq" aria-hidden="true"><b /><b /><b /><b /></i>
+      </button>
     </div>
   </div>;
 }
