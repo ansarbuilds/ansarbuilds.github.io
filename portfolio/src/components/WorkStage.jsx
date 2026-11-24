@@ -162,15 +162,6 @@ function HaloDemo({ active }) {
   </div>;
 }
 
-/* Digital Me: a real render of the model (not an illustration of it), shown
-   whole on the black it was rendered on, and a way in to the live model. */
-function DigitalDemo({ project }) {
-  return <div className="st-cover is-render">
-    <img className="ed-lazy-media" src={media(project.shots?.[0] || coverOf(project))} alt="A render of the 3D model of my head" loading="lazy" onLoad={reveal} />
-    <a href="/playground/digital-double/" className="st-launch"><Play size={16} aria-hidden="true" />Meet the live 3D model</a>
-  </div>;
-}
-
 /* Hedwig: an 18-second silent cut of its launch film, looping while it is
    on stage, with the same rules as saywhen's film (desktop only, not under
    reduced motion or data saver). "Play the film with sound" swaps in the
@@ -215,7 +206,6 @@ const DEMOS = {
   "agent-flight-recorder": FlightDemo,
   "prh-jepa": PrhDemo,
   haloscript: HaloDemo,
-  "digital-double": DigitalDemo,
 };
 
 // Tab labels have to fit six across, so two titles get a short form.

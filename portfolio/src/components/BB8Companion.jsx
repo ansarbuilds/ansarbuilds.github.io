@@ -40,7 +40,7 @@ const ROUTINE_COPY = {
 };
 
 const GUIDE_LINKS = [
-  { href: "#projects", eyebrow: "Start here", label: "Selected work", detail: "Seven flagship builds" },
+  { href: "#projects", eyebrow: "Start here", label: "Selected work", detail: "Six flagship builds" },
   { href: "#capabilities", eyebrow: "Skills", label: "What I bring", detail: "Agents, evals and shipping" },
   { href: "#more", eyebrow: "More", label: "More shipped work", detail: "Studies, a skill and apps" },
   { href: "#contact", eyebrow: "Connect", label: "Get in touch", detail: "Email, GitHub and LinkedIn" },
@@ -51,7 +51,7 @@ const GUIDE_LINKS = [
 // its personality/session state survives navigation, but do not let it cover
 // or compete with those interfaces.
 const AVOID_ON_HOME = ".sc-card, .st-panel, .sc-email, .ed-contact-email, .sc-feed-card, .ed-footer";
-const HIDDEN_ROUTES = new Set(["emet", "explore", "lineage-demo", "infinity", "digital-double"]);
+const HIDDEN_ROUTES = new Set(["emet", "explore", "lineage-demo", "infinity"]);
 
 function readSessionFlag(key) {
   try {

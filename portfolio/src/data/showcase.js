@@ -5,7 +5,7 @@
 //
 // House style: plain words, short sentences, no em dashes.
 
-// The seven flagship case studies, in order. `visual` is the optional second
+// The six flagship case studies, in order. `visual` is the optional second
 // image that floats over the cover art: a real screenshot or figure ("shot"),
 // or a short illustrated terminal ("terminal") for tools that have no screen
 // of their own. Leave it out and the cover fills the frame on its own.
@@ -81,15 +81,6 @@ export const FLAGSHIPS = [
     stack: ["Swift", "SwiftUI", "SwiftData", "CloudKit", "PencilKit"],
     visual: { type: "shot", src: "/shots/haloscript/hero_home_mac.jpg", caption: "Haloscript on the Mac" },
   },
-  {
-    slug: "digital-double",
-    eyebrow: "AI + 3D",
-    badge: "Live demo",
-    headline: "A 3D double of my head, directed with AI from 13 seconds of video.",
-    copy: "I directed Claude Code through Blender and photogrammetry, tried 12 approaches, and shipped the one whose eyes follow you.",
-    stats: [["12", "approaches tried"], ["13 s", "of phone video"], ["$0", "spent on tools"]],
-    stack: ["Claude Code", "Blender", "MCP", "three.js"],
-  },
 ];
 
 // The rest of the shipped work, as image cards. `metric` is optional.
@@ -125,8 +116,8 @@ export const CAPABILITIES = [
     count: "2",
     unit: "apps live on the App Store",
     title: "Product & shipping",
-    copy: "From idea to release: native apps on the App Store, and 3D on the web, designed and shipped end to end.",
-    proof: ["haloscript", "reptrack", "digital-double"],
+    copy: "From idea to release: native apps on the App Store and tools on the desktop, designed and shipped end to end.",
+    proof: ["haloscript", "reptrack", "saywhen"],
   },
 ];
 

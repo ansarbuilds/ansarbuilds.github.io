@@ -153,7 +153,7 @@ export const CONTACT = {
 // The command palette's fixed entries. Its project list is built from the
 // listed projects themselves (see CommandPalette.jsx), so it never drifts.
 export const COMMAND_ITEMS = [
-  { label: "Selected work · seven flagship builds", go: "#projects", group: "Sections" },
+  { label: "Selected work · six flagship builds", go: "#projects", group: "Sections" },
   { label: "What I bring · agents, evals, shipping", go: "#capabilities", group: "Sections" },
   { label: "More shipped work", go: "#more", group: "Sections" },
   { label: "Contact", go: "#contact", group: "Sections" },
@@ -162,7 +162,6 @@ export const COMMAND_ITEMS = [
   { label: "A solar system you can fly around", go: "/playground/explore/", group: "Playground" },
   { label: "An infinity made of stars", go: "/playground/infinity/", group: "Playground" },
   { label: "Data lineage explorer", go: "/playground/lineage-demo/", group: "Playground" },
-  { label: "A 3D model of me, made with AI", go: "/playground/digital-double/", group: "Playground" },
   { label: "RepTrack on the App Store", href: "https://apps.apple.com/us/app/reptrack-workout-log/id6761032027", group: "Links" },
   { label: "My Take on Jev, technical report", href: "/p/decision-models/report.html", group: "Links" },
   { label: "My Take on REA, technical report", href: "/p/rea-study/report.html", group: "Links" },

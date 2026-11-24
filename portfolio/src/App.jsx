@@ -28,7 +28,6 @@ const ProjectWorkPage = lazy(() => import("./components/ProjectWorkPage"));
 const SandboxStubs = lazy(() => import("./components/SandboxStubs"));
 const SolarSystemExplorer = lazy(() => import("./components/SolarSystemExplorer"));
 const DataLineageExplorer = lazy(() => import("./components/DataLineageExplorer"));
-const DigitalDouble = lazy(() => import("./components/DigitalDouble"));
 const HaloscriptPage = lazy(() => import("./components/HaloscriptPage"));
 const HedwigPage = lazy(() => import("./components/HedwigPage"));
 const InfinityPage = lazy(() => import("./components/InfinityPage"));
@@ -416,13 +415,11 @@ function RouteView({ route, bootDone, held, onBoot, heroRun }) {
   if (route === "emet") return <Suspense fallback={<RouteLoader label="Loading Emet" />}><EmetSection /></Suspense>;
   if (route === "explore") return <Suspense fallback={<RouteLoader label="Loading solar system" />}><SolarSystemExplorer /></Suspense>;
   if (route === "work") return <Suspense fallback={<RouteLoader label="Loading work" />}><ProjectWorkPage /></Suspense>;
-  if (route === "project/digital-double") return <Suspense fallback={<RouteLoader label="Loading 3D project" />}><DigitalDouble /></Suspense>;
   if (route === "project/haloscript") return <Suspense fallback={<RouteLoader label="Loading project" />}><HaloscriptPage /></Suspense>;
   if (route === "project/hedwig") return <Suspense fallback={<RouteLoader label="Loading project" />}><HedwigPage /></Suspense>;
   if (route.startsWith("project/")) return <Suspense fallback={<RouteLoader label="Loading project" />}><ProjectPage slug={route.slice("project/".length)} /></Suspense>;
   if (route === "lineage-demo") return <Suspense fallback={<RouteLoader label="Loading data explorer" />}><DataLineageExplorer /></Suspense>;
   if (route === "infinity") return <Suspense fallback={<RouteLoader label="Loading particle scene" />}><InfinityPage /></Suspense>;
-  if (route === "digital-double") return <Suspense fallback={<RouteLoader label="Loading 3D project" />}><DigitalDouble /></Suspense>;
   return <MainDocument bootDone={bootDone} held={held} onBoot={onBoot} heroRun={heroRun} />;
 }
 
@@ -431,7 +428,7 @@ function RouteView({ route, bootDone, held, onBoot, heroRun }) {
    swap is a single synchronous step, which is what lets a view transition
    wrap it. The motion itself is CSS (.rt in showcase.css): it switches off
    during a view transition, which brings its own, and for reduced motion. */
-const FULL_HEIGHT = new Set(["emet", "explore", "lineage-demo", "infinity", "digital-double"]);
+const FULL_HEIGHT = new Set(["emet", "explore", "lineage-demo", "infinity"]);
 function RouteTransition({ route, children }) {
   const kind = route === "main" ? "home" : route.startsWith("project/") || route === "work" ? "page" : "takeover";
   return <div key={route} className={`rt rt-${kind} ${FULL_HEIGHT.has(route) ? "h-[100dvh]" : ""}`}>{children}</div>;
@@ -474,9 +471,6 @@ function Backdrop() {
   }
   if (route === "explore" || route === "lineage-demo" || route === "infinity") {
     return <div className="fixed inset-0 z-0 bg-[#02050c]" aria-hidden="true" />;
-  }
-  if (route === "digital-double") {
-    return <div className="fixed inset-0 z-0 bg-[#050506]" aria-hidden="true" />;
   }
   // Everything else sits on flat ink: sections paint their own full-bleed
   // color blocks, and the infinity loop has its own page (#infinity).

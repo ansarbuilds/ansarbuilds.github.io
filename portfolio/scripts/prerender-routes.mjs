@@ -22,7 +22,6 @@ const VIEW_DESCRIPTIONS = {
   emet: 'Emet, a small terminal that answers questions about my work right in the page.',
   explore: 'An interactive 3D solar system with real orbital mechanics, built with three.js.',
   'lineage-demo': 'An interactive data lineage explorer: follow a column from source to report.',
-  'digital-double': 'A 3D model of me made with AI tools in about six hours, and the twelve stages it took.',
   infinity: 'An interactive particle infinity loop, built with three.js.',
 };
 

@@ -29,7 +29,7 @@
 export const ACTS = [
   { id: "CO", title: "Cold open", note: "Plays once on a first visit, about 8 seconds, can be skipped. A returning visitor gets shots CO-05 to CO-07 only, about 1.5 seconds." },
   { id: "A1", title: "Act I · The short version", note: "The camera goes through the name. The four numbers are objects it passes." },
-  { id: "A2", title: "Act II · Selected work", note: "Seven sets, one per project. Each plays for about five seconds. Each opens on a hard cut held on a finished frame; where two sets share a shape the cut matches them. Nothing fades." },
+  { id: "A2", title: "Act II · Selected work", note: "Six sets, one per project. Each plays for about five seconds. Each opens on a hard cut held on a finished frame; where two sets share a shape the cut matches them. Nothing fades." },
   { id: "A3", title: "Act III · What I bring", note: "Three monoliths: agents, research, shipping." },
   { id: "A4", title: "Act IV · The playground", note: "The effects reel: the network collapses into a star, then the solar system, the infinity ribbon and Emet's terminal, each with a way in." },
   { id: "FN", title: "Finale · Contact", note: "The signal returns, then one line and one button. Bookend to the cold open." },
@@ -44,7 +44,6 @@ export const SETS = {
   "agent-flight-recorder": { label: "Flight Recorder", at: [-32, -4, -430] },
   "prh-jepa": { label: "PRH-JEPA", at: [34, 2, -510] },
   haloscript: { label: "Haloscript", at: [-34, 3, -590] },
-  "digital-double": { label: "Digital double", at: [32, 0, -670] },
   monoliths: { label: "Three monoliths", at: [0, 0, -770] },
   // The star the network collapses into is the solar system's sun.
   star: { label: "Star", at: [0, 0, -940] },
@@ -94,12 +93,11 @@ export const SHOTS = [
 
   // ---- Act II ----
   ...projectShots(0, "hedwig", { title: "A language model, built from nothing.", push: "Slow push past the owl to the page", action: "Night, a branch and the moon. An owl made of points turns toward a floating page. Word-pieces stream from its eyes as a real run of the 13.8M model types onto the page, with the three pieces it was choosing between under the line.", sound: "Night air, soft key ticks", frame: "owl" }),
-  ...projectShots(1, "saywhen", { title: "Look at the screen. Say the command.", push: "Slow push to the monitor", action: "A dark room and a floating monitor. A face made of points turns toward it. A waveform rises from the mouth and becomes text that types onto the screen. The real launch film plays on that monitor.", sound: "A voice, then typing", frame: "monitor" }),
+  ...projectShots(1, "saywhen", { title: "Look at the screen. Say the command.", push: "Slow push to the monitor", action: "A dark room and a floating monitor. A voice, an orb of points, turns toward it. A waveform rises from the mouth and becomes text that types onto the screen. The real launch film plays on that monitor.", sound: "A voice, then typing", frame: "monitor" }),
   ...projectShots(2, "jarvis", { title: "A personal AI agent that runs itself.", push: "Orbit a quarter turn around the core", action: "A control room at night. Panels of the real dashboard orbit a core. A gauge marked \"20 calls a day\" glows like a reactor limit.", sound: "Control-room hum", frame: "control" }),
   ...projectShots(3, "agent-flight-recorder", { title: "A black box recorder for coding agents.", push: "Push in as the box opens", action: "An aircraft black box in an orange spotlight. It comes apart into layers: tool calls, edits, the failure. The suspect edit flashes red and flies to the camera.", sound: "Cockpit beeps, one alarm", frame: "blackbox" }),
   ...projectShots(4, "prh-jepa", { title: "I re-ran a LeCun paper on one laptop.", push: "Slow orbit, then hold", action: "Two clouds of points, images and text, drift apart, then snap into line with one rotation. A light sweeps across and shows the hidden number: minus 35%.", sound: "A click as they align", frame: "clouds" }),
   ...projectShots(5, "haloscript", { title: "A writing studio for novelists.", push: "Turntable, half turn", action: "A Mac, an iPad and an iPhone as real models under studio light, turning slowly. Their screens show the actual app: the manuscript, the whiteboard, the corkboard.", sound: "Pencil on glass, pages", frame: "devices" }),
-  ...projectShots(6, "digital-double", { title: "A 3D double of my head, from 13 seconds of video.", push: "Push in to eye level", action: "The head stands in a cone of light and looks at the visitor. Its twelve build stages hang behind it like a contact sheet.", sound: "Quiet room", frame: "head" }),
 
   // ---- Act III ----
   { id: "A3-01", act: "A3", title: "The monoliths rise", seconds: 3, scroll: 0.8, camera: { pos: [0, 10, -722], look: [0, 6, -770], fov: 36, move: "Low angle, tilt up" }, action: "Three monoliths rise out of the ground: agents, research, shipping.", text: "THREE THINGS, done properly.", sound: "Deep stone movement", bars: true, frame: "monoliths" },

@@ -11,7 +11,6 @@ const VIEW_TITLES = {
   emet: "Emet",
   explore: "Solar system explorer",
   "lineage-demo": "Data lineage explorer",
-  "digital-double": "A 3D model of me, made with AI",
   infinity: "Infinity loop",
   work: "Selected work",
   storyboard: "Storyboard",

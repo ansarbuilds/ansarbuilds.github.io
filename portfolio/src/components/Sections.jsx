@@ -303,7 +303,7 @@ function Sheet({ children }) {
 const coverOf = (project) => project.spotlightArt || project.cardArt || project.cardShot || project.shots?.[0];
 // What each set's screens are, said on its card: nothing in the film
 // passes for more than it is.
-const FILM_NOTES = { saywhen: "Screen: the launch animation", jarvis: "Screens: the real dashboard, sample data", "agent-flight-recorder": "Illustration of a recorded run", "prh-jepa": "Illustration of the finding", haloscript: "Screens: the real app", "digital-double": "Made from the real model. It looks back at you" };
+const FILM_NOTES = { saywhen: "Screen: the launch animation", jarvis: "Screens: the real dashboard, sample data", "agent-flight-recorder": "Illustration of a recorded run", "prh-jepa": "Illustration of the finding", haloscript: "Screens: the real app" };
 
 // The projects Act II has sets for, with what their cards say.
 const FILM_PROJECTS = FILM_SETS.map((slug) => {
@@ -316,7 +316,7 @@ export function ProjectsSection() {
   return <><section id="projects" className="ed-projects ed-light ed-section" data-palette="bloom">
     <div className="ed-section-watermark" aria-hidden="true">WORK</div>
     <div className="ed-wrap">
-      <Enter className="ed-section-heading sc-stage-heading"><div><IndexLabel number="02">Selected work</IndexLabel><h2>Seven builds. <em>Each with its numbers.</em></h2></div><div className="ed-heading-aside"><p>Each one has the number, the picture and a way in. Some you can run, some you watch, some you read.</p></div></Enter>
+      <Enter className="ed-section-heading sc-stage-heading"><div><IndexLabel number="02">Selected work</IndexLabel><h2>Six builds. <em>Each with its numbers.</em></h2></div><div className="ed-heading-aside"><p>Each one has the number, the picture and a way in. Some you can run, some you watch, some you read.</p></div></Enter>
       <WorkStage />
     </div>
   </section></>;
@@ -440,7 +440,7 @@ export function FilmReel({ playback }) {
   </>;
 }
 // The chapter cards between the acts.
-const CHAPTERS = [["act2", "II", "Seven builds"], ["act3", "III", "What I bring"], ["act4", "IV", "The playground"]];
+const CHAPTERS = [["act2", "II", "Six builds"], ["act3", "III", "What I bring"], ["act4", "IV", "The playground"]];
 
 function PlainContact() {
   const { navigate } = useRoute();

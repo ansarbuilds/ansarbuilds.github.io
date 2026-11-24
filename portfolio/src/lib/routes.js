@@ -11,7 +11,7 @@
    Those links are all over the web, so they still open the right view and
    the address bar is rewritten to the new URL. */
 
-export const PLAYGROUND = ["emet", "explore", "lineage-demo", "digital-double", "infinity"];
+export const PLAYGROUND = ["emet", "explore", "lineage-demo", "infinity"];
 
 // The film's pre-vis pages (storyboard, moving pre-vis). They exist only on
 // the dev server: a production build has no such routes, so the URLs fall

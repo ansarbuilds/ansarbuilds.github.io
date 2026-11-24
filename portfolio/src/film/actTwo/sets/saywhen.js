@@ -1,11 +1,10 @@
 import * as THREE from "three";
 import { BONE, SIGNAL, canvasCard, floor, glow, points, ramp, smooth } from "../kit.js";
-import { loadHead } from "./headPoints.js";
 
 /* saywhen (shots A2-01a and A2-01b): a dark room and a floating monitor
-   playing the real app. A head made of points (the digital double's) turns
-   toward it, a waveform runs from its mouth to the screen, and the command
-   types in and is sent.
+   playing the real app. A voice, an orb of points, turns toward it and
+   pulses as it speaks, a waveform runs from it to the screen, and the
+   command types in and is sent.
 
    Local space: +z faces the camera's scene position, +x is screen right. */
 
@@ -23,9 +22,9 @@ export function buildSaywhen({ group, media }) {
   ground.mesh.position.y = -3.2;
   group.add(ground.mesh);
 
-  // The monitor, turned a little toward the head.
+  // The monitor, turned a little toward the voice.
   const monitor = new THREE.Group();
-  // Head and monitor stand high in the frame: the card takes the lower left.
+  // Voice and monitor stand high in the frame: the card takes the lower left.
   monitor.position.set(3.6, 2.1, 0);
   monitor.rotation.y = -0.38;
   group.add(monitor);
@@ -74,29 +73,31 @@ export function buildSaywhen({ group, media }) {
   pool.mesh.position.set(2.4, -3.15, 2.2);
   group.add(pool.mesh);
 
-  // A cone of light over the head.
+  // A cone of light over the voice.
   const cone = keep(glow(5, 9, BONE, { cone: true, opacity: 0.07 }));
   cone.mesh.position.set(-1.6, 4.4, 1.4);
   group.add(cone.mesh);
 
-  // The head, in points, once its file arrives.
+  // The voice: an orb of points, a shell round a brighter core.
   const head = new THREE.Group();
   head.position.set(-1.6, 1.4, 1.4);
   group.add(head);
+  const ORB = 2400;
+  const orbPositions = new Float32Array(ORB * 3), orbColors = new Float32Array(ORB * 3);
+  const dim = BONE.clone().multiplyScalar(0.45);
+  for (let i = 0; i < ORB; i++) {
+    const core = i % 5 === 0;
+    const r = core ? 0.35 + Math.random() * 0.45 : 1.25 + (Math.random() - 0.5) * 0.12;
+    const y = 1 - 2 * ((i + 0.5) / ORB), ring = Math.sqrt(1 - y * y), a = i * 2.399963;
+    orbPositions.set([Math.cos(a) * ring * r, y * r, Math.sin(a) * ring * r], i * 3);
+    (core ? SIGNAL.clone().lerp(VIOLET, Math.random() * 0.5) : dim.clone().lerp(VIOLET, (i % 9) / 14)).toArray(orbColors, i * 3);
+  }
+  const orb = keep(points(orbPositions, orbColors, 0.055, { opacity: 1, wobble: 0.03 }));
+  head.add(orb.mesh);
+  // Where the voice leaves it: its front, toward the screen once it turns.
   const mouth = new THREE.Object3D();
+  mouth.position.set(0, -0.1, 1.25);
   head.add(mouth);
-  let headPoints = null;
-  let headDone = false;
-  loadHead(media("/film/head-points.bin")).then((data) => {
-    const scale = 4.2 / data.size[1];
-    headPoints = points(data.positions, data.colors, 0.05, { opacity: 1, wobble: 0.012 / scale });
-    headPoints.mesh.scale.setScalar(scale);
-    head.add(headPoints.mesh);
-    // The mouth, in the model's own units: just under the nose, at the front.
-    mouth.position.set(0, (-0.047 - data.centre[1]) * scale, (0.072 - data.centre[2]) * scale);
-    headDone = true;
-  }).catch(() => { headDone = true; });
-  disposers.push(() => headPoints?.dispose());
 
   // The voice: points running from the mouth to the screen on a wave.
   const WAVE = 480;
@@ -111,19 +112,19 @@ export function buildSaywhen({ group, media }) {
 
   const TURN = 1.15;
   return {
-    ready: () => headDone,
+    ready: () => true,
     setPlaying(on) {
       if (on) video.play().catch(() => {});
       else video.pause();
     },
     update({ arrive, scene, clock, scale }) {
-      // Head: faces the camera, then turns to the screen.
+      // Voice: faces the camera, then turns to the screen, and pulses as it speaks.
       head.rotation.y = TURN * smooth(ramp(scene, 0.1, 0.38));
       head.position.y = 1.4 + Math.sin(clock * 0.7) * 0.05;
-      if (headPoints) { headPoints.uniforms.uTime.value = clock; headPoints.uniforms.uScale.value = scale; headPoints.uniforms.uOpacity.value = 0.45 + 0.55 * smooth(ramp(arrive, 0.3, 1)); }
-
-      // Voice: flows while it is speaking.
+      // Its wave: flows while it is speaking.
       const speaking = smooth(ramp(scene, 0.33, 0.42)) * (1 - smooth(ramp(scene, 0.7, 0.78)));
+      orb.mesh.scale.setScalar(1 + speaking * 0.08 * Math.abs(Math.sin(clock * 9.3)) + 0.02 * Math.sin(clock * 1.3));
+      orb.uniforms.uTime.value = clock; orb.uniforms.uScale.value = scale; orb.uniforms.uOpacity.value = (0.45 + 0.55 * smooth(ramp(arrive, 0.3, 1))) * (1 + 0.5 * speaking);
       wave.uniforms.uOpacity.value = speaking;
       wave.uniforms.uTime.value = clock;
       wave.uniforms.uScale.value = scale;
