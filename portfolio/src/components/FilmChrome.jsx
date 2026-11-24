@@ -34,7 +34,7 @@ const stillWanted = () => {
    fuse, and fast-forward chevrons march beside it. Hovered, it tilts and
    admits it might cry a lot. Pressed, it punches in, bursts and flashes,
    with a whoosh and a drum, and the film is gone. */
-export function FilmSkip({ onSkip }) {
+export function FilmSkip({ onPress, onSkip }) {
   const [waiting, setWaiting] = useState(() => soundOn() && !soundPlaying());
   const [leaving, setLeaving] = useState(false);
   const gone = useRef(false);
@@ -49,6 +49,9 @@ export function FilmSkip({ onSkip }) {
   const skip = () => {
     if (gone.current) return;
     gone.current = true;
+    // Nothing new starts while it smashes out (the cold open is due at the
+    // end of the ident, and starting it can hold up a slow device).
+    onPress?.();
     cue("whoosh");
     cue("drum");
     if (stillWanted()) { onSkip(); return; }

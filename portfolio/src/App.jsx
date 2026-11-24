@@ -696,6 +696,8 @@ export default function App() {
   }, []);
   const closeColdOpen = useCallback(() => setColdOpenUp(false), []);
   const endFilm = useCallback(() => { setFilmUp(false); setRolling(false); }, []);
+  // The skip was pressed: hold the cold open back while the button smashes out.
+  const holdFilm = useCallback(() => clearTimeout(identTimer.current), []);
   const skipFilm = useCallback(() => {
     clearTimeout(identTimer.current);
     endFilm();
@@ -743,7 +745,7 @@ export default function App() {
           </Suspense></ColdOpenBoundary>}
           {coldOpenUp && <ColdOpenLayer key={`co-${take}`} mode="trailer" onStarted={onStarted} onHandOver={release} onDone={closeColdOpen} />}
           {cover && <FilmIdent />}
-          {filmUp && <FilmSkip onSkip={skipFilm} />}
+          {filmUp && <FilmSkip onPress={holdFilm} onSkip={skipFilm} />}
         </SandboxProvider>
       </ThemeProvider>
     </ErrorBoundary>
