@@ -28,6 +28,9 @@ const usePortrait = () => { const { width, height } = useVideoConfig(); return h
 // A size that reads the same on both layouts: a share of the shorter side.
 const useUnit = () => { const { width, height } = useVideoConfig(); return Math.min(width, height) / 100; };
 
+/* On a wide screen the site's controls bar covers the bottom ~8% of the
+   frame while it shows, so nothing that must be read sits that low. */
+
 /* Every cut lands: a punch-in from a touch large and the colour splitting
    red and cyan, gone in a few frames. Only the big hits (a name, a number,
    a title) also flash, softly: never more than three flashes a second. */
@@ -122,7 +125,7 @@ function ClipShot({ shot }) {
         <AbsoluteFill style={{ justifyContent: "center", alignItems: "center" }}><div style={{ width: "128%", aspectRatio: "16 / 9", overflow: "hidden", boxShadow: "0 30px 80px rgb(0 0 0 / .7)" }}>{video}</div></AbsoluteFill>
       </> : video}
     </AbsoluteFill>
-    {shot.label && <div style={{ position: "absolute", left: 6 * unit, bottom: portrait ? 22 * unit : 8 * unit, opacity: label, transform: `translateX(${(1 - label) * -30}px)` }}>
+    {shot.label && <div style={{ position: "absolute", left: 6 * unit, bottom: portrait ? 22 * unit : 15 * unit, opacity: label, transform: `translateX(${(1 - label) * -30}px)` }}>
       <div style={{ font: `400 ${12 * unit}px/0.9 ${ANTON}`, color: "transparent", background: "linear-gradient(170deg, #fff4e6 15%, #ffc79a 55%, #d5360c)", WebkitBackgroundClip: "text", backgroundClip: "text", filter: "drop-shadow(0 4px 30px #000)" }}>{shot.label[0]}</div>
       <div style={{ font: `500 ${2.4 * unit}px/1.2 ${MONO}`, letterSpacing: "0.14em", textTransform: "uppercase", color: BONE, textShadow: "0 2px 12px #000" }}>{shot.label[1]}</div>
     </div>}
@@ -185,7 +188,7 @@ function TrioShot({ shot }) {
         {[["halo-storybible-mac.jpg", "mac", 640, 0, 20, -1], ["halo-corkboard-ipad.jpg", "ipad", 300, 560, 170, 3], ["halo-write-iphone.jpg", "iphone", 150, -40, 230, -4]].map(([src, device, w, x, y, tilt], i) =>
           <div key={src} style={{ position: "absolute", left: x * scale, top: y * scale, opacity: land(i), transform: `translateY(${(1 - land(i)) * 120}px) scale(${1.2 - 0.2 * land(i)})` }}><Device src={src} device={device} width={w * scale} tilt={tilt} /></div>)}
       </div>
-      <div style={{ position: "absolute", bottom: (portrait ? 18 : 7) * unit, padding: `${1.4 * unit}px ${3 * unit}px`, border: `2px solid ${CORAL}`, borderRadius: 999, font: `600 ${2.8 * unit}px/1 ${MONO}`, letterSpacing: "0.2em", textTransform: "uppercase", color: BONE, background: "rgb(8 7 10 / .7)", opacity: stamp, transform: `scale(${1.6 - 0.6 * stamp}) rotate(-2deg)`, boxShadow: stamp > 0.9 ? `0 0 ${4 * unit}px ${shot.tint ?? CORAL}88` : "none" }}>{shot.stamp}</div>
+      <div style={{ position: "absolute", bottom: (portrait ? 18 : 13) * unit, padding: `${1.4 * unit}px ${3 * unit}px`, border: `2px solid ${CORAL}`, borderRadius: 999, font: `600 ${2.8 * unit}px/1 ${MONO}`, letterSpacing: "0.2em", textTransform: "uppercase", color: BONE, background: "rgb(8 7 10 / .7)", opacity: stamp, transform: `scale(${1.6 - 0.6 * stamp}) rotate(-2deg)`, boxShadow: stamp > 0.9 ? `0 0 ${4 * unit}px ${shot.tint ?? CORAL}88` : "none" }}>{shot.stamp}</div>
     </AbsoluteFill>
     <Shockwave at={at} tint={shot.tint ?? CORAL} />
   </Cut>;
@@ -469,7 +472,7 @@ function ListenShot({ shot }) {
   const talk = f >= lips ? Math.abs(Math.sin(f * 1.4)) * (0.6 + 0.4 * random(`m${f}`)) : 0;
   const corners = [[-1, -1], [1, -1], [-1, 1], [1, 1]].map(([dx, dy], i) => <path key={i} d={`M ${c.x + dx * half} ${c.y + dy * (half - arm)} L ${c.x + dx * half} ${c.y + dy * half} L ${c.x + dx * (half - arm)} ${c.y + dy * half}`} fill="none" stroke={lock > 0.9 ? shot.tint : BONE} strokeWidth={unit * 0.45} strokeOpacity={0.5 + 0.5 * lock} />);
   // The waveform along the bottom: a murmur, then a voice.
-  const bars = 56, wave = { y: portrait ? height * 0.9 : height * 0.88, h: portrait ? height * 0.06 : height * 0.1, x: width * 0.06, w: width * 0.88 };
+  const bars = 56, wave = { y: portrait ? height * 0.9 : height * 0.8, h: portrait ? height * 0.06 : height * 0.09, x: width * 0.06, w: width * 0.88 };
   const loud = interpolate(f, [voice - 1, voice + 4], [0.08, 1], clamp);
   return <Cut still hit={shot.hit}>
     <AbsoluteFill style={{ background: `radial-gradient(circle at ${portrait ? "50% 26%" : "73% 40%"}, #3a2408, ${DUSK} 60%)` }} />
@@ -630,7 +633,7 @@ function MorphShot({ shot }) {
   const shapes = shot.screens.map(([, device]) => SHAPE[device]);
   const mix = (key) => { const i = Math.min(1, Math.floor(along)), u = along - i; return shapes[i][key] + (shapes[Math.min(2, i + 1)][key] - shapes[i][key]) * u; };
   const ratio = Math.exp(mix("ratioLog"));
-  const maxW = portrait ? width * 0.84 : width * 0.62, maxH = portrait ? height * 0.56 : height * 0.66;
+  const maxW = portrait ? width * 0.84 : width * 0.62, maxH = portrait ? height * 0.56 : height * 0.56;
   const w = Math.min(maxW, maxH * ratio), h = w / ratio;
   const spin = turns.reduce((sum, [a, b]) => sum + Math.sin(Math.PI * interpolate(f, [a, b], [0, 1], clamp)), 0);
   const now = Math.round(along);
@@ -661,7 +664,7 @@ function SyncShot({ shot }) {
   const s = portrait ? width / 720 : width / 1280;
   const L = portrait
     ? { cloud: [360, 250], mac: [360, 560, 520], ipad: [235, 905, 210], iphone: [500, 905, 132], promises: 1130 }
-    : { cloud: [640, 150], mac: [330, 430, 400], ipad: [800, 440, 200], iphone: [1010, 440, 124], promises: 650 };
+    : { cloud: [640, 150], mac: [330, 430, 400], ipad: [800, 440, 200], iphone: [1010, 440, 124], promises: 600 };
   const dev = (key, src, device) => { const [x, y, w] = L[key]; const h = w / SHAPE[device].ratio; return { x: x * s, y: y * s, w: w * s, h: h * s, src, device }; };
   const mac = dev("mac", "halo-home-mac.jpg", "mac"), ipad = dev("ipad", "halo-write-ipad.jpg", "ipadUp"), iphone = dev("iphone", "halo-write-iphone.jpg", "iphone");
   const cloud = { x: L.cloud[0] * s, y: L.cloud[1] * s };
