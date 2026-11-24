@@ -194,21 +194,80 @@ function TrioShot({ shot }) {
   </Cut>;
 }
 
-// The end: the name, the address, and a nudge to scroll.
-function EndShot({ shot }) {
+// "There's more": the small word, then the big one punching out of the
+// tunnel, outline first, then filled.
+function MoreShot({ shot }) {
   const f = useCurrentFrame();
   const unit = useUnit();
   const portrait = usePortrait();
-  const name = ease(interpolate(f, [0, 8], [0, 1], clamp));
-  const url = interpolate(f, [8, 14], [0, 1], clamp);
-  const nudge = interpolate(f, [18, 24], [0, 1], clamp);
-  const out = interpolate(f, [shot.frames - 6, shot.frames], [1, 0], clamp);
+  const small = ease(interpolate(f, [0, 4], [0, 1], clamp));
+  const big = ease(interpolate(f, [3, 9], [0, 1], clamp));
+  const filled = f >= 8;
   return <Cut still hit={shot.hit}>
-    <AbsoluteFill style={{ alignItems: "center", justifyContent: "center", flexDirection: "column", gap: 2.5 * unit, opacity: out, background: "radial-gradient(circle at 50% 50%, #2b1810, #08070a 65%)" }}>
-      <div style={{ font: `400 ${(portrait ? 17 : 18) * unit}px/0.9 ${ANTON}`, color: BONE, letterSpacing: `${0.12 - 0.08 * name}em`, opacity: name, filter: `blur(${(1 - name) * 10}px)`, textAlign: "center" }}>MOHAMED ANSAR</div>
-      <div style={{ font: `italic 400 ${6 * unit}px/1 ${SERIF}`, color: CORAL, opacity: url }}>ansarbuilds.dev</div>
-      <div style={{ font: `500 ${2.2 * unit}px/1 ${MONO}`, letterSpacing: "0.3em", textTransform: "uppercase", color: BONE, opacity: nudge * 0.75, marginTop: 4 * unit }}>Scroll for the rest ↓</div>
+    <AbsoluteFill style={{ background: "radial-gradient(circle at 50% 50%, #24120a, #08070a 70%)" }} />
+    <Tunnel speed={2.2} />
+    <Shockwave at={3} frames={12} />
+    <AbsoluteFill style={{ alignItems: "center", justifyContent: "center", flexDirection: "column", gap: unit }}>
+      <div style={{ font: `400 ${(portrait ? 11 : 9) * unit}px/1 ${ANTON}`, color: BONE, letterSpacing: `${0.5 - 0.3 * small}em`, opacity: small }}>{shot.small}</div>
+      <div style={{ font: `400 ${(portrait ? 34 : 36) * unit}px/0.85 ${ANTON}`, letterSpacing: "0.02em", color: "transparent", WebkitTextStroke: filled ? undefined : `2px ${BONE}`, background: filled ? "linear-gradient(170deg, #fff4e6 15%, #ffc79a 50%, #d5360c 100%)" : "none", WebkitBackgroundClip: filled ? "text" : undefined, backgroundClip: filled ? "text" : undefined, transform: `scale(${2.4 - 1.4 * big + 0.04 * (f / shot.frames)})`, opacity: big, filter: `blur(${(1 - big) * 10}px) drop-shadow(0 0 ${3 * unit}px rgb(255 140 90 / ${filled ? 0.45 : 0}))` }}>{shot.big}</div>
     </AbsoluteFill>
+  </Cut>;
+}
+
+/* The end, mirroring the opening: the terminal asks who again, the name
+   slams in letter by letter with the frame shaking on the finale chord,
+   the three projects light under it in their own colours, the address and
+   a nudge to scroll, and then the screen switches off like an old tube. */
+function EndShot({ shot }) {
+  const f = useCurrentFrame();
+  const unit = useUnit();
+  const { width, height } = useVideoConfig();
+  const portrait = usePortrait();
+  const at = shot.slamAt;
+  const term = interpolate(f, [at - 2, at], [1, 0], clamp);
+  const shake = f >= at ? Math.exp(-(f - at) / 4) : 0;
+  const sx = (random(`ex${f}`) - 0.5) * 3 * unit * shake, sy = (random(`ey${f}`) - 0.5) * 3 * unit * shake;
+  const rays = interpolate(f, [at - 1, at + 2, at + 12], [0, 0.85, 0], clamp);
+  const flash = interpolate(f, [at, at + 1, at + 5], [0.3, 0.18, 0], clamp) * (f >= at ? 1 : 0);
+  const url = interpolate(f, [at + 16, at + 22], [0, 1], clamp);
+  const nudge = interpolate(f, [at + 22, at + 27], [0, 1], clamp);
+  const bob = Math.sin((f - at) * 0.35) * 0.6 * unit;
+  // The tube switching off: squashed to a line, then to a dot.
+  const off = interpolate(f, [shot.frames - 9, shot.frames - 4], [0, 1], clamp);
+  const dot = interpolate(f, [shot.frames - 4, shot.frames - 1], [0, 1], clamp);
+  const size = (portrait ? 15 : 13.5) * unit;
+  return <Cut still hit={shot.hit}>
+    <AbsoluteFill style={{ transform: `scale(${1 - 0.995 * dot}, ${1 - 0.994 * off})`, filter: `brightness(${1 + 2.5 * off})`, opacity: 1 - 0.6 * dot }}>
+      <AbsoluteFill style={{ background: "radial-gradient(circle at 50% 50%, #2b1810, #08070a 62%)" }} />
+      <AbsoluteFill style={{ opacity: rays, background: "repeating-conic-gradient(from 0deg, rgb(255 190 140 / .16) 0deg 3deg, transparent 3deg 12deg)", WebkitMaskImage: "radial-gradient(circle, #000 0%, transparent 58%)", maskImage: "radial-gradient(circle, #000 0%, transparent 58%)", transform: "scale(1.6)" }} />
+      <Shockwave at={at} frames={16} />
+      {term > 0 && <AbsoluteFill style={{ alignItems: "center", justifyContent: "center", opacity: term }}>
+        <div style={{ filter: "drop-shadow(0 0 14px rgb(255 150 100 / .45))" }}><Prompt text={shot.command} from={1} perChar={1.1} size={6 * unit} /></div>
+      </AbsoluteFill>}
+      <AbsoluteFill style={{ alignItems: "center", justifyContent: "center", flexDirection: "column", gap: 2.6 * unit, transform: `translate(${sx}px, ${sy}px)` }}>
+        <div style={{ display: "flex", flexWrap: "wrap", justifyContent: "center", maxWidth: "92%", font: `400 ${size}px/0.92 ${ANTON}`, color: BONE, letterSpacing: "0.03em", textShadow: "0 0 60px rgb(255 160 110 / .5)" }}>
+          {shot.name.split(" ").map((word, w, words) => <span key={w} style={{ display: "inline-flex", whiteSpace: "nowrap", marginRight: w < words.length - 1 ? "0.25em" : 0 }}>{Array.from(word).map((ch, k) => {
+            const i = words.slice(0, w).join("").length + w + k;
+            const u = ease(interpolate(f, [at - 6 + i * 0.5, at - 1 + i * 0.5], [0, 1], clamp));
+            return <span key={k} style={{ display: "inline-block", opacity: u, transform: `scale(${2 - u}) translateY(${(1 - u) * -16}px)`, filter: u < 1 ? `blur(${(1 - u) * 8}px)` : "none" }}>{ch}</span>;
+          })}</span>)}
+        </div>
+        <div style={{ display: "flex", flexDirection: portrait ? "column" : "row", alignItems: "center", gap: (portrait ? 1.2 : 2) * unit }}>
+          {shot.projects.map(([number, name, tint], i) => {
+            const u = ease(interpolate(f, [at + 6 + i * 3, at + 10 + i * 3], [0, 1], clamp));
+            return <div key={name} style={{ display: "flex", alignItems: "baseline", gap: unit, padding: `${0.9 * unit}px ${2 * unit}px`, borderRadius: 999, border: `1px solid ${tint}`, background: "rgb(16 10 8 / .7)", boxShadow: `0 0 ${2.5 * unit * u}px ${tint}55`, opacity: u, transform: `translateY(${(1 - u) * 20}px) scale(${1.2 - 0.2 * u})` }}>
+              <span style={{ font: `500 ${2.2 * unit}px/1 ${MONO}`, color: tint }}>{number}</span>
+              <span style={{ font: `400 ${4.2 * unit}px/1 ${ANTON}`, color: BONE, letterSpacing: "0.05em", textTransform: "uppercase" }}>{name}</span>
+            </div>;
+          })}
+        </div>
+        <div style={{ font: `italic 400 ${6 * unit}px/1 ${SERIF}`, color: CORAL, opacity: url, marginTop: unit }}>{shot.url}</div>
+        <div style={{ font: `500 ${2.2 * unit}px/1 ${MONO}`, letterSpacing: "0.3em", textTransform: "uppercase", color: BONE, opacity: nudge * 0.8, transform: `translateY(${bob}px)` }}>Scroll for the rest ↓</div>
+      </AbsoluteFill>
+      <AbsoluteFill style={{ background: "#fff8ee", opacity: flash, mixBlendMode: "screen" }} />
+    </AbsoluteFill>
+    {/* The last dot of light. */}
+    {off > 0 && <div style={{ position: "absolute", left: width / 2 - 4 * unit, top: height / 2 - 4 * unit, width: 8 * unit, height: 8 * unit, borderRadius: "50%", background: "radial-gradient(circle, #fff 0%, rgb(255 220 190 / .6) 25%, transparent 65%)", opacity: dot > 0 ? 1 - dot * 0.5 : off * 0.6 }} />}
   </Cut>;
 }
 
@@ -698,7 +757,7 @@ function SyncShot({ shot }) {
   </Cut>;
 }
 
-const SHOT = { halo: HaloShot, morph: MorphShot, sync: SyncShot, listen: ListenShot, clean: CleanShot, send: SendShot, train: TrainShot, tokens: TokensShot, receipts: ReceiptsShot, boot: BootShot, slam: SlamShot, word: WordShot, three: ThreeShot, type: TypeShot, term: TermShot, title: TitleShot, clip: ClipShot, stat: StatShot, device: DeviceShot, trio: TrioShot, end: EndShot };
+const SHOT = { more: MoreShot, halo: HaloShot, morph: MorphShot, sync: SyncShot, listen: ListenShot, clean: CleanShot, send: SendShot, train: TrainShot, tokens: TokensShot, receipts: ReceiptsShot, boot: BootShot, slam: SlamShot, word: WordShot, three: ThreeShot, type: TypeShot, term: TermShot, title: TitleShot, clip: ClipShot, stat: StatShot, device: DeviceShot, trio: TrioShot, end: EndShot };
 
 // Over every shot: the project's tag at the corner, grain and a vignette.
 function Chrome() {
@@ -712,7 +771,7 @@ function Chrome() {
       <span style={{ width: 1.2 * unit, height: 1.2 * unit, borderRadius: "50%", background: Math.floor(f / 8) % 2 ? CORAL : "#7a2a14" }} />{title.number} / {title.name}
     </div>}
     <AbsoluteFill style={{ background: "radial-gradient(circle at 50% 50%, transparent 55%, rgb(0 0 0 / .55))", pointerEvents: "none" }} />
-    <AbsoluteFill style={{ opacity: 0.07, mixBlendMode: "overlay" }}>
+    <AbsoluteFill style={{ opacity: 0.06, mixBlendMode: "overlay" }}>
       <svg width="100%" height="100%"><filter id="g"><feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="2" seed={Math.floor(random(`g${f}`) * 1000)} /></filter><rect width="100%" height="100%" filter="url(#g)" /></svg>
     </AbsoluteFill>
   </>;
