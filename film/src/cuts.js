@@ -11,14 +11,16 @@ export const FPS = 30;
 // (a screenshot in its frame), trio (all three devices), end.
 // hit: the sound on the cut (drum, braam, impact, tick, whoosh, hit).
 const SHOTS = [
-  // Open: who, and what. Hard cuts on the drum.
-  { chapter: "open", kind: "term", frames: 26, text: "whoami", hit: "tick" },
-  { chapter: "open", kind: "type", frames: 18, text: "MOHAMED ANSAR", size: 1, hit: "impact" },
-  { chapter: "open", kind: "type", frames: 9, text: "I BUILD", hit: "drum" },
-  { chapter: "open", kind: "type", frames: 9, text: "AGENTS.", accent: true, hit: "drum" },
-  { chapter: "open", kind: "type", frames: 9, text: "STUDIES.", accent: true, hit: "drum" },
-  { chapter: "open", kind: "type", frames: 9, text: "APPS.", accent: true, hit: "drum" },
-  { chapter: "open", kind: "type", frames: 20, text: "HERE ARE THREE.", serif: "Watch.", hit: "impact" },
+  // Open: who, and what. A terminal boots and answers, the name slams in,
+  // four words hit on the drum over a rising tunnel, and the three projects
+  // are named before they play.
+  { chapter: "open", kind: "boot", frames: 32, command: "whoami", answer: "mohamed ansar", hit: "tick" },
+  { chapter: "open", kind: "slam", frames: 26, text: "MOHAMED ANSAR", hit: "impact" },
+  { chapter: "open", kind: "word", frames: 10, text: "I BUILD", style: "zoom", riser: 1.4, hit: "drum" },
+  { chapter: "open", kind: "word", frames: 10, text: "AGENTS.", style: "slice", accent: true, hit: "drum" },
+  { chapter: "open", kind: "word", frames: 10, text: "STUDIES.", style: "drop", accent: true, hit: "drum" },
+  { chapter: "open", kind: "word", frames: 10, text: "APPS.", style: "punch", accent: true, hit: "drum" },
+  { chapter: "open", kind: "three", frames: 36, text: "HERE ARE THREE.", names: ["Hedwig", "saywhen", "Haloscript"], serif: "Watch.", hit: "impact" },
 
   // Hedwig.
   { chapter: "hedwig", kind: "title", frames: 32, command: "./hedwig --train", number: "01", name: "Hedwig", line: "A language model, built from scratch", tint: "#e8b04a", hit: "braam" },

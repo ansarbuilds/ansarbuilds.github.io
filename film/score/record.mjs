@@ -30,6 +30,8 @@ window.play = () => new Promise((done) => {
       const want = BEDS[cut.chapter];
       if (want !== bed) { if (bed) showBed(bed, false); showBed(want, true); bed = want; }
       if (cut.hit) cue(cut.hit);
+      // A riser under a run of cuts, into the next big hit.
+      if (cut.riser) cue("riser", cut.riser);
     });
     // The music rises into each project's title.
     if (cut.kind === "title" && s > 0.7) at(s - 0.7, () => cue("swell", 0.7));
