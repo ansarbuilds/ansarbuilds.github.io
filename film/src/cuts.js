@@ -22,15 +22,18 @@ const SHOTS = [
   { chapter: "open", kind: "word", frames: 10, text: "APPS.", style: "punch", accent: true, hit: "drum" },
   { chapter: "open", kind: "three", frames: 36, text: "HERE ARE THREE.", names: ["Hedwig", "saywhen", "Haloscript"], serif: "Watch.", hit: "impact" },
 
-  // Hedwig.
-  { chapter: "hedwig", kind: "title", frames: 32, command: "./hedwig --train", number: "01", name: "Hedwig", line: "A language model, built from scratch", tint: "#e8b04a", hit: "braam" },
-  { chapter: "hedwig", kind: "clip", frames: 20, src: "hedwig-reel.mp4", from: 1.6, hit: "drum" },
-  { chapter: "hedwig", kind: "clip", frames: 16, src: "hedwig-reel.mp4", from: 3.7, hit: "drum" },
-  { chapter: "hedwig", kind: "clip", frames: 16, src: "hedwig-reel.mp4", from: 6.3, hit: "drum" },
-  { chapter: "hedwig", kind: "clip", frames: 20, src: "hedwig-reel.mp4", from: 12.6, label: ["286.7M", "parameters, from random numbers"], hit: "drum" },
-  { chapter: "hedwig", kind: "stat", frames: 18, value: "$2.45", label: "total rented-GPU spend", tint: "#e8b04a", hit: "impact" },
-  { chapter: "hedwig", kind: "clip", frames: 18, src: "hedwig-reel.mp4", from: 15.1, hit: "drum" },
-  { chapter: "hedwig", kind: "clip", frames: 24, src: "hedwig-reel.mp4", from: 16.9, hit: "whoosh" },
+  // Hedwig: a training run, the reel's own shots, the model writing for real,
+  // and the receipts.
+  { chapter: "hedwig", kind: "train", frames: 42, command: "./hedwig --train", number: "01", name: "Hedwig", line: "A language model, built from scratch", params: 286700000, tint: "#e8b04a", riser: 1.2, hit: "braam" },
+  { chapter: "hedwig", kind: "clip", frames: 16, src: "hedwig-reel.mp4", from: 1.6, hit: "drum" },
+  { chapter: "hedwig", kind: "clip", frames: 14, src: "hedwig-reel.mp4", from: 3.7, hit: "drum" },
+  { chapter: "hedwig", kind: "clip", frames: 14, src: "hedwig-reel.mp4", from: 6.3, hit: "drum" },
+  { chapter: "hedwig", kind: "tokens", frames: 36, count: 22, tint: "#e8b04a", hit: "whoosh", ticks: 22 },
+  { chapter: "hedwig", kind: "clip", frames: 18, src: "hedwig-reel.mp4", from: 12.6, label: ["286.7M", "parameters, from random numbers"], hit: "drum" },
+  { chapter: "hedwig", kind: "receipts", frames: 26, value: "$2.45", label: "all three cloud runs", rows: ["286.7M parameters in 115 minutes", "on one rented RTX 4090"], tint: "#e8b04a", hit: "impact" },
+  { chapter: "hedwig", kind: "stat", frames: 16, value: "98.3%", label: "preference win-rate after DPO", tint: "#e8b04a", hit: "drum" },
+  { chapter: "hedwig", kind: "clip", frames: 14, src: "hedwig-reel.mp4", from: 15.1, hit: "drum" },
+  { chapter: "hedwig", kind: "clip", frames: 22, src: "hedwig-reel.mp4", from: 16.9, hit: "whoosh" },
 
   // saywhen.
   { chapter: "saywhen", kind: "title", frames: 32, command: "saywhen --listen", number: "02", name: "saywhen", line: "Hands-free voice input for developers", tint: "#f2a93b", hit: "braam" },

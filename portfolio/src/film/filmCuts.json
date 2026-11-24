@@ -1,5 +1,5 @@
 {
-  "seconds": 22.2,
+  "seconds": 24,
   "chapters": [
     {
       "id": "open",
@@ -15,19 +15,19 @@
     },
     {
       "id": "saywhen",
-      "seconds": 9.933,
+      "seconds": 11.733,
       "numeral": "II",
       "name": "saywhen"
     },
     {
       "id": "haloscript",
-      "seconds": 15.467,
+      "seconds": 17.267,
       "numeral": "III",
       "name": "Haloscript"
     },
     {
       "id": "end",
-      "seconds": 20,
+      "seconds": 21.8,
       "numeral": "",
       "name": "Closing"
     }
