@@ -8,7 +8,7 @@ import PaletteSwatch from "./components/PaletteSwatch";
 const SHOW_SWATCH = typeof window !== "undefined" && (import.meta.env.DEV || new URLSearchParams(window.location.search).has("palette"));
 import Cursor from "./components/Cursor";
 import { COLD_OPEN_SESSION_KEY, SKIP_FILM, WATCH_FILM, coldOpenForced, filmAutoplayWanted, filmEnabled, shouldPlayIntro, watchFilm } from "./lib/intro";
-import { FilmIdent, FilmSkip } from "./components/FilmChrome";
+import { FilmIdent, FilmSkip, FilmSkipBurst } from "./components/FilmChrome";
 import { Play } from "lucide-react";
 import { armSound, cue, setSound } from "./lib/sound";
 import { isRouteTransitioning, noteSource, runRouteChange } from "./lib/routeTransition";
@@ -706,6 +706,11 @@ export default function App() {
     else { setColdOpenUp(false); setHeld(false); }
   }, [endFilm]);
 
+  // The skip button: the film goes at once, and the button leaves a burst.
+  const [burst, setBurst] = useState(0);
+  const pressSkip = useCallback((withBurst) => { skipFilm(); if (withBurst) setBurst((n) => n + 1); }, [skipFilm]);
+  const burstDone = useCallback(() => setBurst(0), []);
+
   // The film plays as a first visit lands.
   useEffect(() => { if (autoplay) roll(false); }, [autoplay, roll]);
   useEffect(() => () => clearTimeout(identTimer.current), []);
@@ -743,7 +748,8 @@ export default function App() {
           </Suspense></ColdOpenBoundary>}
           {coldOpenUp && <ColdOpenLayer key={`co-${take}`} mode="trailer" onStarted={onStarted} onHandOver={release} onDone={closeColdOpen} />}
           {cover && <FilmIdent />}
-          {filmUp && <FilmSkip onSkip={skipFilm} />}
+          {filmUp && <FilmSkip onSkip={pressSkip} />}
+          {burst > 0 && <FilmSkipBurst key={burst} onDone={burstDone} />}
         </SandboxProvider>
       </ThemeProvider>
     </ErrorBoundary>
