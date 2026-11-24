@@ -1,5 +1,6 @@
 import { AbsoluteFill, Audio, Img, OffthreadVideo, Sequence, interpolate, random, staticFile, useCurrentFrame, useVideoConfig } from "remotion";
 import { CUTS, FPS } from "./cuts.js";
+import { PROMPT, RUN } from "../../portfolio/src/data/hedwigRun.js";
 
 /* The film: a trailer cut of three projects. Hard jump cuts on the drum,
    each landing with a punch-in, a flash and a split of colour; terminal
@@ -346,15 +347,106 @@ function ThreeShot({ shot }) {
   </Cut>;
 }
 
-const SHOT = { boot: BootShot, slam: SlamShot, word: WordShot, three: ThreeShot, type: TypeShot, term: TermShot, title: TitleShot, clip: ClipShot, stat: StatShot, device: DeviceShot, trio: TrioShot, end: EndShot };
+/* ---- Hedwig ---- */
+
+const NAVY = "#0b1226";
+// A loss curve, as a height from the top of its box (1 is the top): it falls
+// fast, then flattens, with a little noise. An illustration of the shape,
+// not Hedwig's logged numbers, so it carries no figures of its own.
+const lossAt = (u) => 1 - (0.12 + 0.82 * Math.exp(-4.2 * u) + 0.03 * Math.sin(u * 61) * (1 - u));
+
+/* A training run: the command, a loss curve racing down and the parameter
+   count climbing, then the name slams in and the count lands. */
+function TrainShot({ shot }) {
+  const f = useCurrentFrame();
+  const unit = useUnit();
+  const { width, height } = useVideoConfig();
+  const portrait = usePortrait();
+  const run = ease(interpolate(f, [4, 26], [0, 1], clamp));
+  const slam = ease(interpolate(f, [26, 32], [0, 1], clamp));
+  const line = interpolate(f, [31, 37], [0, 1], clamp);
+  const count = Math.round(shot.params * run);
+  // The curve, across the lower part of the frame.
+  const box = portrait ? { x: width * 0.08, y: height * 0.62, w: width * 0.84, h: height * 0.22 } : { x: width * 0.52, y: height * 0.2, w: width * 0.42, h: height * 0.55 };
+  const n = 80, upto = Math.max(2, Math.round(n * run));
+  const pts = Array.from({ length: upto }, (_, i) => { const u = i / (n - 1); return `${box.x + u * box.w},${box.y + lossAt(u) * box.h}`; }).join(" ");
+  const last = pts.split(" ").at(-1).split(",").map(Number);
+  return <Cut still hit={shot.hit}>
+    <AbsoluteFill style={{ background: `radial-gradient(circle at 70% 40%, #1c2550, ${NAVY} 65%)` }} />
+    <AbsoluteFill style={{ opacity: 0.25, backgroundImage: "linear-gradient(rgb(232 176 74 / .12) 1px, transparent 1px), linear-gradient(90deg, rgb(232 176 74 / .12) 1px, transparent 1px)", backgroundSize: `${6 * unit}px ${6 * unit}px` }} />
+    <AbsoluteFill><svg width={width} height={height}>
+      <polyline points={pts} fill="none" stroke={shot.tint} strokeWidth={unit * 0.6} strokeLinejoin="round" style={{ filter: `drop-shadow(0 0 ${unit}px ${shot.tint})` }} opacity={1 - slam * 0.6} />
+      <circle cx={last[0]} cy={last[1]} r={unit * 1.1} fill="#fff4e6" opacity={1 - slam * 0.6} />
+      <text x={box.x} y={box.y - unit * 1.5} fill={shot.tint} fontFamily={MONO} fontSize={unit * 2} letterSpacing={unit * 0.3} opacity={1 - slam * 0.6}>LOSS</text>
+    </svg></AbsoluteFill>
+    <AbsoluteFill style={{ padding: portrait ? `${14 * unit}px ${7 * unit}px` : `${9 * unit}px ${8 * unit}px`, gap: 2.4 * unit }}>
+      <Prompt text={shot.command} from={0} perChar={0.25} size={3 * unit} />
+      <div style={{ font: `500 ${2 * unit}px/1 ${MONO}`, letterSpacing: "0.3em", color: shot.tint, marginTop: 3 * unit }}>PARAMETERS</div>
+      <div style={{ font: `400 ${(portrait ? 12 : 14) * unit}px/1 ${ANTON}`, color: BONE, fontVariantNumeric: "tabular-nums", letterSpacing: "0.02em", textShadow: `0 0 40px ${shot.tint}66` }}>{slam > 0.5 ? "286.7M" : count.toLocaleString("en-US")}</div>
+      <div style={{ display: "flex", alignItems: "baseline", gap: 3 * unit, marginTop: 2 * unit, transform: `scale(${1.6 - 0.6 * slam})`, transformOrigin: "left center", opacity: slam, filter: `blur(${(1 - slam) * 12}px)` }}>
+        <span style={{ font: `500 ${6 * unit}px/1 ${MONO}`, color: shot.tint }}>{shot.number}</span>
+        <span style={{ font: `400 ${(portrait ? 20 : 22) * unit}px/0.9 ${ANTON}`, color: BONE, textShadow: `0 0 50px ${shot.tint}88` }}>{shot.name}</span>
+      </div>
+      <div style={{ font: `italic 400 ${(portrait ? 6 : 5) * unit}px/1.1 ${SERIF}`, color: BONE, opacity: line * 0.9 }}>{shot.line}</div>
+    </AbsoluteFill>
+    <Shockwave at={26} tint={shot.tint} />
+  </Cut>;
+}
+
+/* Hedwig writing, for real: a run of its 13.8M model, token by token, with
+   the three tokens it was choosing between at each step and their chances. */
+function TokensShot({ shot }) {
+  const f = useCurrentFrame();
+  const unit = useUnit();
+  const portrait = usePortrait();
+  const shown = Math.min(shot.count, Math.floor(interpolate(f, [3, shot.frames - 6], [0, shot.count], clamp)));
+  const text = RUN.slice(0, shown).map(([t]) => t).join("");
+  const step = RUN[Math.min(shown, shot.count - 1)];
+  const [chosen, choices] = step;
+  return <Cut hit={shot.hit}>
+    <AbsoluteFill style={{ background: `radial-gradient(circle at 50% 30%, #18204a, ${NAVY} 70%)` }} />
+    <AbsoluteFill style={{ padding: portrait ? `${16 * unit}px ${7 * unit}px` : `${8 * unit}px ${10 * unit}px`, gap: 3 * unit, justifyContent: "center" }}>
+      <div style={{ font: `500 ${2.2 * unit}px/1.4 ${MONO}`, color: "rgb(239 230 216 / .6)" }}><span style={{ color: shot.tint }}>prompt › </span>{PROMPT}</div>
+      <div style={{ font: `italic 400 ${(portrait ? 7.5 : 6.4) * unit}px/1.18 ${SERIF}`, color: BONE, minHeight: "3.6em" }}>{text}<span style={{ display: "inline-block", width: "0.5em", height: "0.9em", marginLeft: 4, verticalAlign: "-0.1em", background: shot.tint, opacity: Math.floor(f / 4) % 2 ? 1 : 0.3 }} /></div>
+      <div style={{ display: "grid", gap: 1 * unit, width: portrait ? "100%" : "52%" }}>
+        {choices.map(([token, pct]) => <div key={token} style={{ display: "grid", gridTemplateColumns: `${14 * unit}px 1fr ${9 * unit}px`, alignItems: "center", gap: 1.5 * unit, font: `500 ${2.3 * unit}px/1 ${MONO}`, color: token === chosen ? "#fff4e6" : "rgb(239 230 216 / .55)" }}>
+          <span>{JSON.stringify(token)}</span>
+          <span style={{ height: 1.2 * unit, borderRadius: unit, background: "rgb(239 230 216 / .1)", overflow: "hidden" }}><span style={{ display: "block", height: "100%", width: `${pct}%`, background: token === chosen ? shot.tint : "rgb(239 230 216 / .35)" }} /></span>
+          <span style={{ textAlign: "right" }}>{pct}%</span>
+        </div>)}
+      </div>
+      <div style={{ font: `500 ${1.8 * unit}px/1 ${MONO}`, letterSpacing: "0.25em", textTransform: "uppercase", color: shot.tint, opacity: 0.85 }}>A real run of the 13.8M model · its top three each step</div>
+    </AbsoluteFill>
+  </Cut>;
+}
+
+// A number slammed, and the receipts under it, one row at a time.
+function ReceiptsShot({ shot }) {
+  const f = useCurrentFrame();
+  const unit = useUnit();
+  const portrait = usePortrait();
+  const u = ease(interpolate(f, [0, 6], [0, 1], clamp));
+  return <Cut hit={shot.hit}>
+    <AbsoluteFill style={{ alignItems: "center", justifyContent: "center", flexDirection: "column", gap: 2 * unit, background: `radial-gradient(circle, ${shot.tint}30, transparent 55%), ${INK}` }}>
+      <div style={{ font: `400 ${(portrait ? 30 : 30) * unit}px/0.9 ${ANTON}`, color: "transparent", background: `linear-gradient(170deg, #fffaf2 10%, ${shot.tint} 60%, #b8320e)`, WebkitBackgroundClip: "text", backgroundClip: "text", transform: `scale(${1.3 - 0.3 * u})` }}>{shot.value}</div>
+      <div style={{ font: `500 ${2.8 * unit}px/1.2 ${MONO}`, letterSpacing: "0.18em", textTransform: "uppercase", color: BONE, opacity: interpolate(f, [3, 8], [0, 1], clamp) }}>{shot.label}</div>
+      <div style={{ display: "grid", gap: 1.2 * unit, marginTop: 1.5 * unit, justifyItems: "center" }}>
+        {shot.rows.map((row, i) => { const v = ease(interpolate(f, [8 + i * 5, 13 + i * 5], [0, 1], clamp)); return <div key={row} style={{ font: `500 ${2.6 * unit}px/1.2 ${MONO}`, color: shot.tint, opacity: v, transform: `translateY(${(1 - v) * 16}px)`, textAlign: "center" }}>{row}</div>; })}
+      </div>
+    </AbsoluteFill>
+    <Shockwave at={0} tint={shot.tint} frames={12} />
+  </Cut>;
+}
+
+const SHOT = { train: TrainShot, tokens: TokensShot, receipts: ReceiptsShot, boot: BootShot, slam: SlamShot, word: WordShot, three: ThreeShot, type: TypeShot, term: TermShot, title: TitleShot, clip: ClipShot, stat: StatShot, device: DeviceShot, trio: TrioShot, end: EndShot };
 
 // Over every shot: the project's tag at the corner, grain and a vignette.
 function Chrome() {
   const f = useCurrentFrame();
   const unit = useUnit();
   const cut = CUTS.find((c) => f >= c.start && f < c.end) ?? CUTS.at(-1);
-  const title = CUTS.find((c) => c.chapter === cut.chapter && c.kind === "title");
-  const showTag = title && cut.kind !== "title";
+  const title = CUTS.find((c) => c.chapter === cut.chapter && (c.kind === "title" || c.kind === "train"));
+  const showTag = title && cut.kind !== "title" && cut.kind !== "train";
   return <>
     {showTag && <div style={{ position: "absolute", left: 4 * unit, top: 4 * unit, display: "flex", alignItems: "center", gap: 1.2 * unit, font: `600 ${1.9 * unit}px/1 ${MONO}`, letterSpacing: "0.2em", textTransform: "uppercase", color: BONE, textShadow: "0 1px 8px #000" }}>
       <span style={{ width: 1.2 * unit, height: 1.2 * unit, borderRadius: "50%", background: Math.floor(f / 8) % 2 ? CORAL : "#7a2a14" }} />{title.number} / {title.name}

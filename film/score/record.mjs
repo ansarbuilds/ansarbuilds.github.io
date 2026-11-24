@@ -32,6 +32,8 @@ window.play = () => new Promise((done) => {
       if (cut.hit) cue(cut.hit);
       // A riser under a run of cuts, into the next big hit.
       if (cut.riser) cue("riser", cut.riser);
+      // Keys ticking under a shot, evenly through it.
+      for (let k = 1; k <= (cut.ticks ?? 0); k++) setTimeout(() => cue("tick"), (k * cut.frames / (cut.ticks + 1) / FPS) * 1000);
     });
     // The music rises into each project's title.
     if (cut.kind === "title" && s > 0.7) at(s - 0.7, () => cue("swell", 0.7));

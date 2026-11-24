@@ -13,7 +13,7 @@ writeFileSync("../portfolio/src/film/filmCuts.json", JSON.stringify({ seconds: +
 
 const browser = process.env.REMOTION_BROWSER ? ["--browser-executable", process.env.REMOTION_BROWSER] : [];
 for (const [id, file] of [["Film", "film-wide.mp4"], ["FilmUpright", "film-upright.mp4"]]) {
-  execFileSync("npx", ["remotion", "render", "src/index.js", id, `${out}/${file}`, "--codec", "h264", "--crf", "28", "--audio-bitrate", "128k", "--x264-preset", "slow", "--log", "error", ...browser], { stdio: "inherit" });
+  execFileSync("npx", ["remotion", "render", "src/index.js", id, `${out}/${file}`, "--codec", "h264", "--crf", "28", "--audio-bitrate", "96k", "--x264-preset", "slow", "--log", "error", ...browser], { stdio: "inherit" });
   execFileSync("npx", ["remotion", "still", "src/index.js", id, `${out}/${file.replace(".mp4", "-poster.jpg")}`, "--frame", "0", "--jpeg-quality", "80", "--log", "error", ...browser], { stdio: "inherit" });
   console.log(`${file}: ${(statSync(`${out}/${file}`).size / 1e6).toFixed(2)} MB`);
 }

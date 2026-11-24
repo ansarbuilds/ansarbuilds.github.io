@@ -1,6 +1,6 @@
 # The film
 
-The portfolio's launch film: a 22-second trailer of three projects (Hedwig, saywhen and Haloscript), cut on the drum. It is made with [Remotion](https://www.remotion.dev) (React to video) and rendered to MP4 for `portfolio/public/film/`. This folder is not part of the website's build; only its rendered files are.
+The portfolio's launch film: a 24-second trailer of three projects (Hedwig, saywhen and Haloscript), cut on the drum. It is made with [Remotion](https://www.remotion.dev) (React to video) and rendered to MP4 for `portfolio/public/film/`. This folder is not part of the website's build; only its rendered files are.
 
 ## What it is
 
@@ -26,6 +26,6 @@ If Remotion cannot download its own headless Chrome, point it at Playwright's: `
 
 ## Size
 
-The site has a 32 MB budget for everything it ships (`portfolio/scripts/check-budget.mjs`). The two cuts are about 2.6 and 2.4 MB at CRF 28; raise the CRF in `render.mjs` to shrink them.
+The site has a 32 MB budget for everything it ships (`portfolio/scripts/check-budget.mjs`). The two cuts are about 2.6 and 2.4 MB at CRF 28, with 96 kbps sound; raise the CRF in `render.mjs` to shrink them.
 
 Remotion is free for individuals and small teams; see its license for larger companies.
