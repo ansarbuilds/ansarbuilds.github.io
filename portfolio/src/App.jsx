@@ -10,7 +10,7 @@ import Cursor from "./components/Cursor";
 import { COLD_OPEN_SESSION_KEY, SKIP_FILM, WATCH_FILM, coldOpenForced, filmAutoplayWanted, filmEnabled, shouldPlayIntro, watchFilm } from "./lib/intro";
 import { FilmIdent, FilmSkip } from "./components/FilmChrome";
 import { Play } from "lucide-react";
-import { armSound, setSound } from "./lib/sound";
+import { armSound, cue, setSound } from "./lib/sound";
 import { isRouteTransitioning, noteSource, runRouteChange } from "./lib/routeTransition";
 import { PREVIS, parseTarget, pathForRoute, readLocation, urlForTarget } from "./lib/routes";
 import { titleForRoute } from "./lib/routeTitle";
@@ -632,7 +632,9 @@ function ColdOpenLayer({ mode, onStarted, onHandOver, onDone }) {
 
 
 // The studio ident, before the cold open.
-const IDENT_MS = 1200;
+const IDENT_MS = 1600;
+// When the ident's light bursts, for its hit.
+const IDENT_BURST_MS = 420;
 
 /* The film's place in the app, start to end:
      ident     a first visit opens on the film, playing on its own: the
@@ -673,6 +675,8 @@ export default function App() {
   // the ident.
   const roll = useCallback((chosen) => {
     if (chosen) setSound(true); else armSound();
+    // The ident's hit, if the sound can play yet.
+    if (chosen) setTimeout(() => { if (running.current) cue("impact"); }, IDENT_BURST_MS);
     loadFilmPlayer().catch(() => {});
     import("./film/ColdOpen").catch(() => {});
     try { window.sessionStorage.setItem(COLD_OPEN_SESSION_KEY, "1"); } catch { /* not remembered */ }

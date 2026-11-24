@@ -269,7 +269,7 @@ test('the whole film runs under 30 seconds, landing to page', async ({ page }) =
   // The player's own running time, on its scrub bar...
   const player = Number(await page.getByRole('slider', { name: 'Where the film is' }).getAttribute('max', { timeout: 60000 }));
   // ...plus what plays before it: the ident and the cold open's trailer cut.
-  const before = 1.2 + await page.evaluate(async () => { const { T, TRAILER_START, TRAILER_SPEED } = await import('/src/film/coldOpen/score.js'); return (T.open - TRAILER_START) / TRAILER_SPEED; });
+  const before = 1.6 + await page.evaluate(async () => { const { T, TRAILER_START, TRAILER_SPEED } = await import('/src/film/coldOpen/score.js'); return (T.open - TRAILER_START) / TRAILER_SPEED; });
   expect(player + before).toBeLessThan(30);
 });
 
