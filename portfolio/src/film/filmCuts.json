@@ -1,5 +1,5 @@
 {
-  "seconds": 24.933,
+  "seconds": 25.667,
   "chapters": [
     {
       "id": "open",
@@ -27,7 +27,7 @@
     },
     {
       "id": "end",
-      "seconds": 22.733,
+      "seconds": 23.467,
       "numeral": "",
       "name": "Closing"
     }

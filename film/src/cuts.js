@@ -10,7 +10,7 @@ export const FPS = 30;
 // project's title card), clip (footage), stat (a number slammed), device
 // (a screenshot in its frame), trio (all three devices), end. Each
 // project's own shots: train, tokens and receipts (Hedwig); listen, clean
-// and send (saywhen).
+// and send (saywhen); halo, morph and sync (Haloscript).
 // hit: the sound on the cut (drum, braam, impact, tick, whoosh, hit).
 const SHOTS = [
   // Open: who, and what. A terminal boots and answers, the name slams in,
@@ -49,13 +49,15 @@ const SHOTS = [
   { chapter: "saywhen", kind: "stat", frames: 16, value: "34/34", label: "spoken commands cleaned exactly", tint: "#f2a93b", hit: "drum" },
   { chapter: "saywhen", kind: "clip", frames: 18, src: "saywhen-demo.mp4", from: 53.2, hit: "whoosh" },
 
-  // Haloscript.
-  { chapter: "haloscript", kind: "title", frames: 32, command: "open Haloscript.app", number: "03", name: "Haloscript", line: "A writing studio for novelists", tint: "#efe2ce", hit: "braam" },
-  { chapter: "haloscript", kind: "device", frames: 22, src: "halo-home-mac.jpg", device: "mac", hit: "drum" },
-  { chapter: "haloscript", kind: "device", frames: 18, src: "halo-whiteboard-mac.jpg", device: "mac", zoom: true, hit: "drum" },
-  { chapter: "haloscript", kind: "device", frames: 16, src: "halo-corkboard-ipad.jpg", device: "ipad", hit: "drum" },
-  { chapter: "haloscript", kind: "device", frames: 16, src: "halo-write-iphone.jpg", device: "iphone", hit: "drum" },
-  { chapter: "haloscript", kind: "trio", frames: 32, stamp: "Live on the App Store", hit: "impact" },
+  // Haloscript: the app opens and its halo lights, one app turning from a
+  // Mac into an iPad into an iPhone, its own screens, a word syncing to every
+  // device through the writer's iCloud, and the App Store.
+  { chapter: "haloscript", kind: "halo", frames: 38, command: "open Haloscript.app", number: "03", name: "Haloscript", line: "A writing studio for novelists", tint: "#c9b8ff", riser: 1.0, hit: "braam" },
+  { chapter: "haloscript", kind: "device", frames: 14, src: "halo-whiteboard-mac.jpg", device: "mac", zoom: true, hit: "drum" },
+  { chapter: "haloscript", kind: "morph", frames: 32, screens: [["halo-home-mac.jpg", "mac", "Mac"], ["halo-write-ipad.jpg", "ipadUp", "iPad"], ["halo-write-iphone.jpg", "iphone", "iPhone"]], line: "One app. Three screens.", tint: "#c9b8ff", hit: "whoosh", cues: [[11, "drum"], [22, "drum"]] },
+  { chapter: "haloscript", kind: "device", frames: 12, src: "halo-corkboard-ipad.jpg", device: "ipad", hit: "drum" },
+  { chapter: "haloscript", kind: "sync", frames: 30, word: "Chapter One", promises: ["No accounts", "No server of mine", "No tracking"], tint: "#c9b8ff", hit: "drum", cues: [[13, "tick"], [16, "tick"]] },
+  { chapter: "haloscript", kind: "trio", frames: 32, stamp: "Live on the App Store", stampAt: 12, tint: "#c9b8ff", hit: "drum", cues: [[12, "impact"]] },
 
   // The end.
   { chapter: "end", kind: "type", frames: 18, text: "THERE'S MORE.", hit: "drum" },
