@@ -757,7 +757,67 @@ function SyncShot({ shot }) {
   </Cut>;
 }
 
-const SHOT = { more: MoreShot, halo: HaloShot, morph: MorphShot, sync: SyncShot, listen: ListenShot, clean: CleanShot, send: SendShot, train: TrainShot, tokens: TokensShot, receipts: ReceiptsShot, boot: BootShot, slam: SlamShot, word: WordShot, three: ThreeShot, type: TypeShot, term: TermShot, title: TitleShot, clip: ClipShot, stat: StatShot, device: DeviceShot, trio: TrioShot, end: EndShot };
+/* The Mac against a rented GPU on the same lesson: both clocks run the
+   same time, the GPU's bar fills and finishes while the Mac's has barely
+   started, then how much faster slams in. */
+function SpeedShot({ shot }) {
+  const f = useCurrentFrame();
+  const unit = useUnit();
+  const portrait = usePortrait();
+  const at = shot.slamAt;
+  const u = interpolate(f, [2, at], [0, 1], clamp);
+  const fastest = Math.min(...shot.runs.map(([, seconds]) => seconds));
+  const elapsed = u * fastest;
+  const slam = ease(interpolate(f, [at, at + 5], [0, 1], clamp));
+  const shake = f >= at ? Math.exp(-(f - at) / 3) : 0;
+  const sx = (random(`sp${f}`) - 0.5) * 2.4 * unit * shake;
+  const clockOf = (s) => `${Math.floor(s / 60)}:${String(Math.floor(s % 60)).padStart(2, "0")}`;
+  return <Cut still hit={shot.hit}>
+    <AbsoluteFill style={{ background: `radial-gradient(circle at 50% 40%, #1c2550, ${NAVY} 68%)` }} />
+    <AbsoluteFill style={{ padding: portrait ? `0 ${7 * unit}px` : `0 ${12 * unit}px`, justifyContent: "center", gap: 3.4 * unit, transform: `translateX(${sx}px)` }}>
+      <div style={{ font: `600 ${(portrait ? 2.2 : 2.6) * unit}px/1 ${MONO}`, letterSpacing: "0.26em", textTransform: "uppercase", color: shot.tint }}>{shot.title}</div>
+      {shot.runs.map(([name, seconds, total], i) => {
+        const share = Math.min(1, elapsed / seconds), done = share >= 1;
+        return <div key={name} style={{ display: "grid", gap: 1.2 * unit }}>
+          <div style={{ display: "flex", alignItems: "baseline", justifyContent: "space-between", font: `500 ${(portrait ? 3.2 : 3.6) * unit}px/1 ${MONO}`, color: BONE }}>
+            <span>{name}</span>
+            <span style={{ color: done ? "#fff4e6" : "rgb(239 230 216 / .6)", fontVariantNumeric: "tabular-nums" }}>{clockOf(elapsed)} <span style={{ opacity: 0.55 }}>/ {total}</span></span>
+          </div>
+          <div style={{ height: (i ? 3.6 : 2.6) * unit, borderRadius: unit, background: "rgb(239 230 216 / .08)", overflow: "hidden", boxShadow: done ? `0 0 ${3 * unit}px ${shot.tint}88` : "none" }}>
+            <div style={{ height: "100%", width: `${share * 100}%`, background: i ? `linear-gradient(90deg, ${shot.tint}, #fff4e6)` : "rgb(239 230 216 / .45)" }} />
+          </div>
+        </div>;
+      })}
+      <div style={{ font: `400 ${(portrait ? 14 : 13) * unit}px/0.9 ${ANTON}`, color: "transparent", background: `linear-gradient(170deg, #fffaf2 10%, ${shot.tint} 60%, #b8320e)`, WebkitBackgroundClip: "text", backgroundClip: "text", opacity: slam, transform: `scale(${1.6 - 0.6 * slam})`, transformOrigin: "left center", filter: `blur(${(1 - slam) * 10}px)`, marginTop: unit }}>{shot.slam}</div>
+    </AbsoluteFill>
+    <Shockwave at={at} tint={shot.tint} frames={12} />
+  </Cut>;
+}
+
+/* The win-rate slammed, and under it the race it won: the small Mac model
+   and the big rented one, side by side. */
+function WinShot({ shot }) {
+  const f = useCurrentFrame();
+  const unit = useUnit();
+  const portrait = usePortrait();
+  const u = ease(interpolate(f, [0, 6], [0, 1], clamp));
+  const fill = ease(interpolate(f, [3, 13], [0, 1], clamp));
+  return <Cut hit={shot.hit}>
+    <AbsoluteFill style={{ alignItems: "center", justifyContent: "center", flexDirection: "column", gap: 2 * unit, background: `radial-gradient(circle, ${shot.tint}30, transparent 55%), ${INK}` }}>
+      <div style={{ font: `400 ${(portrait ? 28 : 26) * unit}px/0.9 ${ANTON}`, color: "transparent", background: `linear-gradient(170deg, #fffaf2 10%, ${shot.tint} 60%, #b8320e)`, WebkitBackgroundClip: "text", backgroundClip: "text", transform: `scale(${1.3 - 0.3 * u})` }}>{shot.value}</div>
+      <div style={{ font: `500 ${2.6 * unit}px/1.2 ${MONO}`, letterSpacing: "0.18em", textTransform: "uppercase", color: BONE, opacity: interpolate(f, [3, 8], [0, 1], clamp), textAlign: "center" }}>{shot.label}</div>
+      <div style={{ display: "grid", gap: 1.4 * unit, width: portrait ? "84%" : "58%", marginTop: 1.5 * unit }}>
+        {shot.rows.map(([name, pct], i) => <div key={name} style={{ display: "grid", gridTemplateColumns: portrait ? "1fr" : `${31 * unit}px 1fr ${8 * unit}px`, alignItems: "center", gap: 1.2 * unit, font: `500 ${2.2 * unit}px/1 ${MONO}`, color: i ? "#fff4e6" : "rgb(239 230 216 / .6)" }}>
+          <span>{name}{portrait && <span style={{ float: "right" }}>{(pct * fill).toFixed(1)}%</span>}</span>
+          <span style={{ height: 1.4 * unit, borderRadius: unit, background: "rgb(239 230 216 / .08)", overflow: "hidden" }}><span style={{ display: "block", height: "100%", width: `${pct * fill}%`, background: i ? shot.tint : "rgb(239 230 216 / .4)", boxShadow: i ? `0 0 ${2 * unit}px ${shot.tint}` : "none" }} /></span>
+          {!portrait && <span style={{ textAlign: "right", fontVariantNumeric: "tabular-nums" }}>{(pct * fill).toFixed(1)}%</span>}
+        </div>)}
+      </div>
+    </AbsoluteFill>
+  </Cut>;
+}
+
+const SHOT = { speed: SpeedShot, win: WinShot, more: MoreShot, halo: HaloShot, morph: MorphShot, sync: SyncShot, listen: ListenShot, clean: CleanShot, send: SendShot, train: TrainShot, tokens: TokensShot, receipts: ReceiptsShot, boot: BootShot, slam: SlamShot, word: WordShot, three: ThreeShot, type: TypeShot, term: TermShot, title: TitleShot, clip: ClipShot, stat: StatShot, device: DeviceShot, trio: TrioShot, end: EndShot };
 
 // Over every shot: the project's tag at the corner, grain and a vignette.
 function Chrome() {

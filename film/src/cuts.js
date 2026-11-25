@@ -9,7 +9,7 @@ export const FPS = 30;
 // kind: type (a word slammed full screen), term (a command typed), title (a
 // project's title card), clip (footage), stat (a number slammed), device
 // (a screenshot in its frame), trio (all three devices), end. Each
-// project's own shots: train, tokens and receipts (Hedwig); listen, clean
+// project's own shots: train, tokens, speed, receipts and win (Hedwig); listen, clean
 // and send (saywhen); halo, morph and sync (Haloscript); more (the end).
 // hit: the sound on the cut (drum, braam, impact, tick, whoosh, hit).
 const SHOTS = [
@@ -24,16 +24,17 @@ const SHOTS = [
   { chapter: "open", kind: "word", frames: 10, text: "APPS.", style: "punch", accent: true, hit: "drum" },
   { chapter: "open", kind: "three", frames: 36, text: "HERE ARE THREE.", names: ["Hedwig", "saywhen", "Haloscript"], serif: "Watch.", hit: "impact" },
 
-  // Hedwig: a training run, the reel's own shots, the model writing for real,
-  // and the receipts.
+  // Hedwig: a training run, the reel's own shots, the Mac racing a rented
+  // GPU, the model writing for real, the receipts, and its win-rate against
+  // the Mac model.
   { chapter: "hedwig", kind: "train", frames: 42, command: "./hedwig --train", number: "01", name: "Hedwig", line: "A language model, built from scratch", params: 286700000, tint: "#e8b04a", riser: 1.2, hit: "braam" },
   { chapter: "hedwig", kind: "clip", frames: 16, src: "hedwig-reel.mp4", from: 1.6, hit: "drum" },
   { chapter: "hedwig", kind: "clip", frames: 14, src: "hedwig-reel.mp4", from: 3.7, hit: "drum" },
-  { chapter: "hedwig", kind: "clip", frames: 14, src: "hedwig-reel.mp4", from: 6.3, hit: "drum" },
+  { chapter: "hedwig", kind: "speed", frames: 26, title: "The same 50 MB lesson", runs: [["MacBook Air M4", 3540, "~59 min"], ["Rented RTX A5000", 135, "135 s"]], slam: "26× FASTER", slamAt: 17, tint: "#e8b04a", hit: "drum", cues: [[17, "impact"]], ticks: 4 },
   { chapter: "hedwig", kind: "tokens", frames: 36, count: 22, tint: "#e8b04a", hit: "whoosh", ticks: 22 },
   { chapter: "hedwig", kind: "clip", frames: 18, src: "hedwig-reel.mp4", from: 12.6, label: ["286.7M", "parameters, from random numbers"], hit: "drum" },
   { chapter: "hedwig", kind: "receipts", frames: 26, value: "$2.45", label: "all three cloud runs", rows: ["286.7M parameters in 115 minutes", "on one rented RTX 4090"], tint: "#e8b04a", hit: "impact" },
-  { chapter: "hedwig", kind: "stat", frames: 16, value: "98.3%", label: "preference win-rate after DPO", tint: "#e8b04a", hit: "drum" },
+  { chapter: "hedwig", kind: "win", frames: 20, value: "98.3%", label: "preference win-rate after DPO", rows: [["13.8M · on the Mac", 92.5], ["286.7M · on an RTX 4090", 98.3]], tint: "#e8b04a", hit: "drum" },
   { chapter: "hedwig", kind: "clip", frames: 14, src: "hedwig-reel.mp4", from: 15.1, hit: "drum" },
   { chapter: "hedwig", kind: "clip", frames: 22, src: "hedwig-reel.mp4", from: 16.9, hit: "whoosh" },
 
