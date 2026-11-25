@@ -5,20 +5,36 @@ import { cue, onSoundChange, soundOn, soundPlaying } from "../lib/sound";
 /* What sits around the film while it plays (see App):
 
    FilmIdent  the studio ident it opens on, over black: a point of light
-              ignites into a streak and bursts, rays fan out, and the name
-              pulls together out of the light in gold. It holds the screen
+              ignites into a streak and bursts with a jolt, a ring of
+              light and flares, rays fan out, and sparks fly out and are
+              pulled back in as the name comes together in gold. It holds the screen
               until the film's first frame.
    FilmSkip   the way out, big enough that nobody has to look for it, and
               the nudge to tap for sound (a browser plays none before a
               click, tap or key). */
+// The sparks thrown out by the burst: each flies out on its own angle (a
+// golden-angle spiral, so they spread evenly) and lands at its own place
+// along the name, -1 to 1.
+const SPARKS = Array.from({ length: 26 }, (_, i) => {
+  const angle = i * 2.39996, reach = 16 + ((i * 37) % 23);
+  return { "--i": i, "--ox": `${(Math.cos(angle) * reach).toFixed(1)}vmin`, "--oy": `${(Math.sin(angle) * reach * 0.7).toFixed(1)}vmin`, "--t": ((i / 25) * 2 - 1).toFixed(2) };
+});
+// Lens flares sliding along the streak: size and where each ends up.
+const FLARES = [["9vmin", "34vw", "-3vmin"], ["4vmin", "-22vw", "2vmin"], ["14vmin", "-40vw", "5vmin"]];
+
 export function FilmIdent() {
   return <div className="film-ident" aria-hidden="true">
-    <span className="film-ident-rays" />
-    <span className="film-ident-burst" />
-    <span className="film-ident-line" />
-    <div className="film-ident-logo">
-      <p className="film-ident-name">ansarbuilds</p>
-      <p className="film-ident-sub">presents</p>
+    <div className="film-ident-stage">
+      <span className="film-ident-rays" />
+      <span className="film-ident-burst" />
+      <span className="film-ident-shock" />
+      <span className="film-ident-line" />
+      {FLARES.map(([s, x, y]) => <span key={x} className="film-ident-flare" style={{ "--s": s, "--x": x, "--y": y }} />)}
+      {SPARKS.map((style) => <span key={style["--i"]} className="film-ident-spark" style={style} />)}
+      <div className="film-ident-logo">
+        <p className="film-ident-name">ansarbuilds</p>
+        <p className="film-ident-sub">presents</p>
+      </div>
     </div>
   </div>;
 }
