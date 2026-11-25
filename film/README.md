@@ -1,6 +1,6 @@
 # The film
 
-The portfolio's launch film: a 26-second trailer of three projects (Hedwig, saywhen and Haloscript), cut on the drum. It is made with [Remotion](https://www.remotion.dev) (React to video) and rendered to MP4 for `portfolio/public/film/`. This folder is not part of the website's build; only its rendered files are.
+The portfolio's launch film: a 27-second trailer of three projects (Hedwig, saywhen and Haloscript), cut on the drum. It is made with [Remotion](https://www.remotion.dev) (React to video) and rendered to MP4 for `portfolio/public/film/`. This folder is not part of the website's build; only its rendered files are.
 
 ## What it is
 
