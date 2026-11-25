@@ -1,5 +1,5 @@
 {
-  "seconds": 26.533,
+  "seconds": 27.067,
   "chapters": [
     {
       "id": "open",
@@ -21,13 +21,13 @@
     },
     {
       "id": "haloscript",
-      "seconds": 18.733,
+      "seconds": 19.267,
       "numeral": "III",
       "name": "Haloscript"
     },
     {
       "id": "end",
-      "seconds": 24,
+      "seconds": 24.533,
       "numeral": "",
       "name": "Closing"
     }
