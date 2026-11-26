@@ -112,6 +112,7 @@ export const TOOL_INFO = {
   "Weights & Biases": "A service that records machine learning training runs so you can compare them.",
   "facebook/bart-large-mnli": "A free language model that can judge whether a label fits a piece of text without being trained on it (zero-shot).",
   Ollama: "Free software that runs AI language models on your own computer, so nothing is sent to the cloud and nothing is paid per question.",
+  Parakeet: "An on-device speech model (Parakeet TDT 0.6B v2) included in the saywhen v0.3.0 installer. It transcribes English on the computer.",
   "qwen2.5:7b": "A free, general-purpose AI language model from Alibaba with 7 billion parameters: the kind of model most people reach for. It writes text, so it has to be asked to answer in a fixed format.",
   "Strands Decider 2B": "An open \"decision model\" from AWS: instead of writing text, it scores every allowed answer to a typed question and gives each a probability. 2 billion parameters.",
   "Kev-0.8B": "A very small open decision model (0.8 billion parameters) made by Jared Palmer. It speaks the same request format as Jev, and answers in about a third of a second on a laptop.",
