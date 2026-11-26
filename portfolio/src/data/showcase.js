@@ -23,9 +23,9 @@ export const FLAGSHIPS = [
   {
     slug: "saywhen",
     eyebrow: "Open source · Mac and Windows",
-    badge: "Beta · v0.2.1",
+    badge: "Beta · v0.3.0",
     headline: "Look at the screen and talk. It types, then waits before it sends.",
-    copy: "Hands-free dictation for Mac and Windows. The webcam and the microphone have to agree. Speech stays on your computer. Snippets, quiet hours, and a new window are coming in the next release.",
+    copy: "Hands-free dictation for Mac and Windows. The webcam and the microphone have to agree. Speech stays on your computer. Snippets, quiet hours, and a new window are in the unsigned v0.3.0 beta.",
     stats: [["34/34", "spoken commands cleaned exactly"], ["0%", "false starts on 56 replay clips"], ["4", "ways to send, all cancelable"]],
     stack: ["Tauri", "Rust", "TypeScript", "MediaPipe", "Whisper"],
   },
