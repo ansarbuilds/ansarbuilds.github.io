@@ -15,7 +15,7 @@ SELECTED PROJECTS
 - Decision Models study: compared three small local models with a larger chat-style model on 250 fictional support messages. The best small model routed 80% of held-out messages correctly and was five times faster.
 - My Take on REA: an independent test of an AI reverse-engineering tool across 20 programs. The study found no clear accuracy improvement on those programs; directed REA use took more time and steps.
 - StoryEra: an open-source skill for Codex and Claude Code that tracks facts, audits novel continuity, cites passages and suggests repairs without editing the author's manuscript.
-- saywhen: an open-source desktop app for hands-free voice input. It types a spoken command into a terminal or coding assistant after a preview the person can cancel.
+- saywhen: an open-source beta for hands-free dictation on Mac and Windows. It listens when the webcam and microphone agree you are talking to the screen, transcribes on the computer, and types after a preview you can cancel. Snippets, quiet hours, and a redesigned window are coming in the next release and are not in the v0.2.1 installer.
 
 WORKING STYLE
 - Ansar prefers tests, reproducible evidence and honest limitations over inflated claims.

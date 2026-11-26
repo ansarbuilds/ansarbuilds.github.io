@@ -2,9 +2,9 @@
 export const CASE_SUMMARIES = {
   saywhen: {
     problem: 'Voice tools for developers need a key press to start and another to send, or they listen to everything in the room.',
-    outcome: 'A Mac and Windows app that listens when you face the screen and talk, then types the command behind a cancelable preview.',
-    proof: 'A 56-clip replay benchmark, 34 spoken-command clean-up cases, per-frame timings and a public launch checklist.',
-    limits: 'Beta. The replay clips are generated speech with simulated camera traces, not live users. Windows, Intel Mac and signed-build checks are still open.',
+    outcome: 'A Mac and Windows beta that listens when you face the screen and talk, transcribes on the computer, and types behind a cancelable preview. Snippets, per-app profiles, quiet hours, and a redesigned window are coming in the next release.',
+    proof: 'A 56-clip replay benchmark, 34 spoken-command clean-up cases, per-frame timings, a public launch checklist, and a 98-row feature list in the open source work.',
+    limits: 'Beta v0.2.1. The replay clips are generated speech with simulated camera traces, not live users. The next-release work is not in the installer. Windows, Intel Mac and signed-build checks are still open. The trial does not lock anything, and there is no payment provider in the app.',
   },
   'agent-flight-recorder': {
     problem: 'Agent failures can be hard to trace back through earlier actions and edits.',
