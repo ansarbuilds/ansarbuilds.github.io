@@ -3,14 +3,19 @@
 // views) from the built index.html, each with its own title, description,
 // canonical URL and share image, plus a short static version of the page in
 // #root for readers and crawlers that do not run scripts. React replaces it
-// on load. 404.html is the same app, so an unknown URL still opens the site.
+// on load. Each page also gets structured data for search engines: the
+// site-wide Person and WebSite from index.html plus what the page is (a
+// project, the index or the profile at home) and its breadcrumb trail.
+// 404.html is the same app, so an unknown URL still opens the site.
 import { readFile, writeFile, mkdir, access, copyFile } from 'node:fs/promises';
 import { dirname, resolve } from 'node:path';
 import { PROJECTS } from '../src/data/projects.js';
 import { CONTACT, HERO } from '../src/data/content.js';
 import { FLAGSHIPS } from '../src/data/showcase.js';
+import { ARCHIVE } from '../src/data/archive.js';
 import { PLAYGROUND, pathForRoute } from '../src/lib/routes.js';
 import { titleForRoute } from '../src/lib/routeTitle.js';
+import { summarize } from '../src/lib/sentences.js';
 
 const ORIGIN = 'https://ansarbuilds.dev';
 const DIST = resolve('dist');
@@ -24,19 +29,25 @@ const VIEW_DESCRIPTIONS = {
 
 const template = await readFile(resolve(DIST, 'index.html'), 'utf8');
 
-// A search result shows about 160 characters. A description is the opening
-// sentences of the project's own hook that fit, never a rewrite; a first
-// sentence longer than that is cut at a word.
-function summarize(text, limit = 160) {
-  const sentences = text.match(/[^.!?]+[.!?]+(\s|$)/g) || [text];
-  let out = '';
-  for (const sentence of sentences) { if ((out + sentence).trim().length > limit) break; out += sentence; }
-  out = out.trim();
-  if (out) return out;
-  return text.slice(0, limit - 1).replace(/\s+\S*$/, '') + '…';
-}
+// Structured data. index.html carries the Person and the WebSite; every page
+// written here repeats them in one block with its own nodes, which point back
+// by @id, so each page's graph is whole on its own.
+const LD = /<script type="application\/ld\+json">([\s\S]*?)<\/script>/;
+const SITE_GRAPH = JSON.parse(template.match(LD)?.[1] ?? 'null')?.['@graph'];
+if (!SITE_GRAPH) throw new Error('prerender: the site-wide structured data is missing from index.html');
+const PERSON = { '@id': `${ORIGIN}/#person` };
+const WEBSITE = { '@id': `${ORIGIN}/#website` };
+const crumbs = (...trail) => ({
+  '@type': 'BreadcrumbList',
+  itemListElement: trail.map(([name, route], index) => ({ '@type': 'ListItem', position: index + 1, name, item: ORIGIN + pathForRoute(route) })),
+});
+// JSON in a script tag: `<` is escaped so no text can close the tag early.
+const jsonLd = (nodes) => `<script type="application/ld+json">${JSON.stringify({ '@context': 'https://schema.org', '@graph': [...SITE_GRAPH, ...nodes] }).replace(/</g, '\\u003c')}</script>`;
 
-function page({ route, title, description, image, body, quiet = true }) {
+// A search result shows about 160 characters, so a description is
+// summarize(): the opening sentences of the project's own hook that fit.
+
+function page({ route, title, description, image, body, data = [], quiet = true }) {
   const url = ORIGIN + pathForRoute(route);
   const meta = (html, pattern, value) => {
     if (!pattern.test(html)) throw new Error(`prerender: ${pattern} not found in index.html`);
@@ -55,6 +66,7 @@ function page({ route, title, description, image, body, quiet = true }) {
     html = meta(html, /(<meta property="og:image" content=")[^"]*(")/, ORIGIN + image);
     html = meta(html, /(<meta name="twitter:image" content=")[^"]*(")/, ORIGIN + image);
   }
+  html = html.replace(LD, () => jsonLd(data));
   if (!html.includes('<div id="root"></div>')) throw new Error('prerender: #root not found in index.html');
   // The home page opens on the film, so a browser that runs scripts never
   // shows its static text: it is there for readers and crawlers that do not.
@@ -63,20 +75,64 @@ function page({ route, title, description, image, body, quiet = true }) {
 }
 
 const pages = [];
+const INDEX_NAME = titleForRoute('work').split(' · ')[0];
 // Hidden projects are left out of every list, but their pages still open.
 for (const project of PROJECTS) {
   const route = `project/${project.slug}`;
   const shareImage = `/p/${project.slug}/og.jpg`;
+  const image = (await exists(resolve('public', `.${shareImage}`))) ? shareImage : null;
+  const description = summarize(project.hook);
   pages.push({
     route,
     listed: !project.hidden,
     title: titleForRoute(route),
-    description: summarize(project.hook),
-    image: (await exists(resolve('public', `.${shareImage}`))) ? shareImage : null,
-    body: `<p>Mohamed Ansar / Selected work</p><h1>${escape(project.title)}</h1><p>${escape(project.hook)}</p><p><a href="/">Portfolio home</a></p>`,
+    description,
+    image,
+    body: `<p>Mohamed Ansar / ${project.hidden ? 'Index of work' : 'Selected work'}</p><h1>${escape(project.title)}</h1><p>${escape(project.hook)}</p><p><a href="/">Portfolio home</a></p>`,
+    data: [
+      {
+        '@type': 'CreativeWork',
+        '@id': `${ORIGIN}${pathForRoute(route)}#work`,
+        name: project.title,
+        description,
+        url: ORIGIN + pathForRoute(route),
+        ...(image ? { image: ORIGIN + image } : {}),
+        ...(project.tags?.length ? { keywords: project.tags.join(', ') } : {}),
+        author: PERSON,
+        isPartOf: WEBSITE,
+      },
+      crumbs(['Home', 'home'], [INDEX_NAME, 'work'], [project.title, route]),
+    ],
   });
 }
-for (const route of ['work', ...PLAYGROUND]) {
+// The index lists every project in the order /work/ shows them.
+const indexed = ARCHIVE.flatMap((group) => group.projects);
+pages.push({
+  route: 'work',
+  listed: true,
+  title: titleForRoute('work'),
+  description: VIEW_DESCRIPTIONS.work,
+  image: null,
+  body: `<h1>${escape(INDEX_NAME)}</h1><p>${escape(VIEW_DESCRIPTIONS.work)}</p><p><a href="/">Portfolio home</a></p>`,
+  data: [
+    {
+      '@type': 'CollectionPage',
+      '@id': `${ORIGIN}${pathForRoute('work')}#page`,
+      name: titleForRoute('work'),
+      description: VIEW_DESCRIPTIONS.work,
+      url: ORIGIN + pathForRoute('work'),
+      author: PERSON,
+      isPartOf: WEBSITE,
+      mainEntity: {
+        '@type': 'ItemList',
+        numberOfItems: indexed.length,
+        itemListElement: indexed.map((project, index) => ({ '@type': 'ListItem', position: index + 1, name: project.title, url: ORIGIN + pathForRoute(`project/${project.slug}`) })),
+      },
+    },
+    crumbs(['Home', 'home'], [INDEX_NAME, 'work']),
+  ],
+});
+for (const route of PLAYGROUND) {
   const title = titleForRoute(route);
   pages.push({ route, listed: true, title, description: VIEW_DESCRIPTIONS[route], image: null, body: `<h1>${escape(title.split(' · ')[0])}</h1><p>${escape(VIEW_DESCRIPTIONS[route])}</p><p><a href="/">Portfolio home</a></p>` });
 }
@@ -103,6 +159,8 @@ await writeFile(resolve(DIST, 'index.html'), page({
   description: homeDescription,
   image: null,
   quiet: true,
+  // The home page is the profile: who I am, with the work under it.
+  data: [{ '@type': 'ProfilePage', '@id': `${ORIGIN}/#page`, name: homeTitle, description: homeDescription, url: `${ORIGIN}/`, mainEntity: PERSON, isPartOf: WEBSITE }],
   body: [
     `<h1>Mohamed Ansar</h1>`,
     `<p>${escape(HERO.title)}</p>`,

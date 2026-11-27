@@ -13,7 +13,7 @@
   --hw-cobalt: var(--at-cobalt, #1d4ed8);
   --hw-cobalt-soft: rgb(29 78 216 / 0.1);
   --hw-bad: #b4233c;
-  --hw-good: #15803d;
+  --hw-good: #166534;
   --hw-display: var(--font-display);
   --hw-mono: var(--font-mono);
   --line: var(--hw-line);
@@ -148,8 +148,8 @@
 .hw-rtrack { position: relative; height: 28px; background: rgb(17 19 24 / 0.05); overflow: hidden; }
 .hw-rfill { height: 100%; transform-origin: left; display: flex; align-items: center; justify-content: flex-end; padding: 0 10px;
   font: 500 11px var(--hw-mono); white-space: nowrap; color: #fff; }
-.hw-rfill.slow { background: #8b93a5; }
-.hw-rfill.fast { background: #628cff; }
+.hw-rfill.slow { background: #4b5262; }
+.hw-rfill.fast { background: #628cff; color: var(--hw-ink); }
 .hw-rfill.gold { background: var(--hw-cobalt); }
 .hw-rfill.them { background: transparent; border: 1px dashed var(--hw-line-strong); color: var(--hw-ink); }
 

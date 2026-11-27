@@ -161,7 +161,7 @@ export const PROJECTS = [
       ],
     },
     story: [
-      "In 2026 a new kind of AI model appeared: the decision model. It doesn't chat. It answers set questions (yes or no, pick one of these, rate this 1 to 5) and says how likely each answer is. Jev, from TypeSafe, made it famous. Within weeks, free rivals appeared, and every claim about them came from the people who made them.",
+      "In 2026 a new kind of AI model appeared: the decision model. It doesn't chat. It answers set questions (yes or no, pick one of these, rate this 1 to 5) and says how likely each answer is. Jev, from TypeSafe, made it famous. Within weeks, free rivals appeared, and almost every claim about them came from the people who made them.",
       "I've worked close to customer support teams where one language's inbox could hold thousands of messages, and each one needs the same few decisions before a person reads it. So I tested the idea on that: is this urgent, which of 8 teams should handle it, and how frustrated is the customer.",
       "I wrote 250 support messages to a made-up software company. I wrote the rules for the right answers first, and included tricky cases on purpose: two problems in one message, sarcasm, very short messages, and English from non-native speakers. 200 were for building and tuning, and 50 were kept aside and tested only once at the very end. Every model got the same messages in the same way, and I measured not just whether it was right, but whether its confidence could be trusted.",
     ],
@@ -632,7 +632,7 @@ export const PROJECTS = [
     stats: [
       { value: "53", label: "chapters in the original novel workflow demonstration, not an accuracy benchmark", short: "chapters in the original demo" },
       { value: "4", label: "finding types: contradictions, explained changes, intentional mysteries, and author questions", short: "ways to classify a finding" },
-      { value: "24", label: "offline checks for the grader, evidence and package; these do not measure model accuracy", short: "checks for the tooling" },
+      { value: "26", label: "offline checks for the grader, evidence and package; these do not measure model accuracy", short: "checks for the tooling" },
       { value: "No edits", label: "to the manuscript during an audit; repairs stay proposals", short: "the author keeps control" },
     ],
     role: "I defined the continuity workflow, supplied my novel as a real example, and built the skill, documentation and evaluation tools with Codex.",
@@ -649,7 +649,7 @@ export const PROJECTS = [
       "I wanted a way to check a long novel without treating every surprise as a mistake. A change of clothes can be explained. A concealed identity can be deliberate. A missing explanation can be a question for the author. A useful audit needs to tell those apart.",
       "I first tried the workflow on my own novel, YAKUZA: The Borrowed Life, across a prologue and 53 chapters. One finding caught two different groups of children being counted as the same group. Another caught a character's first job happening twice. The full manuscript stayed unchanged; the public case study uses selected excerpts with my permission.",
       "That first audit followed a README description before an installable skill existed. I then turned the process into StoryEra: instructions, a cited fact ledger, a report contract, examples, and a small fictional test manuscript. It is a playbook for an existing AI, not a new AI model or a background agent.",
-      "The saved full-sample audit found the seeded cases. The partial-reading audit kept the identity mystery unresolved but left one expected author question only in its ledger. I kept that shortfall in the documentation. The 24 code checks test the tooling, not how accurately an AI can read every novel.",
+      "The saved full-sample audit found the seeded cases. The partial-reading audit kept the identity mystery unresolved but left one expected author question only in its ledger. I kept that shortfall in the documentation. The 26 code checks test the tooling, not how accurately an AI can read every novel.",
     ],
     how: [
       "Clone or download the repository and copy the whole skills/storyera folder. Cloning alone does not activate it, and no plugin installation is required for this version.",

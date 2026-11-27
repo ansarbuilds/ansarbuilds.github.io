@@ -6,12 +6,13 @@ import { DEPTH } from "../data/depth";
 import { CASE_SUMMARIES } from "../data/caseSummaries";
 import { TOOL_INFO } from "../data/tools";
 import { BEFORE_AFTER, STEP_TOOLS } from "../data/summaries";
-import FlowDiagram, { FlourishTitle, Kicker, TagPill } from "./ui";
+import FlowDiagram, { FlourishTitle, Kicker, ScrollRegion, TagPill } from "./ui";
 import ProjectMotionPreview from "./ProjectMotionPreview";
 import { PREVIEWABLE_PROJECTS } from "../lib/projectMotion";
 import { DUR, EASE, STAGGER, fadeUp } from "../lib/motion";
 import { isRouteTransitioning } from "../lib/routeTransition";
 import { media } from "../lib/media";
+import { firstSentences } from "../lib/sentences";
 import { MORE_WORK } from "../data/showcase";
 
 // Projects with an evidence poster (scripts/make-more-art.mjs) show it here
@@ -144,7 +145,6 @@ function SignatureArtwork({ project, reduced, heroArt }) {
 /* A one-picture summary of the project, folded away by default so the
    page stays short: why it exists, each step of the flow with the tools
    used there, and what came out of it. */
-const firstSentences = (text, n) => (text || "").match(/[^.!?]+[.!?]+(\s|$)/g)?.slice(0, n).join("").trim() || text || "";
 
 function SummaryArrow() {
   return (
@@ -520,9 +520,9 @@ export default function ProjectPage({ slug }) {
               {/* Tall captures (full pages, notebooks) scroll inside the
                   frame; overscroll-contain keeps the page from moving
                   when you reach the end. */}
-              <div tabIndex={0} aria-label={`${project.title} screenshot, scrollable`} className="max-h-[72vh] overflow-y-auto overscroll-contain">
+              <ScrollRegion label={`${project.title} screenshot ${n + 1}, scrolls`} className="max-h-[72vh] overflow-y-auto overscroll-contain">
                 <img src={media(s)} alt={`${project.title} screenshot`} loading="lazy" onLoad={(event) => event.currentTarget.classList.add("is-loaded")} className="ed-lazy-media block w-full" />
-              </div>
+              </ScrollRegion>
             </figure>
           ))}
         </div>
@@ -554,7 +554,7 @@ export default function ProjectPage({ slug }) {
 
         {project.sample && (
           <Block label={project.sample.label || "A look at the output"} accent={project.accent}>
-            <div className="overflow-x-auto rounded-xl border border-blue/12">
+            <ScrollRegion label={`${project.sample.title || "Sample output"}, scrolls sideways`} className="overflow-x-auto rounded-xl border border-blue/12">
               <table className="w-full text-left text-sm">
                 <caption className="text-left px-4 pt-3 pb-2 font-mono text-micro uppercase tracking-[.1em] text-[color:var(--ink-300)]">
                   {project.sample.title}
@@ -580,7 +580,7 @@ export default function ProjectPage({ slug }) {
                   ))}
                 </tbody>
               </table>
-            </div>
+            </ScrollRegion>
           </Block>
         )}
 
@@ -597,13 +597,12 @@ export default function ProjectPage({ slug }) {
               {project.figures.map((f) => (
                 <figure key={f.src}>
                   {/* Diagrams are drawn on white, so they sit on a light card. */}
-                  <div
-                    tabIndex={f.tall ? 0 : undefined}
-                    aria-label={f.tall ? `${f.caption} Scrollable.` : undefined}
+                  <ScrollRegion
+                    label={`Figure, scrolls: ${f.caption}`}
                     className={`overflow-x-auto rounded-xl bg-white p-3 sm:p-5 ${f.tall ? "max-h-[75vh] overflow-y-auto overscroll-contain" : ""}`}
                   >
                     <img src={media(f.src)} alt={f.alt ?? f.caption} loading="lazy" onLoad={(event) => event.currentTarget.classList.add("is-loaded")} className={`ed-lazy-media mx-auto block w-full ${f.narrow ? "max-w-sm" : ""} ${f.wide ? "min-w-[860px]" : ""}`} />
-                  </div>
+                  </ScrollRegion>
                   <figcaption className="mt-2 text-sm text-[color:var(--ink-300)]">
                     {f.caption}
                     {f.tall && " Scroll inside to see it all."}
@@ -617,7 +616,7 @@ export default function ProjectPage({ slug }) {
         {project.results && (
           <Block label="Results" accent={project.accent}>
             {project.results.intro && <p className="mb-4 text-base leading-relaxed text-[color:var(--ink-100)]">{project.results.intro}</p>}
-            <div className="overflow-x-auto rounded-xl border border-blue/12">
+            <ScrollRegion label="Results table, scrolls sideways" className="overflow-x-auto rounded-xl border border-blue/12">
               <table className="w-full text-left text-sm">
                 <thead>
                   <tr className="border-b border-blue/12 text-[color:var(--ink-300)] font-mono text-micro uppercase tracking-wide">
@@ -640,7 +639,7 @@ export default function ProjectPage({ slug }) {
                   ))}
                 </tbody>
               </table>
-            </div>
+            </ScrollRegion>
             {project.results.note && <p className="mt-3 text-sm text-[color:var(--ink-300)]">{project.results.note}</p>}
           </Block>
         )}

@@ -149,6 +149,33 @@ export function SectionHead({ kicker, title, lede, accent = "cyan", align = "lef
    heading that wraps it should carry aria-label={text}. */
 // A project title as plain display type. (It used to set the first letter
 // in a coloured serif italic; the site no longer uses serif italics.)
+// A box whose content can be wider (or taller) than it: tables and figures
+// that scroll sideways on a phone, tall screenshots. While the content
+// overflows, the box joins the tab order as a named region so a keyboard
+// user can reach it and scroll it with the arrow keys; when everything
+// fits, it is a plain div and adds no empty tab stop.
+export function ScrollRegion({ label, className = "", children }) {
+  const ref = useRef(null);
+  const [scrolls, setScrolls] = useState(false);
+  useEffect(() => {
+    const el = ref.current;
+    if (!el || typeof ResizeObserver === "undefined") return undefined;
+    // The observer reports once on start and again whenever the box or its
+    // content changes size (a lazy image loading, a rotation).
+    const ro = new ResizeObserver(() => {
+      setScrolls(el.scrollWidth > el.clientWidth + 1 || el.scrollHeight > el.clientHeight + 1);
+    });
+    ro.observe(el);
+    if (el.firstElementChild) ro.observe(el.firstElementChild);
+    return () => ro.disconnect();
+  }, []);
+  return (
+    <div ref={ref} className={className} tabIndex={scrolls ? 0 : undefined} role={scrolls ? "region" : undefined} aria-label={scrolls ? label : undefined}>
+      {children}
+    </div>
+  );
+}
+
 export function FlourishTitle({ text }) {
   return <span aria-hidden="true">{text}</span>;
 }

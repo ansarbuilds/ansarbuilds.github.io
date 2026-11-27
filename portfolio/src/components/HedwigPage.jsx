@@ -4,6 +4,7 @@ import { ArrowLeft, ArrowUpRight, Play } from "lucide-react";
 import { LISTED_PROJECTS } from "../data/projects";
 import { PROMPT, RUN } from "../data/hedwigRun";
 import { STAGGER, fadeUp, maskReveal, tween } from "../lib/motion";
+import { ScrollRegion } from "./ui";
 import "./HedwigPage.css";
 
 /* Hedwig's own page. It tells the full journey: why I built my own LLM
@@ -30,10 +31,11 @@ const STATS = [
   ["40/40", "pieces the browser version picks the same as PyTorch"],
 ];
 
+// color fills each model's disc; ink is the same hue, dark enough to read as text.
 const SIZES = [
-  { name: "Mac Hedwig", knobs: 13.8, cost: "$0.00", where: "MacBook Air M4", color: "#b8bdc9" },
-  { name: "Cloud Hedwig", knobs: 97.6, cost: "$0.65", where: "1× A40, 66 min", color: "#628cff" },
-  { name: "Flagship Hedwig", knobs: 286.7, cost: "$1.70", where: "1× RTX 4090, 115 min", color: COBALT },
+  { name: "Mac Hedwig", knobs: 13.8, cost: "$0.00", where: "MacBook Air M4", color: "#b8bdc9", ink: "#4b5262" },
+  { name: "Cloud Hedwig", knobs: 97.6, cost: "$0.65", where: "1× A40, 66 min", color: "#628cff", ink: "#3563e0" },
+  { name: "Flagship Hedwig", knobs: 286.7, cost: "$1.70", where: "1× RTX 4090, 115 min", color: COBALT, ink: COBALT },
 ];
 const disc = (knobs) => Math.sqrt(knobs / 286.7);
 
@@ -352,13 +354,13 @@ function Scale({ reduced }) {
               <motion.div className="hw-disc" style={{ width: `${disc(s.knobs) * 100}%`, "--c": s.color }}
                 initial={{ scale: reduced ? 1 : 0 }} animate={seen ? { scale: 1 } : {}} transition={tween("scene", "out", i * STAGGER.loose * 3)} />
             </div>
-            <p className="hw-disc-n" style={{ color: s.color }}>{s.knobs}M</p>
+            <p className="hw-disc-n" style={{ color: s.ink }}>{s.knobs}M</p>
             <p className="hw-disc-name">{s.name}</p>
             <p className="hw-disc-meta">{s.where} · <b>{s.cost}</b></p>
           </div>
         ))}
       </div>
-      <div className="hw-tblwrap">
+      <ScrollRegion label="Hedwig's three models compared, scrolls sideways" className="hw-tblwrap">
         <table className="hw-tbl">
           <thead>
             <tr><th>Metric</th><th className="num">13.8M Mac</th><th className="num">97.6M Cloud</th><th className="num">286.7M Flagship</th></tr>
@@ -371,7 +373,7 @@ function Scale({ reduced }) {
             <tr><td>4-bit compressed size</td><td className="num">7.9 MB</td><td className="num">55.2 MB</td><td className="num">161.9 MB</td></tr>
           </tbody>
         </table>
-      </div>
+      </ScrollRegion>
     </section>
   );
 }
@@ -393,7 +395,7 @@ function Showdown() {
       <div className="hw-show">
         {current.rows.map(([size, line, verdict, status], i) => (
           <div key={`${idx}-${size}`} className="hw-page">
-            <span className="hw-tag" style={{ color: SIZES[i].color }}>{size}</span>
+            <span className="hw-tag" style={{ color: SIZES[i].ink }}>{size}</span>
             <p>{line}</p>
             <span className="hw-verdict" style={{ color: status === "ok" ? "#11734b" : status === "no" ? "#b4233c" : "#8a5a10" }}>
               {status === "ok" ? "✓" : status === "no" ? "✗" : "~"} {verdict}
@@ -432,7 +434,7 @@ function Frontier({ reduced }) {
         </div>
       </div>
 
-      <div className="hw-tblwrap">
+      <ScrollRegion label="Hedwig next to frontier models, scrolls sideways" className="hw-tblwrap">
         <table className="hw-tbl">
           <thead>
             <tr><th>Model</th><th className="num">Params</th><th>GPUs Used</th><th className="num">Tokens Read</th><th className="num">Tokens / Param</th><th className="num">Cost</th></tr>
@@ -450,7 +452,7 @@ function Frontier({ reduced }) {
             ))}
           </tbody>
         </table>
-      </div>
+      </ScrollRegion>
     </section>
   );
 }

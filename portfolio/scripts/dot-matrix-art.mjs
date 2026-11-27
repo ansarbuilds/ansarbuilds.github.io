@@ -34,7 +34,6 @@ export const FILES = process.env.ONLY ? ALL.filter((f) => f.includes(process.env
 const TUNING = {
   'agent-flight-recorder': { floor: 0.35, gamma: 0.8 },
   'rea-study': { floor: 0.3, gamma: 0.9 },
-  'emet': { floor: 0.25, gamma: 0.9 },
 };
 
 // Runs in the page: draws `img` as dot-matrix onto a canvas the same size.

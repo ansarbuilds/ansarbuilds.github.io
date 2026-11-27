@@ -355,5 +355,25 @@ img { display:block; max-width:100%; height:auto; margin:18px auto 6px; backgrou
 <li>Complete licence table with 16-hex SHA-256 file fingerprints: <code>docs/licences.md</code>.</li>
 <li>Dated build, failure and repair log: <code>NOTES.md</code>.</li>
 </ul>
-</main></body>
+</main><script>
+/* Tables and code blocks that scroll sideways (on a phone) join the tab
+   order as named regions, so a keyboard can reach and scroll them. */
+(function () {
+  var boxes = document.querySelectorAll("pre, .table");
+  function mark() {
+    boxes.forEach(function (el) {
+      if (el.scrollWidth > el.clientWidth + 1) {
+        el.tabIndex = 0;
+        el.setAttribute("role", "region");
+        el.setAttribute("aria-label", el.tagName === "PRE" ? "Code, scrolls sideways" : "Table, scrolls sideways");
+      } else {
+        el.removeAttribute("tabindex"); el.removeAttribute("role"); el.removeAttribute("aria-label");
+      }
+    });
+  }
+  mark();
+  addEventListener("resize", mark);
+})();
+</script>
+</body>
 </html>

@@ -234,7 +234,7 @@ export default function DataLineageExplorer() {
               labels, so it is drawn near its real size instead and scrolls
               sideways inside its frame when the screen is narrower. */}
           <div className={`border border-[#111318]/20 bg-[#faf9f6] p-2 ${vertical ? "h-[640px]" : "overflow-x-auto overscroll-x-contain mono-scroll"}`}
-            tabIndex={vertical ? undefined : 0} aria-label={vertical ? undefined : "Pipeline graph, scrolls sideways"}>
+            tabIndex={vertical ? undefined : 0} role={vertical ? undefined : "region"} aria-label={vertical ? undefined : "Pipeline graph, scrolls sideways"}>
             <svg
               viewBox={`0 0 ${width} ${height}`}
               preserveAspectRatio="xMidYMid meet"
