@@ -365,11 +365,10 @@ function ToolList({ tools, usage = {}, accent }) {
   );
 }
 
-function LinkButton({ link, accent }) {
-  const a = ACCENTS[accent];
+function LinkButton({ link }) {
   if (link.locked) {
     return (
-      <a href={link.href} className="inline-flex min-h-11 items-center gap-2 px-4 py-2.5 rounded-full border border-blue/20 text-[color:var(--ink-200)] text-sm transition-colors duration-200 hover:border-blue/50 hover:text-[color:var(--ink-100)] active:scale-[.97]">
+      <a href={link.href} className="inline-flex min-h-11 items-center gap-2 px-4 py-2.5 border border-[#111318]/25 bg-[#f4f3ef] text-[#111318] font-mono text-xs uppercase tracking-[.06em] transition-colors duration-200 hover:border-[#1d4ed8] hover:text-[#1d4ed8]">
         <Lock size={14} /> {link.label}
       </a>
     );
@@ -380,10 +379,9 @@ function LinkButton({ link, accent }) {
       {...(link.external ? { target: "_blank", rel: "noopener noreferrer" } : {})}
       className={
         link.primary
-          ? "inline-flex min-h-11 items-center gap-2 px-5 py-3 rounded-full font-bold text-sm text-aubergine transition-[filter] duration-200 hover:brightness-110 active:scale-[.97]"
-          : "inline-flex min-h-11 items-center gap-2 px-4 py-2.5 rounded-full border border-blue/25 text-[color:var(--ink-100)] text-sm transition-colors duration-200 hover:border-blue/60 hover:bg-white/10 active:scale-[.97]"
+          ? "inline-flex min-h-11 items-center gap-2 px-5 py-3 border border-[#1d4ed8] bg-[#1d4ed8] text-white font-mono font-medium text-xs uppercase tracking-[.06em] transition-colors duration-200 hover:bg-[#1e40af]"
+          : "inline-flex min-h-11 items-center gap-2 px-4 py-2.5 border border-[#111318]/25 bg-white text-[#111318] font-mono text-xs uppercase tracking-[.06em] transition-colors duration-200 hover:border-[#1d4ed8] hover:text-[#1d4ed8]"
       }
-      style={link.primary ? { background: a.hex } : undefined}
     >
       {link.label} <ArrowUpRight size={15} />
     </a>
@@ -511,10 +509,10 @@ export default function ProjectPage({ slug }) {
         </div>
       )}
 
-      {summary && <section aria-labelledby="case-summary-title" className="mt-6 rounded-3xl border border-white/10 bg-white/[0.03] p-6 sm:p-8">
-        <h2 id="case-summary-title" className="font-display text-2xl font-semibold text-[color:var(--ink-100)]">At a glance</h2>
+      {summary && <section aria-labelledby="case-summary-title" className="mt-6 border border-[#111318]/25 bg-white p-6 sm:p-8 shadow-[0_12px_32px_-22px_rgba(17,19,24,0.16)]">
+        <h2 id="case-summary-title" className="font-display text-2xl font-medium tracking-tight text-[#111318]">At a glance</h2>
         <dl className="mt-4 grid gap-4 sm:grid-cols-2">
-          {[["Problem", summary.problem], ["My role", project.role], ["Outcome", summary.outcome], ["Proof", summary.proof], ["Limits", summary.limits], ["Status", project.status]].map(([label, value]) => <div key={label}><dt className="font-mono text-xs uppercase tracking-wide text-[color:var(--ink-300)]">{label}</dt><dd className="mt-1 text-sm leading-relaxed text-[color:var(--ink-100)]">{value}</dd></div>)}
+          {[["Problem", summary.problem], ["My role", project.role], ["Outcome", summary.outcome], ["Proof", summary.proof], ["Limits", summary.limits], ["Status", project.status]].map(([label, value]) => <div key={label} className="border-t border-[#111318]/15 pt-3"><dt className="font-mono text-xs uppercase tracking-wide text-[#4b5262]">{label}</dt><dd className="mt-1 text-sm leading-relaxed text-[#111318]">{value}</dd></div>)}
         </dl>
       </section>}
 

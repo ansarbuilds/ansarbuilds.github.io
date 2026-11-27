@@ -253,25 +253,6 @@ function Nav({ booting = false }) {
   const { route, navigate } = useRoute();
   const [filmOn] = useState(filmEnabled);
   const editorial = route === "main";
-  // While the dark hero is behind it, the nav goes dark glass to match.
-  const [overHero, setOverHero] = useState(editorial);
-  useEffect(() => {
-    if (!editorial) return undefined;
-    let raf = 0;
-    const update = () => {
-      raf = 0;
-      // The hero is pinned on desktop, so watch the sheet that slides over
-      // it rather than the hero's own box.
-      const sheet = document.querySelector(".ed-intro");
-      setOverHero(!!sheet && sheet.getBoundingClientRect().top > 70);
-    };
-    const onScroll = () => { if (!raf) raf = requestAnimationFrame(update); };
-    // The home page mounts a moment after the route changes.
-    const settle = setTimeout(update, 400);
-    update();
-    window.addEventListener("scroll", onScroll, { passive: true });
-    return () => { window.removeEventListener("scroll", onScroll); cancelAnimationFrame(raf); clearTimeout(settle); };
-  }, [editorial]);
   function openPalette() {
     window.dispatchEvent(new KeyboardEvent("keydown", { key: "k", metaKey: true }));
   }
@@ -288,8 +269,8 @@ function Nav({ booting = false }) {
     document.addEventListener("keydown", close);
     return () => { document.removeEventListener("pointerdown", close); document.removeEventListener("keydown", close); };
   }, [menuOpen]);
-  return <nav className={`ed-nav ${editorial && overHero ? "is-over-hero" : ""} ${booting ? "is-booting" : ""}`} aria-label="Main navigation"><div className="ed-nav-inner">
-    <button onClick={() => navigate("deck")} className="ed-wordmark"><span className="ed-wordmark-symbol" aria-hidden="true">ma</span><span>mohamed ansar</span><span className="sr-only">, home</span></button>
+  return <nav className={`ed-nav ${booting ? "is-booting" : ""}`} aria-label="Main navigation"><div className="ed-nav-inner">
+    <button onClick={() => navigate("deck")} className="ed-wordmark"><span className="ed-wordmark-symbol" aria-hidden="true">MA</span><span>mohamed ansar</span><span className="sr-only">, home</span></button>
     <div className="ed-nav-links">{editorial ? <><a href="#projects" className="ed-nav-wide">Work</a><a href="#capabilities" className="ed-nav-wide">Capabilities</a><a href={CONTACT.github} className="ed-nav-wide" target="_blank" rel="noopener noreferrer">GitHub</a><span ref={menuRef} className="ed-nav-menu"><button type="button" aria-expanded={menuOpen} aria-controls="nav-menu" onClick={() => setMenuOpen((open) => !open)}>Menu</button>{menuOpen && <span id="nav-menu" className="ed-nav-menu-list" onClick={() => setMenuOpen(false)}><a href="#projects">Work</a><a href="#capabilities">Capabilities</a><a href="#more">More work</a><a href={CONTACT.github} target="_blank" rel="noopener noreferrer">GitHub ↗</a></span>}</span><a href="#contact" className="ed-nav-contact">Get in touch ↗</a></> : <button onClick={() => navigate("deck")}>← Home</button>}
       {filmOn && editorial && <button type="button" className="ed-nav-sound ed-nav-film" onClick={watchFilm} aria-label="Watch the film"><Play size={14} aria-hidden="true" /><span>Watch the film</span></button>}
       <button type="button" onClick={openPalette} className="ed-nav-command" aria-label={`${PALETTE_KEY} K, open the command palette`}>{PALETTE_KEY} K</button>
@@ -463,9 +444,8 @@ function Backdrop() {
   if (route === "explore" || route === "lineage-demo" || route === "infinity") {
     return <div className="fixed inset-0 z-0 bg-[#02050c]" aria-hidden="true" />;
   }
-  // Everything else sits on flat ink: sections paint their own full-bleed
-  // color blocks, and the infinity loop has its own page (#infinity).
-  return <div className="fixed inset-0 z-0 bg-ink" aria-hidden="true" />;
+  // Everything else sits on alabaster stone with a subtle architectural drafting grid.
+  return <div className="at-grid-backdrop" aria-hidden="true" />;
 }
 
 // BB-8 brings three.js with it, the heaviest chunk on the page. Waiting for
@@ -509,7 +489,7 @@ function AppShell({ bootDone, held, onBoot, heroRun }) {
   const companionReady = useIdleAfterFirstInput(bootDone);
   return (
       <RouteProvider>
-        <div className="relative bg-ink text-slate-100 min-h-[100dvh]">
+        <div className="relative bg-[#f4f3ef] text-[#111318] min-h-[100dvh]">
           <Backdrop />
           <div className="relative z-10">
             <a className="skip-link" href="#main-content" onClick={(event) => { event.preventDefault(); document.getElementById("main-content")?.focus(); }}>Skip to main content</a>

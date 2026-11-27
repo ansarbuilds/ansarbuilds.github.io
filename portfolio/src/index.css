@@ -2,139 +2,178 @@
 @import "./fonts.css";
 
 /* ============================================================
-   DESIGN TOKENS
+   DESIGN TOKENS — Precision Instrument & Monograph System
+   Alabaster Stone / Slate Obsidian / International Cobalt / Amber
    ============================================================ */
 @theme {
-  --color-ivory: #e6d5bd;
-  --color-blue: #101010;
-  --color-coral: #d5360c;
-  /* Compatibility names for the existing detail pages and overlays. */
-  --color-silver: #e6d5bd;
-  --color-aubergine: #101010;
-  --color-marigold: #d5360c;
-  --color-ink: #101010;
-  --color-ink-1: #181513;
-  --color-ink-2: #211c18;
-  --color-ink-3: #332820;
+  --color-stone: #f4f3ef;
+  --color-ivory: #f4f3ef;
+  --color-blue: #111318;
+  --color-cobalt: #1d4ed8;
+  --color-cobalt-dark: #1e40af;
+  --color-cobalt-soft: #dbeafe;
+  --color-coral: #1d4ed8;
+  --color-amber: #d97706;
+  --color-amber-bright: #f59e0b;
+  --color-muted: #4b5262;
+  --color-surface: #e6e4de;
+  --color-btn: #eae8e2;
+  --color-btn-hover: #dfddd5;
 
-  --color-cyan: #22d3ee;
-  --color-cyan-deep: #0e7490;
-  --color-amber: #fbbf24;
-  --color-amber-deep: #f59e0b;
-  --color-violet: #8e7dff;
-  --color-rose: #fb7185;
-  --color-green: #34d399;
+  /* Compatibility names for existing detail pages and overlays. */
+  --color-silver: #111318;
+  --color-aubergine: #111318;
+  --color-marigold: #d97706;
+  --color-ink: #f4f3ef;
+  --color-ink-1: #eae8e2;
+  --color-ink-2: #dfddd5;
+  --color-ink-3: #d2cfc5;
 
-  /* Legacy block tokens remain for the separate experiment views. */
-  --color-hero: #e6d5bd;
-  --color-block-green: #101010;
-  --color-block-amber: #211c18;
-  --color-block-violet: #101010;
-  --color-block-rose: #101010;
+  --color-cyan: #0369a1;
+  --color-cyan-deep: #075985;
+  --color-amber-deep: #b45309;
+  --color-violet: #4338ca;
+  --color-rose: #be123c;
+  --color-green: #15803d;
 
-  /* Below text-xs, for tags and meta lines (11.5px at the 18px root). */
-  --text-micro: 0.64rem;
+  /* Legacy block tokens for separate experiment views. */
+  --color-hero: #f4f3ef;
+  --color-block-green: #111318;
+  --color-block-amber: #eae8e2;
+  --color-block-violet: #111318;
+  --color-block-rose: #111318;
+
+  --text-micro: 0.72rem;
   --text-micro--line-height: 1.45;
 
-  /* Outfit for headings everywhere except emet (see .dark-surface
-     override below) — a bold, geometric grotesk closer to the
-     typeface used on the portfolio site referenced as a style match,
-     replacing Instrument Sans. */
-  --font-display: "Outfit", sans-serif;
-  --font-serif: "Instrument Serif", serif;
-  /* The editorial display face: ultra-condensed caps for the big
-     headlines. Free (Google Fonts) stand-in for a commercial condensed. */
-  --font-condensed: "Anton", "Arial Narrow", sans-serif;
-  --font-body: "Plus Jakarta Sans", sans-serif;
-  --font-mono: "JetBrains Mono", monospace;
+  --font-display: "Space Grotesk", -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-serif: "Instrument Serif", Georgia, serif;
+  --font-condensed: "Space Grotesk", -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-body: "Plus Jakarta Sans", -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-mono: "IBM Plex Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
 
-  /* Motion tokens. These mirror src/lib/motion.js, which is the source of
-     truth; change both together. MOTION.md says which to reach for. */
+  /* Motion tokens. */
   --dur-instant: .12s;
   --dur-fast: .2s;
   --dur-base: .35s;
-  --dur-slow: .6s;
-  --dur-scene: .9s;
-  --ease-out: cubic-bezier(.16,1,.3,1);
+  --dur-slow: .55s;
+  --dur-scene: .8s;
+  --ease-out: cubic-bezier(.22,1,.36,1);
   --ease-standard: cubic-bezier(.4,0,.2,1);
   --ease-exit: cubic-bezier(.4,0,1,1);
-  --stagger-tight: 40ms;
-  --stagger-base: 70ms;
-  --stagger-loose: 90ms;
+  --stagger-tight: 50ms;
+  --stagger-base: 80ms;
+  --stagger-loose: 120ms;
 }
 
-/* ============================================================
-   TEXT TOKENS
-   The site is dark, always — near-white "ink" shades read fine on
-   the ink background everywhere, so there's no per-theme override
-   left to make. The tokens stay (instead of inlining the hex values)
-   because every component still reads them, and because .glass and
-   the CRT chassis lean on the same scale for consistency.
-   ============================================================ */
 :root {
-  --portfolio-accent: #d5360c;
-  --diagram-surface: #101010;
-  --ink-50: #f4f6f8;
-  --ink-100: #e6d5bd;
-  --ink-200: #e6d5bd;
-  --ink-300: #cbd0d8;
-  /* Brightened from #a7b4c8 — this is the color most body copy (ledes,
-     project/role descriptions, tags) actually renders in across the
-     site, not just de-emphasized meta text, and it was reading too
-     dim against a livelier background than the numbering implies. */
-  --ink-400: #cbd0d8;
+  --portfolio-accent: #1d4ed8;
+  --diagram-surface: #eae8e2;
+  --ink-50: #111318;
+  --ink-100: #111318;
+  --ink-200: #2a2e39;
+  --ink-300: #4b5262;
+  --ink-400: #4b5262;
+
+  --at-stone: #f4f3ef;
+  --at-white: #ffffff;
+  --at-obsidian: #111318;
+  --at-muted: #4b5262;
+  --at-cobalt: #1d4ed8;
+  --at-cobalt-dark: #1e40af;
+  --at-cobalt-tint: rgba(29, 78, 216, 0.08);
+  --at-amber: #d97706;
+  --at-amber-bright: #f59e0b;
+  --at-line: rgba(17, 19, 24, 0.14);
+  --at-line-strong: rgba(17, 19, 24, 0.28);
+  --at-btn: #eae8e2;
+  --at-btn-hover: #dfddd5;
 }
+
 /* The terminal keeps its original screen colors and contrast. */
 .dark-surface {
   --color-ink: #050911;
   --color-ink-1: #0a0f1c;
   --color-ink-2: #0e1730;
   --color-ink-3: #13203f;
+  --ink-50: #f4f6f8;
+  --ink-100: #e6d5bd;
+  --ink-200: #e6d5bd;
+  --ink-300: #cbd0d8;
+  --ink-400: #cbd0d8;
 }
 
 @layer base {
-  /* One focus style for everything interactive: a ring in the element's
-     own text color, so it reads on the light hero and every dark block. */
   :where(a, button, [role="button"], [tabindex]):focus-visible {
-    outline: 2px solid currentColor;
+    outline: 2px solid var(--at-cobalt);
     outline-offset: 3px;
   }
-  /* RouteProvider focuses the new page's heading so the change is announced.
-     It is not a control, so a ring around it only looks like a stray box. */
   :where(h1, h2)[tabindex="-1"]:focus-visible { outline: none; }
   html {
-    font-size: 18px;
+    font-size: 16px;
   }
   body {
-    background: var(--color-ink);
-    color: var(--color-silver);
+    background-color: var(--at-stone);
+    color: var(--at-obsidian);
     font-family: var(--font-body);
+    font-size: 0.96rem;
+    line-height: 1.65;
     -webkit-font-smoothing: antialiased;
     overflow-x: hidden;
   }
   ::selection {
-    background: rgba(213, 54, 12, 0.32);
-    color: #fff;
+    background: #dbeafe;
+    color: #111318;
   }
 }
 
+/* Subtle architectural drafting grid backdrop on stone */
+.at-grid-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background-color: var(--at-stone);
+  background-image:
+    linear-gradient(to right, rgba(17, 19, 24, 0.035) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(17, 19, 24, 0.035) 1px, transparent 1px);
+  background-size: 48px 48px;
+}
+
+/* Blueprint dark surface texture (for obsidian panels & footer) */
+.at-obsidian-grid {
+  background-color: var(--at-obsidian);
+  background-image:
+    linear-gradient(to right, rgba(244, 243, 239, 0.05) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(244, 243, 239, 0.05) 1px, transparent 1px);
+  background-size: 32px 32px;
+}
+
+/* Architectural section rule with subtle cobalt tick */
+.at-divider-rule {
+  height: 1px;
+  background: var(--at-line);
+  position: relative;
+}
+.at-divider-rule::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: -1px;
+  width: 64px;
+  height: 3px;
+  background: var(--at-cobalt);
+}
+
 @layer utilities {
-  /* Content panel: a dark, mostly opaque card so body copy never has to
-     fight bright stars for contrast. Use for anything with paragraphs. */
-  /* Doubled-up selector so this beats .panel below without !important —
-     !important inside a layer would also beat the unlayered editorial
-     overrides, which repaint this panel for the light case-study pages. */
   .project-panel.project-panel {
-    background: rgba(0, 0, 0, 0.28);
+    background: #ffffff;
   }
   .panel {
-    backdrop-filter: blur(14px);
-    background: rgba(21, 63, 96, 0.95);
-    border: 1px solid rgba(255, 255, 255, 0.09);
-    box-shadow: 0 18px 40px -22px rgba(0, 0, 0, 0.8);
+    background: #ffffff;
+    border: 1px solid var(--at-line-strong);
+    box-shadow: 0 10px 30px -18px rgba(17, 19, 24, 0.16);
   }
-  /* Static stand-in for the hero loop's atmosphere: shown while its
-     chunk loads and if WebGL is unavailable. Same palette as the shader. */
   .atmosphere-fallback {
     background:
       radial-gradient(ellipse 60% 55% at 72% 48%, rgba(38, 60, 96, 0.55), transparent 70%),
@@ -142,9 +181,9 @@
       linear-gradient(to bottom, #0d1b30, #0b1426);
   }
   .glass {
-    backdrop-filter: blur(16px);
-    background: rgba(21, 63, 96, 0.95);
-    border: 1px solid rgba(255, 255, 255, 0.06);
+    backdrop-filter: blur(14px);
+    background: rgba(244, 243, 239, 0.9);
+    border: 1px solid var(--at-line-strong);
   }
   .text-glow-green {
     text-shadow: 0 0 6px rgba(52, 211, 153, 0.36);
@@ -152,18 +191,13 @@
 }
 
 /* ============================================================
-   CRT PHOSPHOR MONITOR — scanlines, vignette, flicker, glow
+   CRT PHOSPHOR MONITOR — preserved for EMET terminal route
    ============================================================ */
 .crt-shell {
   position: relative;
   overflow: hidden;
   border-radius: 1.4rem;
   isolation: isolate;
-  /* The retro CRT terminal look is the point. A
-     thicker physical bezel: a hairline highlight where light would
-     catch the rim, a dark inner well the screen sits inside, and a
-     soft cast shadow lifting the whole chassis off the page — the
-     same triad a real enclosure's edge reads by, not a flat panel. */
   backdrop-filter: blur(16px);
   background: rgba(2, 6, 16, 0.5);
   border: 1px solid rgba(255, 255, 255, 0.08);
@@ -179,12 +213,7 @@
   position: absolute;
   inset: 0 0 auto 0;
   height: 2px;
-  background: linear-gradient(
-    90deg,
-    transparent,
-    rgba(52, 211, 153, 0.55) 40%,
-    rgba(52, 211, 153, 0.15) 100%
-  );
+  background: linear-gradient(90deg, transparent, rgba(52, 211, 153, 0.55) 40%, rgba(52, 211, 153, 0.15) 100%);
   pointer-events: none;
   z-index: 2;
 }
@@ -195,42 +224,19 @@
   pointer-events: none;
   z-index: 3;
   border-radius: inherit;
-  background: linear-gradient(
-      115deg,
-      rgba(255, 255, 255, 0.05) 0%,
-      transparent 16%,
-      transparent 84%,
-      rgba(255, 255, 255, 0.03) 100%
-    ),
-    repeating-linear-gradient(
-      to bottom,
-      rgba(255, 255, 255, 0.045) 0px,
-      rgba(255, 255, 255, 0.045) 1px,
-      transparent 1px,
-      transparent 3px
-    ),
+  background: linear-gradient(115deg, rgba(255, 255, 255, 0.05) 0%, transparent 16%, transparent 84%, rgba(255, 255, 255, 0.03) 100%),
+    repeating-linear-gradient(to bottom, rgba(255, 255, 255, 0.045) 0px, rgba(255, 255, 255, 0.045) 1px, transparent 1px, transparent 3px),
     radial-gradient(ellipse at 50% 42%, transparent 58%, rgba(0, 0, 0, 0.46) 100%);
   animation: crt-flicker 7s var(--ease-standard) infinite;
 }
 @keyframes crt-flicker {
-  0%,
-  91%,
-  100% {
-    opacity: 1;
-  }
-  93% {
-    opacity: 0.94;
-  }
-  95% {
-    opacity: 1;
-  }
-  96% {
-    opacity: 0.97;
-  }
+  0%, 91%, 100% { opacity: 1; }
+  93% { opacity: 0.94; }
+  95% { opacity: 1; }
+  96% { opacity: 0.97; }
 }
 @media (prefers-reduced-motion: reduce) {
-  .crt-shell::after,
-  .crt-shell * {
+  .crt-shell::after, .crt-shell * {
     animation-duration: 0.001ms !important;
     animation-iteration-count: 1 !important;
   }
@@ -251,98 +257,66 @@
   border-radius: inherit;
   opacity: var(--spot-o);
   transition: opacity var(--dur-base) var(--ease-standard);
-  background: radial-gradient(
-    260px circle at var(--spot-x) var(--spot-y),
-    rgba(52, 211, 153, 0.1),
-    transparent 70%
-  );
+  background: radial-gradient(260px circle at var(--spot-x) var(--spot-y), rgba(52, 211, 153, 0.1), transparent 70%);
   mix-blend-mode: screen;
 }
 @media (hover: none) {
-  .crt-spotlight::before {
-    display: none;
-  }
+  .crt-spotlight::before { display: none; }
 }
 
-/* About: each word's opacity follows the paragraph's scroll progress
-   (--p, 0-1) against its own index (--i) out of the word count (--n). */
-
-/* SpinBadge: rotates only while its card is hovered or focused. */
-@keyframes badge-spin {
-  to {
-    transform: rotate(360deg);
-  }
-}
-.badge-spin {
-  transform-origin: 50% 50%;
-}
-.group:hover .badge-spin,
-.group:focus-visible .badge-spin {
-  animation: badge-spin 9s linear infinite;
-}
+@keyframes badge-spin { to { transform: rotate(360deg); } }
+.badge-spin { transform-origin: 50% 50%; }
+.group:hover .badge-spin, .group:focus-visible .badge-spin { animation: badge-spin 9s linear infinite; }
 @media (prefers-reduced-motion: reduce) {
-  .group:hover .badge-spin,
-  .group:focus-visible .badge-spin {
-    animation: none;
-  }
+  .group:hover .badge-spin, .group:focus-visible .badge-spin { animation: none; }
 }
 
-.blink-cursor {
-  animation: blink var(--dur-slow) step-end infinite;
-}
-@keyframes blink {
-  0%,
-  100% {
-    opacity: 1;
-  }
-  50% {
-    opacity: 0;
-  }
-}
+.blink-cursor { animation: blink 0.9s step-end infinite; }
+@keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0; } }
 
-/* Thin scrollbar for terminal-style scroll areas */
 .mono-scroll::-webkit-scrollbar,
-html::-webkit-scrollbar {
-  width: 6px;
-}
+html::-webkit-scrollbar { width: 6px; }
 .mono-scroll::-webkit-scrollbar-thumb,
-html::-webkit-scrollbar-thumb {
-  background: rgba(140, 168, 214, 0.25);
-  border-radius: 999px;
-}
+html::-webkit-scrollbar-thumb { background: rgba(17, 19, 24, 0.24); }
 .mono-scroll::-webkit-scrollbar-track,
-html::-webkit-scrollbar-track {
-  background: transparent;
-}
+html::-webkit-scrollbar-track { background: transparent; }
 
-/* A visible hand-off while lazy route code and WebGL scenes initialise. */
 .route-loader {
   min-height: 100%;
   display: grid;
   place-content: center;
   justify-items: center;
   gap: 14px;
-  background: #02050c;
-  color: #e6d5bd;
-  font: 500 0.68rem/1.4 var(--font-mono);
+  background: var(--at-stone);
+  color: var(--at-obsidian);
+  font: 500 0.72rem/1.4 var(--font-mono);
   letter-spacing: 0.14em;
   text-transform: uppercase;
 }
 .route-loader > span {
-  width: 38px;
-  height: 38px;
-  border-radius: 50%;
-  border: 2px solid rgb(230 213 189 / .2);
-  border-top-color: #d5360c;
+  width: 32px;
+  height: 32px;
+  border: 2px solid var(--at-line-strong);
+  border-top-color: var(--at-cobalt);
   animation: route-loader-spin var(--dur-slow) linear infinite;
 }
 @keyframes route-loader-spin { to { transform: rotate(360deg); } }
 @media (prefers-reduced-motion: reduce) {
-  .route-loader > span { animation: none; border-color: #d5360c; }
+  .route-loader > span { animation: none; border-color: var(--at-cobalt); }
 }
 
-/* Expose the main content shortcut when navigating by keyboard. */
-.skip-link { position: fixed; top: .5rem; left: .5rem; z-index: 10000; padding: .75rem 1rem; background: #fff; color: #101010; transform: translateY(-200%); }
-.skip-link:focus { transform: translateY(0); outline: 3px solid #74200d; }
-
-
+.skip-link {
+  position: fixed;
+  top: .5rem;
+  left: .5rem;
+  z-index: 10000;
+  padding: .75rem 1rem;
+  background: var(--at-obsidian);
+  color: var(--at-stone);
+  border: 1px solid var(--at-obsidian);
+  transform: translateY(-200%);
+}
+.skip-link:focus {
+  transform: translateY(0);
+  outline: 2px solid var(--at-cobalt);
+}

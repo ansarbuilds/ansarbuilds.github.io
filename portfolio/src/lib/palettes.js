@@ -1,57 +1,35 @@
-/* Each part of the home page has its own three-colour palette, and the
-   whole page eases into it as that part reaches the middle of the screen.
-   Sections opt in with data-palette="<name>"; anything above the first
-   tagged element uses the opening palette, which is also what
-   editorial.css declares on :root.
-
-   paper     light surface, and text on dark sections
-   ink       body text, and the dark sections' background
-   accent    fills: bars, tabs, the contact button. Never small text.
-   accentInk accent for text on paper (>= 4.5:1 against paper)
-   onDark    accent for text on ink (>= 4.5:1 against ink) */
+/* Precision Instrument & Monograph Palette.
+   paper     alabaster stone (#f4f3ef), and light text on obsidian panels
+   ink       deep slate-obsidian (#111318), and dark instrument panels
+   accent    international signal cobalt (#1d4ed8)
+   accentInk high-contrast cobalt on stone (>= 6.5:1 against paper)
+   onDark    signal amber (#f59e0b) on obsidian (>= 9.5:1 against ink) */
 export const PALETTES = {
-  // One dark theme end to end, with one accent: coral. Each part of the
-  // home page tints the carbon and bone a few points, so the page shifts
-  // mood as it scrolls without ever changing character. Only the
-  // playground (neon) and project pages that ask (choreo) differ.
-  // Opening: coral.
-  lumen: { paper: "#0c0a09", ink: "#efe6d8", accent: "#ff8a5f", accentInk: "#ff8a5f", onDark: "#74200d" },
-  // Selected work: a cooler carbon.
-  bloom: { paper: "#0a0a0c", ink: "#ece8e0", accent: "#ff8a5f", accentInk: "#ff8a5f", onDark: "#74200d" },
-  // More work: neutral carbon.
-  lumora: { paper: "#0b0a0a", ink: "#eee7dc", accent: "#ff8a5f", accentInk: "#ff8a5f", onDark: "#74200d" },
-  // The playground: neon rose.
-  neon: { paper: "#0d090c", ink: "#f1e9ee", accent: "#ff2d95", accentInk: "#ff6fb5", onDark: "#a8004f" },
-  // Lavender (project pages that ask for it).
-  choreo: { paper: "#0c0a10", ink: "#ece8f3", accent: "#a98be0", accentInk: "#cdb8e8", onDark: "#4b2f6b" },
-  // What I bring: a warmer carbon.
-  field: { paper: "#0d0a08", ink: "#f0e7d9", accent: "#ff8a5f", accentInk: "#ff8a5f", onDark: "#74200d" },
-  // Contact: the opening carbon, deepened.
-  blueBloom: { paper: "#0b0909", ink: "#efe6d8", accent: "#ff8a5f", accentInk: "#ff8a5f", onDark: "#74200d" },
+  lumen:     { paper: "#f4f3ef", ink: "#111318", accent: "#1d4ed8", accentInk: "#1d4ed8", onDark: "#f59e0b" },
+  bloom:     { paper: "#f4f3ef", ink: "#111318", accent: "#1d4ed8", accentInk: "#1d4ed8", onDark: "#f59e0b" },
+  lumora:    { paper: "#f4f3ef", ink: "#111318", accent: "#1d4ed8", accentInk: "#1d4ed8", onDark: "#f59e0b" },
+  neon:      { paper: "#f4f3ef", ink: "#111318", accent: "#1d4ed8", accentInk: "#1d4ed8", onDark: "#f59e0b" },
+  choreo:    { paper: "#f4f3ef", ink: "#111318", accent: "#1d4ed8", accentInk: "#1d4ed8", onDark: "#f59e0b" },
+  field:     { paper: "#f4f3ef", ink: "#111318", accent: "#1d4ed8", accentInk: "#1d4ed8", onDark: "#f59e0b" },
+  blueBloom: { paper: "#f4f3ef", ink: "#111318", accent: "#1d4ed8", accentInk: "#1d4ed8", onDark: "#f59e0b" },
 };
 
 export const DEFAULT_PALETTE = "lumen";
 
-// What the swatch card in the corner calls each palette and its colours,
-// in the reels' style: a name, then each colour's name and hex.
 export const PALETTE_LABELS = {
-  lumen: { title: "Ember", paper: "Carbon", ink: "Bone", accent: "Coral" },
-  bloom: { title: "Signal", paper: "Cool Carbon", ink: "Bone", accent: "Coral" },
-  lumora: { title: "Lumora", paper: "Carbon", ink: "Bone", accent: "Coral" },
-  neon: { title: "Human Next", paper: "Plum Black", ink: "Blush White", accent: "Neon Rose" },
-  choreo: { title: "Choreo", paper: "Violet Black", ink: "Pale Lavender", accent: "Lavender" },
-  field: { title: "Field / Form", paper: "Warm Carbon", ink: "Bone", accent: "Coral" },
-  blueBloom: { title: "Blue Bloom", paper: "Deep Carbon", ink: "Bone", accent: "Coral" },
+  lumen:     { title: "Atelier Stone", paper: "Alabaster", ink: "Obsidian", accent: "Cobalt" },
+  bloom:     { title: "Blueprint", paper: "Alabaster", ink: "Obsidian", accent: "Cobalt" },
+  lumora:    { title: "Monograph", paper: "Alabaster", ink: "Obsidian", accent: "Cobalt" },
+  neon:      { title: "Lab Room", paper: "Alabaster", ink: "Obsidian", accent: "Cobalt" },
+  choreo:    { title: "Case Study", paper: "Alabaster", ink: "Obsidian", accent: "Cobalt" },
+  field:     { title: "Instrument", paper: "Alabaster", ink: "Obsidian", accent: "Cobalt" },
+  blueBloom: { title: "Colophon", paper: "Alabaster", ink: "Obsidian", accent: "Cobalt" },
 };
 
-// applyPalette and clearPalette announce the palette now showing, so
-// anything that displays it can follow without its own scroll handler.
 export const PALETTE_EVENT = "palettechange";
 let current = DEFAULT_PALETTE;
 export const currentPalette = () => current;
 
-// CSS custom property for each palette key. --ed-blue and --ed-ivory are the
-// site's original names for ink and paper; --ed-deep has always matched ink.
 export const PALETTE_VARS = {
   paper: ["--ed-ivory"],
   ink: ["--ed-blue", "--ed-deep"],
@@ -73,18 +51,12 @@ export function contrast(a, b) {
   return (hi + 0.05) / (lo + 0.05);
 }
 
-// Text colour for a chip of colour bg: the first candidate that reads at
-// AA, else black or white, whichever reads better.
 export function readableOn(bg, candidates) {
   const ok = candidates.find((c) => contrast(c, bg) >= 4.5);
   if (ok) return ok;
   return contrast("#000000", bg) >= contrast("#ffffff", bg) ? "#000000" : "#ffffff";
 }
 
-// A palette holds from the moment its element's top passes the line until
-// the next tagged element's does. So a tagged block inside a section (Test
-// the claim inside Projects) carries on to the end of that section instead
-// of handing back to the section's palette for a second change.
 export function pickPalette(elements, lineY) {
   let name = DEFAULT_PALETTE;
   for (const el of elements) {
@@ -93,15 +65,12 @@ export function pickPalette(elements, lineY) {
   return name;
 }
 
-// Project pages take the palette of the home page section they are listed
-// in: the open-source studies and tools sit under Test the claim.
 export function paletteForRoute(route, openSourceSlugs) {
   if (route === "work") return "bloom";
   if (!route.startsWith("project/")) return null;
   return openSourceSlugs.has(route.slice("project/".length)) ? "lumora" : "bloom";
 }
 
-// The browser's own chrome (theme-color) follows the paper colour too.
 function setThemeColor(root, color) {
   root.ownerDocument?.querySelector('meta[name="theme-color"]')?.setAttribute("content", color);
 }

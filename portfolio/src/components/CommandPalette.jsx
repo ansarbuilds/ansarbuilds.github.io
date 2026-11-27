@@ -9,7 +9,7 @@ import { useRoute, useSandbox } from "../appContexts";
 
 const GROUP_ICONS = { Sections: Hash, Projects: Hash, Playground: Sparkles, Links: Link2, System: Terminal };
 const GROUP_ORDER = ["Sections", "Projects", "Playground", "Links", "System"];
-const CORAL = "#ff8a5f";
+const CORAL = "#1d4ed8";
 
 // Every listed project, flagships first in stage order, each with its stage
 // eyebrow (or its kind) so a search for "agent" or "app" finds it.
@@ -142,7 +142,7 @@ export default function CommandPalette() {
           onClick={() => setOpen(false)}
         >
           <motion.div
-            className="w-full max-w-xl rounded-2xl overflow-hidden border border-white/10 bg-[#15110e]/95 backdrop-blur-xl shadow-2xl shadow-black/60"
+            className="w-full max-w-xl overflow-hidden border border-[#111318]/30 bg-white text-[#111318] shadow-[0_24px_60px_-20px_rgba(17,19,24,0.35)]"
             initial={{ opacity: 0, y: -16, scale: 0.96 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: -10, scale: 0.97 }}
@@ -153,7 +153,7 @@ export default function CommandPalette() {
             aria-modal="true"
             aria-label="Command palette"
           >
-            <div className="flex items-center gap-3 px-4 py-3 border-b border-white/8">
+            <div className="flex items-center gap-3 px-4 py-3 border-b border-[#111318]/15 bg-[#f4f3ef]">
               <Search size={16} className="shrink-0" style={{ color: CORAL }} aria-hidden="true" />
               <input
                 ref={inputRef}
@@ -170,7 +170,7 @@ export default function CommandPalette() {
                 aria-activedescendant={results.length ? `cp-opt-${activeIndex}` : undefined}
                 aria-label="Search sections, projects and links"
                 placeholder="Jump to a section, project or link…"
-                className="flex-1 bg-transparent outline-none text-sm font-mono text-[color:var(--ink-100)] placeholder:text-[color:var(--ink-400)]"
+                className="flex-1 bg-transparent outline-none text-sm font-mono text-[#111318] placeholder:text-[#4b5262]"
                 autoComplete="off"
                 spellCheck={false}
               />
@@ -179,7 +179,7 @@ export default function CommandPalette() {
                 type="button"
                 onClick={() => setOpen(false)}
                 aria-label="Close command palette"
-                className="grid h-8 w-8 place-items-center rounded-md text-[color:var(--ink-400)] hover:text-[color:var(--ink-200)] transition-colors"
+                className="grid h-8 w-8 place-items-center border border-[#111318]/20 bg-white text-[#111318] hover:border-[#1d4ed8] hover:text-[#1d4ed8] transition-colors"
               >
                 <X size={15} aria-hidden="true" />
               </button>
@@ -187,13 +187,13 @@ export default function CommandPalette() {
 
             <div ref={listRef} id="cp-list" role="listbox" aria-label="Results" className="max-h-[50vh] overflow-y-auto mono-scroll py-2">
               {results.length === 0 && (
-                <p role="presentation" className="px-4 py-6 text-center text-sm text-[color:var(--ink-400)] font-mono">No matches.</p>
+                <p role="presentation" className="px-4 py-6 text-center text-sm text-[#4b5262] font-mono">No matches.</p>
               )}
               {Object.entries(grouped).map(([groupName, items]) => {
                 const GroupIcon = GROUP_ICONS[groupName];
                 return (
                   <div key={groupName} role="group" aria-labelledby={`cp-group-${groupName}`} className="mb-1">
-                    <p id={`cp-group-${groupName}`} className="flex items-center gap-1.5 px-4 pt-2 pb-1 text-[.62rem] tracking-[.14em] uppercase text-[color:var(--ink-400)] font-mono">
+                    <p id={`cp-group-${groupName}`} className="flex items-center gap-1.5 px-4 pt-2 pb-1 text-[.66rem] tracking-[.14em] uppercase text-[#4b5262] font-mono">
                       {GroupIcon && <GroupIcon size={10} className="opacity-70" aria-hidden="true" />}
                       {groupName}
                     </p>
@@ -210,13 +210,13 @@ export default function CommandPalette() {
                           onMouseDown={(e) => e.preventDefault()}
                           onClick={() => runItem(item)}
                           className={`relative w-full flex cursor-pointer items-center justify-between gap-3 pl-4 pr-4 py-2.5 text-left text-sm transition-colors ${
-                            active ? "bg-white/[.06]" : "text-[color:var(--ink-300)] hover:bg-white/5"
+                            active ? "bg-[#f4f3ef] font-semibold" : "text-[#111318] hover:bg-[#f4f3ef]/70"
                           }`}
                           style={active ? { color: CORAL } : undefined}
                         >
                           <span
-                            className={`absolute left-0 top-1 bottom-1 w-[2.5px] rounded-full transition-opacity ${active ? "opacity-100" : "opacity-0"}`}
-                            style={{ background: CORAL }}
+                            className={`absolute left-0 top-1 bottom-1 w-[3px] transition-opacity ${active ? "opacity-100" : "opacity-0"}`}
+                            style={{ background: "#1d4ed8" }}
                             aria-hidden="true"
                           />
                           <span className="font-mono">{item.label}</span>
@@ -229,7 +229,7 @@ export default function CommandPalette() {
               })}
             </div>
 
-            <div className="flex items-center gap-4 px-4 py-2.5 border-t border-white/8 text-[.62rem] font-mono text-[color:var(--ink-400)]" aria-hidden="true">
+            <div className="flex items-center gap-4 px-4 py-2.5 border-t border-[#111318]/15 bg-[#f4f3ef] text-[.66rem] font-mono text-[#4b5262]" aria-hidden="true">
               <span className="flex items-center gap-1">
                 <ArrowUp size={11} />
                 <ArrowDown size={11} /> navigate

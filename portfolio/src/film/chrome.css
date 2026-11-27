@@ -7,23 +7,23 @@
    ring of light is thrown out, lens flares slide along the streak, and
    sparks fly out of the light and are pulled back in to become the name;
    as it goes, the name splits red and cyan. */
-.film-ident { position: fixed; inset: 0; z-index: 9500; display: grid; place-content: center; justify-items: center; overflow: hidden; background: #000; color: #efe6d8; }
+.film-ident { position: fixed; inset: 0; z-index: 9500; display: grid; place-content: center; justify-items: center; overflow: hidden; background: #000; color: #efece8; }
 .film-ident-stage { position: absolute; inset: 0; display: grid; place-content: center; justify-items: center; animation: film-ident-shake 1.6s linear both; }
-.film-ident-shock { position: absolute; left: 50%; top: 50%; width: 14vmin; height: 14vmin; translate: -50% -50%; border-radius: 50%; background: radial-gradient(circle, transparent 56%, rgb(255 190 140 / .35) 63%, #fff6ea 68%, rgb(255 150 100 / .45) 72%, transparent 78%); opacity: 0; animation: film-ident-shock 1.6s cubic-bezier(.1, .7, .3, 1) both; }
-.film-ident-flare { position: absolute; left: 50%; top: 50%; width: var(--s); height: var(--s); margin: calc(var(--s) / -2) 0 0 calc(var(--s) / -2); border-radius: 50%; background: radial-gradient(circle, rgb(150 190 255 / .05) 40%, rgb(150 190 255 / .35) 62%, rgb(255 200 160 / .2) 70%, transparent 72%); opacity: 0; animation: film-ident-flare 1.6s ease-out both; }
-.film-ident-spark { position: absolute; left: 50%; top: 50%; width: .5vmin; height: .5vmin; min-width: 3px; min-height: 3px; border-radius: 50%; background: #fff6ea; box-shadow: 0 0 8px 2px rgb(255 170 110 / .8); opacity: 0; animation: film-ident-spark 1.6s cubic-bezier(.3, .6, .4, 1) both; animation-delay: calc(var(--i) * 4ms); }
+.film-ident-shock { position: absolute; left: 50%; top: 50%; width: 14vmin; height: 14vmin; translate: -50% -50%; border-radius: 50%; background: radial-gradient(circle, transparent 56%, rgb(165 184 247 / .35) 63%, #fffcf9 68%, rgb(103 143 255 / .45) 72%, transparent 78%); opacity: 0; animation: film-ident-shock 1.6s cubic-bezier(.1, .7, .3, 1) both; }
+.film-ident-flare { position: absolute; left: 50%; top: 50%; width: var(--s); height: var(--s); margin: calc(var(--s) / -2) 0 0 calc(var(--s) / -2); border-radius: 50%; background: radial-gradient(circle, rgb(150 190 255 / .05) 40%, rgb(150 190 255 / .35) 62%, rgb(214 215 238 / .2) 70%, transparent 72%); opacity: 0; animation: film-ident-flare 1.6s ease-out both; }
+.film-ident-spark { position: absolute; left: 50%; top: 50%; width: .5vmin; height: .5vmin; min-width: 3px; min-height: 3px; border-radius: 50%; background: #fffcf9; box-shadow: 0 0 8px 2px rgb(112 150 255 / .8); opacity: 0; animation: film-ident-spark 1.6s cubic-bezier(.3, .6, .4, 1) both; animation-delay: calc(var(--i) * 4ms); }
 .film-ident-logo { position: relative; display: grid; justify-items: center; animation: film-ident-push 1.6s cubic-bezier(.5, 0, .7, .3) both; }
-.film-ident-rays { position: absolute; left: 50%; top: 50%; width: 160vmax; height: 160vmax; translate: -50% -50%; background: repeating-conic-gradient(from 0deg, rgb(255 190 140 / .22) 0deg 2.2deg, transparent 2.2deg 9deg); -webkit-mask-image: radial-gradient(circle, #000 0%, rgb(0 0 0 / .6) 14%, transparent 42%); mask-image: radial-gradient(circle, #000 0%, rgb(0 0 0 / .6) 14%, transparent 42%); opacity: 0; animation: film-ident-rays 1.6s ease-out both; }
-.film-ident-burst { position: absolute; left: 50%; top: 50%; width: 40vmin; height: 40vmin; translate: -50% -50%; border-radius: 50%; background: radial-gradient(circle, #fffaf2 0%, rgb(255 200 150 / .85) 12%, rgb(255 130 70 / .35) 34%, transparent 66%); opacity: 0; animation: film-ident-burst 1.6s ease-out both; }
-.film-ident-line { position: absolute; left: 50%; top: 50%; width: 90vw; height: 2px; translate: -50% -50%; transform: scaleX(0); background: linear-gradient(to right, transparent, rgb(150 190 255 / .55) 18%, rgb(255 220 190 / .95) 44%, #fff 50%, rgb(255 220 190 / .95) 56%, rgb(150 190 255 / .55) 82%, transparent); box-shadow: 0 0 24px 4px rgb(255 150 100 / .45); animation: film-ident-line 1.6s cubic-bezier(.2, .7, .2, 1) both; }
-.film-ident-name { position: relative; margin: 0; padding: 0 .1em; font: 400 clamp(1.6rem, 7.5vw, 5.4rem)/1 var(--font-condensed); letter-spacing: .38em; text-indent: .38em; text-transform: uppercase; color: transparent; background: linear-gradient(100deg, #c9a46a 0%, #f3ece2 34%, #fffaf2 46%, #ffe1bd 50%, #f3ece2 58%, #d9b27a 100%); background-size: 260% 100%; background-position: 100% 0; -webkit-background-clip: text; background-clip: text; filter: drop-shadow(0 0 24px rgb(255 160 110 / .35)); animation: film-ident-name 1.6s cubic-bezier(.2, .8, .3, 1) both, film-ident-sheen 1.6s ease-out both; }
-.film-ident-sub::before, .film-ident-sub::after { content: ""; width: 3.5em; height: 1px; background: linear-gradient(to right, transparent, rgb(255 200 160 / .75)); transform-origin: right; animation: film-ident-rule 1.6s ease-out both; }
-.film-ident-sub::after { background: linear-gradient(to left, transparent, rgb(255 200 160 / .75)); transform-origin: left; }
-.film-ident-sub { display: flex; align-items: center; gap: .9em; position: relative; margin: 1.2rem 0 0; font: italic 400 clamp(1rem, 1.7vw, 1.3rem)/1 var(--font-serif); letter-spacing: .08em; color: rgb(239 230 216 / .7); animation: film-ident-sub 1.6s ease-out both; }
+.film-ident-rays { position: absolute; left: 50%; top: 50%; width: 160vmax; height: 160vmax; translate: -50% -50%; background: repeating-conic-gradient(from 0deg, rgb(165 184 247 / .22) 0deg 2.2deg, transparent 2.2deg 9deg); -webkit-mask-image: radial-gradient(circle, #000 0%, rgb(0 0 0 / .6) 14%, transparent 42%); mask-image: radial-gradient(circle, #000 0%, rgb(0 0 0 / .6) 14%, transparent 42%); opacity: 0; animation: film-ident-rays 1.6s ease-out both; }
+.film-ident-burst { position: absolute; left: 50%; top: 50%; width: 40vmin; height: 40vmin; translate: -50% -50%; border-radius: 50%; background: radial-gradient(circle, #fffefb 0%, rgb(191 201 242 / .85) 12%, rgb(76 124 255 / .35) 34%, transparent 66%); opacity: 0; animation: film-ident-burst 1.6s ease-out both; }
+.film-ident-line { position: absolute; left: 50%; top: 50%; width: 90vw; height: 2px; translate: -50% -50%; transform: scaleX(0); background: linear-gradient(to right, transparent, rgb(150 190 255 / .55) 18%, rgb(255 245 236 / .95) 44%, #fff 50%, rgb(255 245 236 / .95) 56%, rgb(150 190 255 / .55) 82%, transparent); box-shadow: 0 0 24px 4px rgb(103 143 255 / .45); animation: film-ident-line 1.6s cubic-bezier(.2, .7, .2, 1) both; }
+.film-ident-name { position: relative; margin: 0; padding: 0 .1em; font: 400 clamp(1.6rem, 7.5vw, 5.4rem)/1 var(--font-condensed); letter-spacing: .38em; text-indent: .38em; text-transform: uppercase; color: transparent; background: linear-gradient(100deg, #7489c3 0%, #f3f1ee 34%, #fffefb 46%, #fff6eb 50%, #f3f1ee 58%, #93a2d0 100%); background-size: 260% 100%; background-position: 100% 0; -webkit-background-clip: text; background-clip: text; filter: drop-shadow(0 0 24px rgb(112 150 255 / .35)); animation: film-ident-name 1.6s cubic-bezier(.2, .8, .3, 1) both, film-ident-sheen 1.6s ease-out both; }
+.film-ident-sub::before, .film-ident-sub::after { content: ""; width: 3.5em; height: 1px; background: linear-gradient(to right, transparent, rgb(214 215 238 / .75)); transform-origin: right; animation: film-ident-rule 1.6s ease-out both; }
+.film-ident-sub::after { background: linear-gradient(to left, transparent, rgb(214 215 238 / .75)); transform-origin: left; }
+.film-ident-sub { display: flex; align-items: center; gap: .9em; position: relative; margin: 1.2rem 0 0; font: italic 400 clamp(1rem, 1.7vw, 1.3rem)/1 var(--font-serif); letter-spacing: .08em; color: rgb(239 236 232 / .7); animation: film-ident-sub 1.6s ease-out both; }
 @keyframes film-ident-line { 0% { transform: scaleX(0); opacity: 0; } 8% { transform: scaleX(.04); opacity: 1; } 26% { transform: scaleX(1); opacity: 1; } 55% { opacity: .5; } 100% { transform: scaleX(1.2); opacity: 0; } }
 @keyframes film-ident-burst { 0%, 20% { opacity: 0; transform: scale(.2); } 28% { opacity: 1; transform: scale(1); } 60% { opacity: .25; transform: scale(1.8); } 100% { opacity: 0; transform: scale(2.2); } }
 @keyframes film-ident-rays { 0%, 22% { opacity: 0; rotate: 0deg; scale: .7; } 34% { opacity: 1; } 80% { opacity: .55; } 100% { opacity: 0; rotate: 14deg; scale: 1.15; } }
-@keyframes film-ident-name { 0%, 24% { opacity: 0; filter: blur(16px) drop-shadow(0 0 24px rgb(255 160 110 / .35)); letter-spacing: 1.1em; text-indent: 1.1em; } 46% { opacity: 1; filter: blur(0) drop-shadow(0 0 40px rgb(255 180 130 / .6)); letter-spacing: .4em; text-indent: .4em; } 85% { opacity: 1; text-shadow: 0 0 0 rgb(255 40 80 / 0), 0 0 0 rgb(40 210 255 / 0); } 100% { opacity: 0; letter-spacing: .44em; text-indent: .44em; text-shadow: -.09em 0 0 rgb(255 40 80 / .75), .09em 0 0 rgb(40 210 255 / .75); } }
+@keyframes film-ident-name { 0%, 24% { opacity: 0; filter: blur(16px) drop-shadow(0 0 24px rgb(112 150 255 / .35)); letter-spacing: 1.1em; text-indent: 1.1em; } 46% { opacity: 1; filter: blur(0) drop-shadow(0 0 40px rgb(135 166 253 / .6)); letter-spacing: .4em; text-indent: .4em; } 85% { opacity: 1; text-shadow: 0 0 0 rgb(255 40 80 / 0), 0 0 0 rgb(40 210 255 / 0); } 100% { opacity: 0; letter-spacing: .44em; text-indent: .44em; text-shadow: -.09em 0 0 rgb(255 40 80 / .75), .09em 0 0 rgb(40 210 255 / .75); } }
 @keyframes film-ident-sheen { 0%, 40% { background-position: 100% 0; } 85%, 100% { background-position: 0% 0; } }
 @keyframes film-ident-sub { 0%, 46% { opacity: 0; transform: translateY(8px); } 62%, 85% { opacity: 1; transform: none; } 100% { opacity: 0; } }
 @keyframes film-ident-shake { 0%, 27% { translate: 0 0; } 28.5% { translate: -1.4vmin .9vmin; } 30% { translate: 1.2vmin -1vmin; } 31.5% { translate: -.8vmin .5vmin; } 33.5% { translate: .4vmin -.3vmin; } 36%, 100% { translate: 0 0; } }
@@ -40,41 +40,41 @@
    joke changes its mind. Pressed, it punches in and bursts: a ring, a
    flash from its corner of the screen, and the film is gone. */
 @property --film-skip-a { syntax: "<angle>"; inherits: false; initial-value: 0deg; }
-.film-skip, .film-skip-ghost { position: fixed; z-index: 9700; top: clamp(14px, 2.6vw, 30px); right: clamp(14px, 2.6vw, 30px); display: grid; grid-template-columns: auto auto; align-items: center; gap: clamp(14px, 1.6vw, 22px); padding: clamp(14px, 1.8vw, 20px) clamp(18px, 2.4vw, 28px); border: 1px solid rgb(239 230 216 / .28); border-radius: 22px; background: linear-gradient(135deg, rgb(28 18 12 / .62), rgb(10 8 8 / .5)); backdrop-filter: blur(12px) saturate(1.3); -webkit-backdrop-filter: blur(12px) saturate(1.3); color: #f3ece2; text-align: left; cursor: pointer; animation: film-skip-in .9s cubic-bezier(.2, .8, .2, 1) both .4s, film-skip-breathe 2.8s ease-in-out 1.3s infinite; transition: transform .3s cubic-bezier(.3, 1.6, .5, 1), border-color .25s, background .25s; }
+.film-skip, .film-skip-ghost { position: fixed; z-index: 9700; top: clamp(14px, 2.6vw, 30px); right: clamp(14px, 2.6vw, 30px); display: grid; grid-template-columns: auto auto; align-items: center; gap: clamp(14px, 1.6vw, 22px); padding: clamp(14px, 1.8vw, 20px) clamp(18px, 2.4vw, 28px); border: 1px solid rgb(239 236 232 / .28); border-radius: 22px; background: linear-gradient(135deg, rgb(12 16 27 / .62), rgb(10 9 9 / .5)); backdrop-filter: blur(12px) saturate(1.3); -webkit-backdrop-filter: blur(12px) saturate(1.3); color: #f3f1ee; text-align: left; cursor: pointer; animation: film-skip-in .9s cubic-bezier(.2, .8, .2, 1) both .4s, film-skip-breathe 2.8s ease-in-out 1.3s infinite; transition: transform .3s cubic-bezier(.3, 1.6, .5, 1), border-color .25s, background .25s; }
 .film-skip-text { position: relative; display: grid; justify-items: start; gap: 6px; }
-.film-skip-main { font: 400 clamp(1.25rem, 2.6vw, 2rem)/1 var(--font-condensed); letter-spacing: .04em; text-transform: uppercase; color: transparent; background: linear-gradient(100deg, #d9b27a 0%, #f3ece2 30%, #fffaf2 44%, #ffe1bd 50%, #f3ece2 60%, #d9b27a 100%); background-size: 280% 100%; background-position: 100% 0; -webkit-background-clip: text; background-clip: text; filter: drop-shadow(0 0 14px rgb(255 160 110 / .35)); animation: film-skip-sheen 3.6s ease-in-out 1.1s infinite; transition: letter-spacing .3s cubic-bezier(.2, .8, .2, 1); }
-.film-skip-sub { display: grid; font: italic 400 clamp(.85rem, 1.2vw, 1rem)/1.1 var(--font-serif); color: rgb(239 230 216 / .7); }
+.film-skip-main { font: 400 clamp(1.25rem, 2.6vw, 2rem)/1 var(--font-condensed); letter-spacing: .04em; text-transform: uppercase; color: transparent; background: linear-gradient(100deg, #93a2d0 0%, #f3f1ee 30%, #fffefb 44%, #fff6eb 50%, #f3f1ee 60%, #93a2d0 100%); background-size: 280% 100%; background-position: 100% 0; -webkit-background-clip: text; background-clip: text; filter: drop-shadow(0 0 14px rgb(112 150 255 / .35)); animation: film-skip-sheen 3.6s ease-in-out 1.1s infinite; transition: letter-spacing .3s cubic-bezier(.2, .8, .2, 1); }
+.film-skip-sub { display: grid; font: italic 400 clamp(.85rem, 1.2vw, 1rem)/1.1 var(--font-serif); color: rgb(239 236 232 / .7); }
 .film-skip-sub > span { grid-area: 1 / 1; transition: opacity .25s, translate .3s cubic-bezier(.2, .8, .2, 1), color .25s; }
-.film-skip-sub-b { opacity: 0; translate: 0 70%; color: #ff8a5f; }
+.film-skip-sub-b { opacity: 0; translate: 0 70%; color: #628cff; }
 /* The lit fuse: a spark that runs round the edge. */
-.film-skip-fuse { position: absolute; inset: -1px; border-radius: inherit; padding: 1.5px; background: conic-gradient(from var(--film-skip-a), transparent 0 64%, rgb(255 138 95 / .15) 72%, #ff8a5f 90%, #fff4e6 96%, transparent 100%); -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0); -webkit-mask-composite: xor; mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0); mask-composite: exclude; pointer-events: none; filter: drop-shadow(0 0 4px #ff8a5f); animation: film-skip-fuse 3.2s linear infinite; }
+.film-skip-fuse { position: absolute; inset: -1px; border-radius: inherit; padding: 1.5px; background: conic-gradient(from var(--film-skip-a), transparent 0 64%, rgb(98 140 255 / .15) 72%, #628cff 90%, #fffcf8 96%, transparent 100%); -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0); -webkit-mask-composite: xor; mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0); mask-composite: exclude; pointer-events: none; filter: drop-shadow(0 0 4px #628cff); animation: film-skip-fuse 3.2s linear infinite; }
 .film-skip-glint { position: absolute; inset: 0; border-radius: inherit; overflow: hidden; pointer-events: none; }
-.film-skip-glint::after { content: ""; position: absolute; top: -20%; bottom: -20%; left: 0; width: 34%; background: linear-gradient(100deg, transparent, rgb(255 236 214 / .2) 45%, rgb(255 255 255 / .32) 50%, rgb(255 236 214 / .2) 55%, transparent); translate: -140% 0; rotate: 12deg; animation: film-skip-glint 3.6s ease-in-out 1.1s infinite; }
+.film-skip-glint::after { content: ""; position: absolute; top: -20%; bottom: -20%; left: 0; width: 34%; background: linear-gradient(100deg, transparent, rgb(255 249 243 / .2) 45%, rgb(255 255 255 / .32) 50%, rgb(255 249 243 / .2) 55%, transparent); translate: -140% 0; rotate: 12deg; animation: film-skip-glint 3.6s ease-in-out 1.1s infinite; }
 /* Fast forward. */
 .film-skip-ff { display: inline-flex; gap: 1px; }
-.film-skip-ff i { width: clamp(9px, 1vw, 12px); height: clamp(14px, 1.6vw, 18px); background: #ff8a5f; clip-path: polygon(0 0, 100% 50%, 0 100%); opacity: .2; animation: film-skip-ff 1.2s ease-in-out infinite; }
+.film-skip-ff i { width: clamp(9px, 1vw, 12px); height: clamp(14px, 1.6vw, 18px); background: #628cff; clip-path: polygon(0 0, 100% 50%, 0 100%); opacity: .2; animation: film-skip-ff 1.2s ease-in-out infinite; }
 .film-skip-ff i:nth-child(2) { animation-delay: .15s; }
 .film-skip-ff i:nth-child(3) { animation-delay: .3s; }
-.film-skip:hover, .film-skip:focus-visible { border-color: rgb(255 138 95 / .9); background: linear-gradient(135deg, rgb(255 138 95 / .24), rgb(30 14 8 / .55)); transform: rotate(-2deg) scale(1.05); outline: none; }
+.film-skip:hover, .film-skip:focus-visible { border-color: rgb(98 140 255 / .9); background: linear-gradient(135deg, rgb(98 140 255 / .24), rgb(8 14 28 / .55)); transform: rotate(-2deg) scale(1.05); outline: none; }
 .film-skip:hover .film-skip-main, .film-skip:focus-visible .film-skip-main { letter-spacing: .08em; }
 .film-skip:hover .film-skip-sub-a, .film-skip:focus-visible .film-skip-sub-a { opacity: 0; translate: 0 -70%; }
 .film-skip:hover .film-skip-sub-b, .film-skip:focus-visible .film-skip-sub-b { opacity: 1; translate: 0 0; }
 .film-skip:hover .film-skip-fuse, .film-skip:focus-visible .film-skip-fuse { animation-duration: 1.1s; }
-.film-skip:hover .film-skip-ff i, .film-skip:focus-visible .film-skip-ff i { animation-duration: .5s; filter: drop-shadow(0 0 6px #ff8a5f); }
+.film-skip:hover .film-skip-ff i, .film-skip:focus-visible .film-skip-ff i { animation-duration: .5s; filter: drop-shadow(0 0 6px #628cff); }
 .film-skip:hover .film-skip-ff i:nth-child(2), .film-skip:focus-visible .film-skip-ff i:nth-child(2) { animation-delay: .07s; }
 .film-skip:hover .film-skip-ff i:nth-child(3), .film-skip:focus-visible .film-skip-ff i:nth-child(3) { animation-delay: .14s; }
 .film-skip:active { transform: rotate(-2deg) scale(.96); }
 /* Pressed: the burst it leaves punches in, bursts, and is gone. */
 .film-skip-ghost { pointer-events: none; animation: film-skip-out .32s cubic-bezier(.3, 0, .2, 1) forwards; }
-.film-skip-ring { position: absolute; inset: -2px; border-radius: inherit; border: 2px solid #ffd9b8; box-shadow: 0 0 30px 6px rgb(255 138 95 / .6), inset 0 0 20px rgb(255 200 160 / .5); pointer-events: none; animation: film-skip-ring .32s ease-out forwards; }
-.film-skip-flash { position: fixed; inset: 0; z-index: 9690; pointer-events: none; background: radial-gradient(circle at 88% 7%, rgb(255 246 232 / .95), rgb(255 170 120 / .5) 22%, rgb(255 110 60 / .18) 46%, transparent 72%); animation: film-skip-flash .5s ease-out forwards; }
+.film-skip-ring { position: absolute; inset: -2px; border-radius: inherit; border: 2px solid #fff4ea; box-shadow: 0 0 30px 6px rgb(98 140 255 / .6), inset 0 0 20px rgb(214 215 238 / .5); pointer-events: none; animation: film-skip-ring .32s ease-out forwards; }
+.film-skip-flash { position: fixed; inset: 0; z-index: 9690; pointer-events: none; background: radial-gradient(circle at 88% 7%, rgb(255 252 248 / .95), rgb(121 157 255 / .5) 22%, rgb(67 117 255 / .18) 46%, transparent 72%); animation: film-skip-flash .5s ease-out forwards; }
 @keyframes film-skip-in {
-  0% { opacity: 0; scale: 1.5; translate: 0 -14px; filter: blur(14px) brightness(2.4); box-shadow: 0 0 0 rgb(255 138 95 / 0); }
-  45% { opacity: 1; scale: .96; translate: 0 0; filter: blur(0) brightness(1.7); box-shadow: 0 0 60px 10px rgb(255 160 110 / .55); }
+  0% { opacity: 0; scale: 1.5; translate: 0 -14px; filter: blur(14px) brightness(2.4); box-shadow: 0 0 0 rgb(98 140 255 / 0); }
+  45% { opacity: 1; scale: .96; translate: 0 0; filter: blur(0) brightness(1.7); box-shadow: 0 0 60px 10px rgb(112 150 255 / .55); }
   70% { scale: 1.02; filter: brightness(1.1); }
-  100% { opacity: 1; scale: 1; translate: 0 0; filter: none; box-shadow: 0 0 22px rgb(255 138 95 / .12); }
+  100% { opacity: 1; scale: 1; translate: 0 0; filter: none; box-shadow: 0 0 22px rgb(98 140 255 / .12); }
 }
-@keyframes film-skip-breathe { 0%, 100% { box-shadow: 0 0 22px rgb(255 138 95 / .12); } 50% { box-shadow: 0 0 38px 4px rgb(255 138 95 / .3); } }
+@keyframes film-skip-breathe { 0%, 100% { box-shadow: 0 0 22px rgb(98 140 255 / .12); } 50% { box-shadow: 0 0 38px 4px rgb(98 140 255 / .3); } }
 @keyframes film-skip-sheen { 0%, 30% { background-position: 100% 0; } 70%, 100% { background-position: 0% 0; } }
 @keyframes film-skip-glint { 0%, 30% { translate: -140% 0; } 70%, 100% { translate: 420% 0; } }
 @keyframes film-skip-fuse { to { --film-skip-a: 360deg; } }
@@ -91,31 +91,31 @@
    with a flare, a speaker sends out waves, sonar rings roll off the badge
    and a five-band meter bounces in gold. When the tap lands it answers: a
    flash, the rings blast out, the meter jumps, "Sound on", and it goes. */
-.film-tap { position: fixed; z-index: 9700; left: clamp(14px, 2.6vw, 30px); top: clamp(14px, 2.6vw, 30px); display: inline-flex; align-items: center; gap: 12px; margin: 0; padding: 12px 18px 12px 14px; border-radius: 999px; background: linear-gradient(135deg, rgb(30 18 12 / .62), rgb(10 8 8 / .5)); border: 1px solid rgb(255 170 120 / .35); backdrop-filter: blur(12px) saturate(1.3); -webkit-backdrop-filter: blur(12px) saturate(1.3); color: #efe6d8; font: 500 .66rem/1 var(--font-mono); letter-spacing: .16em; text-transform: uppercase; white-space: nowrap; pointer-events: none; animation: film-tap-in .9s cubic-bezier(.2, .8, .2, 1) both .6s, film-tap-breathe 2.4s ease-in-out 1.5s infinite; }
+.film-tap { position: fixed; z-index: 9700; left: clamp(14px, 2.6vw, 30px); top: clamp(14px, 2.6vw, 30px); display: inline-flex; align-items: center; gap: 12px; margin: 0; padding: 12px 18px 12px 14px; border-radius: 999px; background: linear-gradient(135deg, rgb(12 16 28 / .62), rgb(10 9 9 / .5)); border: 1px solid rgb(121 157 255 / .35); backdrop-filter: blur(12px) saturate(1.3); -webkit-backdrop-filter: blur(12px) saturate(1.3); color: #efece8; font: 500 .66rem/1 var(--font-mono); letter-spacing: .16em; text-transform: uppercase; white-space: nowrap; pointer-events: none; animation: film-tap-in .9s cubic-bezier(.2, .8, .2, 1) both .6s, film-tap-breathe 2.4s ease-in-out 1.5s infinite; }
 /* Sonar: two rings rolling off the badge. */
-.film-tap-ring { position: absolute; inset: -1px; border-radius: inherit; border: 1px solid rgb(255 150 100 / .7); opacity: 0; animation: film-tap-ring 2.4s cubic-bezier(.2, .6, .3, 1) 1.5s infinite; }
+.film-tap-ring { position: absolute; inset: -1px; border-radius: inherit; border: 1px solid rgb(103 143 255 / .7); opacity: 0; animation: film-tap-ring 2.4s cubic-bezier(.2, .6, .3, 1) 1.5s infinite; }
 .film-tap-ring.is-late { animation-delay: 2.3s; }
 /* The speaker and its waves. */
 .film-tap-speaker { position: relative; width: 22px; height: 16px; }
-.film-tap-cone { position: absolute; left: 0; top: 3px; width: 9px; height: 10px; background: linear-gradient(#ffd9b8, #ff8a5f); clip-path: polygon(0 28%, 38% 28%, 100% 0, 100% 100%, 38% 72%, 0 72%); filter: drop-shadow(0 0 4px rgb(255 138 95 / .8)); }
-.film-tap-arc { position: absolute; left: 6px; top: 50%; width: 6px; height: 6px; translate: 0 -50%; border: 1.5px solid #ff8a5f; border-left-color: transparent; border-bottom-color: transparent; border-radius: 50%; rotate: 45deg; opacity: 0; animation: film-tap-arc 1.5s ease-out infinite; }
+.film-tap-cone { position: absolute; left: 0; top: 3px; width: 9px; height: 10px; background: linear-gradient(#fff4ea, #628cff); clip-path: polygon(0 28%, 38% 28%, 100% 0, 100% 100%, 38% 72%, 0 72%); filter: drop-shadow(0 0 4px rgb(98 140 255 / .8)); }
+.film-tap-arc { position: absolute; left: 6px; top: 50%; width: 6px; height: 6px; translate: 0 -50%; border: 1.5px solid #628cff; border-left-color: transparent; border-bottom-color: transparent; border-radius: 50%; rotate: 45deg; opacity: 0; animation: film-tap-arc 1.5s ease-out infinite; }
 .film-tap-arc:nth-child(3) { width: 11px; height: 11px; left: 4px; animation-delay: .25s; }
 .film-tap-arc:nth-child(4) { width: 16px; height: 16px; left: 2px; animation-delay: .5s; }
 /* The words, gold with a sheen, and the answer under them. */
 .film-tap-text { display: grid; }
 .film-tap-text > span { grid-area: 1 / 1; transition: opacity .25s, translate .35s cubic-bezier(.2, .8, .2, 1); }
-.film-tap-ask { color: transparent; background: linear-gradient(100deg, #d9b27a 0%, #f3ece2 30%, #fffaf2 44%, #ffe1bd 50%, #f3ece2 60%, #d9b27a 100%); background-size: 280% 100%; background-position: 100% 0; -webkit-background-clip: text; background-clip: text; animation: film-tap-sheen 3s ease-in-out 1.5s infinite; }
-.film-tap-on { opacity: 0; translate: 0 90%; color: #ffd9b8; text-shadow: 0 0 12px rgb(255 138 95 / .9); }
+.film-tap-ask { color: transparent; background: linear-gradient(100deg, #93a2d0 0%, #f3f1ee 30%, #fffefb 44%, #fff6eb 50%, #f3f1ee 60%, #93a2d0 100%); background-size: 280% 100%; background-position: 100% 0; -webkit-background-clip: text; background-clip: text; animation: film-tap-sheen 3s ease-in-out 1.5s infinite; }
+.film-tap-on { opacity: 0; translate: 0 90%; color: #fff4ea; text-shadow: 0 0 12px rgb(98 140 255 / .9); }
 /* The meter. */
 .film-tap-eq { display: inline-flex; gap: 2px; align-items: end; height: 14px; }
-.film-tap-eq b { width: 2.5px; height: 100%; border-radius: 1px; background: linear-gradient(#ffe1bd, #ff8a5f 60%, #c9503a); box-shadow: 0 0 6px rgb(255 138 95 / .6); transform-origin: bottom; animation: film-eq .9s ease-in-out infinite alternate; }
+.film-tap-eq b { width: 2.5px; height: 100%; border-radius: 1px; background: linear-gradient(#fff6eb, #628cff 60%, #3d62c6); box-shadow: 0 0 6px rgb(98 140 255 / .6); transform-origin: bottom; animation: film-eq .9s ease-in-out infinite alternate; }
 .film-tap-eq b:nth-child(1) { animation-duration: .7s; animation-delay: -.2s; }
 .film-tap-eq b:nth-child(2) { animation-duration: 1.1s; animation-delay: -.5s; }
 .film-tap-eq b:nth-child(3) { animation-duration: .8s; animation-delay: -.1s; }
 .film-tap-eq b:nth-child(4) { animation-duration: 1s; animation-delay: -.7s; }
 .film-tap-eq b:nth-child(5) { animation-duration: .75s; animation-delay: -.35s; }
 /* Woken. */
-.film-tap.is-woke { animation: film-tap-woke 1.1s cubic-bezier(.2, .8, .2, 1) forwards; border-color: #ffd9b8; }
+.film-tap.is-woke { animation: film-tap-woke 1.1s cubic-bezier(.2, .8, .2, 1) forwards; border-color: #fff4ea; }
 .film-tap.is-woke .film-tap-ask { opacity: 0; translate: 0 -90%; }
 .film-tap.is-woke .film-tap-on { opacity: 1; translate: 0 0; }
 .film-tap.is-woke .film-tap-ring { animation: film-tap-blast .8s ease-out forwards; }
@@ -124,10 +124,10 @@
 .film-tap.is-woke .film-tap-arc { animation-duration: .6s; }
 @keyframes film-tap-in {
   0% { opacity: 0; transform: translateX(-24px) scale(1.25); filter: blur(12px) brightness(2.4); }
-  50% { opacity: 1; transform: none; filter: blur(0) brightness(1.6); box-shadow: 0 0 40px 6px rgb(255 160 110 / .5); }
-  100% { opacity: 1; transform: none; filter: none; box-shadow: 0 0 18px rgb(255 138 95 / .12); }
+  50% { opacity: 1; transform: none; filter: blur(0) brightness(1.6); box-shadow: 0 0 40px 6px rgb(112 150 255 / .5); }
+  100% { opacity: 1; transform: none; filter: none; box-shadow: 0 0 18px rgb(98 140 255 / .12); }
 }
-@keyframes film-tap-breathe { 0%, 100% { box-shadow: 0 0 18px rgb(255 138 95 / .12); } 50% { box-shadow: 0 0 30px 3px rgb(255 138 95 / .32); } }
+@keyframes film-tap-breathe { 0%, 100% { box-shadow: 0 0 18px rgb(98 140 255 / .12); } 50% { box-shadow: 0 0 30px 3px rgb(98 140 255 / .32); } }
 @keyframes film-tap-ring { 0% { opacity: .8; scale: 1; } 100% { opacity: 0; scale: 1.25 1.9; } }
 @keyframes film-tap-blast { 0% { opacity: 1; scale: 1; border-width: 2px; } 100% { opacity: 0; scale: 1.8 3.4; border-width: 1px; } }
 @keyframes film-tap-arc { 0% { opacity: 0; } 30% { opacity: 1; } 100% { opacity: 0; } }
@@ -135,16 +135,16 @@
 @keyframes film-eq { 0% { transform: scaleY(.25); } 100% { transform: scaleY(1); } }
 @keyframes film-eq-jump { 0% { transform: scaleY(.5); } 100% { transform: scaleY(1.35); } }
 @keyframes film-tap-woke {
-  0% { opacity: 1; transform: none; filter: brightness(2.2); box-shadow: 0 0 50px 10px rgb(255 170 120 / .7); }
+  0% { opacity: 1; transform: none; filter: brightness(2.2); box-shadow: 0 0 50px 10px rgb(121 157 255 / .7); }
   20% { transform: scale(1.08); filter: brightness(1.4); }
-  70% { opacity: 1; transform: scale(1); filter: none; box-shadow: 0 0 24px rgb(255 138 95 / .3); }
+  70% { opacity: 1; transform: scale(1); filter: none; box-shadow: 0 0 24px rgb(98 140 255 / .3); }
   100% { opacity: 0; transform: scale(.96); filter: blur(4px); }
 }
 
 @media (max-width: 560px) {
   .film-skip, .film-skip-ghost { left: 14px; right: 14px; justify-content: center; text-align: center; }
   .film-skip-text { justify-items: center; }
-  .film-skip-flash { background: radial-gradient(circle at 50% 6%, rgb(255 246 232 / .95), rgb(255 170 120 / .5) 22%, rgb(255 110 60 / .18) 46%, transparent 72%); }
+  .film-skip-flash { background: radial-gradient(circle at 50% 6%, rgb(255 252 248 / .95), rgb(121 157 255 / .5) 22%, rgb(67 117 255 / .18) 46%, transparent 72%); }
   .film-tap { top: auto; bottom: 84px; left: 0; right: 0; width: max-content; margin: 0 auto; }
 }
 @media (prefers-reduced-motion: reduce) {
