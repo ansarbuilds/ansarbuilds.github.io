@@ -1,5 +1,5 @@
 import { Component, createRef, lazy, Suspense, useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { Hero, ProjectsSection, CapabilitiesSection, MoreWorkSection, PlaygroundSection, ContactSection } from "./components/Sections";
+import { Hero, ProjectsSection, CapabilitiesSection, MoreWorkSection, ContactSection } from "./components/Sections";
 import CommandPalette from "./components/CommandPalette";
 import { MatrixBackground } from "./components/RouteBackgrounds";
 import PaletteSwatch from "./components/PaletteSwatch";
@@ -39,7 +39,7 @@ const FilmPlayer = lazy(loadFilmPlayer);
 /* ============================================================
    ROUTER: every view has its own URL (see lib/routes.js). "main" is the
    home page: one scrolled document, the hero followed by Selected work,
-   What I bring, More work, the Playground and Contact, so a link to one of
+   What I bring, More work and Contact, so a link to one of
    those does not swap a view, it scrolls to that section's id. Project
    pages live at /work/<slug>/ and the full-screen views under
    /playground/. Links are ordinary <a href>; one click handler turns the
@@ -375,7 +375,6 @@ function MainDocument({ bootDone, held, onBoot, heroRun }) {
       <ProjectsSection />
       <CapabilitiesSection />
       <MoreWorkSection />
-      <PlaygroundSection />
       <ContactSection />
     </>
   );

@@ -231,8 +231,8 @@ test('the home page is a plain page to scroll, with every section in it', async 
   await page.goto('/');
   await expect(page.locator('.film-player')).toHaveCount(0);
   await expect(page.locator('.sc-receipts dt')).toHaveCount(4);
-  for (const id of ['projects', 'capabilities', 'more', 'ai', 'contact']) await expect(page.locator(`#${id}`)).toHaveCount(1);
-  for (const href of ['/playground/explore/', '/playground/infinity/', '/playground/emet/']) await expect(page.locator(`section#ai a[href="${href}"]`)).toHaveCount(1);
+  for (const id of ['projects', 'capabilities', 'more', 'contact']) await expect(page.locator(`#${id}`)).toHaveCount(1);
+  await expect(page.locator('#ai')).toHaveCount(0);
   await expect(page.locator('#contact a[href^="mailto:"]').first()).toBeAttached();
 });
 

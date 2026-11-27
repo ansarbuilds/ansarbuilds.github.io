@@ -1,10 +1,10 @@
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { animate, motion, useAnimationFrame, useInView, useMotionValue, useReducedMotion, useScroll, useSpring, useTransform, useVelocity } from "framer-motion";
-import { ArrowDown, ArrowRight, ArrowUpRight, ExternalLink, Play } from "lucide-react";
+import { ArrowDown, ArrowUpRight, ExternalLink, Play } from "lucide-react";
 import TelemetryFieldCanvas from "./TelemetryFieldCanvas";
 import WorkStage from "./WorkStage";
 import { CODE, CONTACT, HERO, RECEIPTS } from "../data/content";
-import { EXPERIMENTS, LISTED_PROJECTS, getProject } from "../data/projectIndex";
+import { LISTED_PROJECTS, getProject } from "../data/projectIndex";
 import { CAPABILITIES, FLAGSHIPS, MORE_WORK, STACK_MARQUEE } from "../data/showcase";
 import { EASE, STAGGER, tween } from "../lib/motion";
 import { INTRO_SESSION_KEY, filmEnabled, watchFilm } from "../lib/intro";
@@ -416,85 +416,6 @@ export function MoreWorkSection() {
   );
 }
 
-function ExperimentImage({ experiment }) {
-  const [artBroken, setArtBroken] = useState(false);
-  return <img className="ed-lazy-media" src={media(!artBroken && experiment.cardArt ? experiment.cardArt : experiment.shot)} alt="" width={1200} height={900} loading="lazy" onLoad={revealImage} onError={() => setArtBroken(true)} />;
-}
-
-const FILM_EXPERIMENTS = ["solar", "stars", "emet"].map((id) => EXPERIMENTS.find((e) => e.id === id)).filter(Boolean);
-export function PlaygroundSection() {
-  return (
-    <section id="ai" className="ed-projects ed-light ed-section" aria-labelledby="playground-title" data-palette="neon">
-      <div className="ed-wrap">
-        <Enter className="ed-section-heading">
-          <div>
-            <IndexLabel number="05">Playground</IndexLabel>
-            <h2 id="playground-title">Rooms off <em>the hall.</em></h2>
-          </div>
-          <div className="ed-heading-aside">
-            <p>Small things I built to try an idea. Each one opens on its own page.</p>
-          </div>
-        </Enter>
-        <div className="sc-card-grid is-three">
-          {FILM_EXPERIMENTS.map((experiment, i) => (
-            <Enter key={experiment.id} index={i}>
-              <a href={experiment.href} className="sc-card">
-                <div className="sc-card-plate">
-                  <div className="sc-card-media"><ExperimentImage experiment={experiment} /></div>
-                  <div className="sc-card-plate-bar">
-                    <span className="sc-card-kind">0{i + 1} / Interactive</span>
-                    <span className="sc-card-status-chip">Open room</span>
-                  </div>
-                </div>
-                <div className="sc-card-body">
-                  <h3>{experiment.title}<ArrowUpRight size={18} aria-hidden="true" /></h3>
-                  <p className="sc-card-line">{experiment.hook}</p>
-                </div>
-              </a>
-            </Enter>
-          ))}
-        </div>
-      </div>
-    </section>
-  );
-}
-
-export function ExperimentsSection() {
-  return (
-    <Sheet>
-      <section id="ai" className="ed-experiments ed-section" data-palette="neon">
-        <div className="ed-wrap">
-          <Enter className="ed-section-heading">
-            <div>
-              <IndexLabel number="05">The playground</IndexLabel>
-              <h2>What if <br /><em>I tried this?</em></h2>
-            </div>
-            <p className="ed-heading-aside">Interactive experiments built with AI as a pair programmer. Open one and have a play.</p>
-          </Enter>
-          <div className="ed-experiment-grid">
-            {EXPERIMENTS.map((experiment, i) => (
-              <Enter key={experiment.id} index={i}>
-                <a href={experiment.href} className="ed-experiment" data-cursor="Play">
-                  <div className="ed-experiment-image">
-                    <ExperimentImage experiment={experiment} />
-                    <span>0{i + 1} / Interactive</span>
-                  </div>
-                  <div className="ed-experiment-title">
-                    <h3>{experiment.title}</h3>
-                    <ArrowUpRight size={20} />
-                  </div>
-                  <p>{experiment.hook}</p>
-                  <span className="ed-experiment-cta">{experiment.cta}<ArrowRight size={15} /></span>
-                </a>
-              </Enter>
-            ))}
-          </div>
-        </div>
-      </section>
-    </Sheet>
-  );
-}
-
 export function ContactSection() {
   return <PlainContact />;
 }
@@ -507,7 +428,7 @@ function PlainContact() {
       <div className="ed-wrap">
         <div className="sc-contact-top">
           <div className="sc-contact-lead">
-            <IndexLabel number="06">Contact</IndexLabel>
+            <IndexLabel number="05">Contact</IndexLabel>
             <h2>Building something <em>ambitious?</em></h2>
             <a href={`mailto:${CONTACT.email}`} className="sc-email" data-cursor="Write">{CONTACT.email}</a>
           </div>
