@@ -1,11 +1,12 @@
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
-import { animate, motion, useAnimationFrame, useInView, useMotionValue, useReducedMotion, useScroll, useSpring, useTransform, useVelocity } from "framer-motion";
+import { animate, motion, useMotionValue, useReducedMotion, useScroll, useTransform } from "framer-motion";
 import { ArrowDown, ArrowUpRight, ExternalLink, Play } from "lucide-react";
-import TelemetryFieldCanvas from "./TelemetryFieldCanvas";
+import DotSphere from "./DotSphere";
+import DitherField from "./DitherField";
 import WorkStage from "./WorkStage";
 import { CODE, CONTACT, HERO, RECEIPTS } from "../data/content";
 import { LISTED_PROJECTS, getProject } from "../data/projectIndex";
-import { CAPABILITIES, FLAGSHIPS, MORE_WORK, STACK_MARQUEE } from "../data/showcase";
+import { CAPABILITIES, FLAGSHIPS, MORE_WORK } from "../data/showcase";
 import { EASE, STAGGER, tween } from "../lib/motion";
 import { INTRO_SESSION_KEY, filmEnabled, watchFilm } from "../lib/intro";
 import { media } from "../lib/media";
@@ -14,6 +15,7 @@ import MagneticLink from "./Magnetic";
 import { useRoute } from "../appContexts";
 import "../editorial.css";
 import "../showcase.css";
+import "../quiet-print.css";
 
 const revealImage = (event) => event.currentTarget.classList.add("is-loaded");
 
@@ -183,7 +185,6 @@ export function Hero({ ready = true, hold = false, onReady }) {
           ))}
         </dl>
       </div>
-      <StackMarquee />
     </section>
   );
 
@@ -219,7 +220,7 @@ export function Hero({ ready = true, hold = false, onReady }) {
           </div>
 
           <motion.div className="sc-hero-visual" {...appear(1)}>
-            <TelemetryFieldCanvas />
+            <DotSphere />
           </motion.div>
         </div>
 
@@ -231,41 +232,6 @@ export function Hero({ ready = true, hold = false, onReady }) {
     </div>
   );
 }
-
-/* Velocity-aware stack ribbon */
-function VelocityMarquee({ items, label, className = "", speed = 1.05 }) {
-  const reduced = useReducedMotion();
-  const { scrollY } = useScroll();
-  const velocity = useSpring(useVelocity(scrollY), { damping: 50, stiffness: 400 });
-  const boost = useTransform(velocity, [-1500, 0, 1500], [-4, 0, 4], { clamp: false });
-  const offset = useMotionValue(0);
-  const direction = useRef(1);
-  const rowRef = useRef(null);
-  const onScreen = useInView(rowRef);
-  useAnimationFrame((_, delta) => {
-    if (reduced || !onScreen) return;
-    const push = boost.get();
-    if (push < -0.2) direction.current = -1;
-    else if (push > 0.2) direction.current = 1;
-    let next = offset.get() - direction.current * speed * (Math.min(delta, 64) / 1000) * (1 + Math.abs(push));
-    if (next <= -50) next += 50;
-    else if (next > 0) next -= 50;
-    offset.set(next);
-  });
-  const x = useTransform(offset, (value) => `${value}%`);
-  return (
-    <div ref={rowRef} className={`sc-marquee ${className}`}>
-      <motion.div className="sc-marquee-track" style={reduced ? undefined : { x }}>
-        {[0, 1].map((copy) => (
-          <ul key={copy} aria-label={copy ? undefined : label} aria-hidden={copy ? "true" : undefined}>
-            {items.map((item, i) => <li key={`${item}-${i}`}>{item}<span aria-hidden="true">·</span></li>)}
-          </ul>
-        ))}
-      </motion.div>
-    </div>
-  );
-}
-const StackMarquee = () => <VelocityMarquee items={STACK_MARQUEE} label="Tools I build with" />;
 
 function Sheet({ children }) {
   return <div className="sc-sheet">{children}</div>;
@@ -286,7 +252,12 @@ export function ProjectsSection() {
             <p>Each one has the number, the picture and a way in. Some you can run, some you watch, some you read.</p>
           </div>
         </Enter>
-        <WorkStage />
+      </div>
+      <div className="qp-plate-band">
+        <DitherField seed={2.4} density={0.46} />
+        <div className="ed-wrap">
+          <div className="qp-plate"><WorkStage /></div>
+        </div>
       </div>
     </section>
   );
@@ -304,14 +275,10 @@ function PlainCapabilities() {
       <section id="capabilities" className="sc-caps ed-section" data-palette="field">
         <div className="ed-wrap">
           <div className="sc-caps-split">
-            <Enter className="sc-caps-panel at-obsidian-grid">
+            <Enter className="sc-caps-panel">
               <IndexLabel number="03">What I bring</IndexLabel>
               <h2>Three things, <br /><em>done properly.</em></h2>
               <p className="sc-caps-aside">The same loop on every build: make it work, measure it honestly, and ship it to real people.</p>
-              <div className="sc-caps-meta" aria-hidden="true">
-                <span>DISCIPLINE // 03 TRACKS</span>
-                <span>VERIFIED IN CODE</span>
-              </div>
             </Enter>
             <div className="sc-cap-rows">
               {CAPABILITIES.map((cap, i) => (
@@ -424,7 +391,8 @@ export function ContactSection() {
 function PlainContact() {
   const { navigate } = useRoute();
   return (
-    <section id="contact" className="ed-contact sc-contact at-obsidian-grid" data-palette="blueBloom">
+    <section id="contact" className="ed-contact sc-contact" data-palette="blueBloom">
+      <div className="qp-band-slim"><DitherField seed={5.1} density={0.38} /></div>
       <div className="ed-wrap">
         <div className="sc-contact-top">
           <div className="sc-contact-lead">

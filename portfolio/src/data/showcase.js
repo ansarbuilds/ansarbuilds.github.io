@@ -120,10 +120,3 @@ export const CAPABILITIES = [
     proof: ["haloscript", "reptrack", "saywhen"],
   },
 ];
-
-// The moving row of tools under the intro.
-export const STACK_MARQUEE = [
-  "Claude API", "Claude Code", "MCP", "PyTorch", "Hugging Face", "Ollama", "Playwright",
-  "Python", "TypeScript", "Swift", "SwiftUI", "React", "three.js", "DuckDB", "dbt", "Dagster",
-  "SQLite", "Snowflake", "Tauri", "Rust",
-];

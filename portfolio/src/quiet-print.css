@@ -1,0 +1,250 @@
+/* ============================================================
+   QUIET PRINT — the calm layer over Cobalt & Stone
+   Loaded after editorial, showcase and stage, and only changes what it
+   names. The idea: a technical print, not a dashboard. Mono for reading
+   text, plain sans headings with no italic accents, one cobalt, few
+   borders, more air, and dot-matrix / dithered textures instead of dark
+   panels. Remove this import in Sections.jsx to get the louder v2 back.
+   ============================================================ */
+
+:root {
+  --font-body: "IBM Plex Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+  --qp-paper: #faf9f6;
+  --qp-chip: #e8e6e0;
+  --qp-chip-hover: #dedbd3;
+}
+body { font-size: 0.9rem; line-height: 1.7; }
+/* Plain paper: the dithered bands carry the texture now, not a page-wide grid. */
+.at-grid-backdrop { background-image: none; }
+
+/* Headings: plain sans, quieter weight, no italic serif accents ------- */
+.ed-section-heading h2,
+.ed-contact h2,
+.sc-caps-panel h2 {
+  font-weight: 400;
+  font-size: clamp(2rem, 3.4vw, 2.9rem);
+  letter-spacing: -0.03em;
+  line-height: 1.08;
+}
+.ed-section-heading h2 em,
+.ed-contact h2 em,
+.sc-caps-panel h2 em,
+.sc-brief .sc-statement em,
+.sc-hero-name .is-accent {
+  font-family: inherit;
+  font-style: normal;
+  font-weight: inherit;
+  letter-spacing: inherit;
+  color: var(--at-muted);
+}
+.ed-section-heading h2 br,
+.sc-caps-panel h2 br { display: none; }
+.ed-heading-aside, .ed-heading-aside p { font-size: 0.84rem; line-height: 1.7; color: var(--at-muted); }
+
+/* Section labels: a small cobalt dot-grid glyph, the word, an ink square */
+.ed-label { gap: 10px; font-size: 0.68rem; letter-spacing: 0.14em; color: var(--at-obsidian); }
+.ed-label-num, .ed-label-rule { display: none; }
+.ed-label::before {
+  content: "";
+  width: 11px;
+  height: 11px;
+  background-image: radial-gradient(var(--at-cobalt) 1.1px, transparent 1.3px);
+  background-size: 4px 4px;
+  background-position: -0.5px -0.5px;
+}
+.ed-label::after { content: ""; width: 6px; height: 6px; background: var(--at-obsidian); }
+
+.ed-section { padding-block: 112px; }
+.ed-section + .ed-section { border-top: none; }
+
+/* Buttons: small, flat, mixed case ------------------------------------- */
+.sc-hero-btn, .sc-btn, .ed-contact-email, .st-launch {
+  min-height: 38px;
+  padding: 0 16px;
+  border-radius: 0;
+  font: 500 0.8rem/1 var(--font-mono);
+  text-transform: none;
+  letter-spacing: 0;
+  box-shadow: none;
+}
+.sc-hero-btn:hover, .sc-hero-btn:focus-visible,
+.sc-btn:hover, .ed-contact-email:hover { translate: none; box-shadow: none; }
+.sc-hero-ghost, .sc-btn-ghost, .ed-socials a {
+  min-height: 38px;
+  padding: 0 14px;
+  border: 1px solid transparent;
+  border-radius: 0;
+  background: var(--qp-chip);
+  color: var(--at-obsidian);
+  font: 500 0.8rem/1 var(--font-mono);
+  text-transform: none;
+  letter-spacing: 0;
+}
+.sc-hero-ghost:hover, .sc-hero-ghost:focus-visible,
+.sc-btn-ghost:hover, .ed-socials a:hover {
+  background: var(--qp-chip-hover);
+  border-color: transparent;
+  color: var(--at-obsidian);
+  translate: none;
+}
+.ed-nav-links a, .ed-nav-links button { text-transform: none; letter-spacing: 0; }
+.ed-nav-contact { border-radius: 0; }
+.ed-nav-command, .ed-nav-sound, .ed-nav-menu > button { border-radius: 0; border-color: transparent; background: var(--qp-chip); }
+
+/* Hero ------------------------------------------------------------------ */
+.sc-hero { padding: 136px 0 72px; border-bottom: none; }
+.sc-hero-grid-layout { grid-template-columns: minmax(0, 1.1fr) minmax(0, 0.9fr); gap: 64px; }
+.sc-hero-kicker {
+  padding: 0;
+  background: none;
+  border: none;
+  font-size: 0.68rem;
+  letter-spacing: 0.14em;
+  margin-bottom: 26px;
+}
+.sc-hero-kicker i { border-radius: 0; width: 6px; height: 6px; }
+.sc-hero-name {
+  font-weight: 400;
+  font-size: clamp(2.6rem, 5vw, 4.2rem);
+  line-height: 1.04;
+  letter-spacing: -0.035em;
+}
+.sc-hero-line { margin-top: 22px; max-width: 46ch; font: 400 0.9rem/1.75 var(--font-mono); }
+.sc-hero-line em { font-weight: 500; }
+.sc-hero-ctas { gap: 10px; margin-top: 30px; }
+.sc-hero-visual { display: grid; place-items: center; }
+.qp-sphere { display: block; width: min(400px, 100%); aspect-ratio: 1; }
+
+/* Flagship index under the hero: a quiet row, not four boxed cards */
+.sc-hero-bottom { margin-top: 72px; }
+.sc-feed-wrap { padding-top: 18px; }
+.sc-feed { gap: 0; }
+.sc-feed-card {
+  border: none;
+  border-left: 1px solid var(--at-line);
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+  padding: 6px 20px 4px;
+}
+.sc-feed-card:first-child { border-left: none; padding-left: 0; }
+.sc-feed-card:hover, .sc-feed-card:focus-visible { background: transparent; translate: none; box-shadow: none; }
+.sc-feed-card:hover strong { color: var(--at-cobalt); }
+.sc-feed-status i { border-radius: 0; background: var(--at-cobalt); }
+.sc-feed-card strong { font-weight: 500; }
+.sc-feed-metric { border-top: none; padding-top: 4px; }
+
+/* Brief: statement in plain sans, receipts as a mono spec table ---------- */
+.sc-brief { padding-block: 40px 24px; }
+.sc-brief .sc-statement { font-weight: 400; font-size: clamp(1.4rem, 2.5vw, 2rem); line-height: 1.3; }
+.sc-receipts { background: transparent; border-top: 1px solid var(--at-line); border-bottom: none; }
+.sc-receipts > div { padding: 16px 20px 0; }
+.sc-receipts > div:first-child { padding-left: 0; }
+.sc-receipts dt { font: 500 1.5rem/1 var(--font-display); color: var(--at-cobalt); }
+.sc-receipts dd { font: 400 0.76rem/1.55 var(--font-mono); }
+
+/* Selected work: the stage sits on a paper plate over a dithered band ---- */
+#projects.ed-section { padding-bottom: 0; }
+#projects .ed-section-heading { margin-bottom: 40px; }
+.qp-plate-band { position: relative; padding-block: 64px; }
+.qp-dither { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
+.qp-plate {
+  position: relative;
+  background: var(--qp-paper);
+  border: 1px solid var(--at-line-strong);
+  padding: clamp(10px, 1.6vw, 18px);
+}
+.qp-plate .st { box-shadow: none; border-color: var(--at-line); border-radius: 0; }
+.st-tabs { background: var(--qp-paper); }
+.st-tab:hover { background: #ffffff; }
+.st-headline {
+  font: 400 1rem/1.5 var(--font-display);
+  font-style: normal;
+  color: var(--at-obsidian);
+}
+.st-copy { font-size: 0.82rem; line-height: 1.7; }
+.st-eyebrow span { white-space: nowrap; }
+.st-eyebrow em { border: none; background: var(--qp-chip); border-radius: 0; }
+.st-eyebrow em i { border-radius: 0; background: var(--at-cobalt); }
+/* Stats as a mono spec table: label left, value right, hairlines between */
+.st-stats { display: block; border-block: none; margin-top: 18px; }
+.st-stats > div,
+.st-stats > div:first-child {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 8px 0;
+  border-left: none;
+  border-top: 1px dashed var(--at-line-strong);
+}
+.st-stats > div:last-child { border-bottom: 1px dashed var(--at-line-strong); }
+.st-stats dt { order: 2; font: 500 0.95rem/1 var(--font-mono); letter-spacing: 0; color: var(--at-cobalt); }
+.st-stats dd { order: 1; margin-top: 0; font-size: 0.66rem; letter-spacing: 0.08em; }
+.st-stack li { border: none; border-radius: 0; background: var(--qp-chip); text-transform: none; }
+
+/* What I bring: light, no obsidian panel --------------------------------- */
+.sc-caps-split { border: none; border-radius: 0; background: transparent; box-shadow: none; gap: 56px; }
+.sc-caps-panel { color: var(--at-obsidian); padding: 0; border-right: none; background: none; }
+.sc-caps-panel .ed-label { color: var(--at-obsidian); }
+.sc-caps-panel h2 { color: var(--at-obsidian); }
+.sc-caps-aside { color: var(--at-muted); font-size: 0.84rem; }
+.sc-cap-row { padding: 28px 0; background: transparent; border-top: 1px dashed var(--at-line-strong); }
+.sc-cap-row:first-child { border-top: 1px dashed var(--at-line-strong); }
+.sc-cap-row:last-child { border-bottom: 1px dashed var(--at-line-strong); }
+.sc-cap-row:hover { background: transparent; }
+.sc-cap-count { font-weight: 400; font-size: 2.6rem; }
+.sc-cap-row-body h3 { font-weight: 500; }
+.sc-cap-copy { font-size: 0.82rem; }
+.sc-cap-proof li a { border-radius: 0; border-color: transparent; background: var(--qp-chip); text-transform: none; letter-spacing: 0; }
+.sc-cap-proof li a:hover { border-color: transparent; background: var(--qp-chip-hover); color: var(--at-obsidian); }
+
+/* Cards: hairline frame, paper mat instead of a black one ---------------- */
+.sc-card { border-color: var(--at-line); border-radius: 0; background: var(--qp-paper); }
+.sc-card:hover, .sc-card:focus-visible { translate: none; box-shadow: none; border-color: var(--at-cobalt); }
+.sc-card-plate { background: transparent; padding: 0; border-bottom: 1px solid var(--at-line); }
+.sc-card-media { border: none; background: var(--at-stone); }
+.sc-card-media img.is-poster { background: var(--at-stone); }
+.sc-card:hover .sc-card-media img { transform: none; }
+.sc-card-plate-bar { padding: 9px 14px; }
+.sc-card-kind { color: var(--at-cobalt); }
+.sc-card-status-chip { color: var(--at-muted); }
+.sc-card-body h3 { font-weight: 500; font-size: 1.15rem; }
+.sc-card-metric { border-top: 1px dashed var(--at-line-strong); }
+.sc-card-metric strong { font-weight: 500; font-size: 1.35rem; }
+.sc-card-line { font-size: 0.8rem; line-height: 1.7; }
+.sc-also { border-color: var(--at-line); border-radius: 0; background: var(--qp-paper); }
+
+/* Contact and footer: light, on the same paper ----------------------------- */
+.ed-contact { color: var(--at-obsidian); border-top: none; padding-top: 0; }
+.ed-contact .ed-label { color: var(--at-obsidian); }
+.ed-contact h2 { color: var(--at-obsidian); }
+.ed-contact :focus-visible { outline-color: var(--at-cobalt); }
+.qp-band-slim { position: relative; height: 112px; margin-bottom: 96px; }
+.sc-email { font-weight: 400; color: var(--at-obsidian); border-bottom: 1px solid var(--at-cobalt); }
+.sc-email:hover, .sc-email:focus-visible { color: var(--at-cobalt); }
+.sc-contact-card { background: var(--qp-paper); border: 1px solid var(--at-line); border-top: 1px solid var(--at-line); border-radius: 0; }
+.sc-contact-card-kicker i { border-radius: 0; background: var(--at-cobalt); }
+.sc-contact-card-copy { font-size: 0.82rem; }
+.sc-footer-cols { border-top: 1px solid var(--at-line); }
+.sc-footer-cols h3 { color: var(--at-muted); }
+.sc-footer-cols a { color: var(--at-obsidian); font-size: 0.82rem; }
+.sc-footer-cols a:hover { color: var(--at-cobalt); }
+.ed-footer { border-top: 1px solid var(--at-line); color: var(--at-muted); }
+.ed-footer button { border-color: transparent; background: var(--qp-chip); color: var(--at-obsidian); border-radius: 0; text-transform: none; letter-spacing: 0; }
+.ed-footer button:hover { border-color: transparent; background: var(--qp-chip-hover); color: var(--at-obsidian); }
+
+@media (max-width: 900px) {
+  .sc-hero { padding-top: 104px; }
+  .sc-hero-grid-layout { grid-template-columns: 1fr; gap: 32px; }
+  .qp-sphere { width: min(280px, 80%); }
+  .sc-feed-card { border-left: none; border-top: 1px solid var(--at-line); padding: 12px 0; }
+  .sc-caps-split { gap: 32px; }
+}
+@media (max-width: 640px) {
+  .ed-section { padding-block: 80px; }
+  .qp-plate-band { padding-block: 32px; }
+  .qp-plate { padding: 6px; }
+  .qp-band-slim { height: 72px; margin-bottom: 64px; }
+  .sc-receipts > div { padding-left: 0; }
+}
