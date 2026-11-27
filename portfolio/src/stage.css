@@ -209,7 +209,7 @@
 .st-flight-detail code.is-del { color: #f87171; background: rgba(248, 113, 113, 0.1); }
 .st-demo-foot { display: flex; align-items: center; justify-content: space-between; gap: 12px; font: 0.62rem var(--font-mono); text-transform: uppercase; letter-spacing: 0.1em; color: #9ca3af; }
 .st-demo-foot button { display: inline-flex; align-items: center; gap: 6px; min-height: 28px; padding: 0 10px; border: 1px solid rgba(244, 243, 239, 0.25); color: #f4f3ef; font: inherit; text-transform: inherit; }
-.st-demo-foot button:hover { border-color: #f59e0b; color: #f59e0b; }
+.st-demo-foot button:hover { border-color: #628cff; color: #628cff; }
 
 /* PRH-JEPA figure */
 .st-frame.is-paper .st-frame-body { flex-direction: column; background: #ffffff; }
@@ -221,7 +221,7 @@
 .st-clip button.is-on i { background: #3b82f6; }
 .st-clip button.is-on i::after { translate: 16px 0; }
 .st-clip-bar { height: 8px; background: rgba(244, 243, 239, 0.16); overflow: hidden; }
-.st-clip-bar span { display: block; height: 100%; width: 100%; transform-origin: left center; background: #f59e0b; transition: transform var(--dur-slow) var(--ease-out); }
+.st-clip-bar span { display: block; height: 100%; width: 100%; transform-origin: left center; background: var(--at-cobalt, #1d4ed8); transition: transform var(--dur-slow) var(--ease-out); }
 .st-clip-caption { position: relative; display: grid; font: 600 0.72rem var(--font-mono); color: #f4f3ef; min-width: 9.5em; text-align: right; }
 .st-clip-caption span { grid-area: 1 / 1; opacity: 0; transition: opacity var(--dur-base); }
 .st-clip-caption span.is-shown { opacity: 1; }

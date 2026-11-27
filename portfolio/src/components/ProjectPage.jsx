@@ -100,10 +100,29 @@ function PageTitle({ project }) {
   return <FlourishTitle text={project.title} accent={project.accent} />;
 }
 
+// Which plate a dot-matrix print sits on, read from its top-left pixel.
+function plateOf(img) {
+  try {
+    const c = Object.assign(document.createElement("canvas"), { width: 1, height: 1 });
+    const x = c.getContext("2d");
+    x.drawImage(img, 0, 0, 1, 1, 0, 0, 1, 1);
+    const [r, g, b] = x.getImageData(0, 0, 1, 1).data;
+    // Snap to the two plates the script draws on, so a dot's edge in the
+    // corner cannot tint the frame.
+    return r + g + b < 384 ? "#111318" : "#f4f3ef";
+  } catch {
+    return "#f4f3ef";
+  }
+}
+
 function SignatureArtwork({ project, reduced, heroArt }) {
   const real = REAL_HEADERS[project.slug];
   const poster = POSTERS[project.slug] || real?.src;
   const art = poster || project.heroArt || project.spotlightArt || project.cardArt;
+  // Dot-matrix prints sit on a flat plate, so they are shown whole and the
+  // frame is filled with that plate's colour instead of cropping the print.
+  const dotted = !poster && !real && /\/shots\/(refined|spotlight)\//.test(art);
+  const [plate, setPlate] = useState("#f4f3ef");
   if (!art || (!poster && !real && art === heroArt && !PREVIEWABLE_PROJECTS.has(project.slug))) return null;
   return (
     <motion.figure
@@ -114,7 +133,7 @@ function SignatureArtwork({ project, reduced, heroArt }) {
       transition={{ duration: DUR.slow, ease: EASE.out }}
     >
       <div className="project-signature-frame">
-        <img src={media(art)} style={real?.whole ? { objectFit: "contain", background: "#fff" } : undefined} alt={real ? real.alt : poster ? `${project.title}: the evidence, drawn from the study's own numbers` : project.heroAlt || `${project.title} conceptual artwork`} loading="eager" />
+        <img src={media(art)} style={real?.whole ? { objectFit: "contain", background: "#fff" } : dotted ? { objectFit: "contain", background: plate } : undefined} onLoad={dotted ? (e) => setPlate(plateOf(e.currentTarget)) : undefined} alt={real ? real.alt : poster ? `${project.title}: the evidence, drawn from the study's own numbers` : project.heroAlt || `${project.title} conceptual artwork`} loading="eager" />
         {!poster && <ProjectMotionPreview project={project} active expanded />}
       </div>
       <figcaption>{real ? real.caption : poster ? `${project.title} · drawn from its own numbers` : project.heroCaption || (project.slug === "site-recon" ? "A public page, separated into the evidence a browser can verify." : `${project.title} · project visual`)}</figcaption>
@@ -401,7 +420,7 @@ export default function ProjectPage({ slug }) {
         <div className="panel project-panel rounded-2xl p-8">
           <h1 className="font-display text-2xl font-semibold text-[color:var(--ink-100)]">I couldn't find that project</h1>
           <p className="mt-2 text-[color:var(--ink-200)]">It may have moved. Every project is in the full list.</p>
-          <a href="/work/" className="mt-5 inline-flex min-h-11 items-center gap-2 text-[#ff8a5f] font-mono text-xs uppercase tracking-[.12em]">
+          <a href="/work/" className="mt-5 inline-flex min-h-11 items-center gap-2 text-[#1d4ed8] font-mono text-xs uppercase tracking-[.12em] hover:underline">
             <ArrowLeft size={14} aria-hidden="true" /> All projects
           </a>
         </div>

@@ -26,7 +26,9 @@ test('a card opens its project without a page load, and Back returns home', asyn
   await page.goto('/');
   await page.addStyleTag({ content: '.bb8-edge { display: none !important; }' });
   await page.evaluate(() => { window.__sameDocument = true; });
-  await page.locator('a[href="/work/jarvis/"]').first().click({ force: true });
+  // The stage keeps every project's panel in the page and hides all but
+  // one, so click a Jarvis link a visitor can actually see.
+  await page.locator('a[href="/work/jarvis/"]:visible').first().click({ force: true });
   await expect(page).toHaveURL(/\/work\/jarvis\/$/);
   await expect(page.getByRole('heading', { name: 'Jarvis', level: 1 })).toBeVisible();
   expect(await page.evaluate(() => window.__sameDocument)).toBe(true);
