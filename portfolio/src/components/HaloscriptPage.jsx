@@ -4,7 +4,7 @@ import { DEPTH } from "../data/depth";
 const IMG = (name) => `${import.meta.env.BASE_URL}shots/haloscript/${name}`;
 const SITE_URL = "https://ansarbuilds.github.io/haloscript-site/";
 const APP_STORE_URL = "https://apps.apple.com/ca/app/haloscript/id6820670080";
-const CORAL_INK = "#a8323c";
+const ACCENT = "#1d4ed8";
 const D = DEPTH.haloscript;
 
 const STATS = [
@@ -78,7 +78,7 @@ const LESSONS = [
 function Shot({ src, alt, className = "" }) {
   return (
     <img src={IMG(src)} alt={alt} loading="lazy"
-      className={`w-full border border-black bg-white shadow-[8px_8px_0_#000] ${className}`} />
+      className={`w-full border border-[#111318]/25 bg-[#111318] shadow-[0_14px_34px_-22px_rgba(17,19,24,0.3)] ${className}`} />
   );
 }
 
@@ -87,32 +87,32 @@ function Shot({ src, alt, className = "" }) {
    design are shown here. */
 export default function HaloscriptPage() {
   return (
-    <div className="bg-transparent text-black">
+    <div className="bg-transparent text-[#111318]">
       <header className="mx-auto max-w-5xl px-5 pt-24 sm:px-8 sm:pt-28">
-        <a href="#card-haloscript" className="inline-flex items-center gap-1.5 font-mono text-xs uppercase tracking-[.12em]" style={{ color: CORAL_INK }}>
+        <a href="#card-haloscript" className="inline-flex items-center gap-1.5 font-mono text-xs uppercase tracking-[.12em]" style={{ color: ACCENT }}>
           <ArrowLeft size={13} /> Back to projects
         </a>
         <div className="mt-8 flex items-center gap-4">
-          <img src={IMG("icon.png")} alt="Haloscript app icon" className="h-16 w-16 border border-black shadow-[4px_4px_0_#000] sm:h-20 sm:w-20" />
+          <img src={IMG("icon.png")} alt="Haloscript app icon" className="h-16 w-16 border border-[#111318]/25 sm:h-20 sm:w-20" />
           <div>
-            <h1 className="font-display text-4xl font-normal tracking-tight text-black sm:text-5xl">Haloscript</h1>
-            <p className="mt-1 font-mono text-xs uppercase tracking-[.12em]" style={{ color: CORAL_INK }}>
+            <h1 className="font-display text-4xl font-medium tracking-tight text-[#111318] sm:text-5xl">Haloscript</h1>
+            <p className="mt-1 font-mono text-xs uppercase tracking-[.12em]" style={{ color: ACCENT }}>
               Mac · iPad · iPhone · Live on the App Store
             </p>
           </div>
         </div>
-        <p className="mt-6 max-w-3xl text-base leading-relaxed text-[#2b2b2b]">
+        <p className="mt-6 max-w-3xl text-base leading-relaxed text-[#2a2e39]">
           A writing app for novelists, with an infinite whiteboard beside the manuscript. Plan on a corkboard, keep a Story
           Bible, sketch with Apple Pencil, and write in a focused editor. Everything syncs privately through the writer's own
           iCloud. No accounts, no ads, no analytics.
         </p>
         <div className="mt-6 flex flex-wrap gap-3">
-          <a href={APP_STORE_URL} target="_blank" rel="noopener noreferrer" className="inline-flex min-h-11 items-center gap-2 border border-black bg-[#e57981] px-5 py-3 font-mono text-xs font-semibold uppercase tracking-[.06em] text-black shadow-[4px_4px_0_#000] hover:bg-[#d35f68]">Get it on the App Store <ArrowUpRight size={15} /></a>
+          <a href={APP_STORE_URL} target="_blank" rel="noopener noreferrer" className="inline-flex min-h-11 items-center gap-2 border border-[#1d4ed8] bg-[#1d4ed8] px-5 py-3 font-mono text-xs font-medium uppercase tracking-[.06em] text-white hover:bg-[#1e40af]">Get it on the App Store <ArrowUpRight size={15} /></a>
           <a href={SITE_URL} target="_blank" rel="noopener noreferrer"
-            className="inline-flex min-h-11 items-center gap-2 border border-black bg-[#eceae8] px-5 py-3 font-mono text-xs font-medium uppercase tracking-[.06em] text-black hover:bg-[#e1dfdd] hover:shadow-[2px_2px_0_#000]">
+            className="inline-flex min-h-11 items-center gap-2 border border-[#111318]/25 bg-white px-5 py-3 font-mono text-xs font-medium uppercase tracking-[.06em] text-[#111318] hover:border-[#1d4ed8] hover:text-[#1d4ed8]">
             Support and privacy <ArrowUpRight size={15} />
           </a>
-          <a href="#contact" className="inline-flex min-h-11 items-center gap-2 border border-black bg-[#eceae8] px-4 py-2.5 font-mono text-xs uppercase tracking-[.06em] text-black hover:bg-[#e1dfdd] hover:shadow-[2px_2px_0_#000]">
+          <a href="#contact" className="inline-flex min-h-11 items-center gap-2 border border-[#111318]/25 bg-white px-4 py-2.5 font-mono text-xs uppercase tracking-[.06em] text-[#111318] hover:border-[#1d4ed8] hover:text-[#1d4ed8]">
             <Lock size={14} /> Source is private. Walkthrough on request.
           </a>
         </div>
@@ -122,56 +122,56 @@ export default function HaloscriptPage() {
       <article className="mx-auto max-w-5xl px-5 pb-24 sm:px-8">
         <dl className="mt-12 grid grid-cols-2 gap-4 sm:grid-cols-4">
           {STATS.map(([big, small]) => (
-            <div key={small} className="border border-black bg-white p-4 shadow-[4px_4px_0_#000]">
-              <dt className="font-display text-3xl font-normal text-black">{big}</dt>
-              <dd className="mt-1 text-xs leading-snug text-[#545454]">{small}</dd>
+            <div key={small} className="border border-[#111318]/25 bg-white p-4">
+              <dt className="font-display text-3xl font-medium text-[#111318]">{big}</dt>
+              <dd className="mt-1 text-xs leading-snug text-[#4b5262]">{small}</dd>
             </div>
           ))}
         </dl>
 
-        <h2 className="mt-20 font-display text-3xl font-normal text-black">On the Mac</h2>
+        <h2 className="mt-20 font-display text-3xl font-medium text-[#111318]">On the Mac</h2>
         <div className="mt-6 grid gap-8 sm:grid-cols-2">
           {MAC.map(([img, title, cap]) => (
             <figure key={img}>
               <Shot src={img} alt={`${title} on the Mac`} />
-              <figcaption className="mt-3 text-[#545454]"><span className="font-semibold text-black">{title}.</span> {cap}</figcaption>
+              <figcaption className="mt-3 text-[#4b5262]"><span className="font-semibold text-[#111318]">{title}.</span> {cap}</figcaption>
             </figure>
           ))}
         </div>
         <figure className="mt-8">
           <Shot src="whiteboard_mac.jpg" alt="The infinite whiteboard on the Mac" />
-          <figcaption className="mt-3 text-[#545454]"><span className="font-semibold text-black">Whiteboard.</span> An infinite canvas for notes, shapes, connectors, charts and freehand ink, with a plot board linked to every novel.</figcaption>
+          <figcaption className="mt-3 text-[#4b5262]"><span className="font-semibold text-[#111318]">Whiteboard.</span> An infinite canvas for notes, shapes, connectors, charts and freehand ink, with a plot board linked to every novel.</figcaption>
         </figure>
 
-        <h2 className="mt-20 font-display text-3xl font-normal text-black">On the iPad, with Apple Pencil</h2>
+        <h2 className="mt-20 font-display text-3xl font-medium text-[#111318]">On the iPad, with Apple Pencil</h2>
         <div className="mt-6 grid grid-cols-3 gap-4">
           {IPAD.map(([img, alt]) => (
             <figure key={img}>
               <Shot src={img} alt={alt} />
-              <figcaption className="mt-2 text-xs text-[#545454]">{alt}</figcaption>
+              <figcaption className="mt-2 text-xs text-[#4b5262]">{alt}</figcaption>
             </figure>
           ))}
         </div>
 
-        <h2 className="mt-20 font-display text-3xl font-normal text-black">On the iPhone</h2>
+        <h2 className="mt-20 font-display text-3xl font-medium text-[#111318]">On the iPhone</h2>
         <div className="mt-6 grid max-w-2xl grid-cols-3 gap-4">
           {IPHONE.map(([img, alt]) => (
             <figure key={img}>
               <Shot src={img} alt={`iPhone: ${alt}`} />
-              <figcaption className="mt-2 text-xs text-[#545454]">{alt}</figcaption>
+              <figcaption className="mt-2 text-xs text-[#4b5262]">{alt}</figcaption>
             </figure>
           ))}
         </div>
 
-        <h2 className="mt-20 font-display text-3xl font-normal text-black">What it does</h2>
+        <h2 className="mt-20 font-display text-3xl font-medium text-[#111318]">What it does</h2>
         <div className="mt-6 grid gap-5 sm:grid-cols-2">
           {FEATURES.map(([head, items]) => (
-            <section key={head} className="border border-black bg-white p-5 shadow-[8px_8px_0_#000]">
-              <h3 className="font-display text-xl font-medium text-black">{head}</h3>
-              <ul className="mt-3 space-y-2 text-sm leading-relaxed text-[#2b2b2b]">
+            <section key={head} className="border border-[#111318]/25 bg-white p-5">
+              <h3 className="font-display text-xl font-medium text-[#111318]">{head}</h3>
+              <ul className="mt-3 space-y-2 text-sm leading-relaxed text-[#2a2e39]">
                 {items.map((t) => (
                   <li key={t} className="flex gap-3">
-                    <span className="mt-2 h-1.5 w-1.5 shrink-0" style={{ background: "#e57981" }} />
+                    <span className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full" style={{ background: ACCENT }} />
                     <span>{t}</span>
                   </li>
                 ))}
@@ -180,65 +180,65 @@ export default function HaloscriptPage() {
           ))}
         </div>
 
-        <h2 className="mt-20 font-display text-3xl font-normal text-black">How it's built</h2>
-        <p className="mt-3 max-w-3xl leading-relaxed text-[#2b2b2b]">
+        <h2 className="mt-20 font-display text-3xl font-medium text-[#111318]">How it's built</h2>
+        <p className="mt-3 max-w-3xl leading-relaxed text-[#2a2e39]">
           One SwiftUI app target runs on macOS, iPadOS and iOS. The same SwiftData models drive every screen, and CloudKit
           syncs them through the writer's private iCloud, so there's no server of mine anywhere in the loop. The hard part
           was making sync safe when two devices edit at once.
         </p>
-        <figure className="mt-6 overflow-hidden border border-black bg-white shadow-[8px_8px_0_#000]">
+        <figure className="mt-6 overflow-hidden border border-[#111318]/25 bg-white">
           <img src={IMG("architecture.svg")} alt="Architecture: Mac, iPad and iPhone share one SwiftUI app and SwiftData models, synced through private iCloud. Whiteboard elements merge per element; scene text keeps the other version as a snapshot." className="w-full" loading="lazy" />
         </figure>
-        <p className="mt-4 max-w-3xl text-sm leading-relaxed text-[#545454]">
+        <p className="mt-4 max-w-3xl text-sm leading-relaxed text-[#4b5262]">
           Platform-independent logic (word counting, streaks, search and replace, stylus pressure, and the ZIP, DOCX and ePub
           writers) is covered by a test script that runs without an Xcode test target.
         </p>
 
-        <h2 className="mt-20 font-display text-3xl font-normal text-black">Road to launch</h2>
+        <h2 className="mt-20 font-display text-3xl font-medium text-[#111318]">Road to launch</h2>
         <ol className="mt-6 space-y-3">
           {ROAD.map(([state, text]) => (
             <li key={text} className="flex items-start gap-3">
-              <span className={`mt-0.5 inline-flex h-6 shrink-0 items-center border border-black px-2.5 font-mono text-[10px] font-semibold uppercase tracking-[.1em] ${state === "done" ? "bg-[#e57981] text-black" : "bg-[#eceae8] text-black"}`}>
+              <span className={`mt-0.5 inline-flex h-6 shrink-0 items-center border px-2.5 font-mono text-[10px] font-semibold uppercase tracking-[.1em] ${state === "done" ? "border-[#1d4ed8] bg-[#1d4ed8] text-white" : "border-[#111318]/25 bg-[#f4f3ef] text-[#111318]"}`}>
                 {state === "done" ? "Done" : "Next"}
               </span>
-              <span className="leading-relaxed text-[#2b2b2b]">{text}</span>
+              <span className="leading-relaxed text-[#2a2e39]">{text}</span>
             </li>
           ))}
         </ol>
 
-        <h2 className="mt-20 font-display text-3xl font-normal text-black">How I found the problem</h2>
-        <p className="mt-4 text-base leading-relaxed text-[#2b2b2b]">{D.found}</p>
+        <h2 className="mt-20 font-display text-3xl font-medium text-[#111318]">How I found the problem</h2>
+        <p className="mt-4 text-base leading-relaxed text-[#2a2e39]">{D.found}</p>
 
-        <h2 className="mt-16 font-display text-3xl font-normal text-black">Trade-offs I made</h2>
+        <h2 className="mt-16 font-display text-3xl font-medium text-[#111318]">Trade-offs I made</h2>
         <ul className="mt-6 space-y-3">
           {D.tradeoffs.map((t) => (
-            <li key={t.chose} className="border border-black bg-white p-5 leading-relaxed shadow-[4px_4px_0_#000]">
-              <span className="font-semibold" style={{ color: CORAL_INK }}>{t.chose}</span>
-              <span className="text-[#545454]"> over </span>
-              <span className="font-semibold text-black">{t.over}</span>
-              <span className="mt-1.5 block text-sm text-[#2b2b2b]">Because {t.because}</span>
+            <li key={t.chose} className="border border-[#111318]/25 bg-white p-5 leading-relaxed">
+              <span className="font-semibold" style={{ color: ACCENT }}>{t.chose}</span>
+              <span className="text-[#4b5262]"> over </span>
+              <span className="font-semibold text-[#111318]">{t.over}</span>
+              <span className="mt-1.5 block text-sm text-[#2a2e39]">Because {t.because}</span>
             </li>
           ))}
         </ul>
 
-        <h2 className="mt-16 font-display text-3xl font-normal text-black">{D.ai.label}</h2>
-        <p className="mt-4 text-base leading-relaxed text-[#2b2b2b]">{D.ai.text}</p>
+        <h2 className="mt-16 font-display text-3xl font-medium text-[#111318]">{D.ai.label}</h2>
+        <p className="mt-4 text-base leading-relaxed text-[#2a2e39]">{D.ai.text}</p>
 
-        <h2 className="mt-20 font-display text-3xl font-normal text-black">What I learned</h2>
+        <h2 className="mt-20 font-display text-3xl font-medium text-[#111318]">What I learned</h2>
         <ul className="mt-6 grid gap-5 sm:grid-cols-2">
           {LESSONS.map(([head, body]) => (
-            <li key={head} className="border border-black bg-white p-5 shadow-[4px_4px_0_#000]">
-              <p className="font-display text-lg font-medium text-black">{head}</p>
-              <p className="mt-1 text-sm leading-relaxed text-[#545454]">{body}</p>
+            <li key={head} className="border border-[#111318]/25 bg-white p-5">
+              <p className="font-display text-lg font-medium text-[#111318]">{head}</p>
+              <p className="mt-1 text-sm leading-relaxed text-[#4b5262]">{body}</p>
             </li>
           ))}
         </ul>
 
         <div className="mt-16 flex flex-wrap items-center gap-4">
-          <a href={APP_STORE_URL} target="_blank" rel="noopener noreferrer" className="inline-flex min-h-11 items-center gap-2 border border-black bg-[#e57981] px-5 py-3 font-mono text-xs font-semibold uppercase tracking-[.06em] text-black shadow-[4px_4px_0_#000] hover:bg-[#d35f68]">
+          <a href={APP_STORE_URL} target="_blank" rel="noopener noreferrer" className="inline-flex min-h-11 items-center gap-2 border border-[#1d4ed8] bg-[#1d4ed8] px-5 py-3 font-mono text-xs font-medium uppercase tracking-[.06em] text-white hover:bg-[#1e40af]">
             Get Haloscript on the App Store
           </a>
-          <a href="#card-haloscript" className="inline-flex min-h-11 items-center border border-black bg-[#eceae8] px-4 py-2.5 font-mono text-xs uppercase tracking-[.06em] text-black hover:bg-[#e1dfdd] hover:shadow-[2px_2px_0_#000]">Back to projects</a>
+          <a href="#card-haloscript" className="inline-flex min-h-11 items-center border border-[#111318]/25 bg-white px-4 py-2.5 font-mono text-xs uppercase tracking-[.06em] text-[#111318] hover:border-[#1d4ed8] hover:text-[#1d4ed8]">Back to projects</a>
         </div>
       </article>
     </div>

@@ -444,13 +444,8 @@ function Backdrop() {
   if (route === "explore" || route === "lineage-demo" || route === "infinity") {
     return <div className="fixed inset-0 z-0 bg-[#02050c]" aria-hidden="true" />;
   }
-  // Everything else sits on warm paper with the tiled grain overlay.
-  return (
-    <>
-      <div className="fixed inset-0 z-0 bg-[#f8f6f4]" aria-hidden="true" />
-      <div className="md-grain-layer" aria-hidden="true" />
-    </>
-  );
+  // Everything else sits on alabaster stone with a subtle architectural drafting grid.
+  return <div className="at-grid-backdrop" aria-hidden="true" />;
 }
 
 // BB-8 brings three.js with it, the heaviest chunk on the page. Waiting for
@@ -494,7 +489,7 @@ function AppShell({ bootDone, held, onBoot, heroRun }) {
   const companionReady = useIdleAfterFirstInput(bootDone);
   return (
       <RouteProvider>
-        <div className="relative bg-[#f8f6f4] text-black min-h-[100dvh]">
+        <div className="relative bg-[#f4f3ef] text-[#111318] min-h-[100dvh]">
           <Backdrop />
           <div className="relative z-10">
             <a className="skip-link" href="#main-content" onClick={(event) => { event.preventDefault(); document.getElementById("main-content")?.focus(); }}>Skip to main content</a>

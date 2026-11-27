@@ -368,7 +368,7 @@ function ToolList({ tools, usage = {}, accent }) {
 function LinkButton({ link }) {
   if (link.locked) {
     return (
-      <a href={link.href} className="inline-flex min-h-11 items-center gap-2 px-4 py-2.5 border border-black bg-[#eceae8] text-black font-mono text-xs uppercase tracking-[.06em] transition-[background,box-shadow] duration-200 hover:bg-[#e1dfdd] hover:shadow-[2px_2px_0_#000]">
+      <a href={link.href} className="inline-flex min-h-11 items-center gap-2 px-4 py-2.5 border border-[#111318]/25 bg-[#f4f3ef] text-[#111318] font-mono text-xs uppercase tracking-[.06em] transition-colors duration-200 hover:border-[#1d4ed8] hover:text-[#1d4ed8]">
         <Lock size={14} /> {link.label}
       </a>
     );
@@ -379,8 +379,8 @@ function LinkButton({ link }) {
       {...(link.external ? { target: "_blank", rel: "noopener noreferrer" } : {})}
       className={
         link.primary
-          ? "inline-flex min-h-11 items-center gap-2 px-5 py-3 border border-black bg-[#e57981] text-black font-mono font-semibold text-xs uppercase tracking-[.06em] shadow-[4px_4px_0_#000] transition-[background,box-shadow,translate] duration-200 hover:bg-[#d35f68] hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-[6px_6px_0_#000]"
-          : "inline-flex min-h-11 items-center gap-2 px-4 py-2.5 border border-black bg-[#eceae8] text-black font-mono text-xs uppercase tracking-[.06em] transition-[background,box-shadow] duration-200 hover:bg-[#e1dfdd] hover:shadow-[2px_2px_0_#000]"
+          ? "inline-flex min-h-11 items-center gap-2 px-5 py-3 border border-[#1d4ed8] bg-[#1d4ed8] text-white font-mono font-medium text-xs uppercase tracking-[.06em] transition-colors duration-200 hover:bg-[#1e40af]"
+          : "inline-flex min-h-11 items-center gap-2 px-4 py-2.5 border border-[#111318]/25 bg-white text-[#111318] font-mono text-xs uppercase tracking-[.06em] transition-colors duration-200 hover:border-[#1d4ed8] hover:text-[#1d4ed8]"
       }
     >
       {link.label} <ArrowUpRight size={15} />
@@ -509,10 +509,10 @@ export default function ProjectPage({ slug }) {
         </div>
       )}
 
-      {summary && <section aria-labelledby="case-summary-title" className="mt-6 border border-black bg-white p-6 sm:p-8 shadow-[8px_8px_0_#000]">
-        <h2 id="case-summary-title" className="font-display text-2xl font-normal tracking-tight text-black">At a glance</h2>
+      {summary && <section aria-labelledby="case-summary-title" className="mt-6 border border-[#111318]/25 bg-white p-6 sm:p-8 shadow-[0_12px_32px_-22px_rgba(17,19,24,0.16)]">
+        <h2 id="case-summary-title" className="font-display text-2xl font-medium tracking-tight text-[#111318]">At a glance</h2>
         <dl className="mt-4 grid gap-4 sm:grid-cols-2">
-          {[["Problem", summary.problem], ["My role", project.role], ["Outcome", summary.outcome], ["Proof", summary.proof], ["Limits", summary.limits], ["Status", project.status]].map(([label, value]) => <div key={label} className="border-t border-dashed border-black/30 pt-3"><dt className="font-mono text-xs uppercase tracking-wide text-[#545454]">{label}</dt><dd className="mt-1 text-sm leading-relaxed text-black">{value}</dd></div>)}
+          {[["Problem", summary.problem], ["My role", project.role], ["Outcome", summary.outcome], ["Proof", summary.proof], ["Limits", summary.limits], ["Status", project.status]].map(([label, value]) => <div key={label} className="border-t border-[#111318]/15 pt-3"><dt className="font-mono text-xs uppercase tracking-wide text-[#4b5262]">{label}</dt><dd className="mt-1 text-sm leading-relaxed text-[#111318]">{value}</dd></div>)}
         </dl>
       </section>}
 

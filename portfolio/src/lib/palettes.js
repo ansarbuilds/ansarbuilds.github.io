@@ -1,29 +1,29 @@
-/* Engineering-print paper palette across every section.
-   paper     warm paper surface (#f8f6f4), and light text on black panels
-   ink       pure black ink (#000000), and black panel backgrounds
-   accent    coral fill (#e57981 / #d35f68) for buttons, bars, dots
-   accentInk high-contrast coral ink on paper (>= 4.5:1 against paper)
-   onDark    coral on black (>= 4.5:1 against ink) */
+/* Precision Instrument & Monograph Palette.
+   paper     alabaster stone (#f4f3ef), and light text on obsidian panels
+   ink       deep slate-obsidian (#111318), and dark instrument panels
+   accent    international signal cobalt (#1d4ed8)
+   accentInk high-contrast cobalt on stone (>= 6.5:1 against paper)
+   onDark    signal amber (#f59e0b) on obsidian (>= 9.5:1 against ink) */
 export const PALETTES = {
-  lumen:     { paper: "#f8f6f4", ink: "#000000", accent: "#e57981", accentInk: "#a8323c", onDark: "#e57981" },
-  bloom:     { paper: "#f8f6f4", ink: "#000000", accent: "#e57981", accentInk: "#a8323c", onDark: "#e57981" },
-  lumora:    { paper: "#f8f6f4", ink: "#000000", accent: "#e57981", accentInk: "#a8323c", onDark: "#e57981" },
-  neon:      { paper: "#f8f6f4", ink: "#000000", accent: "#e57981", accentInk: "#a8323c", onDark: "#e57981" },
-  choreo:    { paper: "#f8f6f4", ink: "#000000", accent: "#e57981", accentInk: "#a8323c", onDark: "#e57981" },
-  field:     { paper: "#f8f6f4", ink: "#000000", accent: "#e57981", accentInk: "#a8323c", onDark: "#e57981" },
-  blueBloom: { paper: "#f8f6f4", ink: "#000000", accent: "#d35f68", accentInk: "#a8323c", onDark: "#e57981" },
+  lumen:     { paper: "#f4f3ef", ink: "#111318", accent: "#1d4ed8", accentInk: "#1d4ed8", onDark: "#f59e0b" },
+  bloom:     { paper: "#f4f3ef", ink: "#111318", accent: "#1d4ed8", accentInk: "#1d4ed8", onDark: "#f59e0b" },
+  lumora:    { paper: "#f4f3ef", ink: "#111318", accent: "#1d4ed8", accentInk: "#1d4ed8", onDark: "#f59e0b" },
+  neon:      { paper: "#f4f3ef", ink: "#111318", accent: "#1d4ed8", accentInk: "#1d4ed8", onDark: "#f59e0b" },
+  choreo:    { paper: "#f4f3ef", ink: "#111318", accent: "#1d4ed8", accentInk: "#1d4ed8", onDark: "#f59e0b" },
+  field:     { paper: "#f4f3ef", ink: "#111318", accent: "#1d4ed8", accentInk: "#1d4ed8", onDark: "#f59e0b" },
+  blueBloom: { paper: "#f4f3ef", ink: "#111318", accent: "#1d4ed8", accentInk: "#1d4ed8", onDark: "#f59e0b" },
 };
 
 export const DEFAULT_PALETTE = "lumen";
 
 export const PALETTE_LABELS = {
-  lumen:     { title: "Paper Print", paper: "Warm Paper", ink: "Black Ink", accent: "Coral" },
-  bloom:     { title: "Spec Sheet", paper: "Warm Paper", ink: "Black Ink", accent: "Coral" },
-  lumora:    { title: "Archive", paper: "Warm Paper", ink: "Black Ink", accent: "Coral" },
-  neon:      { title: "Playground", paper: "Warm Paper", ink: "Black Ink", accent: "Coral" },
-  choreo:    { title: "Case Study", paper: "Warm Paper", ink: "Black Ink", accent: "Coral" },
-  field:     { title: "Capabilities", paper: "Warm Paper", ink: "Black Ink", accent: "Coral" },
-  blueBloom: { title: "Colophon", paper: "Warm Paper", ink: "Black Ink", accent: "Coral Strong" },
+  lumen:     { title: "Atelier Stone", paper: "Alabaster", ink: "Obsidian", accent: "Cobalt" },
+  bloom:     { title: "Blueprint", paper: "Alabaster", ink: "Obsidian", accent: "Cobalt" },
+  lumora:    { title: "Monograph", paper: "Alabaster", ink: "Obsidian", accent: "Cobalt" },
+  neon:      { title: "Lab Room", paper: "Alabaster", ink: "Obsidian", accent: "Cobalt" },
+  choreo:    { title: "Case Study", paper: "Alabaster", ink: "Obsidian", accent: "Cobalt" },
+  field:     { title: "Instrument", paper: "Alabaster", ink: "Obsidian", accent: "Cobalt" },
+  blueBloom: { title: "Colophon", paper: "Alabaster", ink: "Obsidian", accent: "Cobalt" },
 };
 
 export const PALETTE_EVENT = "palettechange";

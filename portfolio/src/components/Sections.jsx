@@ -1,8 +1,7 @@
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { animate, motion, useAnimationFrame, useInView, useMotionValue, useReducedMotion, useScroll, useSpring, useTransform, useVelocity } from "framer-motion";
 import { ArrowDown, ArrowRight, ArrowUpRight, ExternalLink, Play } from "lucide-react";
-import DotMorphCanvas from "./DotMorphCanvas";
-import ScrambleText from "./ScrambleText";
+import TelemetryFieldCanvas from "./TelemetryFieldCanvas";
 import WorkStage from "./WorkStage";
 import { CODE, CONTACT, HERO, RECEIPTS } from "../data/content";
 import { EXPERIMENTS, LISTED_PROJECTS, getProject } from "../data/projectIndex";
@@ -18,9 +17,8 @@ import "../showcase.css";
 
 const revealImage = (event) => event.currentTarget.classList.add("is-loaded");
 
-/* IntersectionObserver scroll reveal using the clip-path slide-up keyframe
-   (0.62s cubic-bezier(.22,1,.36,1), staggered via --i). Reduced motion is
-   immediately visible from first paint. */
+/* Smooth editorial scroll reveal using IntersectionObserver.
+   Reduced motion is visible immediately from first paint. */
 function Enter({ children, className = "", index = 0, style, ...rest }) {
   const reduced = useReducedMotion();
   const ref = useRef(null);
@@ -28,8 +26,7 @@ function Enter({ children, className = "", index = 0, style, ...rest }) {
   useEffect(() => {
     const el = ref.current;
     if (!el || reduced) return undefined;
-    const rootHeight = window.innerHeight;
-    const threshold = Math.min(0.2, (rootHeight * 0.2) / Math.max(1, el.offsetHeight));
+    const threshold = 0.05;
     const observer = new IntersectionObserver(([entry]) => {
       if (!entry.isIntersecting) return;
       setShown(true);
@@ -41,29 +38,35 @@ function Enter({ children, className = "", index = 0, style, ...rest }) {
   return <div ref={ref} {...rest} style={{ "--i": index, ...style }} className={`rv ${className} ${shown || reduced ? "is-in" : ""}`}>{children}</div>;
 }
 
-/* Uppercase mono section label ("% LABEL") followed by a blinking 10px square cursor. */
+/* Precision architectural section index label */
 function IndexLabel({ number, children }) {
   return (
     <p className="ed-label">
-      <span>% {number}</span>
+      <span className="ed-label-num">{number}</span>
+      <span className="ed-label-rule" aria-hidden="true" />
       <span>{children}</span>
-      <span className="md-cursor-sq" aria-hidden="true" />
     </p>
   );
 }
 
-/* 'Backed by' style strip of four flagship projects under the hero. */
+/* Four-column precision index strip of flagship builds */
 const HERO_FEED = FLAGSHIPS.slice(0, 4);
 function HeroFeed({ appear, from }) {
   return (
     <div className="sc-feed-wrap">
-      <p className="sc-feed-kicker">% FEATURED BUILDS <span className="md-cursor-sq" aria-hidden="true" /></p>
+      <div className="sc-feed-head">
+        <p className="sc-feed-kicker"><span>01</span> Flagship index</p>
+        <a href="/work/" className="sc-feed-all">All {LISTED_PROJECTS.length} builds <ArrowUpRight size={13} aria-hidden="true" /></a>
+      </div>
       <nav className="sc-feed" aria-label="Flagship projects">
         {HERO_FEED.map((flag, i) => {
           const project = getProject(flag.slug);
           return project && (
             <motion.a key={flag.slug} href={`/work/${project.slug}/`} className="sc-feed-card" data-cursor="Open" {...appear(from + i * (STAGGER.base / STAGGER.loose))}>
-              <span className="sc-feed-status"><i aria-hidden="true" />{flag.badge}</span>
+              <div className="sc-feed-top">
+                <span className="sc-feed-status"><i aria-hidden="true" />{flag.badge}</span>
+                <span className="sc-feed-idx">0{i + 1}</span>
+              </div>
               <strong>{project.title}</strong>
               <span className="sc-feed-metric"><b>{flag.stats[0][0]}</b>{flag.stats[0][1]}</span>
             </motion.a>
@@ -75,7 +78,7 @@ function HeroFeed({ appear, from }) {
 }
 
 function ScrubWord({ progress, range, children }) {
-  const opacity = useTransform(progress, range, [0.45, 1]);
+  const opacity = useTransform(progress, range, [0.42, 1]);
   return <motion.span style={{ opacity }}>{children} </motion.span>;
 }
 function ScrubText({ lead, rest, className }) {
@@ -116,7 +119,7 @@ export function Hero({ ready = true, hold = false, onReady }) {
     const box = textBox(nameRef.current);
     nameX.set(window.innerWidth / 2 - (box.left + box.width / 2));
     nameY.set(window.innerHeight / 2 - (box.top + box.height / 2));
-    nameScale.set(Math.min(1.18, Math.max(1, (window.innerWidth * 0.78) / Math.max(1, box.width))));
+    nameScale.set(Math.min(1.16, Math.max(1, (window.innerWidth * 0.78) / Math.max(1, box.width))));
   }, [intro, nameX, nameY, nameScale]);
 
   useEffect(() => {
@@ -153,16 +156,16 @@ export function Hero({ ready = true, hold = false, onReady }) {
     };
   }, [intro, hold, onReady, nameX, nameY, nameScale]);
 
-  const lead = intro ? 0 : 0.12;
+  const lead = intro ? 0 : 0.1;
   const appear = (step) => (reduced ? {} : {
-    initial: { opacity: 0, y: 14 },
-    animate: arrived ? { opacity: 1, y: 0 } : { opacity: 0, y: 14 },
+    initial: { opacity: 0, y: 12 },
+    animate: arrived ? { opacity: 1, y: 0 } : { opacity: 0, y: 12 },
     transition: tween("slow", "out", lead + step * STAGGER.base),
   });
   const line = (i) => (reduced ? {} : {
     initial: { y: "100%" },
     animate: { y: "0%" },
-    transition: tween("slow", "out", i * 0.12),
+    transition: tween("slow", "out", i * 0.1),
   });
 
   const [film] = useState(filmEnabled);
@@ -181,7 +184,6 @@ export function Hero({ ready = true, hold = false, onReady }) {
         </dl>
       </div>
       <StackMarquee />
-      <div className="md-halftone-band" aria-hidden="true" />
     </section>
   );
 
@@ -191,8 +193,8 @@ export function Hero({ ready = true, hold = false, onReady }) {
         <div className="ed-wrap sc-hero-grid-layout">
           <div className="sc-hero-inner">
             <motion.p className="sc-hero-kicker" {...appear(0)}>
-              <span>% INDEX OF WORK · {CODE.asOf}</span>
-              <span className="md-cursor-sq" aria-hidden="true" />
+              <i aria-hidden="true" />
+              <span>{HERO.eyebrow} · Index of work · {CODE.asOf}</span>
             </motion.p>
             <motion.h1 ref={nameRef} id="hero-name" className="sc-hero-name" aria-label="Mohamed Ansar" style={{ x: nameX, y: nameY, scale: nameScale }}>
               <span className="sc-name-line" aria-hidden="true"><motion.span {...line(0)}>Mohamed</motion.span></span>
@@ -217,17 +219,7 @@ export function Hero({ ready = true, hold = false, onReady }) {
           </div>
 
           <motion.div className="sc-hero-visual" {...appear(1)}>
-            <div className="sc-dot-frame">
-              <div className="sc-dot-frame-head" aria-hidden="true">
-                <span>FIG. 01 · MORPH MATRIX</span>
-                <span>0 / 1</span>
-              </div>
-              <DotMorphCanvas className="sc-dot-canvas" />
-              <div className="sc-dot-frame-foot" aria-hidden="true">
-                <span>CIRCLE → FLOWER → CUBE</span>
-                <span>INTERACTIVE</span>
-              </div>
-            </div>
+            <TelemetryFieldCanvas />
           </motion.div>
         </div>
 
@@ -240,12 +232,12 @@ export function Hero({ ready = true, hold = false, onReady }) {
   );
 }
 
-/* Velocity-aware stack strip */
-function VelocityMarquee({ items, label, className = "", speed = 1.1 }) {
+/* Velocity-aware stack ribbon */
+function VelocityMarquee({ items, label, className = "", speed = 1.05 }) {
   const reduced = useReducedMotion();
   const { scrollY } = useScroll();
   const velocity = useSpring(useVelocity(scrollY), { damping: 50, stiffness: 400 });
-  const boost = useTransform(velocity, [-1500, 0, 1500], [-5, 0, 5], { clamp: false });
+  const boost = useTransform(velocity, [-1500, 0, 1500], [-4, 0, 4], { clamp: false });
   const offset = useMotionValue(0);
   const direction = useRef(1);
   const rowRef = useRef(null);
@@ -266,7 +258,7 @@ function VelocityMarquee({ items, label, className = "", speed = 1.1 }) {
       <motion.div className="sc-marquee-track" style={reduced ? undefined : { x }}>
         {[0, 1].map((copy) => (
           <ul key={copy} aria-label={copy ? undefined : label} aria-hidden={copy ? "true" : undefined}>
-            {items.map((item, i) => <li key={`${item}-${i}`}>{item}<span aria-hidden="true">/</span></li>)}
+            {items.map((item, i) => <li key={`${item}-${i}`}>{item}<span aria-hidden="true">·</span></li>)}
           </ul>
         ))}
       </motion.div>
@@ -288,7 +280,7 @@ export function ProjectsSection() {
         <Enter className="ed-section-heading sc-stage-heading">
           <div>
             <IndexLabel number="02">Selected work</IndexLabel>
-            <h2><ScrambleText text="Six builds." /> <em>Each with its numbers.</em></h2>
+            <h2>Six builds. <em>Each with its numbers.</em></h2>
           </div>
           <div className="ed-heading-aside">
             <p>Each one has the number, the picture and a way in. Some you can run, some you watch, some you read.</p>
@@ -304,20 +296,21 @@ export function CapabilitiesSection() {
   return <PlainCapabilities />;
 }
 
-/* Modaic-style split feature section: black panel on the left, bordered rows on the right. */
+/* Split monograph section: obsidian blueprint panel on the left,
+   precision metric rows on the right. */
 function PlainCapabilities() {
   return (
     <Sheet>
       <section id="capabilities" className="sc-caps ed-section" data-palette="field">
         <div className="ed-wrap">
           <div className="sc-caps-split">
-            <Enter className="sc-caps-panel">
+            <Enter className="sc-caps-panel at-obsidian-grid">
               <IndexLabel number="03">What I bring</IndexLabel>
-              <h2><ScrambleText text="Three things," /> <br /><em>done properly.</em></h2>
+              <h2>Three things, <br /><em>done properly.</em></h2>
               <p className="sc-caps-aside">The same loop on every build: make it work, measure it honestly, and ship it to real people.</p>
               <div className="sc-caps-meta" aria-hidden="true">
-                <span>SPEC // CAPABILITIES</span>
-                <span>03 TRACKS</span>
+                <span>DISCIPLINE // 03 TRACKS</span>
+                <span>VERIFIED IN CODE</span>
               </div>
             </Enter>
             <div className="sc-cap-rows">
@@ -359,19 +352,23 @@ function WorkCard({ item, index }) {
   return (
     <Enter index={index % 3}>
       <a id={`card-${project.slug}`} href={`/work/${project.slug}/`} className="sc-card" data-cursor="View">
-        <div className="sc-card-media">
-          {cover && !broken ? (
-            <img className={`ed-lazy-media ${item.art ? "is-poster" : ""}`} src={media(cover)} alt="" loading="lazy" onLoad={revealImage} onError={() => setBroken(true)} />
-          ) : (
-            <span className="sc-card-type" aria-hidden="true">{project.title}</span>
-          )}
-          <span className="sc-card-kind">{project.kind}</span>
+        <div className="sc-card-plate">
+          <div className="sc-card-media">
+            {cover && !broken ? (
+              <img className={`ed-lazy-media ${item.art ? "is-poster" : ""}`} src={media(cover)} alt="" loading="lazy" onLoad={revealImage} onError={() => setBroken(true)} />
+            ) : (
+              <span className="sc-card-type" aria-hidden="true">{project.title}</span>
+            )}
+          </div>
+          <div className="sc-card-plate-bar">
+            <span className="sc-card-kind">{project.kind}</span>
+            <span className="sc-card-status-chip">{project.status}</span>
+          </div>
         </div>
         <div className="sc-card-body">
           <h3>{project.title}<ArrowUpRight size={18} aria-hidden="true" /></h3>
           {item.metric && <p className="sc-card-metric"><strong><Count value={item.metric} /></strong><span>{item.unit}</span></p>}
           <p className="sc-card-line">{item.line}</p>
-          <p className="sc-card-status">{project.status}</p>
         </div>
       </a>
     </Enter>
@@ -388,7 +385,7 @@ export function MoreWorkSection() {
         <Enter className="ed-section-heading">
           <div>
             <IndexLabel number="04">More shipped work</IndexLabel>
-            <h2><ScrambleText text="And plenty" /> <br /><em>more shipped.</em></h2>
+            <h2>And plenty <br /><em>more shipped.</em></h2>
           </div>
           <p className="ed-heading-aside">Studies, an agent skill and apps. Every card opens a full write-up.</p>
         </Enter>
@@ -432,7 +429,7 @@ export function PlaygroundSection() {
         <Enter className="ed-section-heading">
           <div>
             <IndexLabel number="05">Playground</IndexLabel>
-            <h2 id="playground-title"><ScrambleText text="Rooms off" /> <em>the hall.</em></h2>
+            <h2 id="playground-title">Rooms off <em>the hall.</em></h2>
           </div>
           <div className="ed-heading-aside">
             <p>Small things I built to try an idea. Each one opens on its own page.</p>
@@ -442,7 +439,13 @@ export function PlaygroundSection() {
           {FILM_EXPERIMENTS.map((experiment, i) => (
             <Enter key={experiment.id} index={i}>
               <a href={experiment.href} className="sc-card">
-                <div className="sc-card-media"><ExperimentImage experiment={experiment} /></div>
+                <div className="sc-card-plate">
+                  <div className="sc-card-media"><ExperimentImage experiment={experiment} /></div>
+                  <div className="sc-card-plate-bar">
+                    <span className="sc-card-kind">0{i + 1} / Interactive</span>
+                    <span className="sc-card-status-chip">Open room</span>
+                  </div>
+                </div>
                 <div className="sc-card-body">
                   <h3>{experiment.title}<ArrowUpRight size={18} aria-hidden="true" /></h3>
                   <p className="sc-card-line">{experiment.hook}</p>
@@ -496,12 +499,11 @@ export function ContactSection() {
   return <PlainContact />;
 }
 
-/* Modaic-style black footer with faint halftone dot texture, boxed "Have questions?"
-   contact card, and mono uppercase gray column headings with white links. */
+/* Deep Slate-Obsidian colophon & contact section */
 function PlainContact() {
   const { navigate } = useRoute();
   return (
-    <section id="contact" className="ed-contact sc-contact" data-palette="blueBloom">
+    <section id="contact" className="ed-contact sc-contact at-obsidian-grid" data-palette="blueBloom">
       <div className="ed-wrap">
         <div className="sc-contact-top">
           <div className="sc-contact-lead">
@@ -510,7 +512,7 @@ function PlainContact() {
             <a href={`mailto:${CONTACT.email}`} className="sc-email" data-cursor="Write">{CONTACT.email}</a>
           </div>
           <div className="sc-contact-card">
-            <p className="sc-contact-card-kicker">% HAVE QUESTIONS? <span className="md-cursor-sq" aria-hidden="true" /></p>
+            <p className="sc-contact-card-kicker"><i aria-hidden="true" />Start a conversation</p>
             <p className="sc-contact-card-copy">
               I like the hard part: agents that have to be trusted, evals that have to be honest, and products that have to ship. If that sounds like your problem, write to me.
             </p>

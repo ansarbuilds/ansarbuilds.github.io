@@ -27,10 +27,9 @@ export function Reveal({ children, className = "", delay = 0, y = 24 }) {
 export function Kicker({ children, accent = "cyan", className = "" }) {
   const a = ACCENTS[accent];
   return (
-    <span className={`inline-flex items-center gap-2 font-mono text-xs font-semibold uppercase tracking-[.14em] ${a.text} ${className}`}>
-      <span aria-hidden="true">%</span>
+    <span className={`inline-flex items-center gap-2.5 font-mono text-xs font-semibold uppercase tracking-[.14em] ${a.text} ${className}`}>
+      <span className="inline-block h-px w-5 bg-current" aria-hidden="true" />
       {children}
-      <span className="md-cursor-sq" aria-hidden="true" />
     </span>
   );
 }
@@ -160,7 +159,7 @@ export function FlourishTitle({ text, accent }) {
 
 export function TagPill({ children }) {
   return (
-    <span className="font-mono text-micro uppercase tracking-wide px-2.5 py-1 border border-black bg-[#eceae8] text-black">
+    <span className="font-mono text-micro uppercase tracking-wide px-2.5 py-1 border border-[#111318]/25 bg-[#f4f3ef] text-[#111318]">
       {children}
     </span>
   );
