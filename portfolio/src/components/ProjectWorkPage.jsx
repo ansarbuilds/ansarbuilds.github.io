@@ -23,8 +23,8 @@ export default function ProjectWorkPage() {
 
       {GROUPS.filter((g) => g.projects.length).map((g) => (
         <section key={g.label} className="mt-14">
-          <h2 className="font-mono text-xs font-semibold uppercase tracking-[.14em] text-[color:var(--ink-200)]">{g.label}</h2>
-          <ul className="mt-4 border-t border-blue/10">
+          <h2 className="inline-flex items-center font-mono text-xs font-semibold uppercase tracking-[.14em] text-[#545454]">% {g.label}<span className="md-cursor-sq" aria-hidden="true" /></h2>
+          <ul className="mt-4 border border-black bg-white shadow-[8px_8px_0_#000]">
             {g.projects.map((p, i) => {
               const a = ACCENTS[p.accent] || ACCENTS.cyan;
               return (
@@ -33,17 +33,17 @@ export default function ProjectWorkPage() {
                   initial={{ opacity: 0, y: 8 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ duration: DUR.base, delay: Math.min(i * 0.03, 0.3), ease: EASE.out }}
-                  className="border-b border-blue/10"
+                  className="border-b border-dashed border-black/30 last:border-b-0"
                 >
-                  <a href={`/work/${p.slug}/`} className="group grid grid-cols-[1fr_auto] items-center gap-4 py-5 sm:grid-cols-[minmax(0,16rem)_1fr_auto] sm:gap-8">
+                  <a href={`/work/${p.slug}/`} className="group grid grid-cols-[1fr_auto] items-center gap-4 px-5 py-5 transition-colors hover:bg-[#eceae8] sm:grid-cols-[minmax(0,16rem)_1fr_auto] sm:gap-8">
                     <span>
-                      <span className="block text-lg font-medium text-[color:var(--ink-100)] transition-colors group-hover:text-[color:var(--a)]" style={{ "--a": a.hex }}>
+                      <span className="block font-display text-xl font-normal text-black transition-colors group-hover:text-[#a8323c]">
                         {p.title}
                       </span>
                       <span className={`mt-1 block font-mono text-[.68rem] uppercase tracking-[.1em] ${a.text}`}>{p.kind}</span>
                     </span>
-                    <span className="hidden text-sm text-[color:var(--ink-200)] sm:line-clamp-2">{p.hook}</span>
-                    <ArrowUpRight size={18} className="text-[color:var(--ink-400)] transition-transform group-hover:-translate-y-0.5 group-hover:translate-x-0.5 group-hover:text-[color:var(--ink-100)]" />
+                    <span className="hidden text-sm text-[#545454] sm:line-clamp-2">{p.hook}</span>
+                    <ArrowUpRight size={18} className="text-[#545454] transition-transform group-hover:-translate-y-0.5 group-hover:translate-x-0.5 group-hover:text-black" />
                   </a>
                 </motion.li>
               );

@@ -1,7 +1,8 @@
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { animate, motion, useAnimationFrame, useInView, useMotionValue, useReducedMotion, useScroll, useSpring, useTransform, useVelocity } from "framer-motion";
 import { ArrowDown, ArrowRight, ArrowUpRight, ExternalLink, Play } from "lucide-react";
-import SignalField from "./SignalField";
+import DotMorphCanvas from "./DotMorphCanvas";
+import ScrambleText from "./ScrambleText";
 import WorkStage from "./WorkStage";
 import { CODE, CONTACT, HERO, RECEIPTS } from "../data/content";
 import { EXPERIMENTS, LISTED_PROJECTS, getProject } from "../data/projectIndex";
@@ -17,11 +18,9 @@ import "../showcase.css";
 
 const revealImage = (event) => event.currentTarget.classList.add("is-loaded");
 
-/* The one reveal on the page. It only adds "is-in" when about a third of the
-   element is on screen (less for things taller than the screen), once; the
-   motion itself is CSS (.rv in showcase.css), so a heading, a card and its
-   image all start from the same moment. `index` staggers siblings in
-   reading order. Reduced motion is "in" from the first paint. */
+/* IntersectionObserver scroll reveal using the clip-path slide-up keyframe
+   (0.62s cubic-bezier(.22,1,.36,1), staggered via --i). Reduced motion is
+   immediately visible from first paint. */
 function Enter({ children, className = "", index = 0, style, ...rest }) {
   const reduced = useReducedMotion();
   const ref = useRef(null);
@@ -30,8 +29,7 @@ function Enter({ children, className = "", index = 0, style, ...rest }) {
     const el = ref.current;
     if (!el || reduced) return undefined;
     const rootHeight = window.innerHeight;
-    // 30% of the element, or 30% of the screen for anything taller than it.
-    const threshold = Math.min(0.3, (rootHeight * 0.3) / Math.max(1, el.offsetHeight));
+    const threshold = Math.min(0.2, (rootHeight * 0.2) / Math.max(1, el.offsetHeight));
     const observer = new IntersectionObserver(([entry]) => {
       if (!entry.isIntersecting) return;
       setShown(true);
@@ -42,39 +40,40 @@ function Enter({ children, className = "", index = 0, style, ...rest }) {
   }, [reduced]);
   return <div ref={ref} {...rest} style={{ "--i": index, ...style }} className={`rv ${className} ${shown || reduced ? "is-in" : ""}`}>{children}</div>;
 }
+
+/* Uppercase mono section label ("% LABEL") followed by a blinking 10px square cursor. */
 function IndexLabel({ number, children }) {
-  return <p className="ed-label"><span>{number}</span>{children}</p>;
+  return (
+    <p className="ed-label">
+      <span>% {number}</span>
+      <span>{children}</span>
+      <span className="md-cursor-sq" aria-hidden="true" />
+    </p>
+  );
 }
-/* Four flagships as a status strip. It does not rotate: the hero already
-   has one thing moving. A card lights up when it is hovered or focused. */
+
+/* 'Backed by' style strip of four flagship projects under the hero. */
 const HERO_FEED = FLAGSHIPS.slice(0, 4);
 function HeroFeed({ appear, from }) {
-  return <nav className="sc-feed" aria-label="Flagship projects">{HERO_FEED.map((flag, i) => {
-    const project = getProject(flag.slug);
-    return project && <motion.a key={flag.slug} href={`/work/${project.slug}/`} className="sc-feed-card" data-cursor="Open" {...appear(from + i * (STAGGER.base / STAGGER.loose))}>
-      <span className="sc-feed-status"><i aria-hidden="true" />{flag.badge}</span>
-      <strong>{project.title}</strong>
-      <span className="sc-feed-metric"><b>{flag.stats[0][0]}</b>{flag.stats[0][1]}</span>
-    </motion.a>;
-  })}</nav>;
+  return (
+    <div className="sc-feed-wrap">
+      <p className="sc-feed-kicker">% FEATURED BUILDS <span className="md-cursor-sq" aria-hidden="true" /></p>
+      <nav className="sc-feed" aria-label="Flagship projects">
+        {HERO_FEED.map((flag, i) => {
+          const project = getProject(flag.slug);
+          return project && (
+            <motion.a key={flag.slug} href={`/work/${project.slug}/`} className="sc-feed-card" data-cursor="Open" {...appear(from + i * (STAGGER.base / STAGGER.loose))}>
+              <span className="sc-feed-status"><i aria-hidden="true" />{flag.badge}</span>
+              <strong>{project.title}</strong>
+              <span className="sc-feed-metric"><b>{flag.stats[0][0]}</b>{flag.stats[0][1]}</span>
+            </motion.a>
+          );
+        })}
+      </nav>
+    </div>
+  );
 }
 
-// The viewport's height, kept current, for scroll ranges that scale with it.
-function useViewportHeight() {
-  const [height, setHeight] = useState(() => (typeof window === "undefined" ? 800 : window.innerHeight));
-  useEffect(() => {
-    const onResize = () => setHeight(window.innerHeight);
-    window.addEventListener("resize", onResize);
-    return () => window.removeEventListener("resize", onResize);
-  }, []);
-  return height;
-}
-
-/* Copy that lights up word by word as it crosses the screen. Every word is
-   in the page from the start, only dimmed, so nothing is hidden from
-   readers, search or reduced motion (which gets it fully lit). */
-// Words not yet reached stay readable (about 3.5:1 on carbon, large text),
-// so the statement never reads as missing.
 function ScrubWord({ progress, range, children }) {
   const opacity = useTransform(progress, range, [0.45, 1]);
   return <motion.span style={{ opacity }}>{children} </motion.span>;
@@ -89,22 +88,9 @@ function ScrubText({ lead, rest, className }) {
   return <p ref={ref} className={className}>{leadWords.map(word)}<em>{restWords.map((text, i) => word(text, leadWords.length + i))}</em></p>;
 }
 
-/* The hero, and on a first visit the intro that hands over to it.
-
-   There is no curtain. On a first visit the hero itself is the title card:
-   everything but the name is held back, and the name sits large in the
-   middle of the screen. Its two lines rise out of their masks, then the
-   name travels to its real place (it is the same h1 throughout, so it lands
-   exactly) while the rest arrives in reading order: kicker, sentence,
-   buttons, proof cards, and the network last. Any click, key or scroll
-   skips straight to the end. A return visit plays the same entrance without
-   the travel. */
 const STATEMENT = { lead: "Most AI demos stop at the demo.", rest: "Mine ship with tests, real numbers and a write-up, including the parts that failed." };
 const RECEIPT_VALUES = RECEIPTS.map((item) => ({ ...item, value: item.value === "PROJECTS" ? `${LISTED_PROJECTS.length}+` : item.value }));
 
-// Where the name's letters are. Across: the text itself, since its lines
-// are full-width blocks. Down: the heading's own box, because each line
-// starts its entrance pushed down out of view and the text would read low.
 function textBox(el) {
   const own = el.getBoundingClientRect();
   const range = document.createRange();
@@ -112,42 +98,34 @@ function textBox(el) {
   const text = range.getBoundingClientRect();
   return text.width ? { left: text.left, width: text.width, top: own.top, height: own.height } : own;
 }
-const NAME_SET_S = 0.62; // how long the name holds centre stage before it moves
+const NAME_SET_S = 0.62;
 const NAME_TRAVEL = { duration: 0.75, ease: EASE.out };
+
 export function Hero({ ready = true, hold = false, onReady }) {
   const reduced = useReducedMotion();
   const heroRef = useRef(null);
   const nameRef = useRef(null);
-  const visible = useInView(heroRef, { margin: "50px" });
-  // `ready` is false only on a first visit, before the intro has handed over.
   const [intro] = useState(() => !ready && !reduced);
   const [arrived, setArrived] = useState(!intro);
   const nameX = useMotionValue(0), nameY = useMotionValue(0), nameScale = useMotionValue(1);
 
-  // Before the first paint, move the name from its place to mid-screen.
   const placed = useRef(false);
   useLayoutEffect(() => {
-    // Measure once, from the name's untransformed box. A second run (React
-    // re-runs effects in development) would measure the moved name instead.
     if (!intro || !nameRef.current || placed.current) return;
     placed.current = true;
-    // The lines are full-width blocks, so centre the letters themselves,
-    // not the box around them.
     const box = textBox(nameRef.current);
     nameX.set(window.innerWidth / 2 - (box.left + box.width / 2));
     nameY.set(window.innerHeight / 2 - (box.top + box.height / 2));
-    nameScale.set(Math.min(1.22, Math.max(1, (window.innerWidth * 0.84) / box.width)));
+    nameScale.set(Math.min(1.18, Math.max(1, (window.innerWidth * 0.78) / Math.max(1, box.width))));
   }, [intro, nameX, nameY, nameScale]);
 
   useEffect(() => {
     if (!intro) { onReady?.(); return undefined; }
-    // The film is playing over the page. The name waits, set large
-    // mid-screen, and this intro starts as the film lifts off.
     if (hold) return undefined;
     try {
       window.sessionStorage.setItem(INTRO_SESSION_KEY, "1");
       window.localStorage.setItem(INTRO_SESSION_KEY, "1");
-    } catch { /* storage unavailable: shouldPlayIntro already said no */ }
+    } catch { /* storage unavailable */ }
     let moves = [];
     let handed = false;
     const handOver = () => {
@@ -156,7 +134,6 @@ export function Hero({ ready = true, hold = false, onReady }) {
       setArrived(true);
       onReady?.();
     };
-    // The name leaves for its place; the rest starts a beat into the move.
     const travel = setTimeout(() => {
       moves = [animate(nameX, 0, NAME_TRAVEL), animate(nameY, 0, NAME_TRAVEL), animate(nameScale, 1, NAME_TRAVEL)];
     }, NAME_SET_S * 1000);
@@ -176,92 +153,99 @@ export function Hero({ ready = true, hold = false, onReady }) {
     };
   }, [intro, hold, onReady, nameX, nameY, nameScale]);
 
-  // The hint only appears if the hero has sat untouched for a while, and
-  // goes for good at the first click.
-  const [hint, setHint] = useState(false);
-  useEffect(() => {
-    if (!arrived || !visible || reduced) return undefined;
-    const id = setTimeout(() => setHint(true), 7000);
-    return () => clearTimeout(id);
-  }, [arrived, visible, reduced]);
-
-  // As the hero scrolls away, the copy lifts and fades while the network
-  // swells slightly, so the page seems to move through it. The ranges are
-  // fractions of the viewport height (the hero is one viewport, pinned on
-  // desktop while the next section slides over it), not fixed pixels.
-  const vh = useViewportHeight();
-  const { scrollY } = useScroll();
-  const copyY = useTransform(scrollY, [0, vh * 0.9], reduced ? [0, 0] : [0, -vh * 0.16]);
-  const copyOpacity = useTransform(scrollY, [0, vh * 0.62], reduced ? [1, 1] : [1, 0]);
-  const feedY = useTransform(scrollY, [0, vh * 0.9], reduced ? [0, 0] : [0, -vh * 0.07]);
-  const feedOpacity = useTransform(scrollY, [vh * 0.09, vh * 0.7], reduced ? [1, 1] : [1, 0]);
-  const fieldScale = useTransform(scrollY, [0, vh], reduced ? [1, 1] : [1, 1.14]);
-  const fieldOpacity = useTransform(scrollY, [0, vh], reduced ? [1, 1] : [1, 0.3]);
-
-  // One timeline. The name's lines lead; each later part is a step behind
-  // the one before. Without the intro, the rest waits for the name to be
-  // well on its way.
-  const lead = intro ? 0 : 0.28;
+  const lead = intro ? 0 : 0.12;
   const appear = (step) => (reduced ? {} : {
-    initial: { opacity: 0, y: 16 },
-    animate: arrived ? { opacity: 1, y: 0 } : { opacity: 0, y: 16 },
-    transition: tween("slow", "out", lead + step * STAGGER.loose),
+    initial: { opacity: 0, y: 14 },
+    animate: arrived ? { opacity: 1, y: 0 } : { opacity: 0, y: 14 },
+    transition: tween("slow", "out", lead + step * STAGGER.base),
   });
   const line = (i) => (reduced ? {} : {
-    initial: { y: "106%", skewY: 5 },
-    animate: { y: "0%", skewY: 0 },
-    transition: tween("slow", "out", i * STAGGER.loose),
+    initial: { y: "100%" },
+    animate: { y: "0%" },
+    transition: tween("slow", "out", i * 0.12),
   });
-  // The film plays over the page on its own (see FilmPlayer); the hero
-  // offers it to anyone who has not just seen it.
+
   const [film] = useState(filmEnabled);
-  const brief = <section className="ed-intro ed-light sc-brief" aria-label="The short version" data-palette="lumen">
-    <div className="ed-wrap">
-      <ScrubText className="sc-statement" lead={STATEMENT.lead} rest={STATEMENT.rest} />
-      <dl className="sc-receipts">{RECEIPT_VALUES.map((item) => <div key={item.label}><dt>{item.value}</dt><dd>{item.label}</dd></div>)}</dl>
-    </div>
-    <StackMarquee />
-  </section>;
-  return <div className="sc-open">
-    <section ref={heroRef} id="hero" aria-labelledby="hero-name" className="sc-hero" data-palette="lumen" onPointerDown={() => setHint(false)}>
-      <motion.div className="sc-hero-stage" style={{ scale: fieldScale, opacity: fieldOpacity }}>
-        {/* The network comes up last, once everything it sits behind is in. */}
-        <motion.div className="sc-hero-fade" initial={reduced ? false : { opacity: 0 }} animate={{ opacity: arrived ? 1 : 0 }} transition={tween("scene", "out", lead + 0.4)}><SignalField className="sc-hero-field" labels={HERO_LABELS} /></motion.div>
-      </motion.div>
-      <div className="sc-hero-grid" aria-hidden="true" />
-      <motion.div className="sc-hero-inner" style={{ y: copyY, opacity: copyOpacity }}>
-        <motion.p className="sc-hero-kicker" {...appear(0)}><i aria-hidden="true" />Index of work · {CODE.asOf}</motion.p>
-        <motion.h1 ref={nameRef} id="hero-name" className="sc-hero-name" aria-label="Mohamed Ansar" style={{ x: nameX, y: nameY, scale: nameScale }}>
-          <span className="sc-name-line" aria-hidden="true"><motion.span {...line(0)}>MOHAMED</motion.span></span>
-          <span className="sc-name-line" aria-hidden="true"><motion.span className="is-outline" {...line(1)}>ANSAR</motion.span></span>
-        </motion.h1>
-        <motion.p className="sc-hero-line" {...appear(1)}>{HERO.title} <em className="sc-nowrap">Here are {LISTED_PROJECTS.length} of them.</em></motion.p>
-        <motion.div className="sc-hero-ctas" {...appear(2)}>
-          <MagneticLink href="#projects" className="sc-hero-btn">See the work<ArrowDown size={18} aria-hidden="true" /></MagneticLink>
-          <a href="#contact" className="sc-hero-ghost">Get in touch<ArrowUpRight size={16} aria-hidden="true" /></a>
-          {film && <button type="button" className="sc-hero-ghost sc-hero-film" onClick={watchFilm}><Play size={14} aria-hidden="true" />Watch the film</button>}
-          <span className={`sc-hero-hint ${hint ? "is-shown" : ""}`} aria-hidden="true">Click the network</span>
-        </motion.div>
-      </motion.div>
-      <motion.div className="sc-hero-bottom" style={{ y: feedY, opacity: feedOpacity }}><HeroFeed appear={appear} from={3} /></motion.div>
+
+  const brief = (
+    <section className="ed-intro ed-light sc-brief" aria-label="The short version" data-palette="lumen">
+      <div className="ed-wrap">
+        <ScrubText className="sc-statement" lead={STATEMENT.lead} rest={STATEMENT.rest} />
+        <dl className="sc-receipts">
+          {RECEIPT_VALUES.map((item) => (
+            <div key={item.label}>
+              <dt>{item.value}</dt>
+              <dd>{item.label}</dd>
+            </div>
+          ))}
+        </dl>
+      </div>
+      <StackMarquee />
+      <div className="md-halftone-band" aria-hidden="true" />
     </section>
-    {brief}
-  </div>;
+  );
+
+  return (
+    <div className="sc-open">
+      <section ref={heroRef} id="hero" aria-labelledby="hero-name" className="sc-hero" data-palette="lumen">
+        <div className="ed-wrap sc-hero-grid-layout">
+          <div className="sc-hero-inner">
+            <motion.p className="sc-hero-kicker" {...appear(0)}>
+              <span>% INDEX OF WORK · {CODE.asOf}</span>
+              <span className="md-cursor-sq" aria-hidden="true" />
+            </motion.p>
+            <motion.h1 ref={nameRef} id="hero-name" className="sc-hero-name" aria-label="Mohamed Ansar" style={{ x: nameX, y: nameY, scale: nameScale }}>
+              <span className="sc-name-line" aria-hidden="true"><motion.span {...line(0)}>Mohamed</motion.span></span>
+              <span className="sc-name-line" aria-hidden="true"><motion.span className="is-accent" {...line(1)}>Ansar</motion.span></span>
+            </motion.h1>
+            <motion.p className="sc-hero-line" {...appear(1)}>
+              {HERO.title} <em className="sc-nowrap">Here are {LISTED_PROJECTS.length} of them.</em>
+            </motion.p>
+            <motion.div className="sc-hero-ctas" {...appear(2)}>
+              <MagneticLink href="#projects" className="sc-hero-btn">
+                See the work<ArrowDown size={16} aria-hidden="true" />
+              </MagneticLink>
+              <a href="#contact" className="sc-hero-ghost">
+                Get in touch<ArrowUpRight size={15} aria-hidden="true" />
+              </a>
+              {film && (
+                <button type="button" className="sc-hero-ghost sc-hero-film" onClick={watchFilm}>
+                  <Play size={13} aria-hidden="true" />Watch the film
+                </button>
+              )}
+            </motion.div>
+          </div>
+
+          <motion.div className="sc-hero-visual" {...appear(1)}>
+            <div className="sc-dot-frame">
+              <div className="sc-dot-frame-head" aria-hidden="true">
+                <span>FIG. 01 · MORPH MATRIX</span>
+                <span>0 / 1</span>
+              </div>
+              <DotMorphCanvas className="sc-dot-canvas" />
+              <div className="sc-dot-frame-foot" aria-hidden="true">
+                <span>CIRCLE → FLOWER → CUBE</span>
+                <span>INTERACTIVE</span>
+              </div>
+            </div>
+          </motion.div>
+        </div>
+
+        <div className="ed-wrap sc-hero-bottom">
+          <HeroFeed appear={appear} from={3} />
+        </div>
+      </section>
+      {brief}
+    </div>
+  );
 }
 
-// Named beside a burst when the hero network is clicked, in this order.
-const HERO_LABELS = ["Jarvis", "Flight Recorder", "PRH-JEPA", "Haloscript"];
-
-/* A row that never stops, and takes its speed and lean from the scroll:
-   scroll fast and it rushes and leans a couple of degrees, scroll back and it reverses. The
-   second copy only exists so the loop has no seam; reduced motion gets a
-   still, wrapping list instead. */
+/* Velocity-aware stack strip */
 function VelocityMarquee({ items, label, className = "", speed = 1.1 }) {
   const reduced = useReducedMotion();
   const { scrollY } = useScroll();
   const velocity = useSpring(useVelocity(scrollY), { damping: 50, stiffness: 400 });
   const boost = useTransform(velocity, [-1500, 0, 1500], [-5, 0, 5], { clamp: false });
-  const skewX = useTransform(velocity, [-2600, 2600], [2, -2]);
   const offset = useMotionValue(0);
   const direction = useRef(1);
   const rowRef = useRef(null);
@@ -277,48 +261,94 @@ function VelocityMarquee({ items, label, className = "", speed = 1.1 }) {
     offset.set(next);
   });
   const x = useTransform(offset, (value) => `${value}%`);
-  return <div ref={rowRef} className={`sc-marquee ${className}`}><motion.div className="sc-marquee-track" style={reduced ? undefined : { x, skewX }}>
-    {[0, 1].map((copy) => <ul key={copy} aria-label={copy ? undefined : label} aria-hidden={copy ? "true" : undefined}>
-      {items.map((item, i) => <li key={`${item}-${i}`}>{item}<span aria-hidden="true">✳</span></li>)}
-    </ul>)}
-  </motion.div></div>;
+  return (
+    <div ref={rowRef} className={`sc-marquee ${className}`}>
+      <motion.div className="sc-marquee-track" style={reduced ? undefined : { x }}>
+        {[0, 1].map((copy) => (
+          <ul key={copy} aria-label={copy ? undefined : label} aria-hidden={copy ? "true" : undefined}>
+            {items.map((item, i) => <li key={`${item}-${i}`}>{item}<span aria-hidden="true">/</span></li>)}
+          </ul>
+        ))}
+      </motion.div>
+    </div>
+  );
 }
 const StackMarquee = () => <VelocityMarquee items={STACK_MARQUEE} label="Tools I build with" />;
 
-/* A section that arrives as a sheet sliding over the one before it: a
-   rounded top edge and a hairline, the same language as the page sliding
-   over the hero. It is plain CSS (.sc-sheet), so it costs nothing per
-   scroll frame. It used to animate a clip-path inset on every frame. */
 function Sheet({ children }) {
   return <div className="sc-sheet">{children}</div>;
 }
 
 const coverOf = (project) => project.spotlightArt || project.cardArt || project.cardShot || project.shots?.[0];
+
 export function ProjectsSection() {
-  return <><section id="projects" className="ed-projects ed-light ed-section" data-palette="bloom">
-    <div className="ed-section-watermark" aria-hidden="true">WORK</div>
-    <div className="ed-wrap">
-      <Enter className="ed-section-heading sc-stage-heading"><div><IndexLabel number="02">Selected work</IndexLabel><h2>Six builds. <em>Each with its numbers.</em></h2></div><div className="ed-heading-aside"><p>Each one has the number, the picture and a way in. Some you can run, some you watch, some you read.</p></div></Enter>
-      <WorkStage />
-    </div>
-  </section></>;
+  return (
+    <section id="projects" className="ed-projects ed-light ed-section" data-palette="bloom">
+      <div className="ed-wrap">
+        <Enter className="ed-section-heading sc-stage-heading">
+          <div>
+            <IndexLabel number="02">Selected work</IndexLabel>
+            <h2><ScrambleText text="Six builds." /> <em>Each with its numbers.</em></h2>
+          </div>
+          <div className="ed-heading-aside">
+            <p>Each one has the number, the picture and a way in. Some you can run, some you watch, some you read.</p>
+          </div>
+        </Enter>
+        <WorkStage />
+      </div>
+    </section>
+  );
 }
 
 export function CapabilitiesSection() {
   return <PlainCapabilities />;
 }
 
+/* Modaic-style split feature section: black panel on the left, bordered rows on the right. */
 function PlainCapabilities() {
-  return <Sheet><section id="capabilities" className="sc-caps ed-section" data-palette="field"><div className="ed-wrap">
-    <Enter className="ed-section-heading"><div><IndexLabel number="03">What I bring</IndexLabel><h2>Three things,{" "}<br /><em>done properly.</em></h2></div><p className="ed-heading-aside">The same loop on every build: make it work, measure it honestly, and ship it to real people.</p></Enter>
-    <div className="sc-cap-grid">{CAPABILITIES.map((cap, i) => <Enter key={cap.id} index={i} className="sc-cap">
-      <p className="sc-cap-count"><Count value={cap.count} /></p>
-      <p className="sc-cap-unit">{cap.unit}</p>
-      <h3>{cap.title}</h3>
-      <p className="sc-cap-copy">{cap.copy}</p>
-      <ul>{cap.proof.map((slug) => { const project = getProject(slug); return project && <li key={slug}><a href={`/work/${slug}/`}>{project.title}<ArrowUpRight size={14} aria-hidden="true" /></a></li>; })}</ul>
-    </Enter>)}</div>
-  </div></section></Sheet>;
+  return (
+    <Sheet>
+      <section id="capabilities" className="sc-caps ed-section" data-palette="field">
+        <div className="ed-wrap">
+          <div className="sc-caps-split">
+            <Enter className="sc-caps-panel">
+              <IndexLabel number="03">What I bring</IndexLabel>
+              <h2><ScrambleText text="Three things," /> <br /><em>done properly.</em></h2>
+              <p className="sc-caps-aside">The same loop on every build: make it work, measure it honestly, and ship it to real people.</p>
+              <div className="sc-caps-meta" aria-hidden="true">
+                <span>SPEC // CAPABILITIES</span>
+                <span>03 TRACKS</span>
+              </div>
+            </Enter>
+            <div className="sc-cap-rows">
+              {CAPABILITIES.map((cap, i) => (
+                <Enter key={cap.id} index={i} className="sc-cap-row">
+                  <div className="sc-cap-row-stat">
+                    <p className="sc-cap-count"><Count value={cap.count} /></p>
+                    <p className="sc-cap-unit">{cap.unit}</p>
+                  </div>
+                  <div className="sc-cap-row-body">
+                    <h3>{cap.title}</h3>
+                    <p className="sc-cap-copy">{cap.copy}</p>
+                    <ul className="sc-cap-proof">
+                      {cap.proof.map((slug) => {
+                        const project = getProject(slug);
+                        return project && (
+                          <li key={slug}>
+                            <a href={`/work/${slug}/`}>{project.title}<ArrowUpRight size={13} aria-hidden="true" /></a>
+                          </li>
+                        );
+                      })}
+                    </ul>
+                  </div>
+                </Enter>
+              ))}
+            </div>
+          </div>
+        </div>
+      </section>
+    </Sheet>
+  );
 }
 
 function WorkCard({ item, index }) {
@@ -326,80 +356,212 @@ function WorkCard({ item, index }) {
   const [broken, setBroken] = useState(false);
   if (!project) return null;
   const cover = item.art || coverOf(project);
-  return <Enter index={index % 3}>
-    <a id={`card-${project.slug}`} href={`/work/${project.slug}/`} className="sc-card" data-cursor="View">
-      <div className="sc-card-media">
-        {cover && !broken ? <img className={`ed-lazy-media ${item.art ? "is-poster" : ""}`} src={media(cover)} alt="" loading="lazy" onLoad={revealImage} onError={() => setBroken(true)} /> : <span className="sc-card-type" aria-hidden="true">{project.title}</span>}
-        <span className="sc-card-kind">{project.kind}</span>
-      </div>
-      <div className="sc-card-body">
-        <h3>{project.title}<ArrowUpRight size={20} aria-hidden="true" /></h3>
-        {item.metric && <p className="sc-card-metric"><strong><Count value={item.metric} /></strong><span>{item.unit}</span></p>}
-        <p className="sc-card-line">{item.line}</p>
-        <p className="sc-card-status">{project.status}</p>
-      </div>
-    </a>
-  </Enter>;
+  return (
+    <Enter index={index % 3}>
+      <a id={`card-${project.slug}`} href={`/work/${project.slug}/`} className="sc-card" data-cursor="View">
+        <div className="sc-card-media">
+          {cover && !broken ? (
+            <img className={`ed-lazy-media ${item.art ? "is-poster" : ""}`} src={media(cover)} alt="" loading="lazy" onLoad={revealImage} onError={() => setBroken(true)} />
+          ) : (
+            <span className="sc-card-type" aria-hidden="true">{project.title}</span>
+          )}
+          <span className="sc-card-kind">{project.kind}</span>
+        </div>
+        <div className="sc-card-body">
+          <h3>{project.title}<ArrowUpRight size={18} aria-hidden="true" /></h3>
+          {item.metric && <p className="sc-card-metric"><strong><Count value={item.metric} /></strong><span>{item.unit}</span></p>}
+          <p className="sc-card-line">{item.line}</p>
+          <p className="sc-card-status">{project.status}</p>
+        </div>
+      </a>
+    </Enter>
+  );
 }
 
 const SHOWN = new Set([...FLAGSHIPS, ...MORE_WORK].map((item) => item.slug));
 const ALSO_BUILT = LISTED_PROJECTS.filter((project) => !SHOWN.has(project.slug));
 
 export function MoreWorkSection() {
-  return <section id="more" className="sc-more ed-light ed-section" data-palette="lumora"><div className="ed-wrap">
-    <Enter className="ed-section-heading"><div><IndexLabel number="04">More shipped work</IndexLabel><h2>And plenty{" "}<br /><em>more shipped.</em></h2></div><p className="ed-heading-aside">Studies, an agent skill and apps. Every card opens a full write-up.</p></Enter>
-    <div className="sc-card-grid">{MORE_WORK.map((item, i) => <WorkCard key={item.slug} item={item} index={i} />)}</div>
-    {ALSO_BUILT.length > 0 && <details className="sc-also">
-      <summary><span>Also built</span><small>{ALSO_BUILT.length} more, from internal tools to early experiments</small></summary>
-      <ul>{ALSO_BUILT.map((project) => <li key={project.slug}><a id={`card-${project.slug}`} href={`/work/${project.slug}/`}><strong>{project.title}</strong><span>{project.kind}</span><ArrowUpRight size={16} aria-hidden="true" /></a></li>)}</ul>
-    </details>}
-  </div></section>;
+  return (
+    <section id="more" className="sc-more ed-light ed-section" data-palette="lumora">
+      <div className="ed-wrap">
+        <Enter className="ed-section-heading">
+          <div>
+            <IndexLabel number="04">More shipped work</IndexLabel>
+            <h2><ScrambleText text="And plenty" /> <br /><em>more shipped.</em></h2>
+          </div>
+          <p className="ed-heading-aside">Studies, an agent skill and apps. Every card opens a full write-up.</p>
+        </Enter>
+        <div className="sc-card-grid">
+          {MORE_WORK.map((item, i) => <WorkCard key={item.slug} item={item} index={i} />)}
+        </div>
+        {ALSO_BUILT.length > 0 && (
+          <details className="sc-also">
+            <summary>
+              <span>Also built</span>
+              <small>{ALSO_BUILT.length} more, from internal tools to early experiments</small>
+            </summary>
+            <ul>
+              {ALSO_BUILT.map((project) => (
+                <li key={project.slug}>
+                  <a id={`card-${project.slug}`} href={`/work/${project.slug}/`}>
+                    <strong>{project.title}</strong>
+                    <span>{project.kind}</span>
+                    <ArrowUpRight size={15} aria-hidden="true" />
+                  </a>
+                </li>
+              ))}
+            </ul>
+          </details>
+        )}
+      </div>
+    </section>
+  );
 }
 
-// Keep the real screenshot as a fallback if a decorative cover cannot load.
 function ExperimentImage({ experiment }) {
   const [artBroken, setArtBroken] = useState(false);
   return <img className="ed-lazy-media" src={media(!artBroken && experiment.cardArt ? experiment.cardArt : experiment.shot)} alt="" width={1200} height={900} loading="lazy" onLoad={revealImage} onError={() => setArtBroken(true)} />;
 }
 
-// The playground on the home page: a row of experiments, each a way into
-// the real thing.
 const FILM_EXPERIMENTS = ["solar", "stars", "emet"].map((id) => EXPERIMENTS.find((e) => e.id === id)).filter(Boolean);
 export function PlaygroundSection() {
-  return <section id="ai" className="ed-projects ed-light ed-section" aria-labelledby="playground-title" data-palette="neon">
-    <div className="ed-wrap">
-      <Enter className="ed-section-heading"><div><IndexLabel number="05">Playground</IndexLabel><h2 id="playground-title">Rooms off <em>the hall.</em></h2></div><div className="ed-heading-aside"><p>Small things I built to try an idea. Each one opens on its own page.</p></div></Enter>
-      <div className="sc-card-grid is-three">{FILM_EXPERIMENTS.map((experiment, i) => <Enter key={experiment.id} index={i}>
-        <a href={experiment.href} className="sc-card">
-          <div className="sc-card-media"><ExperimentImage experiment={experiment} /></div>
-          <div className="sc-card-body"><h3>{experiment.title}<ArrowUpRight size={20} aria-hidden="true" /></h3><p className="sc-card-line">{experiment.hook}</p></div>
-        </a>
-      </Enter>)}</div>
-    </div>
-  </section>;
+  return (
+    <section id="ai" className="ed-projects ed-light ed-section" aria-labelledby="playground-title" data-palette="neon">
+      <div className="ed-wrap">
+        <Enter className="ed-section-heading">
+          <div>
+            <IndexLabel number="05">Playground</IndexLabel>
+            <h2 id="playground-title"><ScrambleText text="Rooms off" /> <em>the hall.</em></h2>
+          </div>
+          <div className="ed-heading-aside">
+            <p>Small things I built to try an idea. Each one opens on its own page.</p>
+          </div>
+        </Enter>
+        <div className="sc-card-grid is-three">
+          {FILM_EXPERIMENTS.map((experiment, i) => (
+            <Enter key={experiment.id} index={i}>
+              <a href={experiment.href} className="sc-card">
+                <div className="sc-card-media"><ExperimentImage experiment={experiment} /></div>
+                <div className="sc-card-body">
+                  <h3>{experiment.title}<ArrowUpRight size={18} aria-hidden="true" /></h3>
+                  <p className="sc-card-line">{experiment.hook}</p>
+                </div>
+              </a>
+            </Enter>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
 }
 
 export function ExperimentsSection() {
-  return <Sheet><section id="ai" className="ed-experiments ed-section" data-palette="neon"><div className="ed-wrap">
-    <Enter className="ed-section-heading"><div><IndexLabel number="05">The playground</IndexLabel><h2>What if{" "}<br /><em>I tried this?</em></h2></div><p className="ed-heading-aside">Interactive experiments built with AI as a pair programmer. Open one and have a play.</p></Enter>
-    <div className="ed-experiment-grid">{EXPERIMENTS.map((experiment, i) => <Enter key={experiment.id} index={i}><a href={experiment.href} className="ed-experiment" data-cursor="Play"><div className="ed-experiment-image"><ExperimentImage experiment={experiment} /><span>0{i + 1} / Interactive</span></div><div className="ed-experiment-title"><h3>{experiment.title}</h3><ArrowUpRight size={22} /></div><p>{experiment.hook}</p><span className="ed-experiment-cta">{experiment.cta}<ArrowRight size={16} /></span></a></Enter>)}</div>
-  </div></section></Sheet>;
+  return (
+    <Sheet>
+      <section id="ai" className="ed-experiments ed-section" data-palette="neon">
+        <div className="ed-wrap">
+          <Enter className="ed-section-heading">
+            <div>
+              <IndexLabel number="05">The playground</IndexLabel>
+              <h2>What if <br /><em>I tried this?</em></h2>
+            </div>
+            <p className="ed-heading-aside">Interactive experiments built with AI as a pair programmer. Open one and have a play.</p>
+          </Enter>
+          <div className="ed-experiment-grid">
+            {EXPERIMENTS.map((experiment, i) => (
+              <Enter key={experiment.id} index={i}>
+                <a href={experiment.href} className="ed-experiment" data-cursor="Play">
+                  <div className="ed-experiment-image">
+                    <ExperimentImage experiment={experiment} />
+                    <span>0{i + 1} / Interactive</span>
+                  </div>
+                  <div className="ed-experiment-title">
+                    <h3>{experiment.title}</h3>
+                    <ArrowUpRight size={20} />
+                  </div>
+                  <p>{experiment.hook}</p>
+                  <span className="ed-experiment-cta">{experiment.cta}<ArrowRight size={15} /></span>
+                </a>
+              </Enter>
+            ))}
+          </div>
+        </div>
+      </section>
+    </Sheet>
+  );
 }
-
-/* The last shot: the address itself is the biggest thing in the section,
-   and the network behind it sends its signals in to that address once,
-   then goes quiet. */
 
 export function ContactSection() {
   return <PlainContact />;
 }
 
+/* Modaic-style black footer with faint halftone dot texture, boxed "Have questions?"
+   contact card, and mono uppercase gray column headings with white links. */
 function PlainContact() {
   const { navigate } = useRoute();
-  return <section id="contact" className="ed-contact sc-contact" data-palette="blueBloom"><SignalField className="sc-contact-field" quiet gatherTo=".sc-email" /><div className="ed-wrap">
-    <IndexLabel number="05">Contact</IndexLabel>
-    <h2>Building something <em>ambitious?</em></h2>
-    <a href={`mailto:${CONTACT.email}`} className="sc-email" data-cursor="Write">{CONTACT.email}</a>
-    <div className="ed-contact-bottom"><MagneticLink href={`mailto:${CONTACT.email}`} className="ed-contact-email">Email me<ArrowUpRight aria-hidden="true" /></MagneticLink><div><p>I like the hard part: agents that have to be trusted, evals that have to be honest, and products that have to ship. If that sounds like your problem, write to me.</p><div className="ed-socials"><a href={CONTACT.github} target="_blank" rel="noopener noreferrer">GitHub<ExternalLink size={14} /></a><a href={CONTACT.linkedin} target="_blank" rel="noopener noreferrer">LinkedIn<ExternalLink size={14} /></a></div></div></div>
-    <footer className="ed-footer"><span>© {new Date().getFullYear()}</span><span>Designed and built by me, with AI as the pair programmer.</span><button onClick={() => navigate("deck")} aria-label="Back to top">Back to top ↑</button></footer></div></section>;
+  return (
+    <section id="contact" className="ed-contact sc-contact" data-palette="blueBloom">
+      <div className="ed-wrap">
+        <div className="sc-contact-top">
+          <div className="sc-contact-lead">
+            <IndexLabel number="06">Contact</IndexLabel>
+            <h2>Building something <em>ambitious?</em></h2>
+            <a href={`mailto:${CONTACT.email}`} className="sc-email" data-cursor="Write">{CONTACT.email}</a>
+          </div>
+          <div className="sc-contact-card">
+            <p className="sc-contact-card-kicker">% HAVE QUESTIONS? <span className="md-cursor-sq" aria-hidden="true" /></p>
+            <p className="sc-contact-card-copy">
+              I like the hard part: agents that have to be trusted, evals that have to be honest, and products that have to ship. If that sounds like your problem, write to me.
+            </p>
+            <div className="sc-contact-card-actions">
+              <MagneticLink href={`mailto:${CONTACT.email}`} className="ed-contact-email">
+                Email me<ArrowUpRight size={16} aria-hidden="true" />
+              </MagneticLink>
+              <div className="ed-socials">
+                <a href={CONTACT.github} target="_blank" rel="noopener noreferrer">GitHub<ExternalLink size={13} /></a>
+                <a href={CONTACT.linkedin} target="_blank" rel="noopener noreferrer">LinkedIn<ExternalLink size={13} /></a>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div className="sc-footer-cols">
+          <div>
+            <h3>WORK</h3>
+            <ul>
+              <li><a href="#projects">Selected work</a></li>
+              <li><a href="/work/">All projects</a></li>
+              <li><a href="/work/saywhen/">saywhen</a></li>
+              <li><a href="/work/hedwig/">Hedwig</a></li>
+              <li><a href="/work/jarvis/">Jarvis</a></li>
+            </ul>
+          </div>
+          <div>
+            <h3>PLAYGROUND</h3>
+            <ul>
+              <li><a href="/playground/emet/">Emet terminal</a></li>
+              <li><a href="/playground/explore/">Solar system</a></li>
+              <li><a href="/playground/infinity/">Infinity stars</a></li>
+              <li><a href="/playground/lineage-demo/">Data lineage</a></li>
+            </ul>
+          </div>
+          <div>
+            <h3>CONNECT</h3>
+            <ul>
+              <li><a href={`mailto:${CONTACT.email}`}>Email</a></li>
+              <li><a href={CONTACT.github} target="_blank" rel="noopener noreferrer">GitHub ↗</a></li>
+              <li><a href={CONTACT.linkedin} target="_blank" rel="noopener noreferrer">LinkedIn ↗</a></li>
+            </ul>
+          </div>
+        </div>
+
+        <footer className="ed-footer">
+          <span>© {new Date().getFullYear()} Mohamed Ansar</span>
+          <span>Designed and built by me, with AI as the pair programmer.</span>
+          <button type="button" onClick={() => navigate("deck")} aria-label="Back to top">Back to top ↑</button>
+        </footer>
+      </div>
+    </section>
+  );
 }
