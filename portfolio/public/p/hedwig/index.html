@@ -11,13 +11,13 @@
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://ansarbuilds.dev/p/hedwig/">
 <meta property="og:title" content="Hedwig · My Try at Building an LLM From Scratch">
-<meta property="og:description" content="From a MacBook Air to 286.7M knobs for $2.45. Why GPUs are 26x faster, how much the model improved, and how it compares to GPT and Claude.">
+<meta property="og:description" content="From a MacBook Air to 286.7M parameters for $2.45. Why GPUs are 26x faster, how much the model improved, and how it compares to GPT and Claude.">
 <meta property="og:image" content="https://ansarbuilds.dev/p/hedwig/og.jpg">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="Hedwig · My Try at Building an LLM From Scratch">
-<meta name="twitter:description" content="From a MacBook Air to 286.7M knobs for $2.45. Built from scratch, open source, and runs in your browser.">
+<meta name="twitter:description" content="From a MacBook Air to 286.7M parameters for $2.45. Built from scratch, open source, and runs in your browser.">
 <meta name="twitter:image" content="https://ansarbuilds.dev/p/hedwig/og.jpg">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -337,7 +337,7 @@ footer{padding:40px 20px;text-align:center;font-size:13px;border-top:1px solid v
       <div>
         <p class="k">My try at building an LLM from scratch · open source</p>
         <h1 class="title" aria-label="Hedwig"><span><i style="--i:0">H</i></span><span><i style="--i:1">e</i></span><span><i style="--i:2">d</i></span><span><i style="--i:3">w</i></span><span><i style="--i:4">i</i></span><span><i style="--i:5">g</i></span></h1>
-        <p class="hero-line">From a MacBook Air to <em>286.7 million knobs</em> on rented GPUs for <em>$2.45</em>, and how it compares to GPT and Claude.</p>
+        <p class="hero-line">From a MacBook Air to <em>286.7 million parameters</em> on rented GPUs for <em>$2.45</em>, and how it compares to GPT and Claude.</p>
         <div class="ctas"><a class="btn gold" href="#act1">Watch it write ↓</a><a class="btn" href="https://github.com/ansarbuilds/hedwig" target="_blank" rel="noopener">Read the code ↗</a></div>
       </div>
       <svg class="snowy-owl" viewBox="-100 -100 200 200" aria-hidden="true">
@@ -365,7 +365,7 @@ footer{padding:40px 20px;text-align:center;font-size:13px;border-top:1px solid v
 
 <section class="wrap" aria-label="Key numbers">
   <div class="stats">
-    <div class="stat rv"><b data-count="286.7" data-dec="1" data-suf="M"><span>286.7</span>M</b><p>knobs in the biggest brain, trained from random numbers</p></div>
+    <div class="stat rv"><b data-count="286.7" data-dec="1" data-suf="M"><span>286.7</span>M</b><p>parameters in the largest model, trained from random numbers</p></div>
     <div class="stat rv" style="--i:1"><b data-count="2.45" data-dec="2" data-pre="$">$<span>2.45</span></b><p>total rented-GPU spend across all three cloud runs</p></div>
     <div class="stat rv" style="--i:2"><b data-count="26" data-dec="0" data-suf="×"><span>26</span>×</b><p>faster training on a rented RTX A5000 vs the MacBook Air M4</p></div>
     <div class="stat rv" style="--i:3"><b data-count="98.3" data-dec="1"><span>98.3</span>%</b><p>preference win-rate after taste training on the flagship</p></div>
@@ -397,7 +397,7 @@ footer{padding:40px 20px;text-align:center;font-size:13px;border-top:1px solid v
       </div>
       <div class="facts">
         <div class="rv"><b>40 / 40</b>pieces match PyTorch, on both brains</div>
-        <div class="rv" style="--i:1"><b>2 brains</b>13.8M (14 MB) or 97.6M (98 MB)</div>
+        <div class="rv" style="--i:1"><b>2 models</b>13.8M (14 MB) or 97.6M (98 MB)</div>
         <div class="rv" style="--i:2"><b>$0</b>to host: a static page</div>
       </div>
     </div>
@@ -418,22 +418,22 @@ footer{padding:40px 20px;text-align:center;font-size:13px;border-top:1px solid v
   <div class="schools">
     <article class="glass school rv"><span class="n">1</span><h3>Reading</h3><p>Guess the next piece millions of times. Val score dropped 8.501 → 2.080 → 1.795.</p><div class="paper ex"><small>Pretraining</small>Once upon a time, a little owl found a shiny key</div><p class="metric">13.8M val 1.795</p></article>
     <article class="glass school rv" style="--i:1"><span class="n">2</span><h3>Manners</h3><p>13,852 pairs graded only on the reply (-100 prompt mask). Now it answers and stops.</p><div class="paper ex"><small>SFT</small>User: Tell me a story where Lily finds a shiny key.<br>Hedwig: Once upon a time…</div><p class="metric">13.8M 1.438 · 97.6M 1.336</p></article>
-    <article class="glass school rv" style="--i:2"><span class="n">3</span><h3>Taste</h3><p>Two stories, one liked. Learns to stay on topic and drop clumsy repetition.</p><div class="paper ex"><small>DPO</small>👍 an owl and a tree, as asked<br>👎 Spot the dog, again</div><p class="metric">win-rate 92.5% → 96.7% → 98.3%</p></article>
+    <article class="glass school rv" style="--i:2"><span class="n">3</span><h3>Taste</h3><p>Two stories, one liked. Learns to stay on topic and drop clumsy repetition.</p><div class="paper ex"><small>DPO</small>Chosen: an owl and a tree, as asked<br>Rejected: Spot the dog, again</div><p class="metric">win-rate 92.5% → 96.7% → 98.3%</p></article>
   </div>
   <div class="cheat">
-    <div class="paper bad rv"><span class="t">Caught cheating · DPO run 1 · step 300</span><q>Lily loves <mark>Lily's</mark> key. Lily does <mark>Lily's</mark> mom's idea…</q><p>Cramming "Lily's" in widened the score gap. The score went up; the stories fell apart. Reward hacking at 14M knobs.</p></div>
+    <div class="paper bad rv"><span class="t">Caught cheating · DPO run 1 · step 300</span><q>Lily loves <mark>Lily's</mark> key. Lily does <mark>Lily's</mark> mom's idea…</q><p>Cramming "Lily's" in widened the score gap. The score went up; the stories fell apart. Reward hacking at 14M parameters.</p></div>
     <div class="paper rv" style="--i:1"><span class="t">Fixed · DPO run 2</span><q>An anchor for fluency.</q><p>Adding 0.5x chosen NLL kept liked stories grammatical, as Llama 3 did. The loophole closed and win-rate hit 92.5% peak.</p></div>
   </div>
   <div class="lab">
-    <article class="glass exp rv"><b>8 → 2</b><h3>Mixture of Experts</h3><p>26.2M total knobs, only 11.6M awake per word. Loss 2.461 → 1.966. <code>moe.py</code></p></article>
+    <article class="glass exp rv"><b>8 → 2</b><h3>Mixture of Experts</h3><p>26.2M total parameters, only 11.6M active per token. Loss 2.461 → 1.966. <code>moe.py</code></p></article>
     <article class="glass exp rv" style="--i:1"><b>3.4M</b><h3>Distillation</h3><p>Baby Hedwig taught by the 13.8M teacher (6.8 MB), still writes full stories. <code>distill.py</code></p></article>
     <article class="glass exp rv" style="--i:2"><b>6×</b><h3>Apple MLX</h3><p>Training step 596 → 99 ms, identical next 80 pieces to PyTorch. <code>mlx_bench.py</code></p></article>
     <article class="glass exp rv"><b>2.8×</b><h3>LLM in a Flash</h3><p>Layers streamed from SSD: 52.9 → 18.8 MB held in memory, 33 tok/s. <code>ssd_runner.py</code></p></article>
-    <article class="glass exp rv" style="--i:1"><b>30/30</b><h3>iPhone brain</h3><p>64-seat Core ML export matching PyTorch, plus Swift tokenizer. <code>export_iphone.py</code></p></article>
-    <article class="glass exp rv" style="--i:2"><b>🇫🇷</b><h3>French Hedwig</h3><p>2.56M knobs on public-domain Dumas &amp; Verne, val 7.776 → 3.541. <code>lang_hedwig.py</code></p></article>
+    <article class="glass exp rv" style="--i:1"><b>30/30</b><h3>iPhone model</h3><p>64-seat Core ML export matching PyTorch, plus Swift tokenizer. <code>export_iphone.py</code></p></article>
+    <article class="glass exp rv" style="--i:2"><b>FR</b><h3>French Hedwig</h3><p>2.56M parameters on public-domain Dumas &amp; Verne, val 7.776 → 3.541. <code>lang_hedwig.py</code></p></article>
   </div>
   <div class="glass rv" id="quant">
-    <h3>Squeezing the brain</h3><p style="margin:6px 0 0;font-size:14px">Same 13.8M chat brain, same test, lower is better. 8-bit is free; 4-bit costs 0.023.</p>
+    <h3>Squeezing the brain</h3><p style="margin:6px 0 0;font-size:14px">Same 13.8M chat model, same test, lower is better. 8-bit is free; 4-bit costs 0.023.</p>
     <div class="q"><span>32-bit</span><div class="track"><div class="bar" data-w="300" style="--c:#5b6283;color:var(--ivory)">55.5 MB · 1.4530</div></div></div>
     <div class="q"><span>16-bit</span><div class="track"><div class="bar" data-w="150" style="--c:var(--indigo)">27.8 MB · 1.4530</div></div></div>
     <div class="q"><span>8-bit</span><div class="track"><div class="bar" data-w="75.6" style="--c:var(--cyan)">14.0 MB · 1.4531</div></div></div>
@@ -446,19 +446,14 @@ footer{padding:40px 20px;text-align:center;font-size:13px;border-top:1px solid v
   <div class="wrap">
     <div class="act-n rv"><b>III</b><p class="k">Why the Mac wasn't enough &amp; why GPUs are faster</p><span></span></div>
     <h2 class="h2 rv" id="t3">The Mac hit a wall. <em>Rented GPUs ran 26× faster.</em></h2>
-    <p class="lead rv">Training work scales as FLOPs = 6 × knobs × tokens. A full pass over TinyStories takes ~20 hours on a fanless MacBook Air M4 as it thermally throttles from 66s to 110s per 250 steps, and a 4k dictionary chops rare names apart. I rehearsed a 2-step dry run on Mac (92s) and rented RunPod GPUs.</p>
+    <p class="lead rv">Training work scales as FLOPs = 6 × parameters × tokens. A full pass over TinyStories takes ~20 hours on a fanless MacBook Air M4 as it thermally throttles from 66s to 110s per 250 steps, and a 4k dictionary chops rare names apart. I rehearsed a 2-step dry run on Mac (92s) and rented RunPod GPUs.</p>
     <div class="glass rv" id="speed-race">
-      <h3>Same 50 MB lesson (13.8M knobs, 3,000 steps)</h3>
+      <h3>Same 50 MB lesson (13.8M parameters, 3,000 steps)</h3>
       <div class="row"><div class="who"><b>MacBook Air M4 ($0)</b><small>8-core GPU · fanless thermal throttle</small></div><div class="track"><div class="bar us" data-w="100" style="--c:var(--indigo)">~59 min (3,540 s)</div></div></div>
       <div class="row"><div class="who"><b>Rented RTX A5000 ($0.10)</b><small>1× data-center GPU · $0.28/hr</small></div><div class="track"><div class="bar us" data-w="14" style="--c:var(--cyan)">135 s · 26× faster</div></div></div>
     </div>
     <div class="wallcards">
       <div class="glass wallcard rv">
-        <p class="k">Why NVIDIA GPUs fly</p>
-        <h3>Tensor Cores, FlashAttention &amp; VRAM</h3>
-        <p>Data-center GPUs run thousands of dedicated bf16 Tensor Cores in parallel, execute fused CUDA FlashAttention in fast SRAM, push hundreds of GB/s across 24 to 48 GB VRAM, and keep active cooling so speed never drops.</p>
-      </div>
-      <div class="glass wallcard rv" style="--i:1">
         <p class="k">Why 14M failed Harry Potter</p>
         <h3>4k vocab split "Potter" in half</h3>
         <p>Without a single token for "Potter", 14M Hedwig saw "pot" + "ter", latched onto "pot", and turned Harry into a puppy or Timmy making a pot of soup. At 8k and 16k vocab, the whole name stays whole.</p>
@@ -471,7 +466,7 @@ footer{padding:40px 20px;text-align:center;font-size:13px;border-top:1px solid v
   <div class="strip" id="strip">
     <div class="strip-stick">
       <div class="track3" id="track3">
-        <article class="day"><div class="d"><b>1</b><span>15 NOV</span></div><h3>Guessing one letter at a time</h3><ul><li>4.8M knobs on Tiny Shakespeare, 16 minutes<br><em>loss 4.388 → 1.483</em></li><li>A learning log and a $100 plan before spending anything</li></ul></article>
+        <article class="day"><div class="d"><b>1</b><span>15 NOV</span></div><h3>Guessing one letter at a time</h3><ul><li>4.8M parameters on Tiny Shakespeare, 16 minutes<br><em>loss 4.388 → 1.483</em></li><li>A learning log and a $100 plan before spending anything</li></ul></article>
         <article class="day"><div class="d"><b>2</b><span>16 NOV</span></div><h3>Save points and my own tokenizer</h3><ul><li>Stopped mid-run with Ctrl+C, resumed<br><em>1.622 → 1.481</em></li><li>BPE from scratch<br><em>text 1.96× shorter</em></li><li>First lesson in overfitting<br><em>3.007 → 3.429</em></li></ul></article>
         <article class="day"><div class="d"><b>4</b><span>18 NOV</span></div><h3>The modern stack, then all three stages</h3><ul><li>RoPE, RMSNorm, SwiGLU, bf16, SDPA, one at a time</li><li>13.8M storyteller<br><em>val 8.501 → 2.080</em></li><li>8-bit and 4-bit from scratch<br><em>7.05× smaller</em></li><li>Taste training, caught cheating, fixed<br><em>win-rate 0% → 91.7%</em></li></ul></article>
         <article class="day"><div class="d"><b>5</b><span>19 NOV</span></div><h3>The lab week, on a laptop, for $0</h3><ul><li>KV cache + streaming<br><em>47 → 89 pieces/s</em></li><li>Mixture of Experts, distillation, Brain X-Ray<br><em>26.2M total, 11.6M active</em></li><li>A longer read<br><em>val 2.080 → 1.795</em></li></ul></article>
@@ -494,7 +489,7 @@ footer{padding:40px 20px;text-align:center;font-size:13px;border-top:1px solid v
         <tr><td>Layout (layers × width × heads)</td><td class="num">6 × 384 × 6</td><td class="num">12 × 768 × 12</td><td class="num">20 × 1024 × 16</td></tr>
         <tr><td>Context / Vocabulary</td><td class="num">256 / 4,096</td><td class="num">256 / 8,192</td><td class="num">512 / 16,384</td></tr>
         <tr><td>Hardware &amp; Cost</td><td class="num">Mac M4 · $0.00</td><td class="num">1× A40 (66m) · $0.65</td><td class="num">1× 4090 (115m) · $1.70</td></tr>
-        <tr><td>Tokens seen (per knob)</td><td class="num">~125M (~9 / knob)</td><td class="num">~164M (~1.7 / knob)</td><td class="num">~205M (~0.7 / knob)</td></tr>
+        <tr><td>Tokens seen (per parameter)</td><td class="num">~125M (~9 / param)</td><td class="num">~164M (~1.7 / param)</td><td class="num">~205M (~0.7 / param)</td></tr>
         <tr><td>Stage 2 SFT / Stage 3 DPO win</td><td class="num">1.438 / 92.5%</td><td class="num">1.336 / 96.7%</td><td class="num">1.341 / <b>98.3%</b></td></tr>
         <tr><td>4-bit compressed size</td><td class="num">7.9 MB</td><td class="num">55.2 MB</td><td class="num">161.9 MB</td></tr>
       </tbody>
@@ -507,35 +502,33 @@ footer{padding:40px 20px;text-align:center;font-size:13px;border-top:1px solid v
 
 <!-- ACT V -->
 <section class="wrap act" id="act5" aria-labelledby="t5">
-  <div class="act-n rv"><b>V</b><p class="k">Hedwig vs GPT &amp; Claude</p><span></span></div>
-  <h2 class="h2 rv" id="t5">Same recipe. <em>10,000+ GPUs.</em></h2>
-  <p class="lead rv">ChatGPT and Claude use the same Transformer blocks and three-stage training (Pretrain, SFT, DPO/RLHF). Frontier models aren't hiding a secret algorithm: they wire 10,000 to 100,000+ GPUs together to read 20+ tokens per knob across trillions of web, code and book tokens.</p>
+  <div class="act-n rv"><b>V</b><p class="k">Hedwig next to published models</p><span></span></div>
+  <h2 class="h2 rv" id="t5">Same recipe, <em>different scale.</em></h2>
+  <p class="lead rv">GPT-3 and Llama 3 are decoder-only Transformers trained with the same pretrain-then-post-train loop. The gap is scale: Flagship Hedwig read about 0.7 tokens per parameter on one RTX 4090, Chinchilla argued for about 20, and Llama 3 405B read about 38. The other rows are only what each model's own paper reports; none published a training cost.</p>
   <div class="scale-list" id="scale">
     <div class="row rv"><div class="who"><b>Mac Hedwig</b><small>1× MacBook Air M4 · $0</small></div><div class="track"><div class="bar us" data-w="42" style="--c:var(--indigo)">13.8M · ~125M tok</div></div></div>
     <div class="row rv"><div class="who"><b>Cloud Hedwig</b><small>1× NVIDIA A40 · $0.65</small></div><div class="track"><div class="bar us" data-w="50" style="--c:var(--cyan)">97.6M · ~164M tok</div></div></div>
-    <div class="row rv"><div class="who"><b>GPT-2 Small (2019)</b><small>32× Cloud TPU v3</small></div><div class="track"><div class="bar them" data-w="52">124M · ~10B tok</div></div></div>
     <div class="row rv"><div class="who"><b>Flagship Hedwig</b><small>1× RTX 4090 · $1.70</small></div><div class="track"><div class="bar us" data-w="56" style="--c:var(--gold)">286.7M · ~205M tok</div></div></div>
-    <div class="row rv"><div class="who"><b>GPT-3 (2020)</b><small>~1k-10k× V100 GPUs</small></div><div class="track"><div class="bar them" data-w="82">175B · ~300B tok · ~$4.6M</div></div></div>
-    <div class="row rv"><div class="who"><b>Llama 3 (2024)</b><small>16,384× NVIDIA H100</small></div><div class="track"><div class="bar them" data-w="90">405B · 15.6T tok · ~$50M+</div></div></div>
-    <div class="row rv"><div class="who"><b>GPT-4/5 · Claude Opus</b><small>10k-100k+ H100/B200</small></div><div class="track"><div class="bar them" data-w="100">1T+ (est.) · 10T-20T+ tok</div></div></div>
+    <div class="row rv"><div class="who"><b>Chinchilla (2022)</b><small>TPUv3 / TPUv4</small></div><div class="track"><div class="bar them" data-w="78">70B · 1.4T tok</div></div></div>
+    <div class="row rv"><div class="who"><b>GPT-3 (2020)</b><small>V100 cluster</small></div><div class="track"><div class="bar them" data-w="82">175B · 300B tok</div></div></div>
+    <div class="row rv"><div class="who"><b>Llama 3 (2024)</b><small>16,384× NVIDIA H100</small></div><div class="track"><div class="bar them" data-w="90">405B · 15.6T tok</div></div></div>
   </div>
   <div class="tblwrap rv">
     <table class="tbl">
-      <thead><tr><th>Model</th><th class="num">Knobs</th><th>GPUs Used</th><th class="num">Tokens Read</th><th class="num">Tokens / Knob</th><th class="num">Cost (est.)</th></tr></thead>
+      <thead><tr><th>Model</th><th class="num">Params</th><th>GPUs Used</th><th class="num">Tokens Read</th><th class="num">Tokens / Param</th><th class="num">Cost</th></tr></thead>
       <tbody>
         <tr><td><b>Mac Hedwig</b></td><td class="num">13.8M</td><td>1× MacBook Air M4</td><td class="num">~125M</td><td class="num">~9.0</td><td class="num">$0.00</td></tr>
         <tr><td><b>Cloud Hedwig</b></td><td class="num">97.6M</td><td>1× NVIDIA A40</td><td class="num">~164M</td><td class="num">~1.7</td><td class="num">$0.65</td></tr>
         <tr><td><b>Flagship Hedwig</b></td><td class="num">286.7M</td><td>1× NVIDIA RTX 4090</td><td class="num">~205M</td><td class="num">~0.7</td><td class="num">$1.70</td></tr>
-        <tr><td>GPT-2 Small (2019)</td><td class="num">124M</td><td>32× Cloud TPU v3</td><td class="num">~10B</td><td class="num">~80</td><td class="num">~$1k-$5k</td></tr>
-        <tr><td>GPT-3 (2020)</td><td class="num">175B</td><td>~1k-10k× V100</td><td class="num">~300B</td><td class="num">~1.7</td><td class="num">~$4.6M</td></tr>
-        <tr><td>Llama 3 (2024)</td><td class="num">405B</td><td><b>16,384× H100</b></td><td class="num">15.6T</td><td class="num">~38.5</td><td class="num">~$50M+</td></tr>
-        <tr><td>GPT-4/5 · Claude Opus</td><td class="num">1T+ (est.)</td><td><b>10k-100k+ H100/B200</b></td><td class="num">10T-20T+</td><td class="num">~20+ &amp; RL</td><td class="num">$50M-$500M+</td></tr>
+        <tr><td>Chinchilla (2022)</td><td class="num">70B</td><td>TPUv3 / TPUv4</td><td class="num">1.4T</td><td class="num">20</td><td class="num">not published</td></tr>
+        <tr><td>GPT-3 (2020)</td><td class="num">175B</td><td>V100 cluster</td><td class="num">300B</td><td class="num">~1.7</td><td class="num">not published</td></tr>
+        <tr><td>Llama 3 (2024)</td><td class="num">405B</td><td><b>16,384× H100</b></td><td class="num">15.6T</td><td class="num">~38.5</td><td class="num">not published</td></tr>
       </tbody>
     </table>
   </div>
   <div class="read">
     <div class="glass rv"><h3>What Hedwig read</h3><div class="chips"><span>TinyStories</span><span>FineWeb-Edu</span><span>10 Gutenberg novels</span><span>30k CoEdIT grammar edits</span></div><p style="font-size:14px;margin:14px 0 0">All public domain or openly licensed. No outputs from closed commercial models.</p></div>
-    <div class="glass rv" style="--i:1"><h3>What frontier models add</h3><div class="chips"><span>15+ trillion web &amp; code tokens</span><span>20-40+ tokens per knob</span><span>Data/Tensor/Pipeline parallelism</span><span>Deep RL &amp; reasoning tuning</span></div></div>
+    <div class="glass rv" style="--i:1"><h3>What the big published models add</h3><div class="chips"><span>Trillions of web &amp; code tokens</span><span>20 to 40 tokens per parameter</span><span>Data/Tensor/Pipeline parallelism</span><span>Deep RL &amp; reasoning tuning</span></div></div>
   </div>
 </section>
 
@@ -560,21 +553,21 @@ footer{padding:40px 20px;text-align:center;font-size:13px;border-top:1px solid v
       <div class="shots">
         <figure class="rv"><img src="runpod-terminal.jpg" alt="The first rented GPU running bash cloud_train.sh" loading="lazy"><figcaption>The first rented GPU, running one command that prepares the data, trains all three stages and squeezes the brains.</figcaption></figure>
       </div>
-      <div class="glass why rv"><h3>Why so cheap</h3><p style="margin:8px 0 0;font-size:15px">Small models, cheap community GPUs, one rehearsed script, no wasted runs. The flagship read about 0.7 pieces per knob, far under the Chinchilla rule of about 20, to stay on budget. Its weaker grammar edits are the exact cost of that trade.</p></div>
+      <div class="glass why rv"><h3>Why so cheap</h3><p style="margin:8px 0 0;font-size:15px">Small models, cheap community GPUs, one rehearsed script, no wasted runs. The flagship read about 0.7 tokens per parameter, far under the Chinchilla rule of about 20, to stay on budget. Its weaker grammar edits are the exact cost of that trade.</p></div>
     </div>
   </div>
 </section>
 
 <!-- FILMS -->
 <section class="wrap act" aria-labelledby="tf">
-  <div class="act-n rv"><b>✦</b><p class="k">On screen</p><span></span></div>
+  <div class="act-n rv"><b>·</b><p class="k">On screen</p><span></span></div>
   <h2 class="h2 rv" id="tf">Then it wrote <em>a movie.</em></h2>
   <div class="films">
     <figure class="rv"><div class="screen"><video src="https://ansarbuilds.dev/hedwig/film/out/hedwig-demo.mp4" poster="https://ansarbuilds.dev/hedwig/site/film-poster.jpg" controls preload="none" playsinline></video></div><figcaption><b>The launch film.</b> 60 seconds, made in code with Remotion.</figcaption></figure>
-    <figure class="rv" style="--i:1"><div class="screen"><video src="https://ansarbuilds.dev/hedwig/movie/pip_and_the_lost_key.mp4" poster="https://ansarbuilds.dev/hedwig/site/pip-poster.jpg" controls preload="none" playsinline></video></div><figcaption><b>Pip and the Lost Key.</b> 84 seconds. The story is word for word from the 286.7M brain.</figcaption></figure>
+    <figure class="rv" style="--i:1"><div class="screen"><video src="https://ansarbuilds.dev/hedwig/movie/pip_and_the_lost_key.mp4" poster="https://ansarbuilds.dev/hedwig/site/pip-poster.jpg" controls preload="none" playsinline></video></div><figcaption><b>Pip and the Lost Key.</b> 84 seconds. The story is word for word from the 286.7M model.</figcaption></figure>
   </div>
   <div class="gallery">
-    <figure class="rv"><img src="mac-app.jpg" alt="app.py, the offline Mac app, running the 286.7M brain with the Brain X-Ray open" loading="lazy"><figcaption>The offline Mac app, 286.7M at 33 pieces a second, with Brain X-Ray.</figcaption></figure>
+    <figure class="rv"><img src="mac-app.jpg" alt="app.py, the offline Mac app, running the 286.7M model with the Brain X-Ray open" loading="lazy"><figcaption>The offline Mac app, 286.7M at 33 pieces a second, with Brain X-Ray.</figcaption></figure>
     <figure class="rv" style="--i:1"><img src="browser-demo.jpg" alt="The browser demo running on the visitor's device" loading="lazy"><figcaption>The browser demo.</figcaption></figure>
     <figure class="rv" style="--i:2"><img src="explainer.jpg" alt="how-hedwig-learns.html, the illustrated guide" loading="lazy"><figcaption>The illustrated guide.</figcaption></figure>
   </div>
@@ -582,16 +575,16 @@ footer{padding:40px 20px;text-align:center;font-size:13px;border-top:1px solid v
 
 <!-- LIMITS + WHAT I LEARNT -->
 <section class="wrap act" aria-labelledby="tlim">
-  <div class="act-n rv"><b>✦</b><p class="k">Said plainly &amp; what I learnt</p><span></span></div>
+  <div class="act-n rv"><b>·</b><p class="k">Said plainly &amp; what I learnt</p><span></span></div>
   <h2 class="h2 rv" id="tlim">Honest limits. <em>Five real lessons.</em></h2>
   <div class="limits">
-    <div class="limit rv"><h3>Names wander on tiny models</h3><p>A frog grabs Lily's umbrella, then thanks Lily for helping it. The 14M brain renamed an owl three times in one story.</p></div>
-    <div class="limit rv" style="--i:1"><h3>Under-read flagship trails on grammar</h3><p>286.7M read ~0.7 tokens per knob vs 97.6M's ~1.7 tokens per knob, so 97.6M fixed "I goes" to "I go" while 286.7M missed it.</p></div>
+    <div class="limit rv"><h3>Names wander on tiny models</h3><p>A frog grabs Lily's umbrella, then thanks Lily for helping it. The 14M model renamed an owl three times in one story.</p></div>
+    <div class="limit rv" style="--i:1"><h3>Under-read flagship trails on grammar</h3><p>286.7M read ~0.7 tokens per parameter vs 97.6M's ~1.7 tokens per parameter, so 97.6M fixed "I goes" to "I go" while 286.7M missed it.</p></div>
   </div>
   <ul class="learned">
     <li class="rv"><b>1. Change one thing at a time.</b><span>512-BPE overfit Shakespeare after step 750 (3.007 → 3.429), and RMSNorm was 30% slower than LayerNorm on Apple MPS (419 ms vs 323 ms). Writing down every score caught both.</span></li>
     <li class="rv"><b>2. A rising score can be a lie.</b><span>Pure DPO gamed the reward by repeating "Lily's" every third word. A fluency anchor closed the loophole and hit 92.5% peak win-rate cleanly.</span></li>
-    <li class="rv"><b>3. Reading beats knob count.</b><span>The Chinchilla rule (~20 tokens per knob) showed up in our own grammar benchmark: more reading hours beat extra parameters on a fixed $2 budget.</span></li>
+    <li class="rv"><b>3. Reading beats knob count.</b><span>The Chinchilla rule (~20 tokens per parameter) showed up in our own grammar benchmark: more reading hours beat extra parameters on a fixed $2 budget.</span></li>
     <li class="rv"><b>4. Compare stories, not cross-vocab loss.</b><span>4k, 8k and 16k tokenizers create three different quiz scales. Side-by-side prompts with a fixed seed are the fair test.</span></li>
     <li class="rv"><b>5. Dry-run before renting GPUs.</b><span>A 92-second Mac rehearsal caught path and resume bugs for $0, so every rented GPU minute produced usable weights.</span></li>
   </ul>
@@ -599,7 +592,7 @@ footer{padding:40px 20px;text-align:center;font-size:13px;border-top:1px solid v
 
 <!-- ARCHIVE -->
 <section class="wrap act" aria-labelledby="ta">
-  <div class="act-n rv"><b>✦</b><p class="k">Open source</p><span></span></div>
+  <div class="act-n rv"><b>·</b><p class="k">Open source</p><span></span></div>
   <h2 class="h2 rv" id="ta">Everything is <em>public.</em></h2>
   <div class="archive">
     <a class="glass rv" href="https://github.com/ansarbuilds/hedwig" target="_blank" rel="noopener"><small>GITHUB · MIT</small><b>The code</b><span>Every stage in plain PyTorch, plus the browser version.</span></a>
@@ -619,7 +612,7 @@ footer{padding:40px 20px;text-align:center;font-size:13px;border-top:1px solid v
   <svg class="flyer" viewBox="-45 -32 90 64" aria-hidden="true"><g class="w"><path d="M-4 0 Q-34 -24 -42 4 Q-24 0 -6 9 Z M4 0 Q34 -24 42 4 Q24 0 6 9 Z" fill="#f7f4ec"/><path d="M-24 -6 l4 2 l-2 3 Z M-16 -2 l3 2 l-2 3 Z M24 -6 l-4 2 l2 3 Z M16 -2 l-3 2 l2 3 Z" fill="#5a3d21" opacity=".75"/></g><ellipse cx="0" cy="4" rx="9" ry="12" fill="#ffffff"/><circle cx="-3.5" cy="-2" r="2.3" fill="#e59200"/><circle cx="3.5" cy="-2" r="2.3" fill="#e59200"/><path d="M-1.5 1 L1.5 1 L0 4 Z" fill="#23252b"/></svg>
   <div class="wrap">
     <h2 id="tfin" class="rv">Once upon a time,<br>there was a little owl.</h2>
-    <p class="rv">Six days, three brains, $2.45, and a model that now lives in a browser tab. Built to understand how GPT and Claude work, one measured step at a time.</p>
+    <p class="rv">Six days, three models, $2.45, and a model that now lives in a browser tab. Built to understand how GPT and Claude work, one measured step at a time.</p>
     <div class="ctas rv"><a class="btn gold" href="https://huggingface.co/spaces/ansarbuilds/hedwig-demo" target="_blank" rel="noopener">Try Hedwig ↗</a><a class="btn" href="https://github.com/ansarbuilds/hedwig" target="_blank" rel="noopener">Star it on GitHub ↗</a><a class="btn" href="/work/hedwig/">Back to the project</a><a class="btn" href="/work/">See more work</a></div>
   </div>
 </section>
@@ -739,8 +732,8 @@ const SHOW = [
   { tab: "Grammar edit (Chinchilla test)", prompt: "Improve the grammar of this text: I goes to the office yesterday and send the report to my manager.",
     out: [
       ["Once upon a time, there was an office. It was very big and had many rooms.", "The man worked hard and saved the day.", "no", "Ignored edit mode and wrote a bedtime story."],
-      ["I go to the office yesterday, and send the report to my manager.", "", "mid", "Switched to edit mode and fixed 'goes' (1.7 tok/knob)."],
-      ["I goes to the office yesterday and send the report to my manager.", "", "no", "Under-read (0.7 tok/knob) missed the grammar fix."] ] },
+      ["I go to the office yesterday, and send the report to my manager.", "", "mid", "Switched to edit mode and fixed 'goes' (1.7 tok/param)."],
+      ["I goes to the office yesterday and send the report to my manager.", "", "no", "Under-read (0.7 tok/param) missed the grammar fix."] ] },
 ];
 const NAMES = [["13.8M", "Mac · $0"], ["97.6M", "A40 · $0.65"], ["286.7M", "RTX 4090 · $1.70"]];
 const tabs = $("tabs"), show = $("show");

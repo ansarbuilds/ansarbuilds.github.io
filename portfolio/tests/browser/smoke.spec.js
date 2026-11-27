@@ -70,9 +70,6 @@ test('homepage has no critical or serious automated accessibility violations', a
   await expect(page.getByRole('main')).toBeVisible();
   // Judge the settled page: text caught half faded in reads as low contrast.
   await page.addStyleTag({ content: '*, *::before, *::after { animation-duration: 0s !important; animation-delay: 0s !important; transition: none !important; }' });
-  // The short version's statement reveals word by word as it scrolls up:
-  // judge it read in full.
-  await page.locator('.sc-statement').evaluate((node) => window.scrollTo(0, node.getBoundingClientRect().top + window.scrollY - window.innerHeight * 0.25));
   await page.waitForTimeout(600);
   const result = await new AxeBuilder({ page }).analyze();
   const bad = result.violations.filter((violation) => ['critical', 'serious'].includes(violation.impact));

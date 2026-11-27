@@ -12,7 +12,7 @@ const VIEW_TITLES = {
   explore: "Solar system explorer",
   "lineage-demo": "Data lineage explorer",
   infinity: "Infinity loop",
-  work: "Selected work",
+  work: "Index of work",
 };
 
 export function titleForRoute(route) {

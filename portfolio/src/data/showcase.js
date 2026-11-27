@@ -14,7 +14,7 @@ export const FLAGSHIPS = [
     slug: "hedwig",
     eyebrow: "Open source · LLM from scratch",
     badge: "New · runs in your browser",
-    headline: "My try at building a ChatGPT-style model from scratch, from a MacBook Air to 286.7M knobs for $2.45.",
+    headline: "My try at building a ChatGPT-style model from scratch, from a MacBook Air to 286.7M parameters for $2.45.",
     copy: "Plain PyTorch, why the Mac hit a wall, why rented GPUs ran 26× faster, and how Hedwig compares to GPT and Claude.",
     stats: [["286.7M", "parameters, largest model"], ["$2.45", "total cloud spend"], ["98.3%", "DPO win-rate"]],
     stack: ["PyTorch", "JavaScript", "RunPod", "Hugging Face"],
@@ -87,7 +87,7 @@ export const FLAGSHIPS = [
 // `art` is each card's evidence poster, drawn from the project's own
 // numbers by scripts/make-more-art.mjs.
 export const MORE_WORK = [
-  { slug: "decision-models", art: "/shots/more/decision-models.webp", metric: "+16", unit: "points over a larger AI", line: "The best small model routed support tickets better than a larger one, and ran 5× faster on the same laptop." },
+  { slug: "decision-models", art: "/shots/more/decision-models.webp", metric: "+16", unit: "points over a 7B general model", line: "The best small model routed support tickets better than a larger one, and ran 5× faster on the same laptop." },
   { slug: "rea-study", art: "/shots/more/rea-study.webp", metric: "2.3×", unit: "the cost, no clear gain", line: "An independent test of a reverse-engineering tool for agents on 20 programs, with the null result published in full." },
   { slug: "storyera", art: "/shots/more/storyera.webp", metric: "53", unit: "chapters in the first audit", line: "An agent skill that checks a novel for continuity, cites every passage and leaves the author in control." },
   { slug: "reptrack", art: "/shots/more/reptrack.webp", line: "A fast workout log for the gym floor. Native Swift, live on the App Store." },
@@ -108,7 +108,7 @@ export const CAPABILITIES = [
     count: "3",
     unit: "published AI studies",
     title: "Evaluation & research",
-    copy: "A demo is not evidence. I design the eval, publish the method and every run, and report the result even when it is a null.",
+    copy: "I design the eval, write the scoring rules before the runs, publish every run, and report the result even when it is a null.",
     proof: ["prh-jepa", "rea-study", "decision-models"],
   },
   {

@@ -1,16 +1,16 @@
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
-import { animate, motion, useMotionValue, useReducedMotion, useScroll, useTransform } from "framer-motion";
+import { animate, motion, useMotionValue, useReducedMotion } from "framer-motion";
 import { ArrowDown, ArrowUpRight, ExternalLink, Play } from "lucide-react";
-import DotSphere from "./DotSphere";
+import HedwigTrace from "./HedwigTrace";
 import DitherField from "./DitherField";
 import WorkStage from "./WorkStage";
 import { CODE, CONTACT, HERO, RECEIPTS } from "../data/content";
-import { LISTED_PROJECTS, getProject } from "../data/projectIndex";
-import { CAPABILITIES, FLAGSHIPS, MORE_WORK } from "../data/showcase";
+import { PROJECT_INDEX, getProject } from "../data/projectIndex";
+import { CAPABILITIES, MORE_WORK } from "../data/showcase";
+import { ARCHIVE, ARCHIVE_TOTAL } from "../data/archive";
 import { EASE, STAGGER, tween } from "../lib/motion";
 import { INTRO_SESSION_KEY, filmEnabled, watchFilm } from "../lib/intro";
 import { media } from "../lib/media";
-import Count from "./Count";
 import MagneticLink from "./Magnetic";
 import { useRoute } from "../appContexts";
 import "../editorial.css";
@@ -51,22 +51,12 @@ function IndexLabel({ number, children }) {
   );
 }
 
-function ScrubWord({ progress, range, children }) {
-  const opacity = useTransform(progress, range, [0.42, 1]);
-  return <motion.span style={{ opacity }}>{children} </motion.span>;
-}
-function ScrubText({ lead, rest, className }) {
-  const reduced = useReducedMotion();
-  const ref = useRef(null);
-  const { scrollYProgress } = useScroll({ target: ref, offset: ["start 0.9", "start 0.3"] });
-  const leadWords = lead.split(" "), restWords = rest.split(" ");
-  const total = leadWords.length + restWords.length;
-  const word = (text, i) => (reduced ? `${text} ` : <ScrubWord key={i} progress={scrollYProgress} range={[i / total, (i + 1) / total]}>{text}</ScrubWord>);
-  return <p ref={ref} className={className}>{leadWords.map(word)}<em>{restWords.map((text, i) => word(text, leadWords.length + i))}</em></p>;
-}
-
-const STATEMENT = { lead: "Most AI demos stop at the demo.", rest: "Mine ship with tests, real numbers and a write-up, including the parts that failed." };
-const RECEIPT_VALUES = RECEIPTS.map((item) => ({ ...item, value: item.value === "PROJECTS" ? `${LISTED_PROJECTS.length}+` : item.value }));
+const fill = (text) => text.replace("REPOS", CODE.repos);
+const RECEIPT_VALUES = RECEIPTS.map((item) => ({
+  ...item,
+  value: item.value === "PROJECTS" ? String(PROJECT_INDEX.length) : item.value === "LINES" ? CODE.total.toLocaleString("en-US") : item.value,
+  label: fill(item.label),
+}));
 
 function textBox(el) {
   const own = el.getBoundingClientRect();
@@ -147,7 +137,6 @@ export function Hero({ ready = true, hold = false, onReady }) {
   const brief = (
     <section className="ed-intro ed-light sc-brief" aria-label="The short version" data-palette="lumen">
       <div className="ed-wrap">
-        <ScrubText className="sc-statement" lead={STATEMENT.lead} rest={STATEMENT.rest} />
         <dl className="sc-receipts">
           {RECEIPT_VALUES.map((item) => (
             <div key={item.label}>
@@ -175,7 +164,7 @@ export function Hero({ ready = true, hold = false, onReady }) {
               <span className="sc-name-line"><motion.span className="is-accent" {...line(1)}>{HERO.claim[1]}</motion.span></span>
             </motion.p>
             <motion.p className="sc-hero-line" {...appear(1)}>
-              Agents, independent AI studies and native apps. <em className="sc-nowrap">Here are {LISTED_PROJECTS.length}, each with its numbers.</em>
+              I also build agents that run on their own, test other people's AI claims, and ship native apps. <em className="sc-nowrap">{PROJECT_INDEX.length} projects below.</em>
             </motion.p>
             <motion.div className="sc-hero-ctas" {...appear(2)}>
               <MagneticLink href="#projects" className="sc-hero-btn">
@@ -193,7 +182,7 @@ export function Hero({ ready = true, hold = false, onReady }) {
           </div>
 
           <motion.div className="sc-hero-visual" {...appear(1)}>
-            <DotSphere />
+            <HedwigTrace />
           </motion.div>
         </div>
 
@@ -216,10 +205,10 @@ export function ProjectsSection() {
         <Enter className="ed-section-heading sc-stage-heading">
           <div>
             <IndexLabel number="02">Selected work</IndexLabel>
-            <h2>Six builds. <em>Each with its numbers.</em></h2>
+            <h2>Six projects, <em>in depth.</em></h2>
           </div>
           <div className="ed-heading-aside">
-            <p>Each one has the number, the picture and a way in. Some you can run, some you watch, some you read.</p>
+            <p>Pick a tab. Each has its headline number, a demo or film, and the full write-up.</p>
           </div>
         </Enter>
       </div>
@@ -247,14 +236,14 @@ function PlainCapabilities() {
           <div className="sc-caps-split">
             <Enter className="sc-caps-panel">
               <IndexLabel number="03">What I bring</IndexLabel>
-              <h2>Three things, <br /><em>done properly.</em></h2>
-              <p className="sc-caps-aside">The same loop on every build: make it work, measure it honestly, and ship it to real people.</p>
+              <h2>What the work <br /><em>covers.</em></h2>
+              <p className="sc-caps-aside">Three kinds of work, each linked to the projects that show it.</p>
             </Enter>
             <div className="sc-cap-rows">
               {CAPABILITIES.map((cap, i) => (
                 <Enter key={cap.id} index={i} className="sc-cap-row">
                   <div className="sc-cap-row-stat">
-                    <p className="sc-cap-count"><Count value={cap.count} /></p>
+                    <p className="sc-cap-count">{cap.count}</p>
                     <p className="sc-cap-unit">{cap.unit}</p>
                   </div>
                   <div className="sc-cap-row-body">
@@ -304,7 +293,7 @@ function WorkCard({ item, index }) {
         </div>
         <div className="sc-card-body">
           <h3>{project.title}<ArrowUpRight size={18} aria-hidden="true" /></h3>
-          {item.metric && <p className="sc-card-metric"><strong><Count value={item.metric} /></strong><span>{item.unit}</span></p>}
+          {item.metric && <p className="sc-card-metric"><strong>{item.metric}</strong><span>{item.unit}</span></p>}
           <p className="sc-card-line">{item.line}</p>
         </div>
       </a>
@@ -312,8 +301,6 @@ function WorkCard({ item, index }) {
   );
 }
 
-const SHOWN = new Set([...FLAGSHIPS, ...MORE_WORK].map((item) => item.slug));
-const ALSO_BUILT = LISTED_PROJECTS.filter((project) => !SHOWN.has(project.slug));
 
 export function MoreWorkSection() {
   return (
@@ -322,32 +309,31 @@ export function MoreWorkSection() {
         <Enter className="ed-section-heading">
           <div>
             <IndexLabel number="04">More shipped work</IndexLabel>
-            <h2>And plenty <br /><em>more shipped.</em></h2>
+            <h2>Four more, <br /><em>then everything.</em></h2>
           </div>
-          <p className="ed-heading-aside">Studies, an agent skill and apps. Every card opens a full write-up.</p>
+          <p className="ed-heading-aside">Two studies, an agent skill and an app, then the full index below.</p>
         </Enter>
         <div className="sc-card-grid">
           {MORE_WORK.map((item, i) => <WorkCard key={item.slug} item={item} index={i} />)}
         </div>
-        {ALSO_BUILT.length > 0 && (
-          <details className="sc-also">
-            <summary>
-              <span>Also built</span>
-              <small>{ALSO_BUILT.length} more, from internal tools to early experiments</small>
-            </summary>
-            <ul>
-              {ALSO_BUILT.map((project) => (
-                <li key={project.slug}>
-                  <a id={`card-${project.slug}`} href={`/work/${project.slug}/`}>
-                    <strong>{project.title}</strong>
-                    <span>{project.kind}</span>
-                    <ArrowUpRight size={15} aria-hidden="true" />
-                  </a>
-                </li>
-              ))}
-            </ul>
-          </details>
-        )}
+        <div className="ix-preview" aria-labelledby="ix-preview-h">
+          <div className="ix-preview-head">
+            <h3 id="ix-preview-h">The full index: {ARCHIVE_TOTAL} projects</h3>
+            <a href="/work/">Open the index<ArrowUpRight size={13} aria-hidden="true" /></a>
+          </div>
+          <dl>
+            {ARCHIVE.map((group) => (
+              <div key={group.id}>
+                <dt>{group.label}<span className="ix-count">{group.projects.length}</span></dt>
+                <dd>
+                  {group.projects.map((p, i) => (
+                    <span key={p.slug}>{i > 0 && " · "}<a href={`/work/${p.slug}/`}>{p.title}</a></span>
+                  ))}
+                </dd>
+              </div>
+            ))}
+          </dl>
+        </div>
       </div>
     </section>
   );
@@ -367,13 +353,13 @@ function PlainContact() {
         <div className="sc-contact-top">
           <div className="sc-contact-lead">
             <IndexLabel number="05">Contact</IndexLabel>
-            <h2>Building something <em>ambitious?</em></h2>
+            <h2>Write <em>to me.</em></h2>
             <a href={`mailto:${CONTACT.email}`} className="sc-email" data-cursor="Write">{CONTACT.email}</a>
           </div>
           <div className="sc-contact-card">
-            <p className="sc-contact-card-kicker"><i aria-hidden="true" />Start a conversation</p>
+            <p className="sc-contact-card-kicker"><i aria-hidden="true" />Email</p>
             <p className="sc-contact-card-copy">
-              I like the hard part: agents that have to be trusted, evals that have to be honest, and products that have to ship. If that sounds like your problem, write to me.
+              A question about a project, a study you think I got wrong, or something you are building with AI. I read everything.
             </p>
             <div className="sc-contact-card-actions">
               <MagneticLink href={`mailto:${CONTACT.email}`} className="ed-contact-email">

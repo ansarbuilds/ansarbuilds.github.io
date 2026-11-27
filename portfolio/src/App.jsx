@@ -31,7 +31,6 @@ const DataLineageExplorer = lazy(() => import("./components/DataLineageExplorer"
 const HaloscriptPage = lazy(() => import("./components/HaloscriptPage"));
 const HedwigPage = lazy(() => import("./components/HedwigPage"));
 const InfinityPage = lazy(() => import("./components/InfinityPage"));
-const BB8Companion = lazy(() => import("./components/BB8Companion"));
 // The film's player, loaded only for a visitor who is going to see it.
 const loadFilmPlayer = () => import("./film/FilmPlayer");
 const FilmPlayer = lazy(loadFilmPlayer);
@@ -447,47 +446,7 @@ function Backdrop() {
   return <div className="at-grid-backdrop" aria-hidden="true" />;
 }
 
-// BB-8 brings three.js with it, the heaviest chunk on the page. Waiting for
-// the browser to go idle after the intro keeps it out of the first paint.
-// The companion pulls in three.js, the heaviest thing on the page. Waiting
-// for the visitor's first scroll, tap or key (then an idle moment) keeps it
-// off the first load, and off quick bounces entirely. It only appears a few
-// seconds in anyway, so nobody sees the difference.
-const FIRST_INPUT_EVENTS = ["pointerdown", "pointermove", "wheel", "touchstart", "keydown", "scroll"];
-function useIdleAfterFirstInput(ready) {
-  const [idle, setIdle] = useState(false);
-  useEffect(() => {
-    if (!ready) return undefined;
-    let idleId = 0;
-    let timer = 0;
-    const listen = { passive: true, capture: true };
-    const start = () => {
-      FIRST_INPUT_EVENTS.forEach((name) => window.removeEventListener(name, start, listen));
-      if ("requestIdleCallback" in window) idleId = window.requestIdleCallback(() => setIdle(true), { timeout: 2500 });
-      else timer = setTimeout(() => setIdle(true), 600);
-    };
-    FIRST_INPUT_EVENTS.forEach((name) => window.addEventListener(name, start, listen));
-    return () => {
-      FIRST_INPUT_EVENTS.forEach((name) => window.removeEventListener(name, start, listen));
-      if (idleId) window.cancelIdleCallback(idleId);
-      clearTimeout(timer);
-    };
-  }, [ready]);
-  return idle;
-}
-
-function Companion() {
-  // On a phone there is no room beside the content: the droid and its
-  // speech bubble would sit on top of the headings and the film's cards.
-  const [narrow] = useState(() => window.matchMedia("(max-width: 760px)").matches);
-  // The home page is kept quiet: the droid only rides along on the other pages.
-  const { route } = useRoute();
-  if (narrow || route === "main") return null;
-  return <Suspense fallback={null}><BB8Companion /></Suspense>;
-}
-
 function AppShell({ bootDone, held, onBoot, heroRun }) {
-  const companionReady = useIdleAfterFirstInput(bootDone);
   return (
       <RouteProvider>
         <div className="relative bg-[#f4f3ef] text-[#111318] min-h-[100dvh]">
@@ -498,7 +457,6 @@ function AppShell({ bootDone, held, onBoot, heroRun }) {
             <ScrollProgress />
             {SHOW_SWATCH && <PaletteSwatch />}
             <HomeCursor />
-            {companionReady && <Companion />}
             {/* No page-level `perspective` here on purpose: setting it on an
                 ancestor this high up turns it into the CSS containing block
                 for every `position: fixed` descendant (modals, overlays)

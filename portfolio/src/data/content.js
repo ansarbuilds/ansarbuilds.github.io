@@ -6,18 +6,21 @@
 export const HERO = {
   eyebrow: "Canada",
   title: "I build agents, test AI claims and ship apps.",
-  // The home page headline: a claim, two lines. The name sits above it as the h1.
-  claim: ["I build AI agents", "that hold up in real use."],
+  // The home page headline: the strongest single fact, two lines. The name
+  // sits above it as the h1; the line under it covers the rest of the work.
+  claim: ["I trained an LLM from scratch:", "286.7M parameters for $2.45."],
   lede: [
     { text: "I build agents that run on their own, tools that make coding agents debuggable, independent evaluations of AI claims, and native apps people download from the App Store. Everything ships with its code, its numbers and a full write-up, including what failed." },
   ],
 };
 
 // Quick proof, right under the intro, before anyone reads a paragraph.
+// Every value is counted, not estimated: PROJECTS is the full index, LINES
+// comes from CODE below.
 export const RECEIPTS = [
-  { value: "PROJECTS", label: "shipped projects with code, write-ups or live demos", accent: "green" },
-  { value: "2", label: "open-source agent tools and skills, one on PyPI", accent: "cyan" },
-  { value: "3", label: "independent AI studies with full technical reports", accent: "rose" },
+  { value: "PROJECTS", label: "projects in the index, from that model to my first scripts", accent: "green" },
+  { value: "LINES", label: "lines of code I wrote, across REPOS repositories", accent: "cyan" },
+  { value: "3", label: "independent AI studies, each with a technical report", accent: "rose" },
   { value: "2", label: "native apps live on the App Store", accent: "amber" },
 ];
 
