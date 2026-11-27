@@ -6,7 +6,7 @@
 @property --ed-deep { syntax: "<color>"; inherits: true; initial-value: #111318; }
 @property --ed-coral { syntax: "<color>"; inherits: true; initial-value: #1d4ed8; }
 @property --ed-coral-ink { syntax: "<color>"; inherits: true; initial-value: #1d4ed8; }
-@property --ed-on-dark { syntax: "<color>"; inherits: true; initial-value: #f59e0b; }
+@property --ed-on-dark { syntax: "<color>"; inherits: true; initial-value: #628cff; }
 
 :root {
   --ed-ivory: #f4f3ef;
@@ -14,7 +14,7 @@
   --ed-deep: #111318;
   --ed-coral: #1d4ed8;
   --ed-coral-ink: #1d4ed8;
-  --ed-on-dark: #f59e0b;
+  --ed-on-dark: #628cff;
   --ed-rule: rgba(17, 19, 24, 0.14);
 }
 

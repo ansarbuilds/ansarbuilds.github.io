@@ -5,11 +5,9 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "dev:bb8": "vite --open /bb8.html",
     "build": "vite build && node scripts/prerender-routes.mjs",
-    "build:bb8": "vite build --config vite.bb8.config.js",
     "lint": "oxlint",
-    "test:emet": "node --test src/lib/palettes.test.mjs src/lib/score.test.mjs src/components/companionMotion.test.mjs src/components/createEmetBehaviorDirector.test.mjs src/components/createBB8Roaming.test.mjs src/emet/emetKnowledge.test.mjs src/bb8/motionCues.test.mjs src/bb8/reactionMath.test.mjs src/data/projectIndex.test.mjs",
+    "test:emet": "node --test src/lib/palettes.test.mjs src/lib/score.test.mjs src/emet/emetKnowledge.test.mjs src/data/projectIndex.test.mjs",
     "preview": "vite preview",
     "check:budget": "node scripts/check-budget.mjs",
     "check:tools": "node scripts/check-tools.mjs",

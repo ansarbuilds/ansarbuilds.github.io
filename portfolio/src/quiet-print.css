@@ -303,3 +303,14 @@ body { font-size: 0.9rem; line-height: 1.7; }
 @media (max-width: 900px) {
   .ix-preview dl > div { grid-template-columns: minmax(0, 1fr); gap: 6px; }
 }
+
+/* ---------- Project pages: flat print, like the home page ----------
+   No lifted cards: panels are paper with a thin rule, the hero card loses
+   its cobalt cap and shadow, titles sit at regular weight, and the hook
+   is a readable lede rather than a second headline. */
+.ed-case-study .panel,
+.ed-case-study .pp-hero { box-shadow: none !important; border-radius: 0 !important; background: var(--qp-paper); border-color: rgb(17 19 24 / 0.22); }
+.ed-case-study .pp-hero { background: var(--qp-paper) !important; border: 1px solid rgb(17 19 24 / 0.22) !important; border-top: 1px solid var(--at-obsidian) !important; }
+.ed-case-study .pp-hero h1 { font-weight: 400; letter-spacing: -0.035em; }
+.ed-case-study .pp-hero-line { font-size: clamp(1.02rem, 1.5vw, 1.2rem) !important; line-height: 1.6; }
+.ed-case-study .group.panel:hover { border-color: var(--at-cobalt); transform: none; }

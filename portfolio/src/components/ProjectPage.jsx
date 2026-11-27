@@ -510,9 +510,9 @@ export default function ProjectPage({ slug }) {
           {project.shots.map((s, n) => (
             <figure key={s} className="overflow-hidden rounded-2xl border border-blue/12 bg-blue/[.04]">
               <figcaption className="flex items-center gap-1.5 border-b border-blue/10 px-3.5 py-2.5">
-                <span aria-hidden="true" className="h-2.5 w-2.5 rounded-full bg-[#ff5f57]" />
-                <span aria-hidden="true" className="h-2.5 w-2.5 rounded-full bg-[#febc2e]" />
-                <span aria-hidden="true" className="h-2.5 w-2.5 rounded-full bg-[#28c840]" />
+                <span aria-hidden="true" className="h-1.5 w-1.5 bg-[#1d4ed8]" />
+                <span aria-hidden="true" className="h-1.5 w-1.5 bg-[#111318]/25" />
+                <span aria-hidden="true" className="h-1.5 w-1.5 bg-[#111318]/25" />
                 <span className="ml-3 font-mono text-micro text-[color:var(--ink-300)]">
                   {project.shots.length > 1 ? `Screenshot ${n + 1} of ${project.shots.length}` : "Screenshot"} · scroll inside to see it all
                 </span>

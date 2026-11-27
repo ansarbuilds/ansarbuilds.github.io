@@ -24,7 +24,6 @@ test('old hash links still open their page, at its new URL', async ({ page }) =>
 test('a card opens its project without a page load, and Back returns home', async ({ page }) => {
   await page.addInitScript((key) => sessionStorage.setItem(key, '1'), INTRO_SESSION_KEY);
   await page.goto('/');
-  await page.addStyleTag({ content: '.bb8-edge { display: none !important; }' });
   await page.evaluate(() => { window.__sameDocument = true; });
   // The stage keeps every project's panel in the page and hides all but
   // one, so click a Jarvis link a visitor can actually see.
@@ -93,7 +92,6 @@ test('scrolling over the work grid moves the page, not a box inside it', async (
   await page.goto('/');
   // The roaming droid can park over any point on screen; this test is about
   // the lists, so keep it out of the way.
-  await page.addStyleTag({ content: '.bb8-edge { display: none !important; }' });
   const list = page.locator('.sc-card-grid').last();
   // Bring the list's top to just under the fixed nav, so the point we wheel
   // over is on the list itself and not on the nav or off screen.

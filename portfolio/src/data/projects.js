@@ -102,18 +102,16 @@ export const PROJECTS = [
     },
     reportCta: {
       kicker: "Open source · case study and live demo",
-      title: "Watch it write, then read how",
-      text: "The case study tells the whole story in six acts, with the receipts. The demo runs the model in your browser, and the repository has every stage and a 34-chapter learning log.",
+      title: "Watch it write, then read the code",
+      text: "The demo runs the model in your browser, and the repository has every stage and a 34-chapter learning log.",
       contents: ["A live demo in the browser", "Six days, step by step", "The three training stages", "The 12-prompt showdown", "The $2.45 bill", "What it can't do"],
       links: [
-        { label: "Read the case study", href: "/p/hedwig/", primary: true },
-        { label: "Try the live demo", href: "https://huggingface.co/spaces/ansarbuilds/hedwig-demo", external: true },
+        { label: "Try the live demo", href: "https://huggingface.co/spaces/ansarbuilds/hedwig-demo", external: true, primary: true },
         { label: "Code on GitHub", href: "https://github.com/ansarbuilds/hedwig", external: true },
       ],
     },
     links: [
-      { label: "The six-act case study", href: "/p/hedwig/", primary: true },
-      { label: "Try the live demo", href: "https://huggingface.co/spaces/ansarbuilds/hedwig-demo", external: true },
+      { label: "Try the live demo", href: "https://huggingface.co/spaces/ansarbuilds/hedwig-demo", external: true, primary: true },
       { label: "Code on GitHub", href: "https://github.com/ansarbuilds/hedwig", external: true },
       { label: "Weights on Hugging Face", href: "https://huggingface.co/ansarbuilds/hedwig-300m", external: true },
     ],

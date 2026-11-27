@@ -516,7 +516,6 @@ export default function HedwigPage() {
         <Reveal as="p" className="hw-end-h">Ask it for a story.</Reveal>
         <Reveal i={1} className="hw-ctas hw-ctas-center">
           <a className="hw-btn hw-btn-primary" href={DEMO} target="_blank" rel="noopener noreferrer">Try the live demo <ArrowUpRight size={15} /></a>
-          <a className="hw-btn" href="/p/hedwig/">The six-act case study</a>
           <a className="hw-btn" href={CODE} target="_blank" rel="noopener noreferrer">Code on GitHub <ArrowUpRight size={15} /></a>
           <a className="hw-btn" href={WEIGHTS} target="_blank" rel="noopener noreferrer">Weights <ArrowUpRight size={15} /></a>
         </Reveal>
