@@ -51,34 +51,6 @@ function IndexLabel({ number, children }) {
   );
 }
 
-/* Four-column precision index strip of flagship builds */
-const HERO_FEED = FLAGSHIPS.slice(0, 4);
-function HeroFeed({ appear, from }) {
-  return (
-    <div className="sc-feed-wrap">
-      <div className="sc-feed-head">
-        <p className="sc-feed-kicker"><span>01</span> Flagship index</p>
-        <a href="/work/" className="sc-feed-all">All {LISTED_PROJECTS.length} builds <ArrowUpRight size={13} aria-hidden="true" /></a>
-      </div>
-      <nav className="sc-feed" aria-label="Flagship projects">
-        {HERO_FEED.map((flag, i) => {
-          const project = getProject(flag.slug);
-          return project && (
-            <motion.a key={flag.slug} href={`/work/${project.slug}/`} className="sc-feed-card" data-cursor="Open" {...appear(from + i * (STAGGER.base / STAGGER.loose))}>
-              <div className="sc-feed-top">
-                <span className="sc-feed-status"><i aria-hidden="true" />{flag.badge}</span>
-                <span className="sc-feed-idx">0{i + 1}</span>
-              </div>
-              <strong>{project.title}</strong>
-              <span className="sc-feed-metric"><b>{flag.stats[0][0]}</b>{flag.stats[0][1]}</span>
-            </motion.a>
-          );
-        })}
-      </nav>
-    </div>
-  );
-}
-
 function ScrubWord({ progress, range, children }) {
   const opacity = useTransform(progress, range, [0.42, 1]);
   return <motion.span style={{ opacity }}>{children} </motion.span>;
@@ -193,16 +165,17 @@ export function Hero({ ready = true, hold = false, onReady }) {
       <section ref={heroRef} id="hero" aria-labelledby="hero-name" className="sc-hero" data-palette="lumen">
         <div className="ed-wrap sc-hero-grid-layout">
           <div className="sc-hero-inner">
-            <motion.p className="sc-hero-kicker" {...appear(0)}>
+            <motion.h1 id="hero-name" className="sc-hero-kicker" {...appear(0)}>
               <i aria-hidden="true" />
-              <span>{HERO.eyebrow} · Index of work · {CODE.asOf}</span>
-            </motion.p>
-            <motion.h1 ref={nameRef} id="hero-name" className="sc-hero-name" aria-label="Mohamed Ansar" style={{ x: nameX, y: nameY, scale: nameScale }}>
-              <span className="sc-name-line" aria-hidden="true"><motion.span {...line(0)}>Mohamed</motion.span></span>
-              <span className="sc-name-line" aria-hidden="true"><motion.span className="is-accent" {...line(1)}>Ansar</motion.span></span>
+              <span>Mohamed Ansar</span>
+              <span className="sc-hero-kicker-meta" aria-hidden="true">· {HERO.eyebrow} · {CODE.asOf}</span>
             </motion.h1>
+            <motion.p ref={nameRef} className="sc-hero-name" style={{ x: nameX, y: nameY, scale: nameScale }}>
+              <span className="sc-name-line"><motion.span {...line(0)}>{HERO.claim[0]}</motion.span></span>
+              <span className="sc-name-line"><motion.span className="is-accent" {...line(1)}>{HERO.claim[1]}</motion.span></span>
+            </motion.p>
             <motion.p className="sc-hero-line" {...appear(1)}>
-              {HERO.title} <em className="sc-nowrap">Here are {LISTED_PROJECTS.length} of them.</em>
+              Agents, independent AI studies and native apps. <em className="sc-nowrap">Here are {LISTED_PROJECTS.length}, each with its numbers.</em>
             </motion.p>
             <motion.div className="sc-hero-ctas" {...appear(2)}>
               <MagneticLink href="#projects" className="sc-hero-btn">
@@ -224,9 +197,6 @@ export function Hero({ ready = true, hold = false, onReady }) {
           </motion.div>
         </div>
 
-        <div className="ed-wrap sc-hero-bottom">
-          <HeroFeed appear={appear} from={3} />
-        </div>
       </section>
       {brief}
     </div>
@@ -254,7 +224,7 @@ export function ProjectsSection() {
         </Enter>
       </div>
       <div className="qp-plate-band">
-        <DitherField seed={2.4} density={0.46} />
+        <DitherField seed={2.4} />
         <div className="ed-wrap">
           <div className="qp-plate"><WorkStage /></div>
         </div>
@@ -392,7 +362,7 @@ function PlainContact() {
   const { navigate } = useRoute();
   return (
     <section id="contact" className="ed-contact sc-contact" data-palette="blueBloom">
-      <div className="qp-band-slim"><DitherField seed={5.1} density={0.38} /></div>
+      <div className="qp-band-slim"><DitherField seed={5.1} density={0.36} /></div>
       <div className="ed-wrap">
         <div className="sc-contact-top">
           <div className="sc-contact-lead">

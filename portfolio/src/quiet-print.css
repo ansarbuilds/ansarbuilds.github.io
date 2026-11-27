@@ -103,36 +103,22 @@ body { font-size: 0.9rem; line-height: 1.7; }
   margin-bottom: 26px;
 }
 .sc-hero-kicker i { border-radius: 0; width: 6px; height: 6px; }
+.sc-hero-kicker { gap: 8px; color: var(--at-obsidian); font-weight: 500; }
+.sc-hero-kicker-meta { color: var(--at-muted); font-weight: 400; }
+/* The claim is the display line; it wraps freely (the old name style kept lines whole). */
 .sc-hero-name {
   font-weight: 400;
-  font-size: clamp(2.6rem, 5vw, 4.2rem);
-  line-height: 1.04;
+  font-size: clamp(2.2rem, 3.5vw, 3.15rem);
+  line-height: 1.08;
   letter-spacing: -0.035em;
 }
+.sc-hero-inner { max-width: 700px; }
+.sc-hero-name span { white-space: nowrap; }
 .sc-hero-line { margin-top: 22px; max-width: 46ch; font: 400 0.9rem/1.75 var(--font-mono); }
 .sc-hero-line em { font-weight: 500; }
 .sc-hero-ctas { gap: 10px; margin-top: 30px; }
 .sc-hero-visual { display: grid; place-items: center; }
 .qp-sphere { display: block; width: min(400px, 100%); aspect-ratio: 1; }
-
-/* Flagship index under the hero: a quiet row, not four boxed cards */
-.sc-hero-bottom { margin-top: 72px; }
-.sc-feed-wrap { padding-top: 18px; }
-.sc-feed { gap: 0; }
-.sc-feed-card {
-  border: none;
-  border-left: 1px solid var(--at-line);
-  border-radius: 0;
-  background: transparent;
-  box-shadow: none;
-  padding: 6px 20px 4px;
-}
-.sc-feed-card:first-child { border-left: none; padding-left: 0; }
-.sc-feed-card:hover, .sc-feed-card:focus-visible { background: transparent; translate: none; box-shadow: none; }
-.sc-feed-card:hover strong { color: var(--at-cobalt); }
-.sc-feed-status i { border-radius: 0; background: var(--at-cobalt); }
-.sc-feed-card strong { font-weight: 500; }
-.sc-feed-metric { border-top: none; padding-top: 4px; }
 
 /* Brief: statement in plain sans, receipts as a mono spec table ---------- */
 .sc-brief { padding-block: 40px 24px; }
@@ -181,7 +167,15 @@ body { font-size: 0.9rem; line-height: 1.7; }
 .st-stats > div:last-child { border-bottom: 1px dashed var(--at-line-strong); }
 .st-stats dt { order: 2; font: 500 0.95rem/1 var(--font-mono); letter-spacing: 0; color: var(--at-cobalt); }
 .st-stats dd { order: 1; margin-top: 0; font-size: 0.66rem; letter-spacing: 0.08em; }
-.st-stack li { border: none; border-radius: 0; background: var(--qp-chip); text-transform: none; }
+/* Fewer things per panel: one line per tab, no tool chips, a light frame bar. */
+.st-tab { padding: 13px 14px 15px; }
+.st-tab small { display: none; }
+.st-stack { display: none; }
+.st-frame { border-color: var(--at-line-strong); border-radius: 0; box-shadow: none; }
+.st-frame-bar { background: var(--qp-paper); border-bottom: 1px solid var(--at-line); }
+.st-frame-bar i, .st-frame-bar i:nth-child(2), .st-frame-bar i:nth-child(3) { border-radius: 0; width: 6px; height: 6px; background: var(--at-line-strong); }
+.st-frame-bar i:first-child { background: var(--at-cobalt); }
+.st-frame-bar span { color: var(--at-muted); }
 
 /* What I bring: light, no obsidian panel --------------------------------- */
 .sc-caps-split { border: none; border-radius: 0; background: transparent; box-shadow: none; gap: 56px; }
@@ -238,7 +232,8 @@ body { font-size: 0.9rem; line-height: 1.7; }
   .sc-hero { padding-top: 104px; }
   .sc-hero-grid-layout { grid-template-columns: 1fr; gap: 32px; }
   .qp-sphere { width: min(280px, 80%); }
-  .sc-feed-card { border-left: none; border-top: 1px solid var(--at-line); padding: 12px 0; }
+  .sc-hero-name { font-size: clamp(2rem, 8.6vw, 2.6rem); }
+  .sc-hero-name span { white-space: normal; }
   .sc-caps-split { gap: 32px; }
 }
 @media (max-width: 640px) {

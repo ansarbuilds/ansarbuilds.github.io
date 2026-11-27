@@ -6,6 +6,8 @@
 export const HERO = {
   eyebrow: "Canada",
   title: "I build agents, test AI claims and ship apps.",
+  // The home page headline: a claim, two lines. The name sits above it as the h1.
+  claim: ["I build AI agents", "that hold up in real use."],
   lede: [
     { text: "I build agents that run on their own, tools that make coding agents debuggable, independent evaluations of AI claims, and native apps people download from the App Store. Everything ships with its code, its numbers and a full write-up, including what failed." },
   ],

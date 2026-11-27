@@ -480,7 +480,9 @@ function Companion() {
   // On a phone there is no room beside the content: the droid and its
   // speech bubble would sit on top of the headings and the film's cards.
   const [narrow] = useState(() => window.matchMedia("(max-width: 760px)").matches);
-  if (narrow) return null;
+  // The home page is kept quiet: the droid only rides along on the other pages.
+  const { route } = useRoute();
+  if (narrow || route === "main") return null;
   return <Suspense fallback={null}><BB8Companion /></Suspense>;
 }
 
