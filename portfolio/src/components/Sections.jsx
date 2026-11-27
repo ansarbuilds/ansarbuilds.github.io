@@ -1,19 +1,21 @@
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
-import { animate, motion, useAnimationFrame, useInView, useMotionValue, useReducedMotion, useScroll, useSpring, useTransform, useVelocity } from "framer-motion";
-import { ArrowDown, ArrowRight, ArrowUpRight, ExternalLink, Play } from "lucide-react";
-import TelemetryFieldCanvas from "./TelemetryFieldCanvas";
+import { animate, motion, useMotionValue, useReducedMotion } from "framer-motion";
+import { ArrowDown, ArrowUpRight, ExternalLink, Play } from "lucide-react";
+import HedwigTrace from "./HedwigTrace";
+import DitherField from "./DitherField";
 import WorkStage from "./WorkStage";
 import { CODE, CONTACT, HERO, RECEIPTS } from "../data/content";
-import { EXPERIMENTS, LISTED_PROJECTS, getProject } from "../data/projectIndex";
-import { CAPABILITIES, FLAGSHIPS, MORE_WORK, STACK_MARQUEE } from "../data/showcase";
+import { PROJECT_INDEX, getProject } from "../data/projectIndex";
+import { CAPABILITIES, MORE_WORK } from "../data/showcase";
+import { ARCHIVE, ARCHIVE_TOTAL } from "../data/archive";
 import { EASE, STAGGER, tween } from "../lib/motion";
 import { INTRO_SESSION_KEY, filmEnabled, watchFilm } from "../lib/intro";
 import { media } from "../lib/media";
-import Count from "./Count";
 import MagneticLink from "./Magnetic";
 import { useRoute } from "../appContexts";
 import "../editorial.css";
 import "../showcase.css";
+import "../quiet-print.css";
 
 const revealImage = (event) => event.currentTarget.classList.add("is-loaded");
 
@@ -49,50 +51,12 @@ function IndexLabel({ number, children }) {
   );
 }
 
-/* Four-column precision index strip of flagship builds */
-const HERO_FEED = FLAGSHIPS.slice(0, 4);
-function HeroFeed({ appear, from }) {
-  return (
-    <div className="sc-feed-wrap">
-      <div className="sc-feed-head">
-        <p className="sc-feed-kicker"><span>01</span> Flagship index</p>
-        <a href="/work/" className="sc-feed-all">All {LISTED_PROJECTS.length} builds <ArrowUpRight size={13} aria-hidden="true" /></a>
-      </div>
-      <nav className="sc-feed" aria-label="Flagship projects">
-        {HERO_FEED.map((flag, i) => {
-          const project = getProject(flag.slug);
-          return project && (
-            <motion.a key={flag.slug} href={`/work/${project.slug}/`} className="sc-feed-card" data-cursor="Open" {...appear(from + i * (STAGGER.base / STAGGER.loose))}>
-              <div className="sc-feed-top">
-                <span className="sc-feed-status"><i aria-hidden="true" />{flag.badge}</span>
-                <span className="sc-feed-idx">0{i + 1}</span>
-              </div>
-              <strong>{project.title}</strong>
-              <span className="sc-feed-metric"><b>{flag.stats[0][0]}</b>{flag.stats[0][1]}</span>
-            </motion.a>
-          );
-        })}
-      </nav>
-    </div>
-  );
-}
-
-function ScrubWord({ progress, range, children }) {
-  const opacity = useTransform(progress, range, [0.42, 1]);
-  return <motion.span style={{ opacity }}>{children} </motion.span>;
-}
-function ScrubText({ lead, rest, className }) {
-  const reduced = useReducedMotion();
-  const ref = useRef(null);
-  const { scrollYProgress } = useScroll({ target: ref, offset: ["start 0.9", "start 0.3"] });
-  const leadWords = lead.split(" "), restWords = rest.split(" ");
-  const total = leadWords.length + restWords.length;
-  const word = (text, i) => (reduced ? `${text} ` : <ScrubWord key={i} progress={scrollYProgress} range={[i / total, (i + 1) / total]}>{text}</ScrubWord>);
-  return <p ref={ref} className={className}>{leadWords.map(word)}<em>{restWords.map((text, i) => word(text, leadWords.length + i))}</em></p>;
-}
-
-const STATEMENT = { lead: "Most AI demos stop at the demo.", rest: "Mine ship with tests, real numbers and a write-up, including the parts that failed." };
-const RECEIPT_VALUES = RECEIPTS.map((item) => ({ ...item, value: item.value === "PROJECTS" ? `${LISTED_PROJECTS.length}+` : item.value }));
+const fill = (text) => text.replace("REPOS", CODE.repos);
+const RECEIPT_VALUES = RECEIPTS.map((item) => ({
+  ...item,
+  value: item.value === "PROJECTS" ? String(PROJECT_INDEX.length) : item.value === "LINES" ? CODE.total.toLocaleString("en-US") : item.value,
+  label: fill(item.label),
+}));
 
 function textBox(el) {
   const own = el.getBoundingClientRect();
@@ -173,7 +137,6 @@ export function Hero({ ready = true, hold = false, onReady }) {
   const brief = (
     <section className="ed-intro ed-light sc-brief" aria-label="The short version" data-palette="lumen">
       <div className="ed-wrap">
-        <ScrubText className="sc-statement" lead={STATEMENT.lead} rest={STATEMENT.rest} />
         <dl className="sc-receipts">
           {RECEIPT_VALUES.map((item) => (
             <div key={item.label}>
@@ -183,7 +146,6 @@ export function Hero({ ready = true, hold = false, onReady }) {
           ))}
         </dl>
       </div>
-      <StackMarquee />
     </section>
   );
 
@@ -192,16 +154,17 @@ export function Hero({ ready = true, hold = false, onReady }) {
       <section ref={heroRef} id="hero" aria-labelledby="hero-name" className="sc-hero" data-palette="lumen">
         <div className="ed-wrap sc-hero-grid-layout">
           <div className="sc-hero-inner">
-            <motion.p className="sc-hero-kicker" {...appear(0)}>
+            <motion.h1 id="hero-name" className="sc-hero-kicker" {...appear(0)}>
               <i aria-hidden="true" />
-              <span>{HERO.eyebrow} · Index of work · {CODE.asOf}</span>
-            </motion.p>
-            <motion.h1 ref={nameRef} id="hero-name" className="sc-hero-name" aria-label="Mohamed Ansar" style={{ x: nameX, y: nameY, scale: nameScale }}>
-              <span className="sc-name-line" aria-hidden="true"><motion.span {...line(0)}>Mohamed</motion.span></span>
-              <span className="sc-name-line" aria-hidden="true"><motion.span className="is-accent" {...line(1)}>Ansar</motion.span></span>
+              <span>Mohamed Ansar</span>
+              <span className="sc-hero-kicker-meta" aria-hidden="true">· {HERO.eyebrow} · {CODE.asOf}</span>
             </motion.h1>
+            <motion.p ref={nameRef} className="sc-hero-name" style={{ x: nameX, y: nameY, scale: nameScale }}>
+              <span className="sc-name-line"><motion.span {...line(0)}>{HERO.claim[0]}</motion.span></span>
+              <span className="sc-name-line"><motion.span className="is-accent" {...line(1)}>{HERO.claim[1]}</motion.span></span>
+            </motion.p>
             <motion.p className="sc-hero-line" {...appear(1)}>
-              {HERO.title} <em className="sc-nowrap">Here are {LISTED_PROJECTS.length} of them.</em>
+              I also build agents that run on their own, test other people's AI claims, and ship native apps. <em className="sc-nowrap">{PROJECT_INDEX.length} projects below.</em>
             </motion.p>
             <motion.div className="sc-hero-ctas" {...appear(2)}>
               <MagneticLink href="#projects" className="sc-hero-btn">
@@ -219,53 +182,15 @@ export function Hero({ ready = true, hold = false, onReady }) {
           </div>
 
           <motion.div className="sc-hero-visual" {...appear(1)}>
-            <TelemetryFieldCanvas />
+            <HedwigTrace />
           </motion.div>
         </div>
 
-        <div className="ed-wrap sc-hero-bottom">
-          <HeroFeed appear={appear} from={3} />
-        </div>
       </section>
       {brief}
     </div>
   );
 }
-
-/* Velocity-aware stack ribbon */
-function VelocityMarquee({ items, label, className = "", speed = 1.05 }) {
-  const reduced = useReducedMotion();
-  const { scrollY } = useScroll();
-  const velocity = useSpring(useVelocity(scrollY), { damping: 50, stiffness: 400 });
-  const boost = useTransform(velocity, [-1500, 0, 1500], [-4, 0, 4], { clamp: false });
-  const offset = useMotionValue(0);
-  const direction = useRef(1);
-  const rowRef = useRef(null);
-  const onScreen = useInView(rowRef);
-  useAnimationFrame((_, delta) => {
-    if (reduced || !onScreen) return;
-    const push = boost.get();
-    if (push < -0.2) direction.current = -1;
-    else if (push > 0.2) direction.current = 1;
-    let next = offset.get() - direction.current * speed * (Math.min(delta, 64) / 1000) * (1 + Math.abs(push));
-    if (next <= -50) next += 50;
-    else if (next > 0) next -= 50;
-    offset.set(next);
-  });
-  const x = useTransform(offset, (value) => `${value}%`);
-  return (
-    <div ref={rowRef} className={`sc-marquee ${className}`}>
-      <motion.div className="sc-marquee-track" style={reduced ? undefined : { x }}>
-        {[0, 1].map((copy) => (
-          <ul key={copy} aria-label={copy ? undefined : label} aria-hidden={copy ? "true" : undefined}>
-            {items.map((item, i) => <li key={`${item}-${i}`}>{item}<span aria-hidden="true">·</span></li>)}
-          </ul>
-        ))}
-      </motion.div>
-    </div>
-  );
-}
-const StackMarquee = () => <VelocityMarquee items={STACK_MARQUEE} label="Tools I build with" />;
 
 function Sheet({ children }) {
   return <div className="sc-sheet">{children}</div>;
@@ -280,13 +205,18 @@ export function ProjectsSection() {
         <Enter className="ed-section-heading sc-stage-heading">
           <div>
             <IndexLabel number="02">Selected work</IndexLabel>
-            <h2>Six builds. <em>Each with its numbers.</em></h2>
+            <h2>Six projects, <em>in depth.</em></h2>
           </div>
           <div className="ed-heading-aside">
-            <p>Each one has the number, the picture and a way in. Some you can run, some you watch, some you read.</p>
+            <p>Pick a tab. Each has its headline number, a demo or film, and the full write-up.</p>
           </div>
         </Enter>
-        <WorkStage />
+      </div>
+      <div className="qp-plate-band">
+        <DitherField seed={2.4} />
+        <div className="ed-wrap">
+          <div className="qp-plate"><WorkStage /></div>
+        </div>
       </div>
     </section>
   );
@@ -304,20 +234,16 @@ function PlainCapabilities() {
       <section id="capabilities" className="sc-caps ed-section" data-palette="field">
         <div className="ed-wrap">
           <div className="sc-caps-split">
-            <Enter className="sc-caps-panel at-obsidian-grid">
+            <Enter className="sc-caps-panel">
               <IndexLabel number="03">What I bring</IndexLabel>
-              <h2>Three things, <br /><em>done properly.</em></h2>
-              <p className="sc-caps-aside">The same loop on every build: make it work, measure it honestly, and ship it to real people.</p>
-              <div className="sc-caps-meta" aria-hidden="true">
-                <span>DISCIPLINE // 03 TRACKS</span>
-                <span>VERIFIED IN CODE</span>
-              </div>
+              <h2>What the work <br /><em>covers.</em></h2>
+              <p className="sc-caps-aside">Three kinds of work, each linked to the projects that show it.</p>
             </Enter>
             <div className="sc-cap-rows">
               {CAPABILITIES.map((cap, i) => (
                 <Enter key={cap.id} index={i} className="sc-cap-row">
                   <div className="sc-cap-row-stat">
-                    <p className="sc-cap-count"><Count value={cap.count} /></p>
+                    <p className="sc-cap-count">{cap.count}</p>
                     <p className="sc-cap-unit">{cap.unit}</p>
                   </div>
                   <div className="sc-cap-row-body">
@@ -367,7 +293,7 @@ function WorkCard({ item, index }) {
         </div>
         <div className="sc-card-body">
           <h3>{project.title}<ArrowUpRight size={18} aria-hidden="true" /></h3>
-          {item.metric && <p className="sc-card-metric"><strong><Count value={item.metric} /></strong><span>{item.unit}</span></p>}
+          {item.metric && <p className="sc-card-metric"><strong>{item.metric}</strong><span>{item.unit}</span></p>}
           <p className="sc-card-line">{item.line}</p>
         </div>
       </a>
@@ -375,8 +301,6 @@ function WorkCard({ item, index }) {
   );
 }
 
-const SHOWN = new Set([...FLAGSHIPS, ...MORE_WORK].map((item) => item.slug));
-const ALSO_BUILT = LISTED_PROJECTS.filter((project) => !SHOWN.has(project.slug));
 
 export function MoreWorkSection() {
   return (
@@ -385,113 +309,33 @@ export function MoreWorkSection() {
         <Enter className="ed-section-heading">
           <div>
             <IndexLabel number="04">More shipped work</IndexLabel>
-            <h2>And plenty <br /><em>more shipped.</em></h2>
+            <h2>Four more, <br /><em>then everything.</em></h2>
           </div>
-          <p className="ed-heading-aside">Studies, an agent skill and apps. Every card opens a full write-up.</p>
+          <p className="ed-heading-aside">Two studies, an agent skill and an app, then the full index below.</p>
         </Enter>
         <div className="sc-card-grid">
           {MORE_WORK.map((item, i) => <WorkCard key={item.slug} item={item} index={i} />)}
         </div>
-        {ALSO_BUILT.length > 0 && (
-          <details className="sc-also">
-            <summary>
-              <span>Also built</span>
-              <small>{ALSO_BUILT.length} more, from internal tools to early experiments</small>
-            </summary>
-            <ul>
-              {ALSO_BUILT.map((project) => (
-                <li key={project.slug}>
-                  <a id={`card-${project.slug}`} href={`/work/${project.slug}/`}>
-                    <strong>{project.title}</strong>
-                    <span>{project.kind}</span>
-                    <ArrowUpRight size={15} aria-hidden="true" />
-                  </a>
-                </li>
-              ))}
-            </ul>
-          </details>
-        )}
-      </div>
-    </section>
-  );
-}
-
-function ExperimentImage({ experiment }) {
-  const [artBroken, setArtBroken] = useState(false);
-  return <img className="ed-lazy-media" src={media(!artBroken && experiment.cardArt ? experiment.cardArt : experiment.shot)} alt="" width={1200} height={900} loading="lazy" onLoad={revealImage} onError={() => setArtBroken(true)} />;
-}
-
-const FILM_EXPERIMENTS = ["solar", "stars", "emet"].map((id) => EXPERIMENTS.find((e) => e.id === id)).filter(Boolean);
-export function PlaygroundSection() {
-  return (
-    <section id="ai" className="ed-projects ed-light ed-section" aria-labelledby="playground-title" data-palette="neon">
-      <div className="ed-wrap">
-        <Enter className="ed-section-heading">
-          <div>
-            <IndexLabel number="05">Playground</IndexLabel>
-            <h2 id="playground-title">Rooms off <em>the hall.</em></h2>
+        <div className="ix-preview" aria-labelledby="ix-preview-h">
+          <div className="ix-preview-head">
+            <h3 id="ix-preview-h">The full index: {ARCHIVE_TOTAL} projects</h3>
+            <a href="/work/">Open the index<ArrowUpRight size={13} aria-hidden="true" /></a>
           </div>
-          <div className="ed-heading-aside">
-            <p>Small things I built to try an idea. Each one opens on its own page.</p>
-          </div>
-        </Enter>
-        <div className="sc-card-grid is-three">
-          {FILM_EXPERIMENTS.map((experiment, i) => (
-            <Enter key={experiment.id} index={i}>
-              <a href={experiment.href} className="sc-card">
-                <div className="sc-card-plate">
-                  <div className="sc-card-media"><ExperimentImage experiment={experiment} /></div>
-                  <div className="sc-card-plate-bar">
-                    <span className="sc-card-kind">0{i + 1} / Interactive</span>
-                    <span className="sc-card-status-chip">Open room</span>
-                  </div>
-                </div>
-                <div className="sc-card-body">
-                  <h3>{experiment.title}<ArrowUpRight size={18} aria-hidden="true" /></h3>
-                  <p className="sc-card-line">{experiment.hook}</p>
-                </div>
-              </a>
-            </Enter>
-          ))}
-        </div>
-      </div>
-    </section>
-  );
-}
-
-export function ExperimentsSection() {
-  return (
-    <Sheet>
-      <section id="ai" className="ed-experiments ed-section" data-palette="neon">
-        <div className="ed-wrap">
-          <Enter className="ed-section-heading">
-            <div>
-              <IndexLabel number="05">The playground</IndexLabel>
-              <h2>What if <br /><em>I tried this?</em></h2>
-            </div>
-            <p className="ed-heading-aside">Interactive experiments built with AI as a pair programmer. Open one and have a play.</p>
-          </Enter>
-          <div className="ed-experiment-grid">
-            {EXPERIMENTS.map((experiment, i) => (
-              <Enter key={experiment.id} index={i}>
-                <a href={experiment.href} className="ed-experiment" data-cursor="Play">
-                  <div className="ed-experiment-image">
-                    <ExperimentImage experiment={experiment} />
-                    <span>0{i + 1} / Interactive</span>
-                  </div>
-                  <div className="ed-experiment-title">
-                    <h3>{experiment.title}</h3>
-                    <ArrowUpRight size={20} />
-                  </div>
-                  <p>{experiment.hook}</p>
-                  <span className="ed-experiment-cta">{experiment.cta}<ArrowRight size={15} /></span>
-                </a>
-              </Enter>
+          <dl>
+            {ARCHIVE.map((group) => (
+              <div key={group.id}>
+                <dt>{group.label}<span className="ix-count">{group.projects.length}</span></dt>
+                <dd>
+                  {group.projects.map((p, i) => (
+                    <span key={p.slug}>{i > 0 && " · "}<a href={`/work/${p.slug}/`}>{p.title}</a></span>
+                  ))}
+                </dd>
+              </div>
             ))}
-          </div>
+          </dl>
         </div>
-      </section>
-    </Sheet>
+      </div>
+    </section>
   );
 }
 
@@ -503,18 +347,19 @@ export function ContactSection() {
 function PlainContact() {
   const { navigate } = useRoute();
   return (
-    <section id="contact" className="ed-contact sc-contact at-obsidian-grid" data-palette="blueBloom">
+    <section id="contact" className="ed-contact sc-contact" data-palette="blueBloom">
+      <div className="qp-band-slim"><DitherField seed={5.1} density={0.36} /></div>
       <div className="ed-wrap">
         <div className="sc-contact-top">
           <div className="sc-contact-lead">
-            <IndexLabel number="06">Contact</IndexLabel>
-            <h2>Building something <em>ambitious?</em></h2>
+            <IndexLabel number="05">Contact</IndexLabel>
+            <h2>Write <em>to me.</em></h2>
             <a href={`mailto:${CONTACT.email}`} className="sc-email" data-cursor="Write">{CONTACT.email}</a>
           </div>
           <div className="sc-contact-card">
-            <p className="sc-contact-card-kicker"><i aria-hidden="true" />Start a conversation</p>
+            <p className="sc-contact-card-kicker"><i aria-hidden="true" />Email</p>
             <p className="sc-contact-card-copy">
-              I like the hard part: agents that have to be trusted, evals that have to be honest, and products that have to ship. If that sounds like your problem, write to me.
+              A question about a project, a study you think I got wrong, or something you are building with AI. I read everything.
             </p>
             <div className="sc-contact-card-actions">
               <MagneticLink href={`mailto:${CONTACT.email}`} className="ed-contact-email">
@@ -537,15 +382,6 @@ function PlainContact() {
               <li><a href="/work/saywhen/">saywhen</a></li>
               <li><a href="/work/hedwig/">Hedwig</a></li>
               <li><a href="/work/jarvis/">Jarvis</a></li>
-            </ul>
-          </div>
-          <div>
-            <h3>PLAYGROUND</h3>
-            <ul>
-              <li><a href="/playground/emet/">Emet terminal</a></li>
-              <li><a href="/playground/explore/">Solar system</a></li>
-              <li><a href="/playground/infinity/">Infinity stars</a></li>
-              <li><a href="/playground/lineage-demo/">Data lineage</a></li>
             </ul>
           </div>
           <div>

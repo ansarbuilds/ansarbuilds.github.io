@@ -17,16 +17,17 @@ test('old hash links still open their page, at its new URL', async ({ page }) =>
   await page.goto('/#project/storyera');
   await expect(page.getByRole('heading', { name: 'StoryEra', level: 1 })).toBeVisible();
   await expect(page).toHaveURL(/\/work\/storyera\/$/);
-  await page.goto('/#emet');
-  await expect(page).toHaveURL(/\/playground\/emet\/$/);
+  await page.goto('/#lineage-demo');
+  await expect(page).toHaveURL(/\/playground\/lineage-demo\/$/);
 });
 
 test('a card opens its project without a page load, and Back returns home', async ({ page }) => {
   await page.addInitScript((key) => sessionStorage.setItem(key, '1'), INTRO_SESSION_KEY);
   await page.goto('/');
-  await page.addStyleTag({ content: '.bb8-edge { display: none !important; }' });
   await page.evaluate(() => { window.__sameDocument = true; });
-  await page.locator('a[href="/work/jarvis/"]').first().click({ force: true });
+  // The stage keeps every project's panel in the page and hides all but
+  // one, so click a Jarvis link a visitor can actually see.
+  await page.locator('a[href="/work/jarvis/"]:visible').first().click({ force: true });
   await expect(page).toHaveURL(/\/work\/jarvis\/$/);
   await expect(page.getByRole('heading', { name: 'Jarvis', level: 1 })).toBeVisible();
   expect(await page.evaluate(() => window.__sameDocument)).toBe(true);
@@ -62,20 +63,34 @@ test('share pages open their matching case studies', async ({ page }) => {
   }
 });
 
-test('homepage has no critical or serious automated accessibility violations', async ({ page }) => {
-  await page.addInitScript((key) => sessionStorage.setItem(key, '1'), INTRO_SESSION_KEY);
-  await page.goto('/');
-  await expect(page.getByRole('main')).toBeVisible();
-  // Judge the settled page: text caught half faded in reads as low contrast.
-  await page.addStyleTag({ content: '*, *::before, *::after { animation-duration: 0s !important; animation-delay: 0s !important; transition: none !important; }' });
-  // The short version's statement reveals word by word as it scrolls up:
-  // judge it read in full.
-  await page.locator('.sc-statement').evaluate((node) => window.scrollTo(0, node.getBoundingClientRect().top + window.scrollY - window.innerHeight * 0.25));
-  await page.waitForTimeout(600);
-  const result = await new AxeBuilder({ page }).analyze();
-  const bad = result.violations.filter((violation) => ['critical', 'serious'].includes(violation.impact));
-  expect(bad.map((v) => `${v.id}: ${v.nodes.map((n) => n.target.join(' ')).join(', ')}`)).toEqual([]);
-});
+// Pages that stand for the rest: home, the index, the longest write-ups,
+// the lineage demo and a standalone explainer with its own palette.
+const A11Y_PAGES = ['/', '/work/', '/work/hedwig/', '/work/decision-models/', '/work/prh-jepa/', '/playground/lineage-demo/', '/p/prh-jepa/explainer.html'];
+
+for (const path of A11Y_PAGES) {
+  test(`${path} has no critical or serious automated accessibility violations`, async ({ page }) => {
+    await page.addInitScript((key) => sessionStorage.setItem(key, '1'), INTRO_SESSION_KEY);
+    await page.goto(path);
+    // The heading, not just the frame: project pages load their content after it.
+    await expect(page.locator('main h1').first()).toBeVisible();
+    // Scroll through once so everything that waits to be seen is drawn.
+    await page.evaluate(async () => {
+      for (let y = 0; y < document.documentElement.scrollHeight; y += 600) {
+        window.scrollTo(0, y);
+        await new Promise((resolve) => setTimeout(resolve, 50));
+      }
+      window.scrollTo(0, 0);
+    });
+    // Judge the settled page: text caught half faded in reads as low contrast.
+    // CSS motion stops at once; the scripted entrances (the stat tiles' stagger
+    // ends at 0.81 s) get time to land.
+    await page.addStyleTag({ content: '*, *::before, *::after { animation-duration: 0s !important; animation-delay: 0s !important; transition: none !important; }' });
+    await page.waitForTimeout(1200);
+    const result = await new AxeBuilder({ page }).analyze();
+    const bad = result.violations.filter((violation) => ['critical', 'serious'].includes(violation.impact));
+    expect(bad.map((v) => `${v.id}: ${v.nodes.map((n) => n.target.join(' ')).join(', ')}`)).toEqual([]);
+  });
+}
 
 test('Jarvis project page renders and links its sample-data demo', async ({ page }) => {
   await page.goto('/work/jarvis/');
@@ -94,7 +109,6 @@ test('scrolling over the work grid moves the page, not a box inside it', async (
   await page.goto('/');
   // The roaming droid can park over any point on screen; this test is about
   // the lists, so keep it out of the way.
-  await page.addStyleTag({ content: '.bb8-edge { display: none !important; }' });
   const list = page.locator('.sc-card-grid').last();
   // Bring the list's top to just under the fixed nav, so the point we wheel
   // over is on the list itself and not on the nav or off screen.
@@ -231,8 +245,8 @@ test('the home page is a plain page to scroll, with every section in it', async 
   await page.goto('/');
   await expect(page.locator('.film-player')).toHaveCount(0);
   await expect(page.locator('.sc-receipts dt')).toHaveCount(4);
-  for (const id of ['projects', 'capabilities', 'more', 'ai', 'contact']) await expect(page.locator(`#${id}`)).toHaveCount(1);
-  for (const href of ['/playground/explore/', '/playground/infinity/', '/playground/emet/']) await expect(page.locator(`section#ai a[href="${href}"]`)).toHaveCount(1);
+  for (const id of ['projects', 'capabilities', 'more', 'contact']) await expect(page.locator(`#${id}`)).toHaveCount(1);
+  await expect(page.locator('#ai')).toHaveCount(0);
   await expect(page.locator('#contact a[href^="mailto:"]').first()).toBeAttached();
 });
 

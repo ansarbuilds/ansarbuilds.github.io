@@ -6,12 +6,13 @@ import { DEPTH } from "../data/depth";
 import { CASE_SUMMARIES } from "../data/caseSummaries";
 import { TOOL_INFO } from "../data/tools";
 import { BEFORE_AFTER, STEP_TOOLS } from "../data/summaries";
-import FlowDiagram, { FlourishTitle, Kicker, TagPill } from "./ui";
+import FlowDiagram, { FlourishTitle, Kicker, ScrollRegion, TagPill } from "./ui";
 import ProjectMotionPreview from "./ProjectMotionPreview";
 import { PREVIEWABLE_PROJECTS } from "../lib/projectMotion";
 import { DUR, EASE, STAGGER, fadeUp } from "../lib/motion";
 import { isRouteTransitioning } from "../lib/routeTransition";
 import { media } from "../lib/media";
+import { firstSentences } from "../lib/sentences";
 import { MORE_WORK } from "../data/showcase";
 
 // Projects with an evidence poster (scripts/make-more-art.mjs) show it here
@@ -100,10 +101,29 @@ function PageTitle({ project }) {
   return <FlourishTitle text={project.title} accent={project.accent} />;
 }
 
+// Which plate a dot-matrix print sits on, read from its top-left pixel.
+function plateOf(img) {
+  try {
+    const c = Object.assign(document.createElement("canvas"), { width: 1, height: 1 });
+    const x = c.getContext("2d");
+    x.drawImage(img, 0, 0, 1, 1, 0, 0, 1, 1);
+    const [r, g, b] = x.getImageData(0, 0, 1, 1).data;
+    // Snap to the two plates the script draws on, so a dot's edge in the
+    // corner cannot tint the frame.
+    return r + g + b < 384 ? "#111318" : "#f4f3ef";
+  } catch {
+    return "#f4f3ef";
+  }
+}
+
 function SignatureArtwork({ project, reduced, heroArt }) {
   const real = REAL_HEADERS[project.slug];
   const poster = POSTERS[project.slug] || real?.src;
   const art = poster || project.heroArt || project.spotlightArt || project.cardArt;
+  // Dot-matrix prints sit on a flat plate, so they are shown whole and the
+  // frame is filled with that plate's colour instead of cropping the print.
+  const dotted = !poster && !real && /\/shots\/(refined|spotlight)\//.test(art);
+  const [plate, setPlate] = useState("#f4f3ef");
   if (!art || (!poster && !real && art === heroArt && !PREVIEWABLE_PROJECTS.has(project.slug))) return null;
   return (
     <motion.figure
@@ -114,7 +134,7 @@ function SignatureArtwork({ project, reduced, heroArt }) {
       transition={{ duration: DUR.slow, ease: EASE.out }}
     >
       <div className="project-signature-frame">
-        <img src={media(art)} style={real?.whole ? { objectFit: "contain", background: "#fff" } : undefined} alt={real ? real.alt : poster ? `${project.title}: the evidence, drawn from the study's own numbers` : project.heroAlt || `${project.title} conceptual artwork`} loading="eager" />
+        <img src={media(art)} style={real?.whole ? { objectFit: "contain", background: "#fff" } : dotted ? { objectFit: "contain", background: plate } : undefined} onLoad={dotted ? (e) => setPlate(plateOf(e.currentTarget)) : undefined} alt={real ? real.alt : poster ? `${project.title}: the evidence, drawn from the study's own numbers` : project.heroAlt || `${project.title} conceptual artwork`} loading="eager" />
         {!poster && <ProjectMotionPreview project={project} active expanded />}
       </div>
       <figcaption>{real ? real.caption : poster ? `${project.title} · drawn from its own numbers` : project.heroCaption || (project.slug === "site-recon" ? "A public page, separated into the evidence a browser can verify." : `${project.title} · project visual`)}</figcaption>
@@ -125,7 +145,6 @@ function SignatureArtwork({ project, reduced, heroArt }) {
 /* A one-picture summary of the project, folded away by default so the
    page stays short: why it exists, each step of the flow with the tools
    used there, and what came out of it. */
-const firstSentences = (text, n) => (text || "").match(/[^.!?]+[.!?]+(\s|$)/g)?.slice(0, n).join("").trim() || text || "";
 
 function SummaryArrow() {
   return (
@@ -401,7 +420,7 @@ export default function ProjectPage({ slug }) {
         <div className="panel project-panel rounded-2xl p-8">
           <h1 className="font-display text-2xl font-semibold text-[color:var(--ink-100)]">I couldn't find that project</h1>
           <p className="mt-2 text-[color:var(--ink-200)]">It may have moved. Every project is in the full list.</p>
-          <a href="/work/" className="mt-5 inline-flex min-h-11 items-center gap-2 text-[#ff8a5f] font-mono text-xs uppercase tracking-[.12em]">
+          <a href="/work/" className="mt-5 inline-flex min-h-11 items-center gap-2 text-[#1d4ed8] font-mono text-xs uppercase tracking-[.12em] hover:underline">
             <ArrowLeft size={14} aria-hidden="true" /> All projects
           </a>
         </div>
@@ -491,9 +510,9 @@ export default function ProjectPage({ slug }) {
           {project.shots.map((s, n) => (
             <figure key={s} className="overflow-hidden rounded-2xl border border-blue/12 bg-blue/[.04]">
               <figcaption className="flex items-center gap-1.5 border-b border-blue/10 px-3.5 py-2.5">
-                <span aria-hidden="true" className="h-2.5 w-2.5 rounded-full bg-[#ff5f57]" />
-                <span aria-hidden="true" className="h-2.5 w-2.5 rounded-full bg-[#febc2e]" />
-                <span aria-hidden="true" className="h-2.5 w-2.5 rounded-full bg-[#28c840]" />
+                <span aria-hidden="true" className="h-1.5 w-1.5 bg-[#1d4ed8]" />
+                <span aria-hidden="true" className="h-1.5 w-1.5 bg-[#111318]/25" />
+                <span aria-hidden="true" className="h-1.5 w-1.5 bg-[#111318]/25" />
                 <span className="ml-3 font-mono text-micro text-[color:var(--ink-300)]">
                   {project.shots.length > 1 ? `Screenshot ${n + 1} of ${project.shots.length}` : "Screenshot"} · scroll inside to see it all
                 </span>
@@ -501,9 +520,9 @@ export default function ProjectPage({ slug }) {
               {/* Tall captures (full pages, notebooks) scroll inside the
                   frame; overscroll-contain keeps the page from moving
                   when you reach the end. */}
-              <div tabIndex={0} aria-label={`${project.title} screenshot, scrollable`} className="max-h-[72vh] overflow-y-auto overscroll-contain">
+              <ScrollRegion label={`${project.title} screenshot ${n + 1}, scrolls`} className="max-h-[72vh] overflow-y-auto overscroll-contain">
                 <img src={media(s)} alt={`${project.title} screenshot`} loading="lazy" onLoad={(event) => event.currentTarget.classList.add("is-loaded")} className="ed-lazy-media block w-full" />
-              </div>
+              </ScrollRegion>
             </figure>
           ))}
         </div>
@@ -535,7 +554,7 @@ export default function ProjectPage({ slug }) {
 
         {project.sample && (
           <Block label={project.sample.label || "A look at the output"} accent={project.accent}>
-            <div className="overflow-x-auto rounded-xl border border-blue/12">
+            <ScrollRegion label={`${project.sample.title || "Sample output"}, scrolls sideways`} className="overflow-x-auto rounded-xl border border-blue/12">
               <table className="w-full text-left text-sm">
                 <caption className="text-left px-4 pt-3 pb-2 font-mono text-micro uppercase tracking-[.1em] text-[color:var(--ink-300)]">
                   {project.sample.title}
@@ -561,7 +580,7 @@ export default function ProjectPage({ slug }) {
                   ))}
                 </tbody>
               </table>
-            </div>
+            </ScrollRegion>
           </Block>
         )}
 
@@ -578,13 +597,12 @@ export default function ProjectPage({ slug }) {
               {project.figures.map((f) => (
                 <figure key={f.src}>
                   {/* Diagrams are drawn on white, so they sit on a light card. */}
-                  <div
-                    tabIndex={f.tall ? 0 : undefined}
-                    aria-label={f.tall ? `${f.caption} Scrollable.` : undefined}
+                  <ScrollRegion
+                    label={`Figure, scrolls: ${f.caption}`}
                     className={`overflow-x-auto rounded-xl bg-white p-3 sm:p-5 ${f.tall ? "max-h-[75vh] overflow-y-auto overscroll-contain" : ""}`}
                   >
                     <img src={media(f.src)} alt={f.alt ?? f.caption} loading="lazy" onLoad={(event) => event.currentTarget.classList.add("is-loaded")} className={`ed-lazy-media mx-auto block w-full ${f.narrow ? "max-w-sm" : ""} ${f.wide ? "min-w-[860px]" : ""}`} />
-                  </div>
+                  </ScrollRegion>
                   <figcaption className="mt-2 text-sm text-[color:var(--ink-300)]">
                     {f.caption}
                     {f.tall && " Scroll inside to see it all."}
@@ -598,7 +616,7 @@ export default function ProjectPage({ slug }) {
         {project.results && (
           <Block label="Results" accent={project.accent}>
             {project.results.intro && <p className="mb-4 text-base leading-relaxed text-[color:var(--ink-100)]">{project.results.intro}</p>}
-            <div className="overflow-x-auto rounded-xl border border-blue/12">
+            <ScrollRegion label="Results table, scrolls sideways" className="overflow-x-auto rounded-xl border border-blue/12">
               <table className="w-full text-left text-sm">
                 <thead>
                   <tr className="border-b border-blue/12 text-[color:var(--ink-300)] font-mono text-micro uppercase tracking-wide">
@@ -621,7 +639,7 @@ export default function ProjectPage({ slug }) {
                   ))}
                 </tbody>
               </table>
-            </div>
+            </ScrollRegion>
             {project.results.note && <p className="mt-3 text-sm text-[color:var(--ink-300)]">{project.results.note}</p>}
           </Block>
         )}

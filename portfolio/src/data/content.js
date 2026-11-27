@@ -1,4 +1,4 @@
-// Site-wide copy: the hero, skills, EMET's answers, contact
+// Site-wide copy: the hero, skills, contact
 // details and command palette. Projects live in projects.js.
 //
 // House style: plain words, short sentences, first person, no em dashes.
@@ -6,16 +6,21 @@
 export const HERO = {
   eyebrow: "Canada",
   title: "I build agents, test AI claims and ship apps.",
+  // The home page headline: the strongest single fact, two lines. The name
+  // sits above it as the h1; the line under it covers the rest of the work.
+  claim: ["I trained an LLM from scratch:", "286.7M parameters for $2.45."],
   lede: [
     { text: "I build agents that run on their own, tools that make coding agents debuggable, independent evaluations of AI claims, and native apps people download from the App Store. Everything ships with its code, its numbers and a full write-up, including what failed." },
   ],
 };
 
 // Quick proof, right under the intro, before anyone reads a paragraph.
+// Every value is counted, not estimated: PROJECTS is the full index, LINES
+// comes from CODE below.
 export const RECEIPTS = [
-  { value: "PROJECTS", label: "shipped projects with code, write-ups or live demos", accent: "green" },
-  { value: "2", label: "open-source agent tools and skills, one on PyPI", accent: "cyan" },
-  { value: "3", label: "independent AI studies with full technical reports", accent: "rose" },
+  { value: "PROJECTS", label: "projects in the index, from that model to my first scripts", accent: "green" },
+  { value: "LINES", label: "lines of code I wrote, across REPOS repositories", accent: "cyan" },
+  { value: "3", label: "independent AI studies, each with a technical report", accent: "rose" },
   { value: "2", label: "native apps live on the App Store", accent: "amber" },
 ];
 
@@ -83,64 +88,6 @@ export const ABOUT = {
   ],
 };
 
-// EMET answers as me, right in the terminal. `keywords` lets free text
-// match a topic ("sql", "snowflake"), and `go` is an optional "see more" link.
-export const EMET_TOPICS = [
-  {
-    n: 1,
-    label: "What do you do now?",
-    go: "#projects",
-    keywords: ["now", "current", "today", "build", "agents"],
-    answer: [
-      {
-        text: "I build agents, test AI claims in public, and ship small products. The code, the numbers and the failures are on this site.",
-      },
-    ],
-  },
-  {
-    n: 2,
-    label: "What tools do you use?",
-    go: "#capabilities",
-    keywords: ["tools", "skills", "sql", "snowflake", "stack"],
-    answer: [
-      {
-        text: "SQL, Snowflake, Python and DuckDB for data. Swift and TypeScript for products. Claude Code and MCP for agents.",
-      },
-    ],
-  },
-  {
-    n: 3,
-    label: "What have you built?",
-    go: "#projects",
-    keywords: ["shipped", "built", "projects", "ios", "app", "reptrack", "haloscript", "jarvis", "swift", "demo", "extension", "chrome", "study"],
-    answer: [
-      { text: "Start with " },
-      { text: "Jarvis", cls: "font-bold" },
-      { text: ", a personal AI agent that runs on my Mac. I also have two apps on the " },
-      { text: "App Store", cls: "font-bold" },
-      { text: " (Haloscript for novelists, RepTrack for workouts), " },
-      { text: "three independent AI studies", cls: "font-bold" },
-      {
-        text:
-          " with full technical reports, and open-source agent skills. Most have a live demo or a write-up.",
-      },
-    ],
-  },
-  {
-    n: 4,
-    label: "How do I reach you?",
-    go: "#contact",
-    keywords: ["reach", "contact", "email", "linkedin", "hire", "talk", "hello", "hi"],
-    answer: [
-      { text: "Email is fastest: " },
-      { text: "mohamedansarkms@gmail.com", cls: "font-bold" },
-      { text: ". I'm also on LinkedIn as " },
-      { text: "kmsmohamedansar", cls: "font-bold" },
-      { text: ". Say hi, I read everything." },
-    ],
-  },
-];
-
 export const CONTACT = {
   email: "mohamedansarkms@gmail.com",
   linkedin: "https://www.linkedin.com/in/kmsmohamedansar/",
@@ -158,10 +105,6 @@ export const COMMAND_ITEMS = [
   { label: "More shipped work", go: "#more", group: "Sections" },
   { label: "Contact", go: "#contact", group: "Sections" },
   { label: "All projects, in one list", go: "/work/", group: "Sections" },
-  { label: "Emet · a terminal that answers as me", go: "/playground/emet/", group: "Playground" },
-  { label: "A solar system you can fly around", go: "/playground/explore/", group: "Playground" },
-  { label: "An infinity made of stars", go: "/playground/infinity/", group: "Playground" },
-  { label: "Data lineage explorer", go: "/playground/lineage-demo/", group: "Playground" },
   { label: "RepTrack on the App Store", href: "https://apps.apple.com/us/app/reptrack-workout-log/id6761032027", group: "Links" },
   { label: "My Take on Jev, technical report", href: "/p/decision-models/report.html", group: "Links" },
   { label: "My Take on REA, technical report", href: "/p/rea-study/report.html", group: "Links" },

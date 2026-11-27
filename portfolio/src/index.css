@@ -1,5 +1,4 @@
 @import "tailwindcss";
-@import "./fonts.css";
 
 /* ============================================================
    DESIGN TOKENS — Precision Instrument & Monograph System
@@ -47,9 +46,9 @@
   --text-micro--line-height: 1.45;
 
   --font-display: "Space Grotesk", -apple-system, BlinkMacSystemFont, sans-serif;
-  --font-serif: "Instrument Serif", Georgia, serif;
+  --font-serif: "Space Grotesk", -apple-system, BlinkMacSystemFont, sans-serif;
   --font-condensed: "Space Grotesk", -apple-system, BlinkMacSystemFont, sans-serif;
-  --font-body: "Plus Jakarta Sans", -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-body: "IBM Plex Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
   --font-mono: "IBM Plex Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
 
   /* Motion tokens. */
@@ -91,17 +90,6 @@
 }
 
 /* The terminal keeps its original screen colors and contrast. */
-.dark-surface {
-  --color-ink: #050911;
-  --color-ink-1: #0a0f1c;
-  --color-ink-2: #0e1730;
-  --color-ink-3: #13203f;
-  --ink-50: #f4f6f8;
-  --ink-100: #e6d5bd;
-  --ink-200: #e6d5bd;
-  --ink-300: #cbd0d8;
-  --ink-400: #cbd0d8;
-}
 
 @layer base {
   :where(a, button, [role="button"], [tabindex]):focus-visible {
@@ -141,29 +129,8 @@
 }
 
 /* Blueprint dark surface texture (for obsidian panels & footer) */
-.at-obsidian-grid {
-  background-color: var(--at-obsidian);
-  background-image:
-    linear-gradient(to right, rgba(244, 243, 239, 0.05) 1px, transparent 1px),
-    linear-gradient(to bottom, rgba(244, 243, 239, 0.05) 1px, transparent 1px);
-  background-size: 32px 32px;
-}
 
 /* Architectural section rule with subtle cobalt tick */
-.at-divider-rule {
-  height: 1px;
-  background: var(--at-line);
-  position: relative;
-}
-.at-divider-rule::before {
-  content: "";
-  position: absolute;
-  left: 0;
-  top: -1px;
-  width: 64px;
-  height: 3px;
-  background: var(--at-cobalt);
-}
 
 @layer utilities {
   .project-panel.project-panel {
@@ -174,94 +141,6 @@
     border: 1px solid var(--at-line-strong);
     box-shadow: 0 10px 30px -18px rgba(17, 19, 24, 0.16);
   }
-  .atmosphere-fallback {
-    background:
-      radial-gradient(ellipse 60% 55% at 72% 48%, rgba(38, 60, 96, 0.55), transparent 70%),
-      radial-gradient(ellipse 80% 60% at 30% 85%, rgba(23, 43, 73, 0.5), transparent 75%),
-      linear-gradient(to bottom, #0d1b30, #0b1426);
-  }
-  .glass {
-    backdrop-filter: blur(14px);
-    background: rgba(244, 243, 239, 0.9);
-    border: 1px solid var(--at-line-strong);
-  }
-  .text-glow-green {
-    text-shadow: 0 0 6px rgba(52, 211, 153, 0.36);
-  }
-}
-
-/* ============================================================
-   CRT PHOSPHOR MONITOR — preserved for EMET terminal route
-   ============================================================ */
-.crt-shell {
-  position: relative;
-  overflow: hidden;
-  border-radius: 1.4rem;
-  isolation: isolate;
-  backdrop-filter: blur(16px);
-  background: rgba(2, 6, 16, 0.5);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  box-shadow:
-    inset 0 0 0 1px rgba(255, 255, 255, 0.05),
-    inset 0 1px 0 rgba(255, 255, 255, 0.12),
-    inset 0 3px 18px rgba(0, 0, 0, 0.55),
-    0 2px 3px rgba(2, 6, 16, 0.3),
-    0 36px 64px -24px rgba(2, 6, 16, 0.65);
-}
-.crt-shell::before {
-  content: "";
-  position: absolute;
-  inset: 0 0 auto 0;
-  height: 2px;
-  background: linear-gradient(90deg, transparent, rgba(52, 211, 153, 0.55) 40%, rgba(52, 211, 153, 0.15) 100%);
-  pointer-events: none;
-  z-index: 2;
-}
-.crt-shell::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  pointer-events: none;
-  z-index: 3;
-  border-radius: inherit;
-  background: linear-gradient(115deg, rgba(255, 255, 255, 0.05) 0%, transparent 16%, transparent 84%, rgba(255, 255, 255, 0.03) 100%),
-    repeating-linear-gradient(to bottom, rgba(255, 255, 255, 0.045) 0px, rgba(255, 255, 255, 0.045) 1px, transparent 1px, transparent 3px),
-    radial-gradient(ellipse at 50% 42%, transparent 58%, rgba(0, 0, 0, 0.46) 100%);
-  animation: crt-flicker 7s var(--ease-standard) infinite;
-}
-@keyframes crt-flicker {
-  0%, 91%, 100% { opacity: 1; }
-  93% { opacity: 0.94; }
-  95% { opacity: 1; }
-  96% { opacity: 0.97; }
-}
-@media (prefers-reduced-motion: reduce) {
-  .crt-shell::after, .crt-shell * {
-    animation-duration: 0.001ms !important;
-    animation-iteration-count: 1 !important;
-  }
-}
-
-.crt-spotlight {
-  --spot-x: 50%;
-  --spot-y: 50%;
-  --spot-o: 0;
-  position: relative;
-}
-.crt-spotlight::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  z-index: 4;
-  pointer-events: none;
-  border-radius: inherit;
-  opacity: var(--spot-o);
-  transition: opacity var(--dur-base) var(--ease-standard);
-  background: radial-gradient(260px circle at var(--spot-x) var(--spot-y), rgba(52, 211, 153, 0.1), transparent 70%);
-  mix-blend-mode: screen;
-}
-@media (hover: none) {
-  .crt-spotlight::before { display: none; }
 }
 
 @keyframes badge-spin { to { transform: rotate(360deg); } }
@@ -270,8 +149,6 @@
 @media (prefers-reduced-motion: reduce) {
   .group:hover .badge-spin, .group:focus-visible .badge-spin { animation: none; }
 }
-
-.blink-cursor { animation: blink 0.9s step-end infinite; }
 @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0; } }
 
 .mono-scroll::-webkit-scrollbar,

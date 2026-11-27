@@ -5,7 +5,6 @@ import { FLAGSHIPS } from "../data/showcase";
 import { getProject } from "../data/projectIndex";
 import { media } from "../lib/media";
 import { spring } from "../lib/motion";
-import Count from "./Count";
 import { usePageVisible } from "../lib/usePageVisible";
 import "../stage.css";
 
@@ -277,7 +276,7 @@ export default function WorkStage() {
             <h3><a href={`/work/${project.slug}/`}>{project.title}</a></h3>
             <p className="st-headline">{flag.headline}</p>
             <p className="st-copy">{flag.copy}</p>
-            <dl className="st-stats">{flag.stats.map(([value, label]) => <div key={label}><dt><Count value={value} run={shown && live} /></dt><dd>{label}</dd></div>)}</dl>
+            <dl className="st-stats">{flag.stats.map(([value, label]) => <div key={label}><dt>{value}</dt><dd>{label}</dd></div>)}</dl>
             <ul className="st-stack" aria-label="Built with">{flag.stack.map((tool) => <li key={tool}>{tool}</li>)}</ul>
             <div className="st-ctas">
               <a className="sc-btn" href={`/work/${project.slug}/`}>Read the case study<ArrowUpRight size={18} aria-hidden="true" /></a>

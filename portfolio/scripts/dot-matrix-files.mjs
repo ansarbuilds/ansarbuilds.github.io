@@ -1,0 +1,19 @@
+// The illustrations scripts/dot-matrix-art.mjs redraws as dot-matrix prints,
+// as paths under public/. make-share-images.mjs reads it too.
+export const DOT_ART = [
+  'shots/refined/agent-flight-recorder.webp',
+  'shots/refined/analytics-assistant.webp',
+  'shots/refined/authorized-web-exposure-audit.webp',
+  'shots/refined/catalogue-checker.webp',
+  'shots/refined/data-delivery.webp',
+  'shots/refined/decision-models.webp',
+  'shots/refined/haloscript.webp',
+  'shots/refined/integration.webp',
+  'shots/refined/jarvis.webp',
+  'shots/refined/rea-study.webp',
+  'shots/refined/reptrack.webp',
+  'shots/refined/site-recon.webp',
+  'shots/refined/sitescout.webp',
+  'shots/refined/storyera.webp',
+  'shots/spotlight/prh-jepa.jpg',
+];

@@ -107,7 +107,7 @@ pointers. Check `(hover: hover) and (pointer: fine)` before attaching them.
 
 ## Checking a change
 
-- `npm run lint`, `npm run test:emet`, `npm run build`.
+- `npm run lint`, `npm run test:unit`, `npm run build`.
 - `npx playwright test -c motion-audit/playwright.chrome.config.js` runs the
   smoke and accessibility tests with a local Chrome.
 - `node motion-audit/record.mjs after` records the four reference flows at

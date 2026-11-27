@@ -24,7 +24,6 @@ export const FILES = [
   'shots/refined/catalogue-checker.webp',
   'shots/refined/data-delivery.webp',
   'shots/refined/decision-models.webp',
-  'shots/refined/emet.webp',
   'shots/refined/haloscript.webp',
   'shots/refined/integration.webp',
   'shots/refined/jarvis.webp',

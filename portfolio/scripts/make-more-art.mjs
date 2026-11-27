@@ -34,7 +34,7 @@ const page = (body) => `<!doctype html><html><head>${FONTS}<style>${CSS}</style>
 const dots = Array.from({ length: 100 }, (_, i) => `<i style="background:${i < 80 ? COBALT : 'rgb(17 19 24 / .1)'}"></i>`).join('');
 const jev = page(`<p class="label">Final test · per 100 messages</p>
 <div style="position:absolute;left:50%;top:50%;transform:translate(-50%,-52%);display:grid;grid-template-columns:repeat(20,48px);gap:18px">${dots}</div>
-<style>i{display:block;width:48px;height:48px;border-radius:50%}</style>
+<style>i{display:block;width:48px;height:48px}</style>
 <p class="cap">Blue: sent to the right team by a small free model</p>`);
 
 // REA: cost per run as the tool reports it (report figure 6, development runs).
@@ -42,18 +42,19 @@ const bars = [['Ordinary tools only', 0.088], ['With REA, left alone', 0.14], ['
 const rea = page(`<p class="label">Cost per run · report figure 6</p>
 <div style="position:absolute;left:160px;right:160px;top:50%;transform:translateY(-52%);display:grid;gap:40px">${bars.map(([name, v], i) => `
   <div><p style="font-size:22px;color:${MUTED};margin-bottom:12px">${name}</p>
-  <div style="display:flex;align-items:center;gap:24px"><span style="display:block;height:64px;width:${Math.round((v / 0.204) * 960)}px;border-radius:4px;background:${i === 2 ? COBALT : i === 1 ? 'rgb(29 78 216 / .4)' : 'rgb(17 19 24 / .16)'}"></span>
+  <div style="display:flex;align-items:center;gap:24px"><div style="position:relative;width:960px;height:64px;background:repeating-linear-gradient(135deg, rgb(17 19 24 / .12) 0 2px, transparent 2px 9px)"><span style="position:absolute;left:0;top:0;bottom:0;width:${Math.round((v / 0.204) * 960)}px;background:${i === 2 ? COBALT : i === 1 ? 'rgb(29 78 216 / .4)' : 'rgb(17 19 24 / .16)'}"></span></div>
   <b class="big" style="font-size:60px">$${v.toFixed(3)}</b></div></div>`).join('')}
 </div>
 <p class="cap">More cost, no clear gain in the answers</p>`);
 
 // StoryEra: the 53 chapters of the first audit, and its five steps.
 // One equal mark per chapter: the heights carry no data.
-const ticks = Array.from({ length: 53 }, () => '<i></i>').join('');
+// Each chapter is one column of square dots, like a dot-matrix readout.
+const ticks = Array.from({ length: 53 }, () => `<i>${'<b></b>'.repeat(9)}</i>`).join('');
 const steps = ['Scope', 'Read', 'Ledger', 'Reconcile', 'Report'];
 const story = page(`<p class="label">Continuity audit · 53 chapters</p>
-<div style="position:absolute;left:160px;right:160px;top:200px;height:240px;display:flex;align-items:flex-end;gap:10px">${ticks}</div>
-<style>i{flex:1;height:200px;background:linear-gradient(${COBALT}, rgb(29 78 216 / .18));border-radius:2px}</style>
+<div style="position:absolute;left:160px;right:160px;top:200px;height:240px;display:flex;align-items:flex-end;gap:7px">${ticks}</div>
+<style>i{flex:1;display:grid;gap:6px}i b{display:block;aspect-ratio:1;background:${COBALT}}i b:nth-child(n+6){opacity:.55}i b:nth-child(n+8){opacity:.25}</style>
 <div style="position:absolute;left:160px;right:160px;top:500px;display:flex;justify-content:space-between">${steps.map((s, i) => `<div><p style="font-size:20px;color:${COBALT}">0${i + 1}</p><p class="big" style="font-size:64px;margin-top:10px">${s}</p></div>`).join('')}</div>
 <p class="cap">The author decides what becomes canon</p>`);
 

@@ -4,7 +4,7 @@ Live portfolio for **Mohamed Ansar**. Reliable data systems, evidence-backed AI 
 
 **Live site:** [ansarbuilds.dev](https://ansarbuilds.dev)
 
-For the full project index, live demos, and how to reach out about private repos, see my [GitHub profile](https://github.com/ansarbuilds).
+Every project has a page in the [full index](https://ansarbuilds.dev/work/), with live demos where they exist. My [GitHub profile](https://github.com/ansarbuilds) has the public repositories.
 
 ## What's in this repo
 
@@ -16,24 +16,17 @@ projects/
 .github/workflows/    CI/CD for portfolio deployment
 ```
 
-Other projects live in their own repositories:
+Other projects live in their own repositories. These are public:
 
+- [hedwig](https://github.com/ansarbuilds/hedwig)
 - [saywhen](https://github.com/ansarbuilds/saywhen)
-- [analytics-assistant](https://github.com/ansarbuilds/analytics-assistant)
-- [catalogue-checker](https://github.com/ansarbuilds/catalogue-checker)
-- [data-delivery](https://github.com/ansarbuilds/data-delivery)
-- [integration-in-a-box](https://github.com/ansarbuilds/integration-in-a-box)
-- [sitescout](https://github.com/ansarbuilds/sitescout)
-- [site-recon](https://github.com/ansarbuilds/site-recon)
-- [storyera](https://github.com/ansarbuilds/storyera)
 - [agent-flight-recorder](https://github.com/ansarbuilds/agent-flight-recorder)
+- [storyera](https://github.com/ansarbuilds/storyera)
 - [rea-study](https://github.com/ansarbuilds/rea-study)
 - [prh-jepa](https://github.com/ansarbuilds/prh-jepa)
-- [authorized-web-exposure-audit](https://github.com/ansarbuilds/authorized-web-exposure-audit)
-- [mcp-analytics-stub](https://github.com/ansarbuilds/mcp-analytics-stub)
-- [mv3-sidepanel-starter](https://github.com/ansarbuilds/mv3-sidepanel-starter)
+- [analytics-assistant](https://github.com/ansarbuilds/analytics-assistant)
 
-RepTrack and Haloscript live in their own repositories — reach out if you'd like a walkthrough.
+These are private, so they have no links here: Haloscript, RepTrack, decision-models (My Take on Jev), catalogue-checker, data-delivery, integration-in-a-box, sitescout, site-recon, authorized-web-exposure-audit, mcp-analytics-stub and mv3-sidepanel-starter. Each has a page on the site, and I'm happy to give a walkthrough.
 
 ## How it's built
 

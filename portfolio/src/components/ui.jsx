@@ -108,9 +108,9 @@ export function ScrollShot({ src, label, onError, ratio = "aspect-[16/10]" }) {
         className="origin-bottom overflow-hidden rounded-2xl border border-white/12 bg-ink-1 shadow-[0_40px_80px_-40px_rgba(0,0,0,.85)]"
       >
         <div className="flex items-center gap-1.5 border-b border-white/10 px-3.5 py-2.5" aria-hidden="true">
-          <span className="h-2.5 w-2.5 rounded-full bg-[#ff5f57]" />
-          <span className="h-2.5 w-2.5 rounded-full bg-[#febc2e]" />
-          <span className="h-2.5 w-2.5 rounded-full bg-[#28c840]" />
+          <span className="h-1.5 w-1.5 bg-[#1d4ed8]" />
+          <span className="h-1.5 w-1.5 bg-[#111318]/25" />
+          <span className="h-1.5 w-1.5 bg-[#111318]/25" />
           {label && <span className="ml-3 truncate font-mono text-micro text-[color:var(--ink-300)]">{label}</span>}
         </div>
         <div ref={viewRef} className={`relative overflow-hidden ${ratio}`}>
@@ -147,14 +147,37 @@ export function SectionHead({ kicker, title, lede, accent = "cyan", align = "lef
 /* A project name set the editorial way: the first letter in the italic
    serif, in the project's accent, the rest in condensed caps. The
    heading that wraps it should carry aria-label={text}. */
-export function FlourishTitle({ text, accent }) {
-  const a = ACCENTS[accent];
+// A project title as plain display type. (It used to set the first letter
+// in a coloured serif italic; the site no longer uses serif italics.)
+// A box whose content can be wider (or taller) than it: tables and figures
+// that scroll sideways on a phone, tall screenshots. While the content
+// overflows, the box joins the tab order as a named region so a keyboard
+// user can reach it and scroll it with the arrow keys; when everything
+// fits, it is a plain div and adds no empty tab stop.
+export function ScrollRegion({ label, className = "", children }) {
+  const ref = useRef(null);
+  const [scrolls, setScrolls] = useState(false);
+  useEffect(() => {
+    const el = ref.current;
+    if (!el || typeof ResizeObserver === "undefined") return undefined;
+    // The observer reports once on start and again whenever the box or its
+    // content changes size (a lazy image loading, a rotation).
+    const ro = new ResizeObserver(() => {
+      setScrolls(el.scrollWidth > el.clientWidth + 1 || el.scrollHeight > el.clientHeight + 1);
+    });
+    ro.observe(el);
+    if (el.firstElementChild) ro.observe(el.firstElementChild);
+    return () => ro.disconnect();
+  }, []);
   return (
-    <span aria-hidden="true">
-      <span className={`font-serif italic font-normal normal-case text-[1.12em] leading-none pr-[.04em] ${a.text}`}>{text[0].toUpperCase()}</span>
-      <span className="font-condensed uppercase">{text.slice(1)}</span>
-    </span>
+    <div ref={ref} className={className} tabIndex={scrolls ? 0 : undefined} role={scrolls ? "region" : undefined} aria-label={scrolls ? label : undefined}>
+      {children}
+    </div>
   );
+}
+
+export function FlourishTitle({ text }) {
+  return <span aria-hidden="true">{text}</span>;
 }
 
 export function TagPill({ children }) {

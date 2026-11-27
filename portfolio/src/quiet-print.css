@@ -1,0 +1,313 @@
+/* ============================================================
+   QUIET PRINT — the calm layer over Cobalt & Stone
+   Loaded after editorial, showcase and stage, and only changes what it
+   names. The idea: a technical print, not a dashboard. Mono for reading
+   text, plain sans headings with no italic accents, one cobalt, few
+   borders, more air, and dot-matrix / dithered textures instead of dark
+   panels. Remove this import in Sections.jsx to get the louder v2 back.
+   ============================================================ */
+
+:root {
+  --font-body: "IBM Plex Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+  --qp-paper: #faf9f6;
+  --qp-chip: #e8e6e0;
+  --qp-chip-hover: #dedbd3;
+}
+body { font-size: 0.9rem; line-height: 1.7; }
+/* Plain paper: the dithered bands carry the texture now, not a page-wide grid. */
+.at-grid-backdrop { background-image: none; }
+
+/* Headings: plain sans, quieter weight, no italic serif accents ------- */
+.ed-section-heading h2,
+.ed-contact h2,
+.sc-caps-panel h2 {
+  font-weight: 400;
+  font-size: clamp(2rem, 3.4vw, 2.9rem);
+  letter-spacing: -0.03em;
+  line-height: 1.08;
+}
+.ed-section-heading h2 em,
+.ed-contact h2 em,
+.sc-caps-panel h2 em,
+.sc-hero-name .is-accent {
+  font-family: inherit;
+  font-style: normal;
+  font-weight: inherit;
+  letter-spacing: inherit;
+  color: var(--at-muted);
+}
+.ed-section-heading h2 br,
+.sc-caps-panel h2 br { display: none; }
+.ed-heading-aside, .ed-heading-aside p { font-size: 0.84rem; line-height: 1.7; color: var(--at-muted); }
+
+/* Section labels: a small cobalt dot-grid glyph, the word, an ink square */
+.ed-label { gap: 10px; font-size: 0.68rem; letter-spacing: 0.14em; color: var(--at-obsidian); }
+.ed-label-num, .ed-label-rule { display: none; }
+.ed-label::before {
+  content: "";
+  width: 11px;
+  height: 11px;
+  background-image: radial-gradient(var(--at-cobalt) 1.1px, transparent 1.3px);
+  background-size: 4px 4px;
+  background-position: -0.5px -0.5px;
+}
+.ed-label::after { content: ""; width: 6px; height: 6px; background: var(--at-obsidian); }
+
+.ed-section { padding-block: 112px; }
+.ed-section + .ed-section { border-top: none; }
+
+/* Buttons: small, flat, mixed case ------------------------------------- */
+.sc-hero-btn, .sc-btn, .ed-contact-email, .st-launch {
+  min-height: 38px;
+  padding: 0 16px;
+  border-radius: 0;
+  font: 500 0.8rem/1 var(--font-mono);
+  text-transform: none;
+  letter-spacing: 0;
+  box-shadow: none;
+}
+.sc-hero-btn:hover, .sc-hero-btn:focus-visible,
+.sc-btn:hover, .ed-contact-email:hover { translate: none; box-shadow: none; }
+.sc-hero-ghost, .sc-btn-ghost, .ed-socials a {
+  min-height: 38px;
+  padding: 0 14px;
+  border: 1px solid transparent;
+  border-radius: 0;
+  background: var(--qp-chip);
+  color: var(--at-obsidian);
+  font: 500 0.8rem/1 var(--font-mono);
+  text-transform: none;
+  letter-spacing: 0;
+}
+.sc-hero-ghost:hover, .sc-hero-ghost:focus-visible,
+.sc-btn-ghost:hover, .ed-socials a:hover {
+  background: var(--qp-chip-hover);
+  border-color: transparent;
+  color: var(--at-obsidian);
+  translate: none;
+}
+.ed-nav-links a, .ed-nav-links button { text-transform: none; letter-spacing: 0; }
+.ed-nav-contact { border-radius: 0; }
+.ed-nav-command, .ed-nav-sound, .ed-nav-menu > button { border-radius: 0; border-color: transparent; background: var(--qp-chip); }
+
+/* Hero ------------------------------------------------------------------ */
+.sc-hero { padding: 136px 0 72px; border-bottom: none; }
+.sc-hero-grid-layout { grid-template-columns: minmax(0, 1.1fr) minmax(0, 0.9fr); gap: 64px; }
+.sc-hero-kicker {
+  padding: 0;
+  background: none;
+  border: none;
+  font-size: 0.68rem;
+  letter-spacing: 0.14em;
+  margin-bottom: 26px;
+}
+.sc-hero-kicker i { border-radius: 0; width: 6px; height: 6px; }
+.sc-hero-kicker { gap: 8px; color: var(--at-obsidian); font-weight: 500; }
+.sc-hero-kicker-meta { color: var(--at-muted); font-weight: 400; }
+/* The claim is the display line; it wraps freely (the old name style kept lines whole). */
+.sc-hero-name {
+  font-weight: 400;
+  font-size: clamp(2.2rem, 3.5vw, 3.15rem);
+  line-height: 1.08;
+  letter-spacing: -0.035em;
+}
+.sc-hero-inner { max-width: 700px; }
+.sc-hero-name span { white-space: normal; text-wrap: balance; }
+.sc-hero-line { margin-top: 22px; max-width: 46ch; font: 400 0.9rem/1.75 var(--font-mono); }
+.sc-hero-line em { font-weight: 500; }
+.sc-hero-ctas { gap: 10px; margin-top: 30px; }
+.sc-hero-visual { display: grid; place-items: center; }
+/* Hero visual: a recorded Hedwig run (HedwigTrace.jsx). */
+.ht { width: min(460px, 100%); margin: 0; border: 1px solid var(--at-obsidian); background: var(--qp-paper); font-family: var(--font-mono); color: var(--at-obsidian); }
+.ht-head { display: flex; justify-content: space-between; gap: 12px; padding: 10px 14px; border-bottom: 1px solid var(--at-obsidian); font: 500 0.66rem/1 var(--font-mono); text-transform: uppercase; letter-spacing: 0.1em; color: var(--at-muted); }
+.ht-head span:first-child { color: var(--at-cobalt); }
+.ht-prompt { padding: 14px 14px 0; font: 400 0.74rem/1.55 var(--font-mono); color: var(--at-muted); }
+.ht-story { min-height: 9.4em; padding: 10px 14px 14px; font: 400 0.86rem/1.65 var(--font-mono); white-space: pre-wrap; }
+.ht-now { color: var(--at-cobalt); background: rgb(29 78 216 / 0.08); }
+.ht-caret { display: inline-block; width: 0.55em; height: 1.05em; margin-left: 1px; vertical-align: -0.15em; background: var(--at-cobalt); animation: ht-blink 1s steps(1) infinite; }
+@keyframes ht-blink { 50% { opacity: 0; } }
+.ht-probs { padding: 12px 14px 14px; border-top: 1px dashed rgb(17 19 24 / 0.25); }
+.ht-probs-h { display: flex; justify-content: space-between; gap: 12px; margin-bottom: 10px; font: 400 0.64rem/1 var(--font-mono); text-transform: uppercase; letter-spacing: 0.08em; color: var(--at-muted); }
+.ht-flag.is-on { color: var(--at-cobalt); }
+.ht-row { display: grid; grid-template-columns: 5.5rem 1fr 3.4rem; gap: 10px; align-items: center; padding: 3px 0; font-size: 0.74rem; color: var(--at-muted); }
+.ht-row.is-pick { color: var(--at-obsidian); }
+.ht-tok { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.ht-pct { text-align: right; font-variant-numeric: tabular-nums; }
+.ht-dots { display: grid; grid-template-columns: repeat(20, 1fr); gap: 3px; }
+.ht-dots i { aspect-ratio: 1; background: rgb(17 19 24 / 0.08); }
+.ht-dots i.on { background: rgb(17 19 24 / 0.55); }
+.ht-row.is-pick .ht-dots i.on { background: var(--at-cobalt); }
+@media (prefers-reduced-motion: reduce) { .ht-caret { animation: none; } }
+
+/* Brief: statement in plain sans, receipts as a mono spec table ---------- */
+.sc-brief { padding-block: 40px 24px; }
+.sc-receipts { background: transparent; border-top: 1px solid var(--at-line); border-bottom: none; }
+.sc-receipts > div { padding: 16px 20px 0; }
+.sc-receipts > div:first-child { padding-left: 0; }
+.sc-receipts dt { font: 500 1.5rem/1 var(--font-display); color: var(--at-cobalt); }
+.sc-receipts dd { font: 400 0.76rem/1.55 var(--font-mono); }
+
+/* Selected work: the stage sits on a paper plate over a dithered band ---- */
+#projects.ed-section { padding-bottom: 0; }
+#projects .ed-section-heading { margin-bottom: 40px; }
+.qp-plate-band { position: relative; padding-block: 64px; }
+.qp-dither { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
+.qp-plate {
+  position: relative;
+  background: var(--qp-paper);
+  border: 1px solid var(--at-line-strong);
+  padding: clamp(10px, 1.6vw, 18px);
+}
+.qp-plate .st { box-shadow: none; border-color: var(--at-line); border-radius: 0; }
+.st-tabs { background: var(--qp-paper); }
+.st-tab:hover { background: #ffffff; }
+.st-headline {
+  font: 400 1rem/1.5 var(--font-display);
+  font-style: normal;
+  color: var(--at-obsidian);
+}
+.st-copy { font-size: 0.82rem; line-height: 1.7; }
+.st-eyebrow span { white-space: nowrap; }
+.st-eyebrow em { border: none; background: var(--qp-chip); border-radius: 0; }
+.st-eyebrow em i { border-radius: 0; background: var(--at-cobalt); }
+/* Stats as a mono spec table: label left, value right, hairlines between */
+.st-stats { display: block; border-block: none; margin-top: 18px; }
+.st-stats > div,
+.st-stats > div:first-child {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 8px 0;
+  border-left: none;
+  border-top: 1px dashed var(--at-line-strong);
+}
+.st-stats > div:last-child { border-bottom: 1px dashed var(--at-line-strong); }
+.st-stats dt { order: 2; font: 500 0.95rem/1 var(--font-mono); letter-spacing: 0; color: var(--at-cobalt); }
+.st-stats dd { order: 1; margin-top: 0; font-size: 0.66rem; letter-spacing: 0.08em; }
+/* Fewer things per panel: one line per tab, no tool chips, a light frame bar. */
+.st-tab { padding: 13px 14px 15px; }
+.st-tab small { display: none; }
+.st-stack { display: none; }
+.st-frame { border-color: var(--at-line-strong); border-radius: 0; box-shadow: none; }
+.st-frame-bar { background: var(--qp-paper); border-bottom: 1px solid var(--at-line); }
+.st-frame-bar i, .st-frame-bar i:nth-child(2), .st-frame-bar i:nth-child(3) { border-radius: 0; width: 6px; height: 6px; background: var(--at-line-strong); }
+.st-frame-bar i:first-child { background: var(--at-cobalt); }
+.st-frame-bar span { color: var(--at-muted); }
+
+/* What I bring: light, no obsidian panel --------------------------------- */
+.sc-caps-split { border: none; border-radius: 0; background: transparent; box-shadow: none; gap: 56px; }
+.sc-caps-panel { color: var(--at-obsidian); padding: 0; border-right: none; background: none; }
+.sc-caps-panel .ed-label { color: var(--at-obsidian); }
+.sc-caps-panel h2 { color: var(--at-obsidian); }
+.sc-caps-aside { color: var(--at-muted); font-size: 0.84rem; }
+.sc-cap-row { padding: 28px 0; background: transparent; border-top: 1px dashed var(--at-line-strong); }
+.sc-cap-row:first-child { border-top: 1px dashed var(--at-line-strong); }
+.sc-cap-row:last-child { border-bottom: 1px dashed var(--at-line-strong); }
+.sc-cap-row:hover { background: transparent; }
+.sc-cap-count { font-weight: 400; font-size: 2.6rem; }
+.sc-cap-row-body h3 { font-weight: 500; }
+.sc-cap-copy { font-size: 0.82rem; }
+.sc-cap-proof li a { border-radius: 0; border-color: transparent; background: var(--qp-chip); text-transform: none; letter-spacing: 0; }
+.sc-cap-proof li a:hover { border-color: transparent; background: var(--qp-chip-hover); color: var(--at-obsidian); }
+
+/* Cards: hairline frame, paper mat instead of a black one ---------------- */
+.sc-card { border-color: var(--at-line); border-radius: 0; background: var(--qp-paper); }
+.sc-card:hover, .sc-card:focus-visible { translate: none; box-shadow: none; border-color: var(--at-cobalt); }
+.sc-card-plate { background: transparent; padding: 0; border-bottom: 1px solid var(--at-line); }
+.sc-card-media { border: none; background: var(--at-stone); }
+.sc-card-media img.is-poster { background: var(--at-stone); }
+.sc-card:hover .sc-card-media img { transform: none; }
+.sc-card-plate-bar { padding: 9px 14px; }
+.sc-card-kind { color: var(--at-cobalt); }
+.sc-card-status-chip { color: var(--at-muted); }
+.sc-card-body h3 { font-weight: 500; font-size: 1.15rem; }
+.sc-card-metric { border-top: 1px dashed var(--at-line-strong); }
+.sc-card-metric strong { font-weight: 500; font-size: 1.35rem; }
+.sc-card-line { font-size: 0.8rem; line-height: 1.7; }
+
+/* Contact and footer: light, on the same paper ----------------------------- */
+.ed-contact { color: var(--at-obsidian); border-top: none; padding-top: 0; }
+.ed-contact .ed-label { color: var(--at-obsidian); }
+.ed-contact h2 { color: var(--at-obsidian); }
+.ed-contact :focus-visible { outline-color: var(--at-cobalt); }
+.qp-band-slim { position: relative; height: 112px; margin-bottom: 96px; }
+.sc-email { font-weight: 400; color: var(--at-obsidian); border-bottom: 1px solid var(--at-cobalt); }
+.sc-email:hover, .sc-email:focus-visible { color: var(--at-cobalt); }
+.sc-contact-card { background: var(--qp-paper); border: 1px solid var(--at-line); border-top: 1px solid var(--at-line); border-radius: 0; }
+.sc-contact-card-kicker i { border-radius: 0; background: var(--at-cobalt); }
+.sc-contact-card-copy { font-size: 0.82rem; }
+.sc-footer-cols { border-top: 1px solid var(--at-line); }
+.sc-footer-cols h3 { color: var(--at-muted); }
+.sc-footer-cols a { color: var(--at-obsidian); font-size: 0.82rem; }
+.sc-footer-cols a:hover { color: var(--at-cobalt); }
+.ed-footer { border-top: 1px solid var(--at-line); color: var(--at-muted); }
+.ed-footer button { border-color: transparent; background: var(--qp-chip); color: var(--at-obsidian); border-radius: 0; text-transform: none; letter-spacing: 0; }
+.ed-footer button:hover { border-color: transparent; background: var(--qp-chip-hover); color: var(--at-obsidian); }
+
+@media (max-width: 900px) {
+  .sc-hero { padding-top: 104px; }
+  .sc-hero-grid-layout { grid-template-columns: 1fr; gap: 32px; }
+  .sc-hero-name { font-size: clamp(2rem, 8.6vw, 2.6rem); }
+  .sc-hero-name span { white-space: normal; }
+  .sc-caps-split { gap: 32px; }
+}
+@media (max-width: 640px) {
+  .ed-section { padding-block: 80px; }
+  .qp-plate-band { padding-block: 32px; }
+  .qp-plate { padding: 6px; }
+  .qp-band-slim { height: 72px; margin-bottom: 64px; }
+  .sc-receipts > div { padding-left: 0; }
+}
+
+/* ---------- The full index (/work/ and the home page preview) ---------- */
+.ix-page { max-width: 1120px; margin: 0 auto; padding: 128px 24px 112px; }
+.ix-kicker { font: 500 0.74rem/1 var(--font-mono); text-transform: uppercase; letter-spacing: 0.14em; color: var(--at-cobalt); }
+.ix-title { margin-top: 14px; font: 400 clamp(2rem, 4vw, 3rem)/1.05 var(--font-display); letter-spacing: -0.02em; color: var(--at-obsidian); }
+.ix-lede { margin-top: 16px; max-width: 60ch; font: 400 0.9rem/1.7 var(--font-mono); color: var(--at-muted); }
+.ix-group { margin-top: 56px; }
+.ix-group-h { display: flex; align-items: baseline; justify-content: space-between; padding-bottom: 10px; border-bottom: 1px solid var(--at-obsidian); font: 500 0.74rem/1 var(--font-mono); text-transform: uppercase; letter-spacing: 0.12em; color: var(--at-obsidian); }
+.ix-group-h small { font: inherit; color: var(--at-cobalt); }
+.ix-rows { list-style: none; margin: 0; padding: 0; }
+.ix-rows li { border-bottom: 1px dashed rgb(17 19 24 / 0.18); }
+.ix-row { display: grid; grid-template-columns: 2.4rem minmax(0, 15rem) minmax(0, 1fr) 13rem 1rem; gap: 20px; align-items: baseline; padding: 14px 0; color: var(--at-obsidian); text-decoration: none; }
+.ix-n { font: 400 0.72rem/1 var(--font-mono); color: var(--at-muted); }
+.ix-name b { display: block; font: 500 1rem/1.3 var(--font-display); }
+.ix-name small { display: block; margin-top: 4px; font: 400 0.66rem/1.3 var(--font-mono); text-transform: uppercase; letter-spacing: 0.08em; color: var(--at-muted); }
+.ix-line { font: 400 0.8rem/1.55 var(--font-mono); color: var(--at-muted); overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; }
+.ix-status { font: 400 0.68rem/1.4 var(--font-mono); text-transform: uppercase; letter-spacing: 0.06em; color: var(--at-muted); text-align: right; }
+.ix-arrow { color: var(--at-muted); align-self: center; }
+.ix-row:hover b, .ix-row:hover .ix-arrow, .ix-row:focus-visible b { color: var(--at-cobalt); }
+@media (max-width: 900px) {
+  .ix-row { grid-template-columns: 2rem minmax(0, 1fr) 1rem; gap: 12px; }
+  .ix-line, .ix-status { grid-column: 2; }
+  .ix-status { text-align: left; }
+  .ix-arrow { grid-row: 1; grid-column: 3; }
+}
+
+/* Home page: the index as one line per group. */
+.ix-preview { margin-top: 64px; }
+.ix-preview-head { display: flex; align-items: baseline; justify-content: space-between; gap: 16px; padding-bottom: 12px; border-bottom: 1px solid var(--at-obsidian); }
+.ix-preview-head h3 { font: 400 1.4rem/1.2 var(--font-display); color: var(--at-obsidian); }
+.ix-preview-head a { font: 500 0.74rem/1 var(--font-mono); text-transform: uppercase; letter-spacing: 0.1em; color: var(--at-cobalt); white-space: nowrap; }
+.ix-preview dl { margin: 0; }
+.ix-preview dl > div { display: grid; grid-template-columns: minmax(0, 19rem) minmax(0, 1fr); gap: 20px; padding: 14px 0; border-bottom: 1px dashed rgb(17 19 24 / 0.18); align-items: baseline; }
+.ix-preview dt { display: flex; justify-content: space-between; gap: 12px; font: 500 0.74rem/1.4 var(--font-mono); text-transform: uppercase; letter-spacing: 0.08em; color: var(--at-obsidian); }
+.ix-preview .ix-count { font: 400 0.74rem/1.4 var(--font-mono); color: var(--at-cobalt); }
+.ix-preview dd { margin: 0; font: 400 0.8rem/1.7 var(--font-mono); color: var(--at-muted); }
+.ix-preview dd a { color: var(--at-obsidian); text-decoration: none; border-bottom: 1px solid rgb(17 19 24 / 0.2); }
+.ix-preview dd a:hover { color: var(--at-cobalt); border-color: currentColor; }
+@media (max-width: 900px) {
+  .ix-preview dl > div { grid-template-columns: minmax(0, 1fr); gap: 6px; }
+}
+
+/* ---------- Project pages: flat print, like the home page ----------
+   No lifted cards: panels are paper with a thin rule, the hero card loses
+   its cobalt cap and shadow, titles sit at regular weight, and the hook
+   is a readable lede rather than a second headline. */
+.ed-case-study .panel,
+.ed-case-study .pp-hero { box-shadow: none !important; border-radius: 0 !important; background: var(--qp-paper); border-color: rgb(17 19 24 / 0.22); }
+.ed-case-study .pp-hero { background: var(--qp-paper) !important; border: 1px solid rgb(17 19 24 / 0.22) !important; border-top: 1px solid var(--at-obsidian) !important; }
+.ed-case-study .pp-hero h1 { font-weight: 400; letter-spacing: -0.035em; }
+.ed-case-study .pp-hero-line { font-size: clamp(1.02rem, 1.5vw, 1.2rem) !important; line-height: 1.6; }
+.ed-case-study .group.panel:hover { border-color: var(--at-cobalt); transform: none; }

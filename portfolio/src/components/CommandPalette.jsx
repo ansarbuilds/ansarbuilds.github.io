@@ -1,14 +1,14 @@
 import { DUR, EASE } from "../lib/motion";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
-import { Search, CornerDownLeft, ArrowUp, ArrowDown, X, Hash, Link2, Terminal, Sparkles } from "lucide-react";
+import { Search, CornerDownLeft, ArrowUp, ArrowDown, X, Hash, Link2 } from "lucide-react";
 import { COMMAND_ITEMS } from "../data/content";
 import { LISTED_PROJECTS } from "../data/projectIndex";
 import { FLAGSHIPS } from "../data/showcase";
-import { useRoute, useSandbox } from "../appContexts";
+import { useRoute } from "../appContexts";
 
-const GROUP_ICONS = { Sections: Hash, Projects: Hash, Playground: Sparkles, Links: Link2, System: Terminal };
-const GROUP_ORDER = ["Sections", "Projects", "Playground", "Links", "System"];
+const GROUP_ICONS = { Sections: Hash, Projects: Hash, Links: Link2 };
+const GROUP_ORDER = ["Sections", "Projects", "Links"];
 const CORAL = "#1d4ed8";
 
 // Every listed project, flagships first in stage order, each with its stage
@@ -22,10 +22,7 @@ const PROJECT_ITEMS = [
   group: "Projects",
 }));
 
-// A tool for working on the site, not for visitors: the dev server only.
-const SYSTEM_ITEMS = import.meta.env.DEV ? [{ label: "Toggle dev_mode · sandbox stubs", action: "toggle-sandbox", group: "System" }] : [];
-
-const ALL_ITEMS = [...COMMAND_ITEMS, ...PROJECT_ITEMS, ...SYSTEM_ITEMS]
+const ALL_ITEMS = [...COMMAND_ITEMS, ...PROJECT_ITEMS]
   .sort((a, b) => GROUP_ORDER.indexOf(a.group) - GROUP_ORDER.indexOf(b.group));
 
 /**
@@ -44,7 +41,6 @@ export default function CommandPalette() {
   const closeRef = useRef(null);
   const listRef = useRef(null);
   const returnTo = useRef(null);
-  const { toggleDevMode } = useSandbox();
   const { navigate } = useRoute();
 
   const results = useMemo(() => {
@@ -94,8 +90,7 @@ export default function CommandPalette() {
     if (!item) return;
     // Navigating moves focus to the new place; don't pull it back.
     returnTo.current = null;
-    if (item.action === "toggle-sandbox") toggleDevMode();
-    else if (item.go) navigate(item.go);
+    if (item.go) navigate(item.go);
     else if (item.href) window.open(item.href, item.href.startsWith("mailto:") ? "_self" : "_blank", "noopener,noreferrer");
     setOpen(false);
   }

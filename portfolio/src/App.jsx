@@ -1,7 +1,6 @@
 import { Component, createRef, lazy, Suspense, useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { Hero, ProjectsSection, CapabilitiesSection, MoreWorkSection, PlaygroundSection, ContactSection } from "./components/Sections";
+import { Hero, ProjectsSection, CapabilitiesSection, MoreWorkSection, ContactSection } from "./components/Sections";
 import CommandPalette from "./components/CommandPalette";
-import { MatrixBackground } from "./components/RouteBackgrounds";
 import PaletteSwatch from "./components/PaletteSwatch";
 // The palette card is a tool for working on the site, not for visitors:
 // on the dev server, or with ?palette in the address.
@@ -17,21 +16,16 @@ import { titleForRoute } from "./lib/routeTitle";
 import { CONTACT } from "./data/content";
 import { applyPalette, clearPalette, paletteForRoute, pickPalette } from "./lib/palettes";
 import { OPEN_SOURCE_PROJECTS } from "./data/projectIndex";
-import { RouteContext, SandboxContext, ThemeContext, useRoute, useSandbox } from "./appContexts";
+import { RouteContext, ThemeContext, useRoute } from "./appContexts";
 import { scrollToElement, scrollToTop, setSmoothScroll } from "./lib/scroll";
 
 // Only the home page ships in the first load; every other view arrives
 // when it is opened.
-const EmetSection = lazy(() => import("./components/EmetSection"));
 const ProjectPage = lazy(() => import("./components/ProjectPage"));
 const ProjectWorkPage = lazy(() => import("./components/ProjectWorkPage"));
-const SandboxStubs = lazy(() => import("./components/SandboxStubs"));
-const SolarSystemExplorer = lazy(() => import("./components/SolarSystemExplorer"));
 const DataLineageExplorer = lazy(() => import("./components/DataLineageExplorer"));
 const HaloscriptPage = lazy(() => import("./components/HaloscriptPage"));
 const HedwigPage = lazy(() => import("./components/HedwigPage"));
-const InfinityPage = lazy(() => import("./components/InfinityPage"));
-const BB8Companion = lazy(() => import("./components/BB8Companion"));
 // The film's player, loaded only for a visitor who is going to see it.
 const loadFilmPlayer = () => import("./film/FilmPlayer");
 const FilmPlayer = lazy(loadFilmPlayer);
@@ -39,10 +33,10 @@ const FilmPlayer = lazy(loadFilmPlayer);
 /* ============================================================
    ROUTER: every view has its own URL (see lib/routes.js). "main" is the
    home page: one scrolled document, the hero followed by Selected work,
-   What I bring, More work, the Playground and Contact, so a link to one of
+   What I bring, More work and Contact, so a link to one of
    those does not swap a view, it scrolls to that section's id. Project
-   pages live at /work/<slug>/ and the full-screen views under
-   /playground/. Links are ordinary <a href>; one click handler turns the
+   pages live at /work/<slug>/ and the lineage demo at
+   /playground/lineage-demo/. Links are ordinary <a href>; one click handler turns the
    in-app ones into history changes so the page never reloads.
    ============================================================ */
 function readRoute() {
@@ -232,19 +226,6 @@ function ThemeProvider({ children }) {
   return <ThemeContext.Provider value={value}>{children}</ThemeContext.Provider>;
 }
 
-/* ============================================================
-   SANDBOX STATE — dev_mode toggle, reachable from the EMET
-   terminal input ("dev_mode") or the command palette.
-   ============================================================ */
-function SandboxProvider({ children }) {
-  const [devMode, setDevMode] = useState(false);
-  const value = useMemo(
-    () => ({ devMode, toggleDevMode: () => setDevMode((v) => !v), setDevMode }),
-    [devMode]
-  );
-  return <SandboxContext.Provider value={value}>{children}</SandboxContext.Provider>;
-}
-
 // The command palette's shortcut as the visitor's keyboard writes it.
 const PALETTE_KEY = typeof navigator !== "undefined" && /Mac|iPhone|iPad/.test(navigator.userAgentData?.platform || navigator.platform || navigator.userAgent) ? "⌘" : "Ctrl";
 
@@ -375,7 +356,6 @@ function MainDocument({ bootDone, held, onBoot, heroRun }) {
       <ProjectsSection />
       <CapabilitiesSection />
       <MoreWorkSection />
-      <PlaygroundSection />
       <ContactSection />
     </>
   );
@@ -384,14 +364,11 @@ function MainDocument({ bootDone, held, onBoot, heroRun }) {
 // What each route shows. Takeover views fill the stage; the home page and
 // the project pages scroll.
 function RouteView({ route, bootDone, held, onBoot, heroRun }) {
-  if (route === "emet") return <Suspense fallback={<RouteLoader label="Loading Emet" />}><EmetSection /></Suspense>;
-  if (route === "explore") return <Suspense fallback={<RouteLoader label="Loading solar system" />}><SolarSystemExplorer /></Suspense>;
   if (route === "work") return <Suspense fallback={<RouteLoader label="Loading work" />}><ProjectWorkPage /></Suspense>;
   if (route === "project/haloscript") return <Suspense fallback={<RouteLoader label="Loading project" />}><HaloscriptPage /></Suspense>;
   if (route === "project/hedwig") return <Suspense fallback={<RouteLoader label="Loading project" />}><HedwigPage /></Suspense>;
   if (route.startsWith("project/")) return <Suspense fallback={<RouteLoader label="Loading project" />}><ProjectPage slug={route.slice("project/".length)} /></Suspense>;
   if (route === "lineage-demo") return <Suspense fallback={<RouteLoader label="Loading data explorer" />}><DataLineageExplorer /></Suspense>;
-  if (route === "infinity") return <Suspense fallback={<RouteLoader label="Loading particle scene" />}><InfinityPage /></Suspense>;
   return <MainDocument bootDone={bootDone} held={held} onBoot={onBoot} heroRun={heroRun} />;
 }
 
@@ -400,7 +377,7 @@ function RouteView({ route, bootDone, held, onBoot, heroRun }) {
    swap is a single synchronous step, which is what lets a view transition
    wrap it. The motion itself is CSS (.rt in showcase.css): it switches off
    during a view transition, which brings its own, and for reduced motion. */
-const FULL_HEIGHT = new Set(["emet", "explore", "lineage-demo", "infinity"]);
+const FULL_HEIGHT = new Set(["lineage-demo"]);
 function RouteTransition({ route, children }) {
   const kind = route === "main" ? "home" : route.startsWith("project/") || route === "work" ? "page" : "takeover";
   return <div key={route} className={`rt rt-${kind} ${FULL_HEIGHT.has(route) ? "h-[100dvh]" : ""}`}>{children}</div>;
@@ -409,10 +386,9 @@ function RouteTransition({ route, children }) {
 function Stage({ bootDone, held, onBoot, heroRun }) {
   const { route } = useRoute();
   useRoutePalette(route);
-  const { devMode, toggleDevMode } = useSandbox();
 
-  // The document is the scroller. Full-screen views own the wheel (orbit
-  // controls, the terminal), so smoothing is only on for pages that scroll.
+  // The document is the scroller. The full-screen lineage demo owns the
+  // wheel (pan and zoom), so smoothing is only on for pages that scroll.
   useEffect(() => {
     setSmoothScroll(!FULL_HEIGHT.has(route));
     if (route !== "main") scrollToTop({ instant: true });
@@ -421,72 +397,16 @@ function Stage({ bootDone, held, onBoot, heroRun }) {
   return (
     <main id="main-content" tabIndex={-1} className="relative min-h-[100dvh]">
       <RouteTransition route={route}><RouteView route={route} bootDone={bootDone} held={held} onBoot={onBoot} heroRun={heroRun} /></RouteTransition>
-      {devMode && <Suspense fallback={null}><SandboxStubs onClose={toggleDevMode} /></Suspense>}
     </main>
   );
 }
 
-// The explorer is content (like EMET), not backdrop — it needs to
-// capture drag/scroll/pinch itself for orbit controls, which a fixed
-// z-0 layer sitting *behind* Stage's scrollable <main> can't reliably
-// do. So on that route the backdrop is just a plain matching fill;
-// SolarSystemExplorer renders its own full 3D scene inside Stage
-// instead.
 function Backdrop() {
-  const { route } = useRoute();
-  if (route === "emet") {
-    return (
-      <Suspense fallback={<div className="fixed inset-0 z-0 bg-[#04120a]" aria-hidden="true" />}>
-        <MatrixBackground />
-      </Suspense>
-    );
-  }
-  if (route === "explore" || route === "lineage-demo" || route === "infinity") {
-    return <div className="fixed inset-0 z-0 bg-[#02050c]" aria-hidden="true" />;
-  }
-  // Everything else sits on alabaster stone with a subtle architectural drafting grid.
+  // Every view sits on alabaster stone with a subtle architectural drafting grid.
   return <div className="at-grid-backdrop" aria-hidden="true" />;
 }
 
-// BB-8 brings three.js with it, the heaviest chunk on the page. Waiting for
-// the browser to go idle after the intro keeps it out of the first paint.
-// The companion pulls in three.js, the heaviest thing on the page. Waiting
-// for the visitor's first scroll, tap or key (then an idle moment) keeps it
-// off the first load, and off quick bounces entirely. It only appears a few
-// seconds in anyway, so nobody sees the difference.
-const FIRST_INPUT_EVENTS = ["pointerdown", "pointermove", "wheel", "touchstart", "keydown", "scroll"];
-function useIdleAfterFirstInput(ready) {
-  const [idle, setIdle] = useState(false);
-  useEffect(() => {
-    if (!ready) return undefined;
-    let idleId = 0;
-    let timer = 0;
-    const listen = { passive: true, capture: true };
-    const start = () => {
-      FIRST_INPUT_EVENTS.forEach((name) => window.removeEventListener(name, start, listen));
-      if ("requestIdleCallback" in window) idleId = window.requestIdleCallback(() => setIdle(true), { timeout: 2500 });
-      else timer = setTimeout(() => setIdle(true), 600);
-    };
-    FIRST_INPUT_EVENTS.forEach((name) => window.addEventListener(name, start, listen));
-    return () => {
-      FIRST_INPUT_EVENTS.forEach((name) => window.removeEventListener(name, start, listen));
-      if (idleId) window.cancelIdleCallback(idleId);
-      clearTimeout(timer);
-    };
-  }, [ready]);
-  return idle;
-}
-
-function Companion() {
-  // On a phone there is no room beside the content: the droid and its
-  // speech bubble would sit on top of the headings and the film's cards.
-  const [narrow] = useState(() => window.matchMedia("(max-width: 760px)").matches);
-  if (narrow) return null;
-  return <Suspense fallback={null}><BB8Companion /></Suspense>;
-}
-
 function AppShell({ bootDone, held, onBoot, heroRun }) {
-  const companionReady = useIdleAfterFirstInput(bootDone);
   return (
       <RouteProvider>
         <div className="relative bg-[#f4f3ef] text-[#111318] min-h-[100dvh]">
@@ -497,13 +417,11 @@ function AppShell({ bootDone, held, onBoot, heroRun }) {
             <ScrollProgress />
             {SHOW_SWATCH && <PaletteSwatch />}
             <HomeCursor />
-            {companionReady && <Companion />}
             {/* No page-level `perspective` here on purpose: setting it on an
                 ancestor this high up turns it into the CSS containing block
                 for every `position: fixed` descendant (modals, overlays)
                 anywhere in the tree, breaking their viewport-relative
-                positioning. Each 3D component (deck cards, emet's chassis,
-                project cards) establishes its own local perspective instead. */}
+                positioning. Each 3D component (deck cards, project cards) establishes its own local perspective instead. */}
             <Stage bootDone={bootDone} held={held} onBoot={onBoot} heroRun={heroRun} />
             <CommandPalette />
           </div>
@@ -684,7 +602,6 @@ export default function App() {
   return (
     <ErrorBoundary>
       <ThemeProvider>
-        <SandboxProvider>
           <AppShell bootDone={bootDone} held={held} onBoot={onBoot} heroRun={heroRun} />
           {filmUp && <FilmBoundary key={`film-${take}`} onFail={endFilm}><Suspense fallback={null}>
             <FilmPlayer rolling={rolling} onEnd={endFilm} onStarted={onStarted} />
@@ -692,7 +609,6 @@ export default function App() {
           {cover && <FilmIdent />}
           {filmUp && <FilmSkip onSkip={pressSkip} />}
           {burst > 0 && <FilmSkipBurst key={burst} onDone={burstDone} />}
-        </SandboxProvider>
       </ThemeProvider>
     </ErrorBoundary>
   );

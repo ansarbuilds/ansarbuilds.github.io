@@ -3,15 +3,15 @@
    ink       deep slate-obsidian (#111318), and dark instrument panels
    accent    international signal cobalt (#1d4ed8)
    accentInk high-contrast cobalt on stone (>= 6.5:1 against paper)
-   onDark    signal amber (#f59e0b) on obsidian (>= 9.5:1 against ink) */
+   onDark    bright cobalt (#628cff) on obsidian (>= 4.5:1 against ink) */
 export const PALETTES = {
-  lumen:     { paper: "#f4f3ef", ink: "#111318", accent: "#1d4ed8", accentInk: "#1d4ed8", onDark: "#f59e0b" },
-  bloom:     { paper: "#f4f3ef", ink: "#111318", accent: "#1d4ed8", accentInk: "#1d4ed8", onDark: "#f59e0b" },
-  lumora:    { paper: "#f4f3ef", ink: "#111318", accent: "#1d4ed8", accentInk: "#1d4ed8", onDark: "#f59e0b" },
-  neon:      { paper: "#f4f3ef", ink: "#111318", accent: "#1d4ed8", accentInk: "#1d4ed8", onDark: "#f59e0b" },
-  choreo:    { paper: "#f4f3ef", ink: "#111318", accent: "#1d4ed8", accentInk: "#1d4ed8", onDark: "#f59e0b" },
-  field:     { paper: "#f4f3ef", ink: "#111318", accent: "#1d4ed8", accentInk: "#1d4ed8", onDark: "#f59e0b" },
-  blueBloom: { paper: "#f4f3ef", ink: "#111318", accent: "#1d4ed8", accentInk: "#1d4ed8", onDark: "#f59e0b" },
+  lumen:     { paper: "#f4f3ef", ink: "#111318", accent: "#1d4ed8", accentInk: "#1d4ed8", onDark: "#628cff" },
+  bloom:     { paper: "#f4f3ef", ink: "#111318", accent: "#1d4ed8", accentInk: "#1d4ed8", onDark: "#628cff" },
+  lumora:    { paper: "#f4f3ef", ink: "#111318", accent: "#1d4ed8", accentInk: "#1d4ed8", onDark: "#628cff" },
+  neon:      { paper: "#f4f3ef", ink: "#111318", accent: "#1d4ed8", accentInk: "#1d4ed8", onDark: "#628cff" },
+  choreo:    { paper: "#f4f3ef", ink: "#111318", accent: "#1d4ed8", accentInk: "#1d4ed8", onDark: "#628cff" },
+  field:     { paper: "#f4f3ef", ink: "#111318", accent: "#1d4ed8", accentInk: "#1d4ed8", onDark: "#628cff" },
+  blueBloom: { paper: "#f4f3ef", ink: "#111318", accent: "#1d4ed8", accentInk: "#1d4ed8", onDark: "#628cff" },
 };
 
 export const DEFAULT_PALETTE = "lumen";

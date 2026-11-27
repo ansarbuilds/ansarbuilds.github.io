@@ -1,44 +1,31 @@
 # Mohamed Ansar, portfolio
 
 The source for [ansarbuilds.dev](https://ansarbuilds.dev).
-React 19, Vite, Tailwind v4, Framer Motion, and three.js for the interactive experiments.
+React 19, Vite, Tailwind v4 and Framer Motion.
 
 ## How the site is laid out
 
-A portfolio of agents, AI studies and shipped apps, with the proof for each. One scrolling page, then a detail page per project:
+A portfolio of agents, AI studies and shipped apps, with the proof for each. One scrolling page, then a page per project:
 
-1. **Hero**: a dark stage with a layered agent graph and travelling signals (`SignalField.jsx`). It sways, leans toward the pointer, and a click sends out a burst and moves it to its next shape. On a first visit the hero is its own title card: the name sets large mid-screen, then travels to its place while the kicker, sentence, buttons and four proof cards arrive in order. The nav turns to dark glass while the hero is behind it, and the same graph, dimmed, sits behind Contact.
+1. **Hero** (`#hero`): the claim (a language model trained from scratch, 286.7M parameters for $2.45) beside `HedwigTrace.jsx`, a real recorded run of the Hedwig model replayed one token at a time, with the three tokens it was choosing between drawn as rows of square dots. Nothing in it is generated on the page. It pauses off-screen; reduced motion shows one still step.
+2. **The short version**: the positioning statement and the counts (projects, lines, repositories).
+3. **Selected work** (`#projects`, "Six projects, in depth."): one interactive stage (`WorkStage.jsx`, `stage.css`). Tabs pick a project; the demo sits on the left and the short version on the right. saywhen plays its launch film (an animation, and the frame says so), Jarvis runs its real sample-data demo, Haloscript switches between its Mac, iPad and iPhone screenshots, and PRH-JEPA shows a report figure with a toggle for its headline finding. On small screens the projects stack.
+4. **What the work covers** (`#capabilities`): agents and tooling, evaluation and research, product and shipping, each linked to the projects that show it.
+5. **More work** (`#more`): four image cards, then a compact preview of the full index.
+6. **Contact** (`#contact`): email first, then GitHub and LinkedIn.
 
-   **Motion.** `MOTION.md` is the reference: the rules, the tokens in `src/lib/motion.js` (mirrored as CSS variables in `index.css`), and the reduced-motion policy. `motion-audit/AUDIT.md` records what was measured and why each thing moves. The moving parts: `Enter` (the one scroll reveal), `Count` (the one counter), `Magnetic.jsx` (the two primary buttons), `Cursor.jsx`, `lib/routeTransition.js` (card to project page), `ScrubText` and `VelocityMarquee` in `Sections.jsx`.
-2. **The short version**: the positioning statement, four counts, the lines-of-code band, and a moving row of the tools I build with.
-3. **Selected work** (`#projects`): one interactive stage (`WorkStage.jsx`, `stage.css`) instead of seven long sections. Tabs along the top pick a project; the demo sits on the left and the short version on the right. It moves on by itself until the visitor picks a tab. saywhen plays its launch film, muted, with a button that restarts it in place with sound (the film is an animation, and the frame says so), Jarvis runs its real sample-data demo in a frame, Haloscript switches between its own Mac, iPad and iPhone screenshots, PRH-JEPA shows a report figure with a toggle for its headline finding, and the Flight Recorder replay and Site Recon terminal are illustrations that say so. On small screens the tabs drop away and the seven projects stack.
-4. **What I bring** (`#capabilities`): agents and tooling, evaluation and research, product and shipping, each with the projects that prove it.
-5. **More shipped work** (`#more`): image cards with one highlight each, then an "Also built" toggle for internal tools and early experiments.
-6. **The playground** (`#ai`): the EMET terminal, solar system, and infinity loop.
-7. **Contact** (`#contact`): email first, then GitHub and LinkedIn.
+**Design.** Cobalt & Stone: stone paper (`#f4f3ef`), obsidian ink (`#111318`), one cobalt (`#1d4ed8`, `#628cff` on dark). Two typefaces, Space Grotesk for display and IBM Plex Mono for everything else. Illustrations are dot-matrix prints (square dots on stone, one cobalt), redrawn by `scripts/dot-matrix-art.mjs`. The styles layer in this order: `index.css` (tokens), `editorial.css`, `showcase.css`, `stage.css`, and last `quiet-print.css`, which holds the current design and wins. `src/lib/palettes.js` names the palette per section; the swatch card (`PaletteSwatch.jsx`) shows on the dev server or with `?palette` in the URL. `src/lib/palettes.test.mjs` holds every pairing to AA contrast.
 
-The whole site is one dark theme: carbon surfaces and bone text. Each later
-section tints that base a few points toward its own accent
-(`src/lib/palettes.js`): sections tagged `data-palette` swap the colour tokens
-as they reach the middle of the screen, and the page eases between them. A
-swatch card in the bottom-left corner (`src/components/PaletteSwatch.jsx`)
-names the palette on screen and opens into its colours and hex codes.
-`src/lib/palettes.test.mjs` holds every palette to AA contrast. `src/editorial.css` contains the homepage's layout and light/dark
-surfaces. Shared compatibility tokens live in `src/index.css`. The main page uses
-oversized condensed headings, illustrated covers using the original project
-icons, flagship case-study spreads, an image grid, and a dark
-interactive experiments section. The hero network pauses offscreen and in
-hidden tabs, uses fewer nodes on phones, and draws one still frame for
-reduced motion. The terminal and 3D scenes keep their own colors.
+**Motion.** `MOTION.md` is the reference: the rules, the tokens in `src/lib/motion.js` (mirrored as CSS variables in `index.css`), and the reduced-motion policy.
 
 Clicking a project opens `/work/<slug>/`: the story, a flow diagram, what I took from it, and links.
 
 ## URLs, scrolling and the build
 
-- **Every view has a real URL** (`src/lib/routes.js`): the home page is `/` with its sections as `/#projects`, `/#contact` and so on; project pages are `/work/<slug>/`; the full-screen views are `/playground/<id>/`. Links are ordinary `<a href>`, and one click handler in `App.jsx` turns the in-app ones into history changes. The old hash links (`/#project/jarvis`, `/#emet`) still open the right view and are rewritten to the new URL.
-- **Each URL is a file.** After `vite build`, `scripts/prerender-routes.mjs` writes `dist/work/<slug>/index.html` (and the other views) with that page's own title, description, canonical URL and share image, plus a short static version of the page for readers that do not run scripts. It also writes `404.html` and adds the pages to the sitemap.
+- **Every view has a real URL** (`src/lib/routes.js`): the home page is `/` with its sections as `/#projects`, `/#contact` and so on; project pages are `/work/<slug>/`; the full index is `/work/`; the lineage explorer's live demo is `/playground/lineage-demo/`. Links are ordinary `<a href>`, and one click handler in `App.jsx` turns the in-app ones into history changes. The old hash links (`/#project/jarvis`) still open the right view and are rewritten to the new URL.
+- **Each URL is a file.** After `vite build`, `scripts/prerender-routes.mjs` writes `dist/work/<slug>/index.html` (and the other views) with that page's own title, description, canonical URL and share image, plus a short static version of the page for readers that do not run scripts (hidden when scripts run, so the page does not jump). It also writes `404.html` and adds the pages to the sitemap.
 - **The document scrolls**, not a box inside it, smoothed by Lenis on the pages that scroll (`src/lib/scroll.js`). Anything that scrolls the page from code goes through that file.
-- **Fonts are self-hosted** (`src/fonts.css`, `src/assets/fonts/`): Anton, Outfit, Plus Jakarta Sans, Instrument Serif and JetBrains Mono, latin subset.
+- **Fonts** are Space Grotesk and IBM Plex Mono from Google Fonts, linked in `index.html`.
 - **Budgets.** `npm run check:budget` (run in CI after the build) fails when the first load or the shipped media grows past the limits in `scripts/check-budget.mjs`.
 - **Media.** The launch film is H.264 at CRF 30.
 
@@ -53,6 +40,7 @@ A first visit opens on a short film: the studio ident, then a 24-second trailer 
 - It is skipped for reduced motion and on Save-Data or slow connections. Browser tests run in real Chrome (`channel: 'chrome'`), since Playwright's own Chromium cannot play H.264.
 - **Sound** (`lib/sound.js`, the switch in the nav) is off by default and generated in the browser: an ambient pad that opens up with scroll speed, and the hits on the ident and the skip button. The film's soundtrack is recorded from the same engine (`film/score/record.mjs`).
 - **Project data on the home page** comes from `src/data/projectIndex.js`, a generated slim copy of `projects.js` (titles, hooks, links, covers). After editing `projects.js`, run `node scripts/make-project-index.mjs`; a unit test fails if you forget.
+- **Share images.** Every project has a 1200×630 card at `public/p/<slug>/og.jpg`, drawn from its own page's copy by `PW_CHANNEL=chrome node scripts/make-share-images.mjs` (name slugs after it to redraw only those). Redraw after changing a project's title, hook, stats, status or stack. The script checks each layout and exits with an error if text runs into anything. SayWhen's card is a designed product shot and is left alone.
 - `rig.js` turns the shot list into a camera pose for any moment. It is plain maths with tests (`rig.test.mjs`), and it is the piece the real film reuses.
 
 ## Where things live
@@ -60,20 +48,24 @@ A first visit opens on a short film: the studio ident, then a 24-second trailer 
 ```
 src/
   data/projects.js      every project (copy, flow diagram, links, screenshots)
-  data/content.js       hero, roles, about/skills, EMET answers, command palette
+  data/content.js       hero, receipts, about/skills, contact, command palette
+  data/archive.js       the full index, grouped by kind of work
+  data/hedwigRun.js     the recorded Hedwig run the hero replays
   components/
     Sections.jsx        hero + the home page sections
     ProjectPage.jsx     the per-project detail page
     ui.jsx              Rail (scroller), FlowDiagram, tags, section heading
-    EmetSection.jsx     the terminal
-    SignalField.jsx      the hero's node network canvas
-    SolarSystemExplorer.jsx, DataLineageExplorer.jsx, InfinityLoop.jsx
+    HedwigTrace.jsx     the hero's recorded model run
+    WorkStage.jsx       the Selected work stage
+    ProjectWorkPage.jsx the full index at /work/
+    HedwigPage.jsx, HaloscriptPage.jsx  the two custom project pages
+    DataLineageExplorer.jsx             the lineage demo
 public/shots/           screenshots used on project pages
 ```
 
 ## Adding or changing a project
 
-Edit `src/data/projects.js` for the full story. The home page order and its short copy live in `src/data/showcase.js`: `FLAGSHIPS` (the seven spreads, with their headline, stats, stack and floating visual), `MORE_WORK` (the image cards), `CAPABILITIES` and `STACK_MARQUEE`. Any listed project not named there appears under "Also built". Flow diagrams are columns of boxes; boxes link to the next column automatically, or list `links` like `"0.0>1.1"` for a specific shape. Add images to `public/shots/` and list them under `shots`.
+Edit `src/data/projects.js` for the full story. The home page order and its short copy live in `src/data/showcase.js`: `FLAGSHIPS` (the six spreads, with their headline, stats, stack and floating visual), `MORE_WORK` (the image cards), `CAPABILITIES` and `STACK_MARQUEE`. Any listed project not named there appears under "Also built". Flow diagrams are columns of boxes; boxes link to the next column automatically, or list `links` like `"0.0>1.1"` for a specific shape. Add images to `public/shots/` and list them under `shots`.
 
 ## Writing style
 
@@ -81,7 +73,7 @@ Plain words, first person, short sentences, no em dashes. Work projects stay gen
 
 ## saywhen launch page
 
-`public/p/saywhen/index.html` is a standalone page at `/p/saywhen/` with the 60-second launch film (`demo.mp4`, a re-encode of the film in the saywhen repository), its poster and the share image. `keyboard-museum.mp4` is the six-second film of a keyboard in a glass case. `who-its-for.mp4` is the eight-second home-then-office loop. Each has a `.jpg` poster. `real-run.mp4` is a real 23-second screen recording, cropped and silent, shown under the film. The survey figures stay in the page text. `public/p/saywhen/loops/` holds seven short silent loops (MP4, with a WebP still each) rendered from the saywhen repository's `docs/visuals/animated/`. They play only while on screen, and not at all for reduced motion or data saver. They are illustrations, not screen recordings. The saywhen README links to it, so keep the URL stable. `public/shots/spotlight/saywhen.webp` is the film's poster frame, an illustration and not a screenshot. `public/shots/saywhen/home-preview.webp` is the app in its browser demo mode.
+`public/p/saywhen/index.html` is a standalone page at `/p/saywhen/` with the 60-second launch film (`demo.mp4`, a re-encode of the film in the saywhen repository), its poster and the share image. `real-run.mp4` is a real 23-second screen recording, cropped and silent, shown under the film, with a `.jpg` poster. The survey figures stay in the page text. `public/p/saywhen/loops/` holds five short silent loops (MP4, with a WebP still each) rendered from the saywhen repository's `docs/visuals/animated/`. They play only while on screen, and not at all for reduced motion or data saver. They are illustrations, not screen recordings. The saywhen README links to it, so keep the URL stable. `public/shots/spotlight/saywhen.webp` is the film's poster frame, an illustration and not a screenshot. `public/shots/saywhen/home-preview.webp` is the app in its browser demo mode.
 
 ## Run it
 
@@ -90,17 +82,13 @@ npm install
 npm run dev      # http://localhost:5173
 npm run build    # outputs to dist/
 npm run lint
+npm run test:unit
+PW_CHANNEL=chrome npx playwright test
 ```
 
 ## Deploy
 
 `.github/workflows/deploy-portfolio.yml` builds and publishes to GitHub Pages on every push to `main` that touches `portfolio/**`. Pages must be set to the **GitHub Actions** source.
-
-## Emet answers
-
-The terminal and edge chat share `src/emet/emetKnowledge.js`, including scored matching, short conversation context and follow-up suggestions. Without `VITE_EMET_AI_URL`, every answer stays local and deterministic. With the variable set, the same matched topic is sent as context to the separately deployed worker.
-
-Questions the local matcher cannot answer are kept only in the visitor's session storage under `emet-unanswered-questions` (the latest 20) and emit an `emet:unanswered` browser event. Nothing sends those questions off-device. Connect analytics only with an explicit privacy decision and an updated visitor notice.
 
 ## Studies, tools and skills
 

@@ -31,23 +31,10 @@ jobs:
 
       - run: npm ci
       - run: npm run lint
-      - run: npm run test:emet
+      - run: npm run test:unit
       - run: node --test scripts/share-pages.test.mjs
       - run: npx playwright install --with-deps chromium
       - run: npx playwright test
       - run: npm run build
       - run: node --test scripts/prerender.test.mjs
       - run: npm run check:budget
-
-  emet-worker:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-
-      - uses: actions/setup-node@v4
-        with:
-          node-version: 22
-
-      # The worker tests use only node:test, so no install is needed.
-      - run: node --test src/index.test.mjs
-        working-directory: emet-ai-worker
