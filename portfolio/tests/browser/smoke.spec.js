@@ -17,8 +17,8 @@ test('old hash links still open their page, at its new URL', async ({ page }) =>
   await page.goto('/#project/storyera');
   await expect(page.getByRole('heading', { name: 'StoryEra', level: 1 })).toBeVisible();
   await expect(page).toHaveURL(/\/work\/storyera\/$/);
-  await page.goto('/#emet');
-  await expect(page).toHaveURL(/\/playground\/emet\/$/);
+  await page.goto('/#lineage-demo');
+  await expect(page).toHaveURL(/\/playground\/lineage-demo\/$/);
 });
 
 test('a card opens its project without a page load, and Back returns home', async ({ page }) => {

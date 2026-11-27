@@ -5,13 +5,13 @@
      main                  /            (sections are /#projects, /#contact …)
      work                  /work/
      project/<slug>        /work/<slug>/
-     emet, explore, …      /playground/<id>/
+     lineage-demo          /playground/lineage-demo/
 
-   The site used to keep the view in the hash (/#project/jarvis, /#emet).
+   The site used to keep the view in the hash (/#project/jarvis, /#lineage-demo).
    Those links are all over the web, so they still open the right view and
    the address bar is rewritten to the new URL. */
 
-export const PLAYGROUND = ["emet", "explore", "lineage-demo", "infinity"];
+export const PLAYGROUND = ["lineage-demo"];
 
 // A view id from the old hash scheme, or "main" for a section id.
 export function routeFromLegacyHash(id) {

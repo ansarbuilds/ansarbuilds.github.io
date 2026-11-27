@@ -7,20 +7,18 @@
     "dev": "vite",
     "build": "vite build && node scripts/prerender-routes.mjs",
     "lint": "oxlint",
-    "test:emet": "node --test src/lib/palettes.test.mjs src/lib/score.test.mjs src/emet/emetKnowledge.test.mjs src/data/projectIndex.test.mjs",
+    "test:emet": "node --test src/lib/palettes.test.mjs src/lib/score.test.mjs src/data/projectIndex.test.mjs",
     "preview": "vite preview",
     "check:budget": "node scripts/check-budget.mjs",
     "check:tools": "node scripts/check-tools.mjs",
     "count:loc": "node scripts/count-loc.mjs"
   },
   "dependencies": {
-    "@react-three/fiber": "^9.8.2",
     "framer-motion": "^13.1.0",
     "lenis": "^1.3.27",
     "lucide-react": "^1.33.0",
     "react": "^19.2.8",
-    "react-dom": "^19.2.8",
-    "three": "^0.185.1"
+    "react-dom": "^19.2.8"
   },
   "devDependencies": {
     "@axe-core/playwright": "^4.14.0",

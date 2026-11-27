@@ -385,15 +385,6 @@ function PlainContact() {
             </ul>
           </div>
           <div>
-            <h3>PLAYGROUND</h3>
-            <ul>
-              <li><a href="/playground/emet/">Emet terminal</a></li>
-              <li><a href="/playground/explore/">Solar system</a></li>
-              <li><a href="/playground/infinity/">Infinity stars</a></li>
-              <li><a href="/playground/lineage-demo/">Data lineage</a></li>
-            </ul>
-          </div>
-          <div>
             <h3>CONNECT</h3>
             <ul>
               <li><a href={`mailto:${CONTACT.email}`}>Email</a></li>

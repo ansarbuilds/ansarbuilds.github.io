@@ -8,10 +8,7 @@ export const SITE_TITLE = "Mohamed Ansar · Agents, AI studies and apps";
 
 // The takeover views that are not a project page.
 const VIEW_TITLES = {
-  emet: "Emet",
-  explore: "Solar system explorer",
   "lineage-demo": "Data lineage explorer",
-  infinity: "Infinity loop",
   work: "Index of work",
 };
 

@@ -43,7 +43,7 @@ test("project pages use the palette of the section that lists them", () => {
   assert.equal(paletteForRoute("project/jarvis", openSource), "bloom");
   assert.equal(paletteForRoute("work", openSource), "bloom");
   assert.equal(paletteForRoute("main", openSource), null);
-  assert.equal(paletteForRoute("emet", openSource), null);
+  assert.equal(paletteForRoute("lineage-demo", openSource), null);
 });
 
 test("every palette has a name and colour names for the swatch card", () => {
