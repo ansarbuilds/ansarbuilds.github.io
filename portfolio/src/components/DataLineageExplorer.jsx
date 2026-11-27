@@ -1,6 +1,5 @@
 import { useMemo, useState } from "react";
 import { motion } from "framer-motion";
-import { useRoute } from "../appContexts";
 import { LINEAGE_NODES, LINEAGE_EDGES } from "../data/lineageData";
 
 // Layout: each node's column is its longest-path depth from any node
@@ -98,11 +97,16 @@ function neighborsOf(id, forward, reverse) {
   return { nodes, edges };
 }
 
+// Stone and cobalt, like the rest of the site: the four kinds of node are
+// told apart by fill and outline, and cobalt marks what is lit.
+const INK = "#111318";
+const COBALT = "#1d4ed8";
+const PAPER = "#faf9f6";
 const TYPE_STYLES = {
-  source: { color: "#38bdf8", label: "Source", r: 6 },
-  table: { color: "#34d399", label: "Table", r: 5.5 },
-  job: { color: "#fbbf24", label: "Job", r: 5.5 },
-  dashboard: { color: "#c084fc", label: "Consumer", r: 6.5 },
+  source: { fill: INK, stroke: INK, label: "Source", r: 6 },
+  table: { fill: PAPER, stroke: INK, label: "Table", r: 5.5 },
+  job: { fill: "#8a909c", stroke: "#8a909c", label: "Job", r: 5 },
+  dashboard: { fill: PAPER, stroke: COBALT, label: "Consumer", r: 6.5 },
 };
 
 function edgeLine(a, b, r) {
@@ -133,15 +137,14 @@ function LineageNode({ node, pos, active, dimmed, onClick, onHoverStart, onHover
       aria-label={`${node.label} (${style.label})`}
     >
       {active && (
-        <circle r={style.r * 3} fill={style.color} opacity={0.16} className="transition-all duration-200" />
+        <circle r={style.r * 2.6} fill="none" stroke={COBALT} strokeWidth={1} opacity={0.5} className="transition-all duration-200" />
       )}
       <circle
         r={radius}
-        fill={dimmed ? "#1e293b" : style.color}
-        stroke={active ? "#fff" : "transparent"}
-        strokeWidth={1.5}
-        opacity={dimmed ? 0.35 : 1}
-        style={{ filter: active ? `drop-shadow(0 0 6px ${style.color})` : "none" }}
+        fill={active && style.fill !== PAPER ? COBALT : style.fill}
+        stroke={active ? COBALT : style.stroke}
+        strokeWidth={1.6}
+        opacity={dimmed ? 0.25 : 1}
         className="transition-all duration-200"
       />
       {/* Larger invisible ring so hover fires well before the cursor is
@@ -157,7 +160,10 @@ function LineageNode({ node, pos, active, dimmed, onClick, onHoverStart, onHover
         className="font-mono select-none pointer-events-none transition-opacity duration-150"
         fontSize={11}
         fontWeight={700}
-        fill="#fff"
+        fill={INK}
+        stroke="#f4f3ef"
+        strokeWidth={4}
+        paintOrder="stroke"
         opacity={active ? 1 : 0}
       >
         {node.label}
@@ -167,7 +173,6 @@ function LineageNode({ node, pos, active, dimmed, onClick, onHoverStart, onHover
 }
 
 export default function DataLineageExplorer() {
-  const { navigate } = useRoute();
   const [selected, setSelected] = useState(null);
   const [hovered, setHovered] = useState(null);
 
@@ -195,24 +200,32 @@ export default function DataLineageExplorer() {
   }, [selected, forward]);
 
   return (
-    <div className="h-full overflow-y-auto mono-scroll bg-[#050911]">
-      <div className="mx-auto max-w-[1260px] px-5 py-10">
-        <button
-          onClick={() => navigate("deck")}
-          className="mb-6 font-mono text-[.68rem] uppercase tracking-[.14em] text-cyan hover:text-white transition-colors"
+    <div className="h-full overflow-y-auto mono-scroll bg-[#f4f3ef] text-[#111318]">
+      <div className="mx-auto max-w-[1260px] px-5 pt-24 pb-10">
+        <a
+          href="/work/lineage-explorer/"
+          className="mb-6 inline-block font-mono text-[.68rem] uppercase tracking-[.14em] text-[#1d4ed8] hover:text-[#111318] transition-colors"
         >
-          ← Home
-        </button>
+          ← About this project
+        </a>
 
-        <p className="font-mono text-[.68rem] uppercase tracking-[.14em] text-cyan mb-2">Live demo</p>
-        <h1 className="font-display text-2xl sm:text-3xl font-semibold mb-3">Data Lineage &amp; Impact Explorer</h1>
-        <p className="text-slate-400 text-sm max-w-2xl mb-2">
+        <p className="font-mono text-[.68rem] uppercase tracking-[.14em] text-[#1d4ed8] mb-2">Live demo</p>
+        <h1 className="font-display text-3xl sm:text-4xl font-normal tracking-[-0.035em] mb-3">Data lineage &amp; impact explorer</h1>
+        <p className="text-[#4b5262] text-sm max-w-2xl mb-2">
           Hover a point to see what it connects to. Click one to pin the full downstream impact
           chain: everything that would break, go stale or need a re-run if that node changed.
         </p>
-        <p className="font-mono text-[.65rem] text-slate-400 mb-8">
+        <p className="font-mono text-[.65rem] text-[#4b5262] mb-4">
           Sample data only. This is a made-up retail pricing pipeline, built to show the idea.
         </p>
+        <ul className="mb-6 flex flex-wrap gap-x-5 gap-y-2 font-mono text-[.65rem] uppercase tracking-[.12em] text-[#4b5262]" aria-label="Key">
+          {Object.entries(TYPE_STYLES).map(([type, t]) => (
+            <li key={type} className="flex items-center gap-2">
+              <svg width="14" height="14" viewBox="-7 -7 14 14" aria-hidden="true"><circle r={t.r} fill={t.fill} stroke={t.stroke} strokeWidth={1.6} /></svg>
+              {t.label}
+            </li>
+          ))}
+        </ul>
 
         <div className="grid lg:grid-cols-[1fr_320px] gap-6">
           <div>
@@ -220,7 +233,7 @@ export default function DataLineageExplorer() {
               Squeezed into a fixed box it shrank to a thin strip of unreadable
               labels, so it is drawn near its real size instead and scrolls
               sideways inside its frame when the screen is narrower. */}
-          <div className={`rounded-2xl border border-white/10 bg-black/30 p-2 ${vertical ? "h-[640px]" : "overflow-x-auto overscroll-x-contain mono-scroll"}`}
+          <div className={`border border-[#111318]/20 bg-[#faf9f6] p-2 ${vertical ? "h-[640px]" : "overflow-x-auto overscroll-x-contain mono-scroll"}`}
             tabIndex={vertical ? undefined : 0} aria-label={vertical ? undefined : "Pipeline graph, scrolls sideways"}>
             <svg
               viewBox={`0 0 ${width} ${height}`}
@@ -243,10 +256,9 @@ export default function DataLineageExplorer() {
                       y1={line.y1}
                       x2={line.x2}
                       y2={line.y2}
-                      stroke={isHot ? "#38bdf8" : "#334155"}
-                      strokeWidth={isHot ? 1.8 : 1}
-                      opacity={isDimmed ? 0.12 : isHot ? 0.95 : 0.45}
-                      style={{ filter: isHot ? "drop-shadow(0 0 3px #38bdf8)" : "none" }}
+                      stroke={isHot ? COBALT : INK}
+                      strokeWidth={isHot ? 1.6 : 1}
+                      opacity={isDimmed ? 0.08 : isHot ? 0.95 : 0.28}
                       className="transition-all duration-200"
                     />
                   );
@@ -273,7 +285,7 @@ export default function DataLineageExplorer() {
               </g>
             </svg>
           </div>
-          {!vertical && <p className="mt-2 font-mono text-[.65rem] text-slate-400">Scroll sideways inside the frame to follow the pipeline →</p>}
+          {!vertical && <p className="mt-2 font-mono text-[.65rem] text-[#4b5262]">Scroll sideways inside the frame to follow the pipeline →</p>}
           </div>
 
           <motion.div
@@ -281,34 +293,33 @@ export default function DataLineageExplorer() {
             initial={{ opacity: 0, y: 8 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.2 }}
-            className="rounded-2xl border border-white/10 bg-black/30 p-5 h-fit"
+            className="border border-[#111318]/20 border-t-[#111318] bg-[#faf9f6] p-5 h-fit"
           >
             {!selectedNode ? (
-              <p className="text-slate-400 text-sm">
+              <p className="text-[#4b5262] text-sm">
                 Hover a point to preview its connections. Click one to pin the full impact chain.
               </p>
             ) : (
               <>
-                <p className="font-mono text-[.62rem] uppercase tracking-[.14em] text-cyan mb-1">
+                <p className="font-mono text-[.62rem] uppercase tracking-[.14em] text-[#1d4ed8] mb-1">
                   {TYPE_STYLES[selectedNode.type].label}
                 </p>
                 <h2 className="font-mono text-sm font-bold mb-2">{selectedNode.label}</h2>
-                <p className="text-slate-400 text-[.8rem] mb-4">{selectedNode.desc}</p>
+                <p className="text-[#4b5262] text-[.8rem] mb-4">{selectedNode.desc}</p>
 
-                <p className="font-mono text-[.62rem] uppercase tracking-[.14em] text-slate-500 mb-2">
+                <p className="font-mono text-[.62rem] uppercase tracking-[.14em] text-[#4b5262] mb-2">
                   Downstream impact ({impactList.length})
                 </p>
                 {impactList.length === 0 ? (
-                  <p className="text-slate-500 text-[.8rem]">Nothing downstream. This is an end point.</p>
+                  <p className="text-[#4b5262] text-[.8rem]">Nothing downstream. This is an end point.</p>
                 ) : (
                   <ul className="space-y-1.5">
                     {impactList.map((n) => (
                       <li key={n.id} className="flex items-center gap-2 font-mono text-[.72rem]">
-                        <span
-                          className="w-1.5 h-1.5 rounded-full shrink-0"
-                          style={{ background: TYPE_STYLES[n.type].color }}
-                        />
-                        <span className="text-slate-300">{n.label}</span>
+                        <svg width="10" height="10" viewBox="-5 -5 10 10" className="shrink-0" aria-hidden="true">
+                          <circle r={3.5} fill={TYPE_STYLES[n.type].fill} stroke={TYPE_STYLES[n.type].stroke} strokeWidth={1.4} />
+                        </svg>
+                        <span className="text-[#111318]">{n.label}</span>
                       </li>
                     ))}
                   </ul>

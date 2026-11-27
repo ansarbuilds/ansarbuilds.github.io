@@ -195,7 +195,6 @@
 
 .ed-lazy-media { opacity: 0; transition: opacity var(--dur-fast) var(--ease-standard); }
 .ed-lazy-media.is-loaded { opacity: 1; }
-.ed-count { font-variant-numeric: tabular-nums; }
 
 /* Deep Slate-Obsidian Footer / Contact */
 .ed-contact {
@@ -316,11 +315,6 @@
   text-transform: none;
   letter-spacing: -0.035em;
 }
-.ed-case-study article > header h1 .font-serif {
-  font-family: var(--font-serif);
-  font-style: italic;
-  color: var(--at-cobalt);
-}
 .ed-case-study .pp-hero { min-height: auto; justify-content: flex-start; }
 .ed-case-study .pp-hero-art { display: none; }
 .ed-case-study .project-stat-tile {
@@ -348,7 +342,7 @@
 }
 .ed-case-study .ed-flow-surface svg path { stroke: #4b5262; }
 .ed-case-study .ed-flow-surface svg marker path { fill: #1d4ed8; stroke: none; }
-.ed-case-study :is(.text-green, .text-rose, .text-cyan, .text-amber, .text-violet) { color: var(--at-cobalt); }
+.ed-case-study :is(.text-green, .text-rose) { color: var(--at-cobalt); }
 .ed-case-study article > header > p,
 .ed-case-study .project-panel section > p,
 .ed-case-study .project-panel .space-y-4,

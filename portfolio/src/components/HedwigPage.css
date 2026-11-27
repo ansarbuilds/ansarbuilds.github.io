@@ -95,7 +95,6 @@
 .hw-disc-name { margin-top: 6px; font: 500 14px var(--hw-display); color: var(--hw-ink); }
 .hw-disc-meta { margin-top: 2px; font: 400 12px/1.5 var(--hw-mono); }
 .hw-disc-meta b { color: var(--hw-ink); font-weight: 500; }
-.hw-scale-note { margin-top: 36px; max-width: 64ch; font: 400 14px/1.7 var(--hw-mono); border-left: 2px solid var(--hw-cobalt); padding-left: 16px; }
 
 /* ---------- stages ---------- */
 .hw-stages { position: relative; margin-top: 56px; display: grid; gap: 28px; list-style: none; padding: 0; }

@@ -39,9 +39,9 @@ export const PROJECTS = [
     accent: "violet",
     status: "Open source · weights on Hugging Face · live demo",
     spotlightArt: "/shots/spotlight/hedwig.jpg",
-    heroAlt: "The Hedwig case-study title over a night sky, with a real run of the 13.8M model writing a story about an owl.",
-    heroCaption: "Title card from the case study. The story text is a real run of the 13.8M model, replayed.",
-    shots: ["/p/hedwig/mac-app.jpg", "/p/hedwig/browser-demo.jpg", "/p/hedwig/explainer.jpg"],
+    heroAlt: "A real run of the 13.8M Hedwig model writing a story about an owl, with the three tokens it was choosing between and their odds.",
+    heroCaption: "A real run of the 13.8M model, replayed one token at a time.",
+    shots: ["/p/hedwig/mac-app.jpg", "/p/hedwig/browser-demo.jpg"],
     hook: "My try at building a ChatGPT-style LLM from scratch in plain PyTorch. I built and proved all three stages on a MacBook Air, hit the laptop compute and 4k vocabulary wall, then moved to rented GPUs that ran 26× faster and grew the model to 286.7 million parameters for $2.45.",
     stats: [
       { value: "286.7M", label: "parameters in the largest model, trained from random numbers on one rented RTX 4090 in 115 minutes", short: "parameters, largest model" },

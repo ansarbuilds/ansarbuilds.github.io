@@ -401,13 +401,8 @@ function Stage({ bootDone, held, onBoot, heroRun }) {
   );
 }
 
-// The lineage demo draws its own dark canvas; behind it, a matching fill.
 function Backdrop() {
-  const { route } = useRoute();
-  if (route === "lineage-demo") {
-    return <div className="fixed inset-0 z-0 bg-[#02050c]" aria-hidden="true" />;
-  }
-  // Everything else sits on alabaster stone with a subtle architectural drafting grid.
+  // Every view sits on alabaster stone with a subtle architectural drafting grid.
   return <div className="at-grid-backdrop" aria-hidden="true" />;
 }
 

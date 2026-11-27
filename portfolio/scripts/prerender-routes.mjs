@@ -36,7 +36,7 @@ function summarize(text, limit = 160) {
   return text.slice(0, limit - 1).replace(/\s+\S*$/, '') + '…';
 }
 
-function page({ route, title, description, image, body, quiet = false }) {
+function page({ route, title, description, image, body, quiet = true }) {
   const url = ORIGIN + pathForRoute(route);
   const meta = (html, pattern, value) => {
     if (!pattern.test(html)) throw new Error(`prerender: ${pattern} not found in index.html`);

@@ -7,7 +7,7 @@
     "dev": "vite",
     "build": "vite build && node scripts/prerender-routes.mjs",
     "lint": "oxlint",
-    "test:emet": "node --test src/lib/palettes.test.mjs src/lib/score.test.mjs src/data/projectIndex.test.mjs",
+    "test:unit": "node --test src/lib/palettes.test.mjs src/lib/score.test.mjs src/data/projectIndex.test.mjs",
     "preview": "vite preview",
     "check:budget": "node scripts/check-budget.mjs",
     "check:tools": "node scripts/check-tools.mjs",
