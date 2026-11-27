@@ -403,8 +403,8 @@ html.film-quiet .ed-nav-command { opacity: 0; pointer-events: none; visibility: 
   .ed-wordmark { font-size: 0.8rem; gap: 8px; }
   .ed-wordmark-symbol { width: 26px; height: 26px; font-size: 0.64rem; }
   .ed-nav-links { gap: 8px; font-size: 0.7rem; }
-  .ed-nav-wide, .ed-nav-command { display: none; }
-  .ed-nav-contact { padding: 0 12px !important; }
+  .ed-nav-links .ed-nav-wide, .ed-nav-links .ed-nav-command { display: none; }
+  .ed-nav-contact { padding: 0 12px !important; white-space: nowrap; }
   .ed-case-study article > header { padding: 22px !important; }
   .ed-footer { flex-wrap: wrap; gap: 12px; }
   .ed-footer > span:nth-child(2) { display: none; }
@@ -412,4 +412,10 @@ html.film-quiet .ed-nav-command { opacity: 0; pointer-events: none; visibility: 
 }
 @media (prefers-reduced-motion: reduce) {
   .ed-nav, .ed-lazy-media, .ed-contact-email, .ed-nav-links a, .ed-nav-links button { transition: none; }
+}
+
+/* Narrow phones: the hero carries its own "Watch the film" button,
+   so the nav's film icon gives up its slot to keep the bar on-screen. */
+@media (max-width: 420px) {
+  .ed-nav-links .ed-nav-film { display: none; }
 }
