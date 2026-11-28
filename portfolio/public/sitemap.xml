@@ -1,16 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url><loc>https://ansarbuilds.dev/</loc></url>
-  <url><loc>https://ansarbuilds.dev/p/decision-models/report.html</loc></url>
-  <url><loc>https://ansarbuilds.dev/p/rea-study/report.html</loc></url>
-  <url><loc>https://ansarbuilds.dev/p/prh-jepa/report.html</loc></url>
+  <url><loc>https://ansarbuilds.dev/p/hermione/</loc></url>
+  <url><loc>https://ansarbuilds.dev/p/saywhen/</loc></url>
   <url><loc>https://ansarbuilds.dev/p/haloscript/</loc></url>
   <url><loc>https://ansarbuilds.dev/p/agent-flight-recorder/</loc></url>
-  <url><loc>https://ansarbuilds.dev/p/storyera/</loc></url>
-  <url><loc>https://ansarbuilds.dev/p/reptrack/</loc></url>
-  <url><loc>https://ansarbuilds.dev/p/jarvis/</loc></url>
-  <url><loc>https://ansarbuilds.dev/p/hedwig/</loc></url>
-  <url><loc>https://ansarbuilds.dev/p/saywhen/</loc></url>
-  <url><loc>https://ansarbuilds.dev/p/hermione/</loc></url>
   <url><loc>https://ansarbuilds.dev/p/hermione/docs/introduction/</loc></url>
 </urlset>

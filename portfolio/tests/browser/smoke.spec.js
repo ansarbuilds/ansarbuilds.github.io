@@ -1,49 +1,113 @@
 import { test, expect } from '@playwright/test';
 import AxeBuilder from '@axe-core/playwright';
-import { INTRO_SESSION_KEY } from '../../src/lib/intro.js';
-import CUTS from '../../src/film/filmCuts.json' with { type: 'json' };
+import { INTRO_KEY } from '../../src/lib/intro.js';
+import { LISTED_SLUGS } from '../../src/data/site.js';
 
-test('homepage and project navigation work', async ({ page }) => {
+// A visitor who has already seen the intro this visit.
+const seen = (key) => sessionStorage.setItem(key, '1');
+
+test('the home page tells the story in order, with every section in it', async ({ page }) => {
+  await page.addInitScript(seen, INTRO_KEY);
   await page.goto('/');
-  await expect(page.getByRole('main')).toBeVisible();
   await expect(page.getByRole('link', { name: 'Skip to main content' })).toBeAttached();
+  await expect(page.getByRole('heading', { level: 1 })).toContainText('Software that runs');
+  const order = await page.evaluate(() => [...document.querySelectorAll('main section[id]')].map((s) => s.id));
+  expect(order).toEqual(['top', 'about', 'now', 'shipped', 'more', 'how', 'contact']);
+  // The three spotlights, in the order they were asked for.
+  const spots = await page.locator('.ab-spot').evaluateAll((nodes) => nodes.map((n) => n.id));
+  expect(spots).toEqual(['shipped-hermione', 'shipped-saywhen', 'shipped-haloscript']);
+  // The headline number is the profile README's, not a hand-typed one.
+  await expect(page.locator('.ab-telemetry .sr-only').nth(1)).toHaveText(/^\d{3},\d{3}$/);
+});
+
+test('a first visit plays a short intro that a key press skips', async ({ page }) => {
+  await page.goto('/?intro=1');
+  const intro = page.getByRole('dialog', { name: 'Intro' });
+  await expect(intro).toBeVisible();
+  await expect(intro.getByRole('button', { name: 'Skip intro' })).toBeVisible();
+  await page.keyboard.press('Space');
+  await expect(intro).toHaveCount(0, { timeout: 3000 });
+  await expect(page.getByRole('heading', { level: 1 })).toBeVisible();
+});
+
+test('the intro finishes on its own in under nine seconds and only once a visit', async ({ page }) => {
+  test.setTimeout(30000);
+  await page.goto('/');
+  const intro = page.getByRole('dialog', { name: 'Intro' });
+  await expect(intro).toBeVisible();
+  await expect(intro).toHaveCount(0, { timeout: 9000 });
+  await page.reload();
+  await expect(page.getByRole('heading', { level: 1 })).toBeVisible();
+  await expect(intro).toHaveCount(0);
+});
+
+test('no intro with reduced motion or a section link', async ({ page }) => {
+  await page.emulateMedia({ reducedMotion: 'reduce' });
+  await page.goto('/');
+  await expect(page.getByRole('heading', { level: 1 })).toBeVisible();
+  await expect(page.getByRole('dialog', { name: 'Intro' })).toHaveCount(0);
+  await page.emulateMedia({ reducedMotion: 'no-preference' });
+  await page.goto('/#contact');
+  await expect(page.locator('#contact')).toBeInViewport();
+  await expect(page.getByRole('dialog', { name: 'Intro' })).toHaveCount(0);
+});
+
+test('the theme switch flips light and dark and is remembered', async ({ page }) => {
+  await page.addInitScript(seen, INTRO_KEY);
+  await page.emulateMedia({ colorScheme: 'light' });
+  await page.goto('/');
+  await expect(page.locator('html')).toHaveAttribute('data-theme', 'light');
+  await page.getByRole('button', { name: 'Switch to dark mode' }).click();
+  await expect(page.locator('html')).toHaveAttribute('data-theme', 'dark');
+  await page.reload();
+  await expect(page.locator('html')).toHaveAttribute('data-theme', 'dark');
+});
+
+test('the work index lists only the curated projects, in order', async ({ page }) => {
+  await page.goto('/work/');
+  await expect(page.locator('.ab-index-list a').first()).toBeVisible();
+  const hrefs = await page.locator('.ab-index-list a').evaluateAll((nodes) => nodes.map((n) => n.getAttribute('href')));
+  expect(hrefs).toEqual(LISTED_SLUGS.map((slug) => `/work/${slug}/`));
+});
+
+test('a spotlight opens its case study without a page load, and Back returns home', async ({ page }) => {
+  await page.addInitScript(seen, INTRO_KEY);
+  await page.goto('/');
+  await page.evaluate(() => { window.__sameDocument = true; });
+  await page.locator('#shipped-saywhen a[href="/work/saywhen/"]').first().click();
+  await expect(page).toHaveURL(/\/work\/saywhen\/$/);
+  await expect(page.getByRole('heading', { name: 'saywhen', level: 1 })).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'The short version' })).toBeVisible();
+  expect(await page.evaluate(() => window.__sameDocument)).toBe(true);
+  await page.goBack();
+  await expect(page).toHaveURL(/\/$/);
+  await expect(page.locator('#shipped')).toBeAttached();
+  expect(await page.evaluate(() => window.__sameDocument)).toBe(true);
+});
+
+test('older write-ups stay reachable but are kept out of search', async ({ page }) => {
   await page.goto('/work/storyera/');
   await expect(page.getByRole('heading', { name: 'StoryEra', level: 1 })).toBeVisible();
-  await expect(page.getByRole('heading', { name: 'At a glance' })).toBeVisible();
-  await expect(page).toHaveTitle(/StoryEra/);
+  await expect(page.locator('meta[name="robots"]')).toHaveAttribute('content', /noindex/);
+  await page.goto('/work/hermione/');
+  await expect(page.locator('meta[name="robots"][content*="noindex"]')).toHaveCount(0);
 });
 
 test('old hash links still open their page, at its new URL', async ({ page }) => {
-  await page.goto('/#project/storyera');
-  await expect(page.getByRole('heading', { name: 'StoryEra', level: 1 })).toBeVisible();
-  await expect(page).toHaveURL(/\/work\/storyera\/$/);
+  await page.goto('/#project/saywhen');
+  await expect(page.getByRole('heading', { name: 'saywhen', level: 1 })).toBeVisible();
+  await expect(page).toHaveURL(/\/work\/saywhen\/$/);
   await page.goto('/#lineage-demo');
   await expect(page).toHaveURL(/\/playground\/lineage-demo\/$/);
 });
 
-test('a card opens its project without a page load, and Back returns home', async ({ page }) => {
-  await page.addInitScript((key) => sessionStorage.setItem(key, '1'), INTRO_SESSION_KEY);
-  await page.goto('/');
-  await page.evaluate(() => { window.__sameDocument = true; });
-  // The stage keeps every project's panel in the page and hides all but
-  // one, so click a Jarvis link a visitor can actually see.
-  await page.locator('a[href="/work/jarvis/"]:visible').first().click({ force: true });
-  await expect(page).toHaveURL(/\/work\/jarvis\/$/);
-  await expect(page.getByRole('heading', { name: 'Jarvis', level: 1 })).toBeVisible();
-  expect(await page.evaluate(() => window.__sameDocument)).toBe(true);
-  await page.goBack();
-  await expect(page).toHaveURL(/\/$/);
-  await expect(page.locator('#projects')).toBeAttached();
-  expect(await page.evaluate(() => window.__sameDocument)).toBe(true);
-});
-
-test('the page scrolls the document and section links land on their section', async ({ page }) => {
-  await page.addInitScript((key) => sessionStorage.setItem(key, '1'), INTRO_SESSION_KEY);
-  await page.goto('/');
-  expect(await page.evaluate(() => getComputedStyle(document.querySelector('main')).overflowY)).toBe('visible');
-  await page.goto('/#contact');
-  await expect.poll(() => page.evaluate(() => window.scrollY)).toBeGreaterThan(1000);
-  await expect(page.locator('#contact')).toBeInViewport();
+test('no link on a case study points at a private repository', async ({ page }) => {
+  for (const slug of LISTED_SLUGS) {
+    await page.goto(`/work/${slug}/`);
+    await expect(page.getByRole('heading', { level: 1 })).toBeVisible();
+    const hrefs = await page.locator('main a[href*="github.com/ansarbuilds/"]').evaluateAll((nodes) => nodes.map((n) => n.href));
+    for (const href of hrefs) expect(href, slug).not.toMatch(/github\.com\/ansarbuilds\/(Hermione|sirius|haloscript|decision-models)(\/|$)/i);
+  }
 });
 
 test('share pages open their matching case studies', async ({ page }) => {
@@ -63,13 +127,13 @@ test('share pages open their matching case studies', async ({ page }) => {
   }
 });
 
-// Pages that stand for the rest: home, the index, the longest write-ups,
-// the lineage demo and a standalone explainer with its own palette.
-const A11Y_PAGES = ['/', '/work/', '/work/hedwig/', '/work/decision-models/', '/work/prh-jepa/', '/playground/lineage-demo/', '/p/prh-jepa/explainer.html'];
+// Pages that stand for the rest: home, the index, three case studies, one
+// older write-up, the lineage demo and a standalone explainer.
+const A11Y_PAGES = ['/', '/work/', '/work/hermione/', '/work/saywhen/', '/work/sirius/', '/work/hedwig/', '/playground/lineage-demo/', '/p/prh-jepa/explainer.html'];
 
 for (const path of A11Y_PAGES) {
   test(`${path} has no critical or serious automated accessibility violations`, async ({ page }) => {
-    await page.addInitScript((key) => sessionStorage.setItem(key, '1'), INTRO_SESSION_KEY);
+    await page.addInitScript((key) => sessionStorage.setItem(key, '1'), INTRO_KEY);
     await page.goto(path);
     // The heading, not just the frame: project pages load their content after it.
     await expect(page.locator('main h1').first()).toBeVisible();
@@ -102,175 +166,9 @@ test('Jarvis project page renders and links its sample-data demo', async ({ page
   await expect(page.getByText('Portfolio demo with made-up sample data.')).toBeVisible();
 });
 
-test('scrolling over the work grid moves the page, not a box inside it', async ({ page, isMobile }) => {
-  test.skip(isMobile, 'wheel input is a desktop concern; touch scrolls the page directly');
-  // Skip the intro title card, which covers the page for its first moments.
-  await page.addInitScript((key) => sessionStorage.setItem(key, '1'), INTRO_SESSION_KEY);
-  await page.goto('/');
-  // The roaming droid can park over any point on screen; this test is about
-  // the lists, so keep it out of the way.
-  const list = page.locator('.sc-card-grid').last();
-  // Bring the list's top to just under the fixed nav, so the point we wheel
-  // over is on the list itself and not on the nav or off screen.
-  await list.evaluate((node) => window.scrollBy(0, node.getBoundingClientRect().top - 160));
-  // Nothing in the work grid may be a scroll box of its own.
-  const scrollers = await page.locator('.sc-card-grid *').evaluateAll((nodes) => nodes.filter((node) => {
-    const { overflowY } = getComputedStyle(node);
-    return (overflowY === 'auto' || overflowY === 'scroll') && node.scrollHeight > node.clientHeight;
-  }).length);
-  expect(scrollers).toBe(0);
-  const box = await list.boundingBox();
-  const point = { x: box.x + box.width / 2, y: box.y + 120 };
-  expect(await page.evaluate(({ x, y }) => !!document.elementFromPoint(x, y)?.closest('.sc-card-grid'), point)).toBe(true);
-  await page.mouse.move(point.x, point.y);
-  const before = await page.evaluate(() => window.scrollY);
-  await page.mouse.wheel(0, 1200);
-  // The page itself moved (smooth scrolling eases in, and on a busy machine
-  // it can take a few seconds), rather than a box inside the list.
-  await expect.poll(() => page.evaluate(() => window.scrollY), { timeout: 15000 }).toBeGreaterThan(before + 300);
-});
-
-// A visitor who has been here before: the page, without the poster.
-const RETURNING = (key) => { sessionStorage.setItem(key, '1'); sessionStorage.setItem('cold-open-played', '1'); };
-// How far the film's video has played.
-const filmTime = (page) => page.evaluate(() => document.querySelector('.film-video')?.currentTime ?? 0);
-
-test('a first visit plays the film on its own, with a big way out and sound on the first tap', async ({ page }) => {
-  test.setTimeout(90000);
-  await page.goto('/?coldopen=full');
-  await expect(page.locator('.film-ident')).toBeVisible();
-  const skip = page.getByRole('button', { name: 'Skip the movie' });
-  await expect(skip).toBeVisible();
-  await expect(skip).toContainText('You can skip this.');
-  // A browser plays no sound before a tap: the film asks for one, and a
-  // tap does not skip anything.
-  await expect(page.locator('.film-tap')).toBeVisible();
-  await page.mouse.click(400, 400);
-  await expect(page.locator('.film-player.is-rolling')).toBeVisible({ timeout: 20000 });
-  await expect.poll(() => filmTime(page), { timeout: 20000 }).toBeGreaterThan(0.5);
-  // The tap woke the sound, so the film is not muted.
-  await expect.poll(() => page.evaluate(() => document.querySelector('.film-video').muted)).toBe(false);
-  // The page under the film holds still and is out of reach.
-  await expect(page.locator('#main-content')).toHaveAttribute('inert', '');
-  await expect(page.getByRole('button', { name: 'Pause the film' })).toBeAttached();
-  await expect(page.getByRole('slider', { name: 'Where the film is' })).toBeAttached();
-  // The skip lands on the page, which then scrolls as usual.
-  await skip.click();
-  await expect(page.locator('.film-player, .film-skip')).toHaveCount(0);
-  await expect(page.locator('#main-content')).not.toHaveAttribute('inert', '');
-  await page.evaluate(() => window.scrollTo(0, 1200));
-  await expect.poll(() => page.evaluate(() => window.scrollY)).toBeGreaterThan(1000);
-});
-
-test('the skip button lifts the film straight off the page, even during the ident', async ({ page }) => {
-  await page.goto('/?coldopen=full');
-  await page.getByRole('button', { name: 'Skip the movie' }).click();
-  await expect(page.locator('.film-ident, .film-player, .film-skip')).toHaveCount(0);
-  await expect(page.getByRole('heading', { name: 'Mohamed Ansar', level: 1 })).toBeVisible();
-  await expect(page.locator('.ed-nav')).toHaveCSS('opacity', '1');
-  // And it does not come back on its own.
-  await page.waitForTimeout(3000);
-  await expect(page.locator('.film-player')).toHaveCount(0);
-});
-
-test('Escape during the film skips it', async ({ page }) => {
-  test.setTimeout(60000);
-  await page.goto('/?coldopen=full');
-  await expect(page.locator('.film-player.is-rolling')).toBeVisible({ timeout: 20000 });
-  await page.waitForTimeout(800);
-  await page.keyboard.press('Escape');
-  await expect(page.locator('.film-player, .film-skip')).toHaveCount(0, { timeout: 4000 });
-  await expect(page.getByRole('heading', { name: 'Mohamed Ansar', level: 1 })).toBeVisible();
-});
-
-test('the film plays to its end and lifts off onto the page', async ({ page }) => {
-  test.setTimeout(90000);
-  await page.goto('/?coldopen=full');
-  await expect(page.locator('.film-player.is-rolling')).toBeVisible({ timeout: 20000 });
-  // Jump near the end rather than wait it out.
-  await expect.poll(() => filmTime(page), { timeout: 20000 }).toBeGreaterThan(0.2);
-  await page.evaluate((s) => { document.querySelector('.film-video').currentTime = s - 1; }, CUTS.seconds);
-  await expect(page.locator('.film-player')).toHaveCount(0, { timeout: 10000 });
-  await expect(page.locator('#main-content')).not.toHaveAttribute('inert', '');
-  await expect(page.getByRole('heading', { name: 'Mohamed Ansar', level: 1 })).toBeVisible();
-});
-
-test('the film plays again on a later visit, but not on a reload in the same visit', async ({ page }) => {
-  // Been here before, in another visit: it still plays as the page opens.
-  await page.addInitScript((key) => localStorage.setItem(key, '1'), INTRO_SESSION_KEY);
-  await page.goto('/');
-  await expect(page.locator('.film-ident')).toBeVisible();
-  await page.getByRole('button', { name: 'Skip the movie' }).click();
-  await page.reload();
-  await expect(page.locator('.film-ident, .film-player')).toHaveCount(0);
-});
-
-test('the film does not play on its own for reduced motion, a section link, or a second page view', async ({ page }) => {
-  await page.emulateMedia({ reducedMotion: 'reduce' });
-  await page.goto('/');
-  await expect(page.locator('.film-ident, .film-player')).toHaveCount(0);
-  await page.emulateMedia({ reducedMotion: 'no-preference' });
-  await page.goto('/#contact');
-  await expect(page.locator('.film-ident, .film-player')).toHaveCount(0);
-  await page.evaluate(() => sessionStorage.setItem('cold-open-played', '1'));
-  await page.goto('/');
-  await expect(page.locator('.film-ident, .film-player')).toHaveCount(0);
-});
-
-test('a returning visitor can watch the film from the nav, and pause it', async ({ page, isMobile }) => {
-  test.skip(isMobile, 'the nav button is the same on a phone');
-  test.setTimeout(90000);
-  await page.addInitScript(RETURNING, INTRO_SESSION_KEY);
-  await page.goto('/');
-  await page.evaluate(() => window.scrollTo(0, 1500));
-  await page.locator('.ed-nav').getByRole('button', { name: 'Watch the film' }).click();
-  await expect(page.locator('.film-ident')).toBeVisible();
-  await expect.poll(() => page.evaluate(() => window.scrollY)).toBe(0);
-  await expect(page.locator('.film-player.is-rolling')).toBeVisible({ timeout: 20000 });
-  // Once it is playing, Space pauses (the controls tuck away while the film
-  // plays untouched).
-  const scrub = page.getByRole('slider', { name: 'Where the film is' });
-  await expect.poll(async () => Number(await scrub.inputValue()), { timeout: 20000 }).toBeGreaterThan(0.3);
-  await page.keyboard.press('Space');
-  await expect(page.getByRole('button', { name: 'Play the film', exact: true })).toBeAttached();
-  const at = await scrub.inputValue();
-  await page.waitForTimeout(1200);
-  expect(await scrub.inputValue()).toBe(at);
-  await page.getByRole('button', { name: 'Skip the movie' }).click();
-  await expect(page.locator('.film-player')).toHaveCount(0);
-});
-
-test('the home page is a plain page to scroll, with every section in it', async ({ page }) => {
-  await page.addInitScript(RETURNING, INTRO_SESSION_KEY);
-  await page.goto('/');
-  await expect(page.locator('.film-player')).toHaveCount(0);
-  await expect(page.locator('.sc-receipts dt')).toHaveCount(4);
-  for (const id of ['projects', 'capabilities', 'more', 'contact']) await expect(page.locator(`#${id}`)).toHaveCount(1);
-  await expect(page.locator('#ai')).toHaveCount(0);
-  await expect(page.locator('#contact a[href^="mailto:"]').first()).toBeAttached();
-});
-
-test('with reduced motion there is no film to watch', async ({ page }) => {
-  await page.emulateMedia({ reducedMotion: 'reduce' });
-  await page.goto('/');
-  await expect(page.getByRole('button', { name: 'Watch the film' })).toHaveCount(0);
-  await expect(page.locator('.sc-receipts dt')).toHaveCount(4);
-});
-
-test('the whole film runs under 30 seconds, landing to page, with its chapters on the timeline', async ({ page }) => {
-  test.setTimeout(60000);
-  await page.goto('/?coldopen=full');
-  // The video's own running time, plus the 1.6 s ident before it.
-  await expect(page.locator('.film-player.is-rolling')).toBeVisible({ timeout: 20000 });
-  const seconds = await page.evaluate(() => document.querySelector('.film-video').duration);
-  expect(Math.abs(seconds - CUTS.seconds)).toBeLessThan(0.2);
-  expect(1.6 + seconds).toBeLessThan(30);
-  await expect(page.locator('.film-mark b')).toHaveText(['I', 'II', 'III']);
-});
-
 test('the command palette lists every project, works by keyboard and gives focus back', async ({ page, isMobile }) => {
   test.skip(isMobile, 'the palette button lives in the desktop nav');
-  await page.addInitScript((key) => { sessionStorage.setItem(key, '1'); sessionStorage.setItem('cold-open-played', '1'); }, INTRO_SESSION_KEY);
+  await page.addInitScript(seen, INTRO_KEY);
   await page.goto('/');
   const opener = page.getByRole('button', { name: /open the command palette/ });
   await opener.focus();
@@ -279,8 +177,8 @@ test('the command palette lists every project, works by keyboard and gives focus
   await expect(dialog).toBeVisible();
   const box = dialog.getByRole('combobox');
   await expect(box).toBeFocused();
-  // Every flagship is there, including the two the old list left out.
-  for (const name of ['saywhen', 'Agent Flight Recorder', 'Jarvis', 'Haloscript']) await expect(dialog.getByRole('option', { name: new RegExp(name) })).toHaveCount(1);
+  // Every listed project is there.
+  for (const name of ['Hermione', 'saywhen', 'Haloscript', 'Agent Flight Recorder', 'Sirius']) await expect(dialog.getByRole('option', { name: new RegExp(`^${name}`) }).first()).toBeVisible();
   // The highlighted result is announced through aria-activedescendant.
   await page.keyboard.press('ArrowDown');
   const active = await box.getAttribute('aria-activedescendant');

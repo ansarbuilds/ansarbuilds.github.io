@@ -2,10 +2,12 @@
 // budget. Run after `npm run build`. "First load" is what index.html asks
 // for before anything is clicked: its script, preloaded chunks and CSS.
 //
-// The brief's target for first-load JS is 150 kB gzipped. It is about 153 kB
-// (React 57, Framer Motion 47, the home page 39, the rest 10) since the home
-// page reads a generated slim index (src/data/projectIndex.js) instead of every
-// project's full story. The budget holds that line with a little room.
+// First-load JS is about 87 kB gzipped: React 57, the home page and the
+// light field 26, icons 4. Framer Motion and the full project stories load
+// only with the older write-ups that use them. The budget keeps that line
+// with some room. The site's own film is gone; the largest file and most
+// of dist are now Hermione's launch page (/p/hermione/: an 8.9 MB film and
+// its docs screenshots), so those two limits allow for it, about 43 MB in all.
 import { readFile, readdir, stat } from 'node:fs/promises';
 import { gzipSync } from 'node:zlib';
 import { join, resolve } from 'node:path';
@@ -13,11 +15,11 @@ import { join, resolve } from 'node:path';
 const KB = 1000;
 const MB = 1000 * KB;
 const BUDGET = {
-  'first-load JS (gzip)': 165 * KB,
-  'first-load CSS (gzip)': 30 * KB,
+  'first-load JS (gzip)': 110 * KB,
+  'first-load CSS (gzip)': 20 * KB,
   'preloaded fonts': 60 * KB,
-  'largest file in dist': 7 * MB,
-  'all of dist': 32 * MB,
+  'largest file in dist': 9.5 * MB,
+  'all of dist': 48 * MB,
 };
 
 const dist = resolve('dist');

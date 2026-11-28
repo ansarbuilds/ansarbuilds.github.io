@@ -4,6 +4,7 @@ import { readFile, access } from 'node:fs/promises';
 import { resolve } from 'node:path';
 import { PROJECTS } from '../src/data/projects.js';
 import { PLAYGROUND } from '../src/lib/routes.js';
+import { isListed } from '../src/data/site.js';
 
 const slugs = ['agent-flight-recorder', 'storyera', 'reptrack', 'jarvis', 'saywhen'];
 
@@ -11,7 +12,8 @@ test('share pages have their own URLs, case-study links and existing images', as
   const sitemap = await readFile('public/sitemap.xml', 'utf8');
   for (const slug of slugs) {
     const html = await readFile(`public/p/${slug}/index.html`, 'utf8');
-    assert.ok(sitemap.includes(`https://ansarbuilds.dev/p/${slug}/`), `${slug} missing from sitemap`);
+    // Only the listed projects' share pages are offered to search engines.
+    assert.equal(sitemap.includes(`https://ansarbuilds.dev/p/${slug}/`), isListed(slug), `${slug}: sitemap should ${isListed(slug) ? '' : 'not '}list it`);
     assert.ok(html.includes(`href="/work/${slug}/"`), `${slug} missing case study link`);
     assert.ok(html.includes(`rel="canonical" href="https://ansarbuilds.dev/p/${slug}/"`));
     const image = html.match(/property="og:image" content="https:\/\/ansarbuilds\.dev(\/[^"]+)"/);

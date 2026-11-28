@@ -1,71 +1,66 @@
 # Mohamed Ansar, portfolio
 
-The source for [ansarbuilds.dev](https://ansarbuilds.dev).
-React 19, Vite, Tailwind v4 and Framer Motion.
+The source for [ansarbuilds.dev](https://ansarbuilds.dev). React 19, Vite 8 and Tailwind v4, with one hand-written WebGL shader.
 
-## How the site is laid out
+## The story the home page tells
 
-A portfolio of agents, AI studies and shipped apps, with the proof for each. One scrolling page, then a page per project:
+One page, in this order (`src/components/Home.jsx`, copy in `src/data/site.js`):
 
-1. **Hero** (`#hero`): the claim (a language model trained from scratch, 286.7M parameters for $2.45) beside `HedwigTrace.jsx`, a real recorded run of the Hedwig model replayed one token at a time, with the three tokens it was choosing between drawn as rows of square dots. Nothing in it is generated on the page. It pauses off-screen; reduced motion shows one still step.
-2. **The short version**: the positioning statement and the counts (projects, lines, repositories).
-3. **Selected work** (`#projects`, "Six projects, in depth."): one interactive stage (`WorkStage.jsx`, `stage.css`). Tabs pick a project; the demo sits on the left and the short version on the right. saywhen plays its launch film (an animation, and the frame says so), Jarvis runs its real sample-data demo, Haloscript switches between its Mac, iPad and iPhone screenshots, and PRH-JEPA shows a report figure with a toggle for its headline finding. On small screens the projects stack.
-4. **What the work covers** (`#capabilities`): agents and tooling, evaluation and research, product and shipping, each linked to the projects that show it.
-5. **More work** (`#more`): four image cards, then a compact preview of the full index.
-6. **Contact** (`#contact`): email first, then GitHub and LinkedIn.
+1. **Intro** (`Intro.jsx`): about seven seconds, once per visit. Three lines set letter by letter: the name, what I build, what I'm building now. Any key, click, scroll or the Skip button ends it. Never with reduced motion, Save-Data, a 2G connection or a link to a section. `?intro=1` forces it, `?intro=0` turns it off.
+2. **Hero** (`#top`): the claim, and four numbers: lines of code, repositories, commits, apps released.
+3. **Who I am** (`#about`).
+4. **Now** (`#now`): Sirius, the app in progress, with its models' numbers and the live demo.
+5. **Shipped** (`#shipped`): Hermione, saywhen and Haloscript, each told as situation, task, action, result, with numbers, stack and a screenshot that tilts toward the pointer.
+6. **More shipped work** (`#more`): Agent Flight Recorder.
+7. **How I work** (`#how`) and **Contact** (`#contact`).
 
-**Design.** Cobalt & Stone: stone paper (`#f4f3ef`), obsidian ink (`#111318`), one cobalt (`#1d4ed8`, `#628cff` on dark). Two typefaces, Space Grotesk for display and IBM Plex Mono for everything else. Illustrations are dot-matrix prints (square dots on stone, one cobalt), redrawn by `scripts/dot-matrix-art.mjs`. The styles layer in this order: `index.css` (tokens), `editorial.css`, `showcase.css`, `stage.css`, and last `quiet-print.css`, which holds the current design and wins. `src/lib/palettes.js` names the palette per section; the swatch card (`PaletteSwatch.jsx`) shows on the dev server or with `?palette` in the URL. `src/lib/palettes.test.mjs` holds every pairing to AA contrast.
+Each project opens at `/work/<slug>/` (`CaseStudy.jsx`): the short version, numbers with their notes, screens, how it works, what I learned, the stack, then the long version.
 
-**Motion.** `MOTION.md` is the reference: the rules, the tokens in `src/lib/motion.js` (mirrored as CSS variables in `index.css`), and the reduced-motion policy.
+## What is listed, and the numbers
 
-Clicking a project opens `/work/<slug>/`: the story, a flow diagram, what I took from it, and links.
+- **Listed projects** are `LISTED_SLUGS` in `src/data/site.js`. Only they appear on the home page, in `/work/`, the command palette and the sitemap. Every other project still has its page at `/work/<slug>/` (older ones keep their original design, wrapped in `.legacy`), marked `noindex`.
+- **Private repositories** are named in `PRIVATE_REPOS`. Links to them are dropped from case studies, so no visitor lands on a 404. Remove a name when that repository goes public.
+- **The code numbers are the profile README's.** `npm run sync:telemetry` (run before every build) reads `code-telemetry.svg` and `build-hours.svg` from the `ansarbuilds/ansarbuilds` profile repository and writes `src/data/telemetry.json`. If the fetch fails, the saved numbers stay. The deploy workflow runs daily, so the site follows the README within a day.
+- **Hermione's numbers** on the home page come from its entry in `projects.js`, so the spotlight and its page always agree.
 
-## URLs, scrolling and the build
+## Look and motion
 
-- **Every view has a real URL** (`src/lib/routes.js`): the home page is `/` with its sections as `/#projects`, `/#contact` and so on; project pages are `/work/<slug>/`; the full index is `/work/`; the lineage explorer's live demo is `/playground/lineage-demo/`. Links are ordinary `<a href>`, and one click handler in `App.jsx` turns the in-app ones into history changes. The old hash links (`/#project/jarvis`) still open the right view and are rewritten to the new URL.
-- **Each URL is a file.** After `vite build`, `scripts/prerender-routes.mjs` writes `dist/work/<slug>/index.html` (and the other views) with that page's own title, description, canonical URL and share image, plus a short static version of the page for readers that do not run scripts (hidden when scripts run, so the page does not jump). It also writes `404.html` and adds the pages to the sitemap.
-- **The document scrolls**, not a box inside it, smoothed by Lenis on the pages that scroll (`src/lib/scroll.js`). Anything that scrolls the page from code goes through that file.
-- **Fonts** are Space Grotesk and IBM Plex Mono from Google Fonts, linked in `index.html`.
-- **Budgets.** `npm run check:budget` (run in CI after the build) fails when the first load or the shipped media grows past the limits in `scripts/check-budget.mjs`.
-- **Media.** The launch film is H.264 at CRF 30.
+- **Theme.** Light (stone) and dark (obsidian), with cobalt as the one accent. It follows the system until the visitor picks one with the switch in the nav, which is remembered. A script in `index.html` sets it before the first paint. Tokens are at the top of `src/site.css`; `src/lib/theme.test.mjs` holds every text pairing to AA contrast in both themes.
+- **The light field** (`Field.jsx`, `lib/fieldShader.js`) is one full-screen WebGL2 fragment shader: domain-warped noise in cobalt, violet and cyan, thin lines where it folds, a swirl that follows the pointer, grain. It is quiet on the left where text sits and quietens as the page scrolls. It renders at half resolution, stops when the tab is hidden, and draws one still frame for reduced motion. Without WebGL a CSS gradient shows instead.
+- **Page changes** use the View Transitions API: a project's screenshot carries over from the home page to its case study.
+- **Scroll reveals** use one IntersectionObserver per element (`bits.jsx`); device frames enter with CSS scroll-driven animations where supported.
+- `MOTION.md` has the older motion rules, still used by the legacy pages.
 
-`FABLE_REDESIGN_BRIEF.md` is the audit and the plan for the redesign this groundwork is for.
+## URLs and the build
 
-## The film
-
-A first visit opens on a short film: the studio ident, then a 24-second trailer of three projects (Hedwig, saywhen, Haloscript) in hard jump cuts, then the page. "Watch the film" in the nav plays it again.
-
-- **It is a rendered video**, made in the repo's `film/` folder with [Remotion](https://www.remotion.dev): `film/src/cuts.js` is the cut list (every shot, its length and the sound on its cut), `film/src/Film.jsx` the shots. `node render.mjs` there renders `public/film/film-wide.mp4` (1280×720) and `film-upright.mp4` (720×1280, for a phone held upright), their posters, and `src/film/filmCuts.json` (length and chapters, for the player). See `film/README.md`.
-- **The player** (`src/film/FilmPlayer.jsx`) plays it full screen over the page with the controls bar (chapters on the timeline), Space, the arrows, M and Escape. It plays muted until the visitor's first tap wakes the sound. The ident, skip button and tap-for-sound badge are `components/FilmChrome.jsx`.
-- It is skipped for reduced motion and on Save-Data or slow connections. Browser tests run in real Chrome (`channel: 'chrome'`), since Playwright's own Chromium cannot play H.264.
-- **Sound** (`lib/sound.js`, the switch in the nav) is off by default and generated in the browser: an ambient pad that opens up with scroll speed, and the hits on the ident and the skip button. The film's soundtrack is recorded from the same engine (`film/score/record.mjs`).
-- **Project data on the home page** comes from `src/data/projectIndex.js`, a generated slim copy of `projects.js` (titles, hooks, links, covers). After editing `projects.js`, run `node scripts/make-project-index.mjs`; a unit test fails if you forget.
-- **Share images.** Every project has a 1200×630 card at `public/p/<slug>/og.jpg`, drawn from its own page's copy by `PW_CHANNEL=chrome node scripts/make-share-images.mjs` (name slugs after it to redraw only those). Redraw after changing a project's title, hook, stats, status or stack. The script checks each layout and exits with an error if text runs into anything. SayWhen's card is a designed product shot and is left alone.
-- `rig.js` turns the shot list into a camera pose for any moment. It is plain maths with tests (`rig.test.mjs`), and it is the piece the real film reuses.
+- **Every view has a real URL** (`src/lib/routes.js`). Old hash links (`/#project/saywhen`) still open the right view and are rewritten.
+- **Each URL is a file.** After `vite build`, `scripts/prerender-routes.mjs` writes `dist/work/<slug>/index.html` and the other views with their own title, description, canonical URL, share image and JSON-LD, plus a static version of the page for readers that don't run scripts. It writes `404.html` and the sitemap too.
+- **Budgets.** `npm run check:budget` fails the build past the limits in `scripts/check-budget.mjs`. First-load JS is about 87 kB gzipped.
+- **Project data** for the home page and index comes from `src/data/projectIndex.js`, a generated slim copy of `projects.js`. After editing `projects.js`, run `node scripts/make-project-index.mjs`; a unit test fails if you forget.
+- **Share images.** `PW_CHANNEL=chrome node scripts/make-share-images.mjs [slugs]` draws the site card (`public/og-image.png`) and a card per project at `public/p/<slug>/og.jpg`. saywhen's and Hermione's cards are made separately and left alone.
 
 ## Where things live
 
 ```
 src/
-  data/projects.js      every project (copy, flow diagram, links, screenshots)
-  data/content.js       hero, receipts, about/skills, contact, command palette
-  data/archive.js       the full index, grouped by kind of work
-  data/hedwigRun.js     the recorded Hedwig run the hero replays
+  data/site.js           home page copy, listed projects, private repos, intro lines
+  data/telemetry.json    synced code numbers (do not edit by hand)
+  data/projects.js       every project's full story, stats, stack and links
   components/
-    Sections.jsx        hero + the home page sections
-    ProjectPage.jsx     the per-project detail page
-    ui.jsx              Rail (scroller), FlowDiagram, tags, section heading
-    HedwigTrace.jsx     the hero's recorded model run
-    WorkStage.jsx       the Selected work stage
-    ProjectWorkPage.jsx the full index at /work/
-    HedwigPage.jsx, HaloscriptPage.jsx  the two custom project pages
-    DataLineageExplorer.jsx             the lineage demo
-public/shots/           screenshots used on project pages
+    Home.jsx             the home page sections
+    CaseStudy.jsx        /work/<slug>/ for listed projects
+    ProjectWorkPage.jsx  /work/
+    Intro.jsx, Field.jsx the intro and the light field
+    bits.jsx             reveal, count-up numbers, device frame, buttons
+    ProjectPage.jsx, HedwigPage.jsx, DataLineageExplorer.jsx   older pages
+  site.css               the design system
+scripts/                 prerender, telemetry sync, share images, budget
+tests/browser/           Playwright: story order, intro, theme, routing, a11y, phone widths
 ```
 
-## Adding or changing a project
+## Adding a project to the home page
 
-Edit `src/data/projects.js` for the full story. The home page order and its short copy live in `src/data/showcase.js`: `FLAGSHIPS` (the six spreads, with their headline, stats, stack and floating visual), `MORE_WORK` (the image cards), `CAPABILITIES` and `STACK_MARQUEE`. Any listed project not named there appears under "Also built". Flow diagrams are columns of boxes; boxes link to the next column automatically, or list `links` like `"0.0>1.1"` for a specific shape. Add images to `public/shots/` and list them under `shots`.
+Write its full entry in `src/data/projects.js`, regenerate the index, then add its slug to `LISTED_SLUGS` and its spotlight (line, STAR paragraphs, stats, stack, screenshot) to `SHIPPED` or `MORE` in `src/data/site.js`. Add it to `public/sitemap.xml`.
 
 ## Writing style
 
@@ -90,12 +85,10 @@ PW_CHANNEL=chrome npx playwright test
 
 `.github/workflows/deploy-portfolio.yml` builds and publishes to GitHub Pages on every push to `main` that touches `portfolio/**`. Pages must be set to the **GitHub Actions** source.
 
-## Studies, tools and skills
+## Deploy
 
-The studies (My Take on Jev, REA and PRH-JEPA) and the open-source tools and skills (Agent Flight Recorder, StoryEra, Site Recon, Exposure Audit) each sit on their own shelf in the builds list, with their own row, cover, story link and repository or report link.
+`.github/workflows/deploy-portfolio.yml` builds and publishes to GitHub Pages on every push to `main` that touches `portfolio/**`, and once a day so the code numbers stay in sync. Pages must be set to the **GitHub Actions** source.
 
-StoryEra documents a continuity-audit workflow for novels. Site Recon documents and automates public website inspection, including stack evidence, exact browser-visible animation values, mobile and reduced-motion comparison, and clean-room rebuild guidance.
-
-Agent Flight Recorder records agent actions and file changes locally, then ranks the edit most likely to explain a failed step. Its project page links the full case study, reproducible demo script and published package.
+## Artwork
 
 `public/shots/spotlight/storyera.webp`, `agent-flight-recorder.jpg`, and `exposure-audit.jpg` are original AI-generated editorial illustrations, not application screenshots. The prompts for the two newer covers are in [ARTWORK_PROMPTS.md](ARTWORK_PROMPTS.md). The two StoryEra diagrams in `public/shots/storyera/` come from the MIT-licensed StoryEra repository. `public/shots/spotlight/jarvis.webp` is also an editorial illustration, not a screenshot; the real Jarvis dashboard is shown in `public/shots/jarvis/dashboard.webp` and the demo at `/p/jarvis/demo/`.

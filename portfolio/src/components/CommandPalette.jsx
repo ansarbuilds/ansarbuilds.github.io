@@ -1,28 +1,35 @@
-import { DUR, EASE } from "../lib/motion";
 import { useEffect, useMemo, useRef, useState } from "react";
-import { AnimatePresence, motion } from "framer-motion";
-import { Search, CornerDownLeft, ArrowUp, ArrowDown, X, Hash, Link2 } from "lucide-react";
-import { COMMAND_ITEMS } from "../data/content";
+import { Search, CornerDownLeft, ArrowUp, ArrowDown, X } from "lucide-react";
 import { LISTED_PROJECTS } from "../data/projectIndex";
-import { FLAGSHIPS } from "../data/showcase";
+import { PERSON } from "../data/site";
 import { useRoute } from "../appContexts";
 
-const GROUP_ICONS = { Sections: Hash, Projects: Hash, Links: Link2 };
 const GROUP_ORDER = ["Sections", "Projects", "Links"];
-const CORAL = "#1d4ed8";
 
-// Every listed project, flagships first in stage order, each with its stage
-// eyebrow (or its kind) so a search for "agent" or "app" finds it.
-const PROJECT_ITEMS = [
-  ...FLAGSHIPS.map((flag) => [flag, LISTED_PROJECTS.find((p) => p.slug === flag.slug)]),
-  ...LISTED_PROJECTS.filter((p) => !FLAGSHIPS.some((flag) => flag.slug === p.slug)).map((p) => [null, p]),
-].filter(([, project]) => project).map(([flag, project]) => ({
-  label: `${project.title} · ${flag?.eyebrow || project.kind}`,
-  go: `/work/${project.slug}/`,
-  group: "Projects",
-}));
+const SECTION_ITEMS = [
+  { label: "Who I am", go: "#about", group: "Sections" },
+  { label: "Now · what I'm building", go: "#now", group: "Sections" },
+  { label: "Shipped work", go: "#shipped", group: "Sections" },
+  { label: "More shipped work", go: "#more", group: "Sections" },
+  { label: "How I work", go: "#how", group: "Sections" },
+  { label: "Contact", go: "#contact", group: "Sections" },
+  { label: "All work, in one list", go: "/work/", group: "Sections" },
+];
 
-const ALL_ITEMS = [...COMMAND_ITEMS, ...PROJECT_ITEMS]
+// Every listed project, with its kind so a search for "app" or "AI" finds it.
+const PROJECT_ITEMS = LISTED_PROJECTS.map((project) => ({ label: `${project.title} · ${project.kind}`, go: `/work/${project.slug}/`, group: "Projects" }));
+
+const LINK_ITEMS = [
+  { label: "Haloscript on the App Store", href: "https://apps.apple.com/ca/app/haloscript/id6820670080", group: "Links" },
+  { label: "saywhen on GitHub", href: "https://github.com/ansarbuilds/saywhen", group: "Links" },
+  { label: "Agent Flight Recorder on PyPI", href: "https://pypi.org/project/flightrecorder-ai/", group: "Links" },
+  { label: "Sirius demo on Hugging Face", href: "https://huggingface.co/spaces/ansarbuilds/sirius-demo", group: "Links" },
+  { label: "GitHub", href: PERSON.github, group: "Links" },
+  { label: "LinkedIn", href: PERSON.linkedin, group: "Links" },
+  { label: "Email · " + PERSON.email, href: "mailto:" + PERSON.email, group: "Links" },
+];
+
+const ALL_ITEMS = [...SECTION_ITEMS, ...PROJECT_ITEMS, ...LINK_ITEMS]
   .sort((a, b) => GROUP_ORDER.indexOf(a.group) - GROUP_ORDER.indexOf(b.group));
 
 /**
@@ -125,118 +132,61 @@ export default function CommandPalette() {
     return groups;
   }, [results]);
 
+  if (!open) return null;
   return (
-    <AnimatePresence>
-      {open && (
-        <motion.div
-          className="fixed inset-0 z-[200] flex items-start justify-center bg-black/70 backdrop-blur-sm px-4 pt-[14vh]"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
-          transition={{ duration: DUR.instant }}
-          onClick={() => setOpen(false)}
-        >
-          <motion.div
-            className="w-full max-w-xl overflow-hidden border border-[#111318]/30 bg-white text-[#111318] shadow-[0_24px_60px_-20px_rgba(17,19,24,0.35)]"
-            initial={{ opacity: 0, y: -16, scale: 0.96 }}
-            animate={{ opacity: 1, y: 0, scale: 1 }}
-            exit={{ opacity: 0, y: -10, scale: 0.97 }}
-            transition={{ duration: DUR.fast, ease: EASE.out }}
-            onClick={(e) => e.stopPropagation()}
-            onKeyDown={onKeyDownDialog}
-            role="dialog"
-            aria-modal="true"
-            aria-label="Command palette"
-          >
-            <div className="flex items-center gap-3 px-4 py-3 border-b border-[#111318]/15 bg-[#f4f3ef]">
-              <Search size={16} className="shrink-0" style={{ color: CORAL }} aria-hidden="true" />
-              <input
-                ref={inputRef}
-                value={query}
-                onChange={(e) => {
-                  setQuery(e.target.value);
-                  setActiveIndex(0);
-                }}
-                onKeyDown={onKeyDownList}
-                role="combobox"
-                aria-expanded="true"
-                aria-controls="cp-list"
-                aria-autocomplete="list"
-                aria-activedescendant={results.length ? `cp-opt-${activeIndex}` : undefined}
-                aria-label="Search sections, projects and links"
-                placeholder="Jump to a section, project or link…"
-                className="flex-1 bg-transparent outline-none text-sm font-mono text-[#111318] placeholder:text-[#4b5262]"
-                autoComplete="off"
-                spellCheck={false}
-              />
-              <button
-                ref={closeRef}
-                type="button"
-                onClick={() => setOpen(false)}
-                aria-label="Close command palette"
-                className="grid h-8 w-8 place-items-center border border-[#111318]/20 bg-white text-[#111318] hover:border-[#1d4ed8] hover:text-[#1d4ed8] transition-colors"
-              >
-                <X size={15} aria-hidden="true" />
-              </button>
-            </div>
-
-            <div ref={listRef} id="cp-list" role="listbox" aria-label="Results" className="max-h-[50vh] overflow-y-auto mono-scroll py-2">
-              {results.length === 0 && (
-                <p role="presentation" className="px-4 py-6 text-center text-sm text-[#4b5262] font-mono">No matches.</p>
-              )}
-              {Object.entries(grouped).map(([groupName, items]) => {
-                const GroupIcon = GROUP_ICONS[groupName];
+    <div className="ab-cp-scrim" onClick={() => setOpen(false)}>
+      <div className="ab-cp" onClick={(e) => e.stopPropagation()} onKeyDown={onKeyDownDialog} role="dialog" aria-modal="true" aria-label="Command palette">
+        <div className="ab-cp-search">
+          <Search size={16} aria-hidden="true" />
+          <input
+            ref={inputRef}
+            value={query}
+            onChange={(e) => { setQuery(e.target.value); setActiveIndex(0); }}
+            onKeyDown={onKeyDownList}
+            role="combobox"
+            aria-expanded="true"
+            aria-controls="cp-list"
+            aria-autocomplete="list"
+            aria-activedescendant={results.length ? `cp-opt-${activeIndex}` : undefined}
+            aria-label="Search sections, projects and links"
+            placeholder="Jump to a section, project or link…"
+            autoComplete="off"
+            spellCheck={false}
+          />
+          <button ref={closeRef} type="button" onClick={() => setOpen(false)} aria-label="Close command palette" className="ab-icon-btn"><X size={15} aria-hidden="true" /></button>
+        </div>
+        <div ref={listRef} id="cp-list" role="listbox" aria-label="Results" className="ab-cp-list">
+          {results.length === 0 && <p role="presentation" className="ab-cp-empty">No matches.</p>}
+          {Object.entries(grouped).map(([groupName, items]) => (
+            <div key={groupName} role="group" aria-labelledby={`cp-group-${groupName}`}>
+              <p id={`cp-group-${groupName}`} className="ab-cp-group">{groupName}</p>
+              {items.map((item) => {
+                const active = item._index === activeIndex;
                 return (
-                  <div key={groupName} role="group" aria-labelledby={`cp-group-${groupName}`} className="mb-1">
-                    <p id={`cp-group-${groupName}`} className="flex items-center gap-1.5 px-4 pt-2 pb-1 text-[.66rem] tracking-[.14em] uppercase text-[#4b5262] font-mono">
-                      {GroupIcon && <GroupIcon size={10} className="opacity-70" aria-hidden="true" />}
-                      {groupName}
-                    </p>
-                    {items.map((item) => {
-                      const active = item._index === activeIndex;
-                      return (
-                        <div
-                          key={item.label}
-                          id={`cp-opt-${item._index}`}
-                          role="option"
-                          aria-selected={active}
-                          onMouseEnter={() => setActiveIndex(item._index)}
-                          // Keep focus in the search box while clicking.
-                          onMouseDown={(e) => e.preventDefault()}
-                          onClick={() => runItem(item)}
-                          className={`relative w-full flex cursor-pointer items-center justify-between gap-3 pl-4 pr-4 py-2.5 text-left text-sm transition-colors ${
-                            active ? "bg-[#f4f3ef] font-semibold" : "text-[#111318] hover:bg-[#f4f3ef]/70"
-                          }`}
-                          style={active ? { color: CORAL } : undefined}
-                        >
-                          <span
-                            className={`absolute left-0 top-1 bottom-1 w-[3px] transition-opacity ${active ? "opacity-100" : "opacity-0"}`}
-                            style={{ background: "#1d4ed8" }}
-                            aria-hidden="true"
-                          />
-                          <span className="font-mono">{item.label}</span>
-                          {active && <CornerDownLeft size={13} className="shrink-0" aria-hidden="true" />}
-                        </div>
-                      );
-                    })}
+                  <div
+                    key={item.label}
+                    id={`cp-opt-${item._index}`}
+                    role="option"
+                    aria-selected={active}
+                    onMouseEnter={() => setActiveIndex(item._index)}
+                    onMouseDown={(e) => e.preventDefault()}
+                    onClick={() => runItem(item)}
+                    className={`ab-cp-item ${active ? "is-active" : ""}`}
+                  >
+                    <span>{item.label}</span>
+                    {active && <CornerDownLeft size={13} aria-hidden="true" />}
                   </div>
                 );
               })}
             </div>
-
-            <div className="flex items-center gap-4 px-4 py-2.5 border-t border-[#111318]/15 bg-[#f4f3ef] text-[.66rem] font-mono text-[#4b5262]" aria-hidden="true">
-              <span className="flex items-center gap-1">
-                <ArrowUp size={11} />
-                <ArrowDown size={11} /> navigate
-              </span>
-              <span className="flex items-center gap-1">
-                <CornerDownLeft size={11} /> select
-              </span>
-              <span className="ml-auto">esc to close</span>
-            </div>
-          </motion.div>
-        </motion.div>
-      )}
-    </AnimatePresence>
+          ))}
+        </div>
+        <div className="ab-cp-foot" aria-hidden="true">
+          <span><ArrowUp size={11} /><ArrowDown size={11} /> navigate</span>
+          <span><CornerDownLeft size={11} /> select</span>
+          <span style={{ marginLeft: "auto" }}>esc to close</span>
+        </div>
+      </div>
+    </div>
   );
 }

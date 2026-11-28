@@ -4,16 +4,16 @@
    names. The idea: a technical print, not a dashboard. Mono for reading
    text, plain sans headings with no italic accents, one cobalt, few
    borders, more air, and dot-matrix / dithered textures instead of dark
-   panels. Remove this import in Sections.jsx to get the louder v2 back.
+   panels. Only the older write-ups (wrapped in .legacy) load it.
    ============================================================ */
 
-:root {
+.legacy {
   --font-body: "IBM Plex Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
   --qp-paper: #faf9f6;
   --qp-chip: #e8e6e0;
   --qp-chip-hover: #dedbd3;
 }
-body { font-size: 0.9rem; line-height: 1.7; }
+.legacy { font-size: 0.9rem; line-height: 1.7; }
 /* Plain paper: the dithered bands carry the texture now, not a page-wide grid. */
 .at-grid-backdrop { background-image: none; }
 

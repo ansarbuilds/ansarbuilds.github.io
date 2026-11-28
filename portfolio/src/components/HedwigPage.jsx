@@ -6,6 +6,8 @@ import { PROMPT, RUN } from "../data/hedwigRun";
 import { STAGGER, fadeUp, maskReveal, tween } from "../lib/motion";
 import { ScrollRegion } from "./ui";
 import "./HedwigPage.css";
+import "../editorial.css";
+import "../quiet-print.css";
 
 /* Hedwig's own page. It tells the full journey: why I built my own LLM
    from scratch, what ran on the MacBook Air ($0), why the Mac hit a compute

@@ -14,14 +14,18 @@ import { chromium } from '@playwright/test';
 import { mkdirSync, readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { LISTED_PROJECTS, PROJECTS } from '../src/data/projects.js';
-import { FLAGSHIPS } from '../src/data/showcase.js';
-import { HERO } from '../src/data/content.js';
+import { HERO, MORE, NOW, SHIPPED } from '../src/data/site.js';
 import { DOT_ART } from './dot-matrix-files.mjs';
 import { firstSentences } from '../src/lib/sentences.js';
 
 const root = resolve(import.meta.dirname, '..');
+const TELEMETRY = JSON.parse(readFileSync(resolve(root, 'src/data/telemetry.json'), 'utf8'));
+// The home page's line and numbers for each project it tells, so a card says what the page says.
+const FLAGSHIPS = [NOW, ...SHIPPED, ...MORE].map((item) => ({ slug: item.slug, headline: item.line, stats: item.stats || [] }));
 const escape = (text) => String(text).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
-const KEEP = new Set(['saywhen']);
+// saywhen's card is a designed product shot; Hermione's share page and card
+// are maintained with its launch, outside this script.
+const KEEP = new Set(['saywhen', 'hermione']);
 // `node scripts/make-share-images.mjs hedwig jarvis` redraws just those cards.
 const ONLY = process.argv.length > 2 ? process.argv.slice(2) : null;
 
@@ -81,15 +85,17 @@ const builtWith = (stack = [], room) => {
 };
 const titleSize = (title) => (title.length <= 9 ? 150 : title.length <= 16 ? 118 : title.length <= 24 ? 92 : 74);
 
-// The site card: the hero's name, its line and its four proof cards.
-const proof = FLAGSHIPS.slice(0, 4).map((flag) => {
-  const project = LISTED_PROJECTS.find((p) => p.slug === flag.slug);
-  return { value: flag.stats[0][0], label: project?.title.replace(/^My Take on /, '') ?? flag.slug };
-});
+// The site card: the name, the hero's line and the same four numbers as the hero.
+const proof = [
+  { value: TELEMETRY.lines.toLocaleString('en-US'), label: 'lines of code' },
+  { value: String(TELEMETRY.repos), label: 'repositories' },
+  { value: TELEMETRY.commits.toLocaleString('en-US'), label: 'commits' },
+  { value: '3', label: 'apps released' },
+];
 const site = page(`
-  <p class="top"><span>Mohamed Ansar · Index of work</span><b>Agents · AI studies · apps</b></p>
+  <p class="top"><span>Mohamed Ansar · Index of work</span><b>Local-first apps · on-device AI</b></p>
   <h1 class="big" style="position:absolute;left:64px;top:100px;font-size:116px;line-height:.92">Mohamed<br><span class="accent">Ansar</span></h1>
-  <p style="position:absolute;left:64px;top:366px;font:400 26px/1.4 'IBM Plex Mono';max-width:1080px">${escape(HERO.title)} <em style="font-style:normal;color:${COBALT};white-space:nowrap">Here are ${LISTED_PROJECTS.length} of them.</em></p>
+  <p style="position:absolute;left:64px;top:366px;font:400 26px/1.4 'IBM Plex Mono';max-width:1080px">${escape(HERO.title.join(' '))} <em style="font-style:normal;color:${COBALT};white-space:nowrap">Building Sirius now.</em></p>
   <div class="stats" style="bottom:52px;gap:40px">${proof.map((p) => `<div style="min-width:240px"><b style="font-size:46px">${escape(p.value)}</b><span>${escape(p.label)}</span></div>`).join('')}</div>`);
 
 const projectCard = (project) => {

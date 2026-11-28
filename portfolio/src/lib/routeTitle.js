@@ -1,15 +1,12 @@
 import { getProject } from "../data/projectIndex.js";
 
-/* A hash route swaps the whole view, so it should read like a page: its own
-   tab title, and focus moved to the new heading. Without this every project
-   shares one title in tabs, history and bookmarks, and a screen reader is
-   never told the view changed. */
-export const SITE_TITLE = "Mohamed Ansar · Agents, AI studies and apps";
+/* Each view reads like a page: its own tab title, in tabs, history and
+   bookmarks. */
+export const SITE_TITLE = "Mohamed Ansar · Local-first apps and on-device AI";
 
-// The takeover views that are not a project page.
 const VIEW_TITLES = {
   "lineage-demo": "Data lineage explorer",
-  work: "Index of work",
+  work: "Work",
 };
 
 export function titleForRoute(route) {
