@@ -1,0 +1,200 @@
+<!doctype html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Architecture · Hermione docs</title>
+<meta name="description" content="How Hermione is built, from the React interface to the Rust shell, the shared core, the store, the assistant and the model runtime.">
+<link rel="canonical" href="https://ansarbuilds.dev/p/hermione/docs/architecture/">
+<meta property="og:title" content="Architecture · Hermione docs">
+<meta property="og:description" content="How Hermione is built, from the React interface to the Rust shell, the shared core, the store, the assistant and the model runtime.">
+<meta property="og:image" content="https://ansarbuilds.dev/p/hermione/og.jpg">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="icon" href="../assets/icon.png">
+<script>try{const t=localStorage.getItem("hermione-docs-theme")||(matchMedia("(prefers-color-scheme: light)").matches?"light":"dark");document.documentElement.dataset.theme=t}catch{}</script>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400..700&family=JetBrains+Mono:wght@400;500&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/site.css">
+</head>
+<body>
+<a class="skip" href="#content">Skip to content</a>
+<header class="top">
+  <button class="menu" type="button" aria-label="Open navigation" aria-expanded="false" aria-controls="sidebar"><svg viewBox="0 0 24 24"><path d="M4 7h16M4 12h16M4 17h16"/></svg></button>
+  <a class="brand" href="../introduction/"><img src="../assets/icon.png" alt="" width="26" height="26">Hermione <span>Docs</span></a>
+  <button class="search-open" type="button" aria-label="Search the docs"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg><span>Search</span><kbd>⌘K</kbd></button>
+  <nav class="top-links" aria-label="Elsewhere">
+    <a href="../../">Product</a>
+    <a href="https://huggingface.co/ansarbuilds/hermione-models" target="_blank" rel="noopener">Models</a>
+    <a href="https://github.com/ansarbuilds/Hermione" target="_blank" rel="noopener">GitHub</a>
+    <button class="theme" type="button" aria-label="Switch light or dark"><svg class="sun" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg><svg class="moon" viewBox="0 0 24 24"><path d="M20 14.5A8 8 0 0 1 9.5 4a8 8 0 1 0 10.5 10.5Z"/></svg></button>
+  </nav>
+</header>
+<div class="layout">
+  <aside class="sidebar" id="sidebar" aria-label="Docs"><div class="nav-group"><p>Get started</p><ul><li><a href="../introduction/">Introduction</a></li><li><a href="../install/">Install</a></li></ul></div><div class="nav-group"><p>Using Hermione</p><ul><li><a href="../planning/">Planning</a></li><li><a href="../issues/">Issues</a></li><li><a href="../pages/">Pages</a></li><li><a href="../getting-around/">Getting around</a></li><li><a href="../keyboard/">Keyboard</a></li><li><a href="../reports-and-goals/">Reports and goals</a></li><li><a href="../settings/">Settings</a></li><li><a href="../your-data/">Your data</a></li></ul></div><div class="nav-group"><p>The assistant</p><ul><li><a href="../assistant/">The assistant</a></li><li><a href="../models/">Hermione AI models</a></li><li><a href="../train-your-own/">Train your own</a></li></ul></div><div class="nav-group"><p>Under the hood</p><ul><li><a href="../architecture/" aria-current="page">Architecture</a></li><li><a href="../privacy-and-security/">Privacy and security</a></li></ul></div><div class="nav-group"><p>More</p><ul><li><a href="../pro/">Hermione Pro</a></li><li><a href="../faq/">FAQ and troubleshooting</a></li><li><a href="../changelog/">Changelog</a></li></ul></div>
+    <a class="sidebar-cta" href="../../#download">Download for Mac <span>v0.3.0</span></a>
+  </aside>
+  <main id="content" class="content">
+    <article>
+      <p class="crumb">Under the hood</p>
+      <h1>Architecture</h1>
+<p>Hermione is one TypeScript and Rust monorepo: about 32,000 lines of TypeScript
+and 18,000 of Rust. The interface is React, the rules live in a shared
+TypeScript core, and the Mac app is a Tauri 2 shell in Rust that stores the data,
+runs the model and talks to macOS.</p>
+<figure class="diagram"><pre class="mermaid">flowchart TB
+  subgraph Window[&quot;The window (React + Vite, apps/app)&quot;]
+    UI[Views: board, issues, pages, reports, settings]
+    AS[Assistant panel, ⌘J]
+  end
+  subgraph Core[&quot;packages/core (TypeScript)&quot;]
+    R[Workspace rules: every change, validated]
+    EN[Built-in engine: sentence to tool calls]
+    EX[Tool executor, plans, undo]
+  end
+  subgraph Shell[&quot;Tauri 2 shell (Rust, apps/desktop)&quot;]
+    ST[hermione-store: atomic file writes, daily backups]
+    MD[Model manager: download, verify, run llama-server]
+    NET[Web fetch with address checks]
+    SP[Spotlight, notifications, quick capture]
+  end
+  LL[llama-server on 127.0.0.1] --&gt; G[(Hermione AI GGUF)]
+  UI --&gt; R
+  AS --&gt; EN --&gt; EX --&gt; R
+  AS --&gt;|not understood| LL
+  R --&gt; ST
+  MD --&gt; LL
+  AS -.web answers.-&gt; NET
+  UI --&gt; SP</pre></figure>
+<h2 id="the-parts"><a class="anchor" href="#the-parts" aria-label="Link to this section">#</a>The parts</h2>
+<div class="table"><table>
+<thead>
+<tr>
+<th>Path</th>
+<th>Language</th>
+<th>What it is</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>apps/app</code></td>
+<td>TypeScript, React, Vite</td>
+<td>The interface the Mac app shows. Also runs in a browser tab with IndexedDB</td>
+</tr>
+<tr>
+<td><code>apps/web</code></td>
+<td>TypeScript, React</td>
+<td>The components and actions <code>apps/app</code> reuses; still runs as the older Next.js version</td>
+</tr>
+<tr>
+<td><code>apps/desktop</code></td>
+<td>Rust, Tauri 2</td>
+<td>The Mac (and Windows) shell: menus, windows, global shortcut, notifications, Spotlight, the model runtime</td>
+</tr>
+<tr>
+<td><code>packages/domain</code></td>
+<td>TypeScript</td>
+<td>The types: workspace, issue, page, sprint, workflow, permissions, the sample project</td>
+</tr>
+<tr>
+<td><code>packages/core</code></td>
+<td>TypeScript</td>
+<td>Every rule for changing a workspace, the assistant, filters, reports, import and export, undo</td>
+</tr>
+<tr>
+<td><code>crates/hermione-store</code></td>
+<td>Rust</td>
+<td>The data folder: atomic writes, daily backups, a lock so only one copy writes</td>
+</tr>
+<tr>
+<td><code>crates/hermione-sync</code></td>
+<td>Rust, Automerge</td>
+<td>The workspace as CRDT documents, for sync between devices (built, not switched on)</td>
+</tr>
+<tr>
+<td><code>crates/hermione-relay</code></td>
+<td>Rust</td>
+<td>A small, blind relay for sync that stores only encrypted changes, with a Docker image</td>
+</tr>
+<tr>
+<td><code>ml/</code></td>
+<td>Python, Bash</td>
+<td>Data generator, QLoRA training, evaluation, GGUF export, the RunPod script</td>
+</tr>
+<tr>
+<td><code>scripts/</code></td>
+<td>Node</td>
+<td>Licence and model-list signing, the changelog, licence checks, update manifests</td>
+</tr>
+</tbody></table>
+</div><h2 id="one-change-end-to-end"><a class="anchor" href="#one-change-end-to-end" aria-label="Link to this section">#</a>One change, end to end</h2>
+<p>Every change, from a drag on the board or from the assistant, takes the same
+path:</p>
+<ol>
+<li>The interface calls an action with what changed, say &quot;move HER-4 to <em>In
+review</em>&quot;.</li>
+<li><code>packages/core</code> loads the workspace, checks the change against the workflow&#39;s
+rules and permissions, applies it, records it in the issue&#39;s history, runs any
+automations, and works out an undo patch.</li>
+<li>The workspace is written through the store. In the Mac app that&#39;s
+<code>hermione-store</code> in Rust: a temporary file, flushed, renamed over the old one,
+the folder flushed. In a browser it&#39;s IndexedDB.</li>
+<li>The interface updates; the toast offers <strong>Undo</strong>.</li>
+</ol>
+<p>Because both the board and the assistant go through step 2, the assistant can
+never do something the interface wouldn&#39;t allow.</p>
+<h2 id="the-assistant"><a class="anchor" href="#the-assistant" aria-label="Link to this section">#</a>The assistant</h2>
+<ul>
+<li><strong>Tools:</strong> <code>packages/core/src/assistant/tools.ts</code> defines the 19 workspace
+tools with JSON-schema arguments. The built-in engine, the model&#39;s tool list
+and the training data are all generated from it; CI fails if <code>ml/tools.json</code>
+drifts from it.</li>
+<li><strong>Built-in engine:</strong> <code>engine.ts</code>, pattern rules for keys, statuses, people,
+dates, priorities, points, labels and sprints. Answers offline, instantly.</li>
+<li><strong>Model client:</strong> <code>model.ts</code> talks to any OpenAI-compatible server
+(<code>/v1/chat/completions</code>, temperature 0.1) with the tools, the instructions in
+<code>prompt.ts</code> and the project context. With web on, it runs up to three rounds
+of <code>web_search</code> / <code>read_web_page</code> before answering.</li>
+<li><strong>Executor:</strong> <code>execute.ts</code> and <code>plan.ts</code> turn tool calls into ordinary
+workspace changes, enforce the limits (a plan above five changes, at most 25),
+and describe each step in words.</li>
+</ul>
+<h2 id="the-model-runtime"><a class="anchor" href="#the-model-runtime" aria-label="Link to this section">#</a>The model runtime</h2>
+<p>The Mac app bundles llama.cpp&#39;s <code>llama-server</code> (build <code>b12823</code>, pinned in
+<code>apps/desktop/scripts/llama.json</code>) and only the libraries it links. When the
+assistant needs the model, <code>models.rs</code> starts it on <code>127.0.0.1</code> on a free port
+with <code>--jinja -c 8192 --no-webui</code>, waits for it to load, and stops it when it&#39;s
+done. Models are listed in a <code>models.json</code> signed with Ed25519; the app checks
+the signature with public keys compiled into both the Rust shell and the
+TypeScript core (a test fails if they differ), then checks each file&#39;s SHA-256.</p>
+<h2 id="data"><a class="anchor" href="#data" aria-label="Link to this section">#</a>Data</h2>
+<p>A workspace is one JSON document per data folder holding every project, plus
+attachments as files. Every older format opens unchanged: <code>packages/core/fixtures/upgrade</code>
+holds data folders written by each past version&#39;s own code, and a test opens
+every one with the core, the file store and the Rust store on each change.</p>
+<h2 id="sync-next"><a class="anchor" href="#sync-next" aria-label="Link to this section">#</a>Sync (next)</h2>
+<p><code>crates/hermione-sync</code> maps the workspace onto Automerge documents, so two
+devices can change the same project offline and merge without conflicts.
+<code>crates/hermione-relay</code> is the relay: it stores and forwards changes that are
+encrypted on the device, so it sees only their size and timing. It&#39;s built and
+tested but not switched on in the app yet.</p>
+<h2 id="decisions"><a class="anchor" href="#decisions" aria-label="Link to this section">#</a>Decisions</h2>
+<p>The reasoning behind the big choices is in <code>docs/decisions/</code>: the stack, an
+independent implementation (no code from any other product), moving the rules
+into one core, and the sync design.</p>
+
+      <footer class="pager">
+        <a class="prev" href="../train-your-own/"><span>Previous</span>Train your own</a>
+        <a class="next" href="../privacy-and-security/"><span>Next</span>Privacy and security</a>
+      </footer>
+      <p class="edit"><a href="https://github.com/ansarbuilds/Hermione/blob/main/docs/guide/architecture.md" target="_blank" rel="noopener">Edit this page on GitHub</a></p>
+    </article>
+  </main>
+  <nav class="toc" aria-label="On this page"><p>On this page</p><ul><li><a href="#the-parts">The parts</a></li><li><a href="#one-change-end-to-end">One change, end to end</a></li><li><a href="#the-assistant">The assistant</a></li><li><a href="#the-model-runtime">The model runtime</a></li><li><a href="#data">Data</a></li><li><a href="#sync-next">Sync (next)</a></li><li><a href="#decisions">Decisions</a></li></ul></nav>
+</div>
+<dialog class="search" aria-label="Search">
+  <div class="search-box"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg><input type="search" placeholder="Search the docs" aria-label="Search the docs" autocomplete="off" spellcheck="false"><kbd>esc</kbd></div>
+  <ul class="results" role="listbox"></ul>
+</dialog>
+<dialog class="lightbox" aria-label="Screenshot"><img alt=""></dialog>
+<script type="module" src="../assets/site.js"></script>
+</body>
+</html>
