@@ -13,11 +13,13 @@ import { DUR, EASE, STAGGER, fadeUp } from "../lib/motion";
 import { isRouteTransitioning } from "../lib/routeTransition";
 import { media } from "../lib/media";
 import { firstSentences } from "../lib/sentences";
-import { MORE_WORK } from "../data/showcase";
+import "../editorial.css";
+import "../showcase.css";
+import "../quiet-print.css";
 
 // Projects with an evidence poster (scripts/make-more-art.mjs) show it here
 // too, in place of a conceptual illustration.
-const POSTERS = Object.fromEntries(MORE_WORK.filter((item) => item.art).map((item) => [item.slug, item.art]));
+const POSTERS = {};
 // Projects with real material to open on, in place of an illustration. A
 // figure (`whole`) is shown uncropped, on the white it was drawn on.
 const REAL_HEADERS = {

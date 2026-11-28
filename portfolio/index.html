@@ -3,13 +3,24 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Mohamed Ansar · Agents, AI studies and apps</title>
-    <meta name="description" content="Agents, open-source tools for coding agents, independent AI studies and App Store apps. Each one with its code, its numbers and a full write-up." />
+    <title>Mohamed Ansar · Local-first apps and on-device AI</title>
+    <meta name="description" content="I build local-first apps and small AI models that run on your own machine: Hermione, saywhen, Haloscript, and Sirius, which I'm building now." />
     <link rel="canonical" href="https://ansarbuilds.dev/" />
-    <meta name="theme-color" content="#f4f3ef" />
+    <meta name="theme-color" content="#f3f2ee" />
+    <meta name="color-scheme" content="light dark" />
+    <script>
+      /* Light or dark before the first paint: the visitor's choice, else the system's (lib/theme.js). */
+      (function () {
+        var t = null;
+        try { t = localStorage.getItem("theme"); } catch (e) {}
+        if (t !== "light" && t !== "dark") t = matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+        document.documentElement.dataset.theme = t;
+        if (t === "dark") document.querySelector('meta[name="theme-color"]').setAttribute("content", "#07080c");
+      })();
+    </script>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Inter:wght@400;500;600&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet" />
     <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png" />
     <link rel="icon" type="image/png" sizes="192x192" href="/favicon-192.png" />
     <link rel="icon" href="/favicon.ico" sizes="any" />
@@ -17,19 +28,19 @@
 
     <meta property="og:type" content="website" />
     <meta property="og:url" content="https://ansarbuilds.dev/" />
-    <meta property="og:title" content="Mohamed Ansar · Agents, AI studies and apps" />
-    <meta property="og:description" content="Agents, open-source tools for coding agents, independent AI studies and App Store apps. Each one with its code, its numbers and a full write-up." />
+    <meta property="og:title" content="Mohamed Ansar · Local-first apps and on-device AI" />
+    <meta property="og:description" content="I build local-first apps and small AI models that run on your own machine: Hermione, saywhen, Haloscript, and Sirius, which I'm building now." />
     <meta property="og:image" content="https://ansarbuilds.dev/og-image.png" />
     <meta property="og:image:alt" content="Mohamed Ansar's portfolio" />
     <meta property="og:image:width" content="1200" />
     <meta property="og:image:height" content="630" />
     <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:title" content="Mohamed Ansar · Agents, AI studies and apps" />
-    <meta name="twitter:description" content="Agents, open-source tools for coding agents, independent AI studies and App Store apps. Each one with its code, its numbers and a full write-up." />
+    <meta name="twitter:title" content="Mohamed Ansar · Local-first apps and on-device AI" />
+    <meta name="twitter:description" content="I build local-first apps and small AI models that run on your own machine: Hermione, saywhen, Haloscript, and Sirius, which I'm building now." />
     <meta name="twitter:image" content="https://ansarbuilds.dev/og-image.png" />
     <script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"Person","@id":"https://ansarbuilds.dev/#person","name":"Mohamed Ansar","url":"https://ansarbuilds.dev/","sameAs":["https://github.com/ansarbuilds","https://www.linkedin.com/in/kmsmohamedansar/"]},{"@type":"WebSite","@id":"https://ansarbuilds.dev/#website","url":"https://ansarbuilds.dev/","name":"Mohamed Ansar","inLanguage":"en","author":{"@id":"https://ansarbuilds.dev/#person"}}]}</script>
   </head>
-  <body>
+  <body class="ab-body">
     <div id="root"></div>
     <script type="module" src="/src/main.jsx"></script>
   </body>

@@ -1,48 +1,36 @@
-import { ArrowUpRight } from "lucide-react";
-import { ARCHIVE, ARCHIVE_TOTAL, oneLine } from "../data/archive";
+import { ArrowRight, ArrowUpRight } from "lucide-react";
+import { LISTED_PROJECTS } from "../data/projectIndex";
+import { NOW, PERSON, SHIPPED } from "../data/site";
+import { Reveal } from "./bits";
 
-// The full index: every project on the site, one line each, grouped by the
-// kind of work. Rows are numbered across the whole list so the count reads
-// at a glance; each opens the project's own page at /work/<slug>/.
-// Where each group's numbering starts.
-const STARTS = ARCHIVE.map((_, i) => ARCHIVE.slice(0, i).reduce((sum, g) => sum + g.projects.length, 0));
+/* /work/: every listed project in one list. Older experiments, course work
+   and studies stay on GitHub rather than here. */
+
+const PICTURES = Object.fromEntries([...SHIPPED, NOW].map((item) => [item.slug, item.shot?.src]));
 
 export default function ProjectWorkPage() {
   return (
-    <div className="ed-case-study ix-page">
-      <p className="ix-kicker">Index · {ARCHIVE_TOTAL} projects</p>
-      <h1 className="ix-title">Everything I've built</h1>
-      <p className="ix-lede">
-        From a language model trained from scratch to the scripts I started with. The featured ones have full write-ups; the rest have a page each, some short.
+    <section className="ab-wrap ab-index-page" aria-labelledby="work-title">
+      <p className="ab-kicker">Index</p>
+      <h1 id="work-title" className="ab-cs-title">Work</h1>
+      <p className="ab-line">Everything I've shipped or am building now, in one list.</p>
+      <ol className="ab-index-list">
+        {LISTED_PROJECTS.map((project, i) => (
+          <Reveal as="li" key={project.slug} delay={i * 50}>
+            <a href={`/work/${project.slug}/`}>
+              <span className="ab-index">0{i + 1}</span>
+              <span className="ab-index-title">{project.title}</span>
+              <span className="ab-index-kind">{project.kind}</span>
+              <span className="ab-index-status">{project.status.split(" · ")[0]}</span>
+              <ArrowRight size={20} aria-hidden="true" />
+              {PICTURES[project.slug] && <img className="ab-index-peek" src={PICTURES[project.slug]} alt="" loading="lazy" aria-hidden="true" />}
+            </a>
+          </Reveal>
+        ))}
+      </ol>
+      <p className="ab-fine">
+        Older experiments, studies and course work are on <a href={PERSON.github} target="_blank" rel="noopener noreferrer">GitHub <ArrowUpRight size={12} aria-hidden="true" /></a>.
       </p>
-
-      {ARCHIVE.map((group, gi) => (
-        <section key={group.id} className="ix-group" aria-labelledby={`ix-${group.id}`}>
-          <h2 id={`ix-${group.id}`} className="ix-group-h">
-            <span>{group.label}</span>
-            <small>{group.projects.length}</small>
-          </h2>
-          <ol className="ix-rows">
-            {group.projects.map((p, i) => {
-              const n = STARTS[gi] + i + 1;
-              return (
-                <li key={p.slug}>
-                  <a href={`/work/${p.slug}/`} className="ix-row">
-                    <span className="ix-n">{String(n).padStart(2, "0")}</span>
-                    <span className="ix-name">
-                      <b>{p.title}</b>
-                      <small>{p.kind}</small>
-                    </span>
-                    <span className="ix-line">{oneLine(p.hook)}</span>
-                    <span className="ix-status">{p.status}</span>
-                    <ArrowUpRight size={15} aria-hidden="true" className="ix-arrow" />
-                  </a>
-                </li>
-              );
-            })}
-          </ol>
-        </section>
-      ))}
-    </div>
+    </section>
   );
 }

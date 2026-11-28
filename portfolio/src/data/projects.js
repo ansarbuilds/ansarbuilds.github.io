@@ -12,6 +12,7 @@
 // Work projects are written generically on purpose: no employer, product,
 // customer or retailer names, and no numbers. They get no screenshots either;
 // every image in public/shots/ comes from a public repo or this site.
+import { LISTED_SLUGS, isListed } from "./site.js";
 
 // Existing category keys share the portfolio accent. Status colors in
 // tables and the experiments' own scene palettes remain independent.
@@ -959,6 +960,39 @@ export const PROJECTS = [
       { label: "See the full tour", href: "/work/haloscript/", primary: true },
       { label: "Support and privacy", href: "https://ansarbuilds.github.io/haloscript-site/", external: true },
       { label: "Source is private. Walkthrough on request.", href: "#contact", locked: true },
+    ],
+  },
+  {
+    slug: "sirius",
+    title: "Sirius",
+    kind: "An offline focus aid for ADHD, on the Mac",
+    accent: "cyan",
+    status: "Mac beta v0.2 · in progress · models on Hugging Face",
+    icon: "/shots/sirius/check-in.webp",
+    shots: ["/shots/sirius/drifting-dark.webp", "/shots/sirius/check-in.webp"],
+    hook: "Sirius reads the title of the window in front of you and asks two small on-device models whether it fits your work. If you drift for two minutes, it checks in once, gently. Nothing leaves your Mac.",
+    stats: [
+      { value: "14/14", label: "titles judged right on the v2 real-world benchmark, including deceptive titles and YouTube (v1: 7/14)", short: "real-world titles right" },
+      { value: "0", label: "false nudges while on task, on the held-out test split", short: "false nudges on task" },
+      { value: "~7 ms", label: "median time per judgement on the CPU (6.50 ms core model, 7.88 ms YouTube model)", short: "per judgement, CPU" },
+      { value: "32.5 MB", label: "each int8 ONNX model, run locally from Rust", short: "per model" },
+    ],
+    role: "Designed, built and trained on my own: the Mac app, the data, the models and the benchmarks.",
+    tags: ["Tauri", "Rust", "ONNX", "On-device AI"],
+    stack: ["Tauri", "Rust", "ONNX Runtime", "PyTorch", "Hugging Face"],
+    story: [
+      "When I drift from work into a rabbit hole, I rarely notice for twenty minutes. Focus apps either block whole sites or make me label everything up front.",
+      "Sirius watches only window titles, locally. Autopilot reads the open workspace and picks a mode (work, study or personal) without asking. Two small models decide whether the title in front of me is on task, related or a rabbit hole.",
+      "After two minutes off-thread it shows one calm check-in with a button back to the exact file or tab I left. It never blocks anything.",
+      "It is a focus aid. It does not diagnose or treat ADHD.",
+    ],
+    learned: [
+      "Window titles lie. The v2 models were retrained on deceptive titles, which took the real-world benchmark from 7/14 to 14/14.",
+      "A nudge that fires while you are working costs more trust than a missed drift, so false nudges on task are the number I guard first.",
+    ],
+    links: [
+      { label: "Try the models in your browser", href: "https://huggingface.co/spaces/ansarbuilds/sirius-demo", external: true, primary: true },
+      { label: "Sirius-Core on Hugging Face", href: "https://huggingface.co/ansarbuilds/Sirius-Core", external: true },
     ],
   },
   /* ───────────── spotlight: two-column grid ───────────── */
@@ -2184,9 +2218,9 @@ export const PROJECTS = [
   },
 ];
 
-// `hidden: true` keeps a project's page working for old links but leaves it
-// out of every list on the site.
-const listed = (p) => !p.hidden;
+// Only the projects named in site.js (LISTED_SLUGS) are listed. Every other
+// project keeps its page working for old links but is left out of every list.
+const listed = (p) => isListed(p.slug);
 export const OPEN_SOURCE_PROJECTS = PROJECTS.filter((p) => p.spotlightGroup === "open-source" && listed(p));
 export const OPEN_SOURCE_GROUPS = [
   {
@@ -2210,6 +2244,6 @@ export const FEATURED_GRID = PROJECTS.filter((p) => p.featured && p.grid && list
 const isEarlier = (p) => p.earlier || p.status === "Archived experiment";
 export const MORE_PROJECTS = PROJECTS.filter((p) => !p.featured && !isEarlier(p) && listed(p));
 export const EARLIER_PROJECTS = PROJECTS.filter((p) => !p.featured && isEarlier(p) && listed(p));
-export const LISTED_PROJECTS = PROJECTS.filter(listed);
+export const LISTED_PROJECTS = LISTED_SLUGS.map((slug) => PROJECTS.find((p) => p.slug === slug)).filter(Boolean);
 export const getProject = (slug) => PROJECTS.find((p) => p.slug === slug);
 

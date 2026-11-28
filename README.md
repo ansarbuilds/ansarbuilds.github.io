@@ -1,10 +1,10 @@
 # ansarbuilds.github.io
 
-Live portfolio for **Mohamed Ansar**. Reliable data systems, evidence-backed AI tools, and apps.
+Live portfolio for **Mohamed Ansar**. Local-first apps and on-device AI: Hermione, saywhen, Haloscript, and Sirius in progress.
 
 **Live site:** [ansarbuilds.dev](https://ansarbuilds.dev)
 
-Every project has a page in the [full index](https://ansarbuilds.dev/work/), with live demos where they exist. My [GitHub profile](https://github.com/ansarbuilds) has the public repositories.
+The [work index](https://ansarbuilds.dev/work/) has a case study for each, with live demos where they exist. My [GitHub profile](https://github.com/ansarbuilds) has the public repositories.
 
 ## What's in this repo
 

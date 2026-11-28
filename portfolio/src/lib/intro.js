@@ -1,59 +1,28 @@
-export const INTRO_SESSION_KEY = "intro-played";
+/* When the intro plays (components/Intro.jsx): once per visit (a new tab
+   or window), on the home page, and only when it can be enjoyed.
 
-/* Whether the hero should play its intro (the name setting large, then
-   travelling to its place; see Hero in Sections.jsx): once per browser, so a
-   return visit opens straight on the hero. Never with reduced motion, and
-   never if storage is unavailable (private mode), since an intro that
-   replays on every page is worse than none. The session key is still
-   honoured so a test, or an older visit, can switch it off. */
-export function shouldPlayIntro() {
-  if (typeof window === "undefined") return false;
-  if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return false;
-  try {
-    return !window.localStorage.getItem(INTRO_SESSION_KEY) && !window.sessionStorage.getItem(INTRO_SESSION_KEY);
-  } catch {
-    return false;
-  }
-}
+   Never with reduced motion, on Save-Data or a 2G connection, or when the
+   link points at a section further down. `?intro=1` forces it and
+   `?intro=0` turns it off, for sharing a link or testing. */
 
-/* Whether this visitor gets the film at all: not with reduced motion, or on
-   Save-Data or a 2G/3G connection (it is a few megabytes of video). The page
-   shows its plain version instead. */
-export function filmEnabled() {
+export const INTRO_KEY = "intro-seen";
+
+export function introWanted(location = window.location) {
   if (typeof window === "undefined") return false;
+  const param = new URLSearchParams(location.search).get("intro");
+  if (param === "1") return true;
+  if (param === "0") return false;
+  if (location.pathname !== "/" || location.hash) return false;
   if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return false;
   const connection = navigator.connection;
-  return !(connection?.saveData || /(^|-)(2g|3g)$/.test(connection?.effectiveType ?? ""));
-}
-
-export const COLD_OPEN_SESSION_KEY = "cold-open-played";
-
-// Dev server only: ?coldopen=full plays the film on every load (the name
-// is from the film's old cold open; tests and notes use it).
-export function coldOpenForced() {
-  if (typeof window === "undefined" || !import.meta.env?.DEV) return false;
-  return new URLSearchParams(window.location.search).get("coldopen") === "full";
-}
-
-/* Whether the film plays on its own as the home page opens: once per
-   visit (a new tab or window), where the film can play, and not when the
-   link points at a section further down. A reload, or coming back to the
-   home page in the same visit, gets the page, with "Watch the film" in the
-   nav and the hero. Its sound starts at the visitor's first click, tap or
-   key (a browser allows no sooner). */
-export function filmAutoplayWanted() {
-  if (typeof window === "undefined") return false;
-  if (coldOpenForced()) return true;
-  if (window.location.hash || !filmEnabled()) return false;
+  if (connection?.saveData || /(^|-)2g$/.test(connection?.effectiveType ?? "")) return false;
   try {
-    return !window.sessionStorage.getItem(INTRO_SESSION_KEY) && !window.sessionStorage.getItem(COLD_OPEN_SESSION_KEY);
+    return !window.sessionStorage.getItem(INTRO_KEY);
   } catch {
     return false;
   }
 }
 
-// Asks the app to play the film from the start (the nav and hero buttons).
-export const WATCH_FILM = "film:watch";
-export function watchFilm() {
-  window.dispatchEvent(new Event(WATCH_FILM));
+export function markIntroSeen() {
+  try { window.sessionStorage.setItem(INTRO_KEY, "1"); } catch { /* not remembered */ }
 }

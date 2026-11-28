@@ -7,15 +7,14 @@
     "dev": "vite",
     "build": "vite build && node scripts/prerender-routes.mjs",
     "lint": "oxlint",
-    "test:unit": "node --test src/lib/palettes.test.mjs src/lib/score.test.mjs src/lib/sentences.test.mjs src/data/projectIndex.test.mjs",
+    "test:unit": "node --test src/lib/sentences.test.mjs src/lib/theme.test.mjs src/data/projectIndex.test.mjs scripts/telemetry.test.mjs",
     "preview": "vite preview",
     "check:budget": "node scripts/check-budget.mjs",
-    "check:tools": "node scripts/check-tools.mjs",
-    "count:loc": "node scripts/count-loc.mjs"
+    "sync:telemetry": "node scripts/sync-telemetry.mjs",
+    "prebuild": "node scripts/sync-telemetry.mjs"
   },
   "dependencies": {
     "framer-motion": "^13.1.0",
-    "lenis": "^1.3.27",
     "lucide-react": "^1.33.0",
     "react": "^19.2.8",
     "react-dom": "^19.2.8"

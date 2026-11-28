@@ -7,6 +7,10 @@ on:
       - "portfolio/**"
       - ".github/workflows/deploy-portfolio.yml"
   workflow_dispatch:
+  # Daily, so the home page's code numbers follow the profile README
+  # (`npm run build` runs `sync:telemetry` first).
+  schedule:
+    - cron: "17 9 * * *"
 
 permissions:
   contents: read

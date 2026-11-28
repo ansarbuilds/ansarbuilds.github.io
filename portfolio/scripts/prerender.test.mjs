@@ -3,16 +3,15 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFile } from 'node:fs/promises';
-import { FLAGSHIPS } from '../src/data/showcase.js';
 import { PROJECTS } from '../src/data/projects.js';
-import { CONTACT } from '../src/data/content.js';
+import { LISTED_SLUGS, PERSON as CONTACT, isListed } from '../src/data/site.js';
 
 test('the home page carries its words and links for readers without scripts', async () => {
   const html = await readFile('dist/index.html', 'utf8');
   assert.match(html, /<main class="prerendered"[^>]*><h1>Mohamed Ansar<\/h1>/);
-  for (const flag of FLAGSHIPS) assert.ok(html.includes(`href="/work/${flag.slug}/"`), `${flag.slug} not linked`);
+  for (const slug of LISTED_SLUGS) assert.ok(html.includes(`href="/work/${slug}/"`), `${slug} not linked`);
   assert.ok(html.includes('href="https://github.com/ansarbuilds"'));
-  // A browser that runs scripts hides it, so the film opens on black.
+  // A browser that runs scripts hides it.
   assert.ok(html.includes('.js #root>.prerendered{display:none}'));
 });
 
@@ -41,7 +40,7 @@ test('every page tells search engines what it is', async () => {
   assert.ok(nodeOf(await graphOf('dist/index.html'), 'ProfilePage'));
 
   const index = nodeOf(await graphOf('dist/work/index.html'), 'CollectionPage');
-  assert.equal(index.mainEntity.itemListElement.length, PROJECTS.length);
+  assert.equal(index.mainEntity.itemListElement.length, LISTED_SLUGS.length);
 
   for (const project of PROJECTS) {
     const graph = await graphOf(`dist/work/${project.slug}/index.html`);
@@ -50,5 +49,7 @@ test('every page tells search engines what it is', async () => {
     assert.equal(work.url, `https://ansarbuilds.dev/work/${project.slug}/`);
     assert.ok(project.hook.startsWith(work.description.replace(/…$/, '')), `${project.slug}: description is not the hook's opening`);
     assert.equal(nodeOf(graph, 'BreadcrumbList').itemListElement.at(-1).item, work.url);
+    const html = await readFile(`dist/work/${project.slug}/index.html`, 'utf8');
+    assert.equal(html.includes('content="noindex"'), !isListed(project.slug), `${project.slug}: noindex should match whether it is listed`);
   }
 });
