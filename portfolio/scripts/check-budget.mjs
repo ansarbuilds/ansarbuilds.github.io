@@ -5,7 +5,9 @@
 // First-load JS is about 87 kB gzipped: React 57, the home page and the
 // light field 26, icons 4. Framer Motion and the full project stories load
 // only with the older write-ups that use them. The budget keeps that line
-// with some room; the launch film is gone, so all of dist sits near 27 MB.
+// with some room. The site's own film is gone; the largest file and most
+// of dist are now Hermione's launch page (/p/hermione/: an 8.9 MB film and
+// its docs screenshots), so those two limits allow for it, about 43 MB in all.
 import { readFile, readdir, stat } from 'node:fs/promises';
 import { gzipSync } from 'node:zlib';
 import { join, resolve } from 'node:path';
@@ -16,8 +18,8 @@ const BUDGET = {
   'first-load JS (gzip)': 110 * KB,
   'first-load CSS (gzip)': 20 * KB,
   'preloaded fonts': 60 * KB,
-  'largest file in dist': 7 * MB,
-  'all of dist': 30 * MB,
+  'largest file in dist': 9.5 * MB,
+  'all of dist': 48 * MB,
 };
 
 const dist = resolve('dist');
