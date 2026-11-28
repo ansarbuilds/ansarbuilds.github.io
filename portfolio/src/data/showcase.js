@@ -11,6 +11,16 @@
 // of their own. Leave it out and the cover fills the frame on its own.
 export const FLAGSHIPS = [
   {
+    slug: "hermione",
+    eyebrow: "Open source · Local-first Mac app + AI",
+    badge: "New · v0.2.0 + 2 live models",
+    headline: "A local-first Jira and Confluence workspace with custom 2B models that run offline on your Mac.",
+    copy: "Issues, sprints, kanban, handbook, and fine-tuned Qwen3.5-2B models (92.6% exact match) trained on Runpod GPUs for $17.35 and signed with Ed25519.",
+    stats: [["92.6%", "exact match on 500 unseen tests"], ["1.32 GB", "4-bit GGUF on-device model"], ["$17.35", "Runpod GPU training spend"]],
+    stack: ["Tauri", "Rust", "TypeScript", "Unsloth", "llama.cpp"],
+    visual: { type: "shot", src: "/p/hermione/board-dark.jpg", caption: "Hermione sprint board in dark mode" },
+  },
+  {
     slug: "hedwig",
     eyebrow: "Open source · LLM from scratch",
     badge: "New · runs in your browser",

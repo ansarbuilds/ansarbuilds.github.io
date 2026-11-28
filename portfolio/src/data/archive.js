@@ -7,7 +7,7 @@ import { PROJECT_INDEX } from "./projectIndex.js";
 const GROUPS = [
   { id: "models", label: "Language models & AI studies", slugs: ["hedwig", "decision-models", "rea-study", "prh-jepa"] },
   { id: "agents", label: "Agents & agent tooling", slugs: ["jarvis", "agent-flight-recorder", "storyera", "site-recon", "authorized-web-exposure-audit", "mcp-workflow", "local-agent"] },
-  { id: "apps", label: "Apps", slugs: ["saywhen", "haloscript", "reptrack", "sql-playground", "lineage-explorer", "taskmaster", "customer-predictor", "grocery-assistant"] },
+  { id: "apps", label: "Apps", slugs: ["hermione", "saywhen", "haloscript", "reptrack", "sql-playground", "lineage-explorer", "taskmaster", "customer-predictor", "grocery-assistant"] },
   { id: "data", label: "AI for data & operations", slugs: ["analytics-assistant", "catalogue-checker", "category-copilot", "smart-categorization", "fine-food-sentiment", "data-delivery", "integration", "health-dashboard"] },
   { id: "browser", label: "Browser extensions", slugs: ["sitescout", "sidecar", "scope-checker"] },
   { id: "scripts", label: "Scripts & early experiments", slugs: ["news-scraper", "spotify-trends", "cpl-dream-xi", "forex-tools", "f1-telemetry"] },

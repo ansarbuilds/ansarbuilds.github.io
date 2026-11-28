@@ -28,6 +28,51 @@ export const ACCENTS = {
 };
 
 export const PROJECTS = [
+  {
+    slug: "hermione",
+    featured: true,
+    theme: { title: "display" },
+    title: "Hermione",
+    kind: "Local-first workspace & on-device AI for Mac",
+    accent: "violet",
+    status: "Open source desktop app · v0.2.0 + 2 live models on Hugging Face",
+    icon: "/shots/hermione/icon.png",
+    shots: ["/shots/hermione/board-dark.jpg", "/shots/hermione/board-light.jpg"],
+    hook: "A local-first Jira and Confluence workspace for Mac, driven by custom fine-tuned 2B AI models (92.6% exact match) that run offline via llama.cpp. Built and trained for $288.66 total.",
+    stats: [
+      { value: "92.6%", label: "exact match on 500 unseen requests for hermione-2b (up from 47.2% base, 97.2% right tools)", short: "hermione-2b exact match" },
+      { value: "91.2%", label: "exact match for hermione-2b-web across 21 tools including web research (up from 45.0% base)", short: "hermione-2b-web exact match" },
+      { value: "1.32 GB", label: "4-bit Q4_K_M GGUF size on disk, fitting comfortably on an 8 GB Mac with zero API bills", short: "on-device model size" },
+      { value: "$288.66", label: "total build cost: $271.31 in Claude Code plus $17.35 across Runpod A40, L40S and H100 GPUs", short: "total build + GPU cost" },
+    ],
+    role: "Designed, built, trained, evaluated, and shipped end to end with Claude Code and Runpod GPUs.",
+    tags: ["Tauri", "Rust", "TypeScript", "On-device AI", "QLoRA", "Open source"],
+    stack: ["Tauri", "Rust", "React", "TypeScript", "Unsloth", "llama.cpp", "Runpod", "Hugging Face"],
+    story: [
+      "Hermione rebuilds the familiar issue tracker, sprint board, backlog, roadmap, and handbook as a single local file on your Mac, with no cloud account and no per-seat fee.",
+      "Pressing Cmd+J opens an on-device assistant that operates 19 workspace tools (plus 2 web research tools in the web variant): creating and updating issues, planning sprints, drafting release notes, and answering workspace questions offline.",
+      "To make a tiny 2B model reliable on Hermione's exact tool schema, we generated 30,000 synthetic Hermione requests per variant and fine-tuned Qwen3.5-2B with Unsloth QLoRA on Runpod A40 and L40S GPUs, then quantized to 4-bit GGUF with CUDA-built llama.cpp.",
+      "Every model had to clear an 85% exact-match gate on 500 unseen requests. hermione-2b hit 92.6% (97.2% right tools) and hermione-2b-web hit 91.2% (96.2% right tools). A larger Qwen3-4B run on an H100 scored 74.8% due to a chat-template mismatch and was held back automatically.",
+      "Both passing models are hosted on Hugging Face, signed offline with an Ed25519 key on the Mac, and attached to GitHub Release v0.2.0 so Hermione verifies both the signature and SHA-256 before loading any model.",
+    ],
+    how: [
+      "Generate 30,000 synthetic Hermione conversations (28,800 train, 600 val, 600 held-out test) across 26+ request types.",
+      "Fine-tune Qwen3.5-2B with 4-bit QLoRA (r=32, 0.98% trainable weights) using response-only loss masking so gradients only flow through assistant tool calls.",
+      "Merge LoRA weights to 16-bit, convert to GGUF, and quantize to Q4_K_M (1.32 GB) with CUDA-built llama.cpp.",
+      "Evaluate at temperature 0 on 500 unseen requests; upload to Hugging Face only if exact match clears 85%, then sign models.json offline with Ed25519.",
+    ],
+    learned: [
+      "A 2B model specialized on your exact tool schema outperforms a general model at 1.32 GB and zero inference cost.",
+      "Real cloud GPU runs catch bugs local tests never see: llama.cpp overwriting CUDA PyTorch with CPU torch, PyArrow unioning nested tool schemas with null keys past 4,096 tokens, and post-CUDA fork deadlocks on 26-vCPU H100s.",
+      "An automatic 85% release gate is worth its weight in gold: it caught Qwen3-4B's malformed tool_call tags before anything shipped.",
+    ],
+    links: [
+      { label: "Standalone story & technical page", href: "/p/hermione/" },
+      { label: "Models on Hugging Face", href: "https://huggingface.co/ansarbuilds/hermione-models", external: true },
+      { label: "Download Mac app (v0.2.0)", href: "https://github.com/ansarbuilds/Hermione/releases", external: true },
+      { label: "Source on GitHub", href: "https://github.com/ansarbuilds/Hermione", external: true },
+    ],
+  },
   /* ───────────── spotlight: big rows ───────────── */
   {
     slug: "hedwig",
