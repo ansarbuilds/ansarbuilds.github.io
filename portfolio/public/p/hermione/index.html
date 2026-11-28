@@ -3,409 +3,623 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Hermione · Local-first workspace &amp; on-device AI · Mohamed Ansar</title>
-<meta name="description" content="Hermione is an open-source, local-first Jira + Confluence workspace for Mac with custom fine-tuned 2B AI models (92.6% exact match) that run offline via llama.cpp. Built for $288.66 total.">
+<title>Hermione · Your work, on your Mac · Mohamed Ansar</title>
+<meta name="description" content="A project tracker and wiki that lives on your Mac. Boards, sprints, pages and reports in one local file, with an assistant and a small trained model that run offline. Free and open source.">
 <link rel="canonical" href="https://ansarbuilds.dev/p/hermione/">
 <link rel="icon" href="/p/hermione/icon.png">
-<meta name="theme-color" content="#f6f1ea">
+<meta name="theme-color" content="#07070c">
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://ansarbuilds.dev/p/hermione/">
-<meta property="og:title" content="Hermione · Local-first workspace &amp; on-device AI">
-<meta property="og:description" content="Issues, sprints, kanban, handbook, and custom fine-tuned 2B models (92.6% exact match) running locally on your Mac. Open source, Apache-2.0.">
+<meta property="og:title" content="Hermione · Your work, on your Mac">
+<meta property="og:description" content="Boards, sprints, pages and an offline assistant in one local file. Free and open source for macOS.">
 <meta property="og:image" content="https://ansarbuilds.dev/p/hermione/og.jpg">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="Hermione · Local-first workspace &amp; on-device AI">
-<meta name="twitter:description" content="Issues, sprints, kanban, handbook, and custom fine-tuned 2B models (92.6% exact match) running locally on your Mac.">
+<meta name="twitter:title" content="Hermione · Your work, on your Mac">
+<meta name="twitter:description" content="Boards, sprints, pages and an offline assistant in one local file. Free and open source for macOS.">
 <meta name="twitter:image" content="https://ansarbuilds.dev/p/hermione/og.jpg">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter:opsz,wght@14..32,400..700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
 :root {
-  --paper: #f6f1ea; --paper-2: #efe6da; --card: #fffdf9;
-  --ink: #22061c; --ink-2: #5b4857; --ink-3: #6f6170; --line: rgb(34 6 28 / .1); --line-2: rgb(34 6 28 / .18);
-  --plum: #2a0823; --plum-deep: #180414; --amber: #fbb303; --amber-deep: #8a5a00; --mint: #2f8a55; --danger: #c43b5a;
+  --ink: #07070c; --ink-2: #0d0d14; --panel: #12121b; --raise: #191926;
+  --text: #f2f1f7; --text-2: #b8b6c9; --text-3: #8b899e;
+  --line: rgb(255 255 255 / .07); --line-2: rgb(255 255 255 / .14);
+  --indigo: #5b6cff; --violet: #8b5cf6; --lilac: #c4b5fd; --mint: #5ee0a8;
+  --grad: linear-gradient(100deg, #a7b0ff 0%, #8b5cf6 55%, #c4a6ff 100%);
   --serif: "Instrument Serif", "Iowan Old Style", Georgia, serif;
-  --sans: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --sans: "Inter", system-ui, -apple-system, "Segoe UI", sans-serif;
   --mono: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
   --ease: cubic-bezier(.2, .7, .2, 1);
+  color-scheme: dark;
 }
 * { box-sizing: border-box; }
 html { scroll-behavior: smooth; -webkit-text-size-adjust: 100%; overflow-x: clip; }
-body { margin: 0; background: var(--paper); color: var(--ink); font: 17px/1.65 var(--sans); -webkit-font-smoothing: antialiased; overflow-x: clip; }
+body { margin: 0; background: var(--ink); color: var(--text); font: 17px/1.6 var(--sans); -webkit-font-smoothing: antialiased; overflow-x: clip; }
+body::after { content: ""; position: fixed; inset: 0; z-index: 90; pointer-events: none; opacity: .5; mix-blend-mode: overlay;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 0 0 0 .05 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E"); }
 a { color: inherit; text-underline-offset: 3px; text-decoration-thickness: 1px; }
-img { max-width: 100%; display: block; }
-.wrap { width: min(100% - 32px, 1140px); margin-inline: auto; }
-.eyebrow { display: inline-flex; align-items: center; gap: 8px; font: 500 .74rem var(--mono); letter-spacing: .12em; text-transform: uppercase; color: var(--ink-2); }
-.eyebrow::before { content: ""; width: 7px; height: 7px; border-radius: 50%; background: var(--amber); box-shadow: 0 0 0 4px rgb(251 179 3 / .2); }
-h1 { margin: 22px 0 0; font: 400 clamp(3.1rem, 9.5vw, 7.2rem)/.94 var(--serif); letter-spacing: -.03em; }
-h2 { margin: 14px 0 0; font: 400 clamp(2.2rem, 5vw, 3.8rem)/1.03 var(--serif); letter-spacing: -.02em; text-wrap: balance; }
-h3 { margin: 0 0 8px; font: 600 1.05rem/1.35 var(--sans); letter-spacing: -.01em; }
-h1 em, h2 em { font-style: italic; }
-.lead { margin: 18px 0 0; max-width: 42rem; font-size: clamp(1.02rem, 1.5vw, 1.15rem); color: var(--ink-2); }
-.center { text-align: center; } .center .lead { margin-inline: auto; }
-section { padding-block: clamp(56px, 8vw, 108px); }
-section[id] { scroll-margin-top: 88px; }
-code { font: .86em var(--mono); background: rgb(34 6 28 / .07); padding: .12em .42em; border-radius: 6px; word-break: break-word; }
-pre { margin: 16px 0 0; padding: 18px 20px; border-radius: 14px; background: var(--plum-deep); color: #f6efe6; font: .84rem/1.6 var(--mono); overflow-x: auto; border: 1px solid rgb(255 255 255 / .1); }
-pre code { background: none; padding: 0; color: inherit; }
+:focus-visible { outline: 2px solid var(--lilac); outline-offset: 3px; border-radius: 8px; }
+img, video { display: block; max-width: 100%; }
+svg { fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+.wrap { width: min(100% - 40px, 1180px); margin-inline: auto; }
+.skip { position: absolute; left: -999px; } .skip:focus { left: 16px; top: 12px; z-index: 100; background: var(--text); color: var(--ink); padding: 8px 14px; border-radius: 8px; }
+code { font: .86em var(--mono); padding: .1em .4em; border-radius: 6px; background: rgb(255 255 255 / .07); }
+kbd { display: inline-grid; place-items: center; min-width: 1.7em; padding: .05em .4em; border-radius: 6px; border: 1px solid var(--line-2); border-bottom-width: 2px; background: var(--raise); font: 500 .8em var(--sans); color: var(--text); }
+
+/* atmosphere */
+.orbs { position: absolute; inset: 0; overflow: hidden; pointer-events: none; z-index: 0; }
+.orbs i { position: absolute; border-radius: 50%; filter: blur(90px); opacity: .55; animation: drift 22s ease-in-out infinite alternate; }
+.orbs i:nth-child(1) { width: 720px; height: 720px; left: -10%; top: -20%; background: #2b2f8f; }
+.orbs i:nth-child(2) { width: 820px; height: 820px; right: -15%; top: 10%; background: #3b1f7a; animation-delay: -8s; }
+.orbs i:nth-child(3) { width: 520px; height: 520px; left: 40%; top: -30%; background: #1d3a7a; animation-delay: -14s; }
+@keyframes drift { to { transform: translate3d(60px, 40px, 0) scale(1.08); } }
 
 /* nav */
-.nav { position: sticky; top: 14px; z-index: 40; display: flex; align-items: center; justify-content: space-between; gap: 14px; width: min(100% - 24px, 1140px); margin: 14px auto 0; padding: 8px 10px 8px 16px; border-radius: 999px; background: rgb(246 241 234 / .82); border: 1px solid var(--line); -webkit-backdrop-filter: blur(16px); backdrop-filter: blur(16px); }
-.scroll-meter { position: absolute; left: 20px; right: 20px; bottom: 0; height: 2px; border-radius: 999px; background: linear-gradient(90deg, var(--amber), #d45b92); transform-origin: left; transform: scaleX(0); opacity: .8; pointer-events: none; }
-.brand { display: inline-flex; align-items: center; gap: 10px; font-weight: 600; text-decoration: none; white-space: nowrap; }
-.brand img { width: 28px; height: 28px; border-radius: 8px; }
-.brand small { font-weight: 400; color: var(--ink-3); }
-.nav-links { display: flex; align-items: center; gap: 18px; font-size: .88rem; flex-wrap: wrap; }
-.nav-links a { text-decoration: none; color: var(--ink-2); white-space: nowrap; }
-.nav-links a:hover { color: var(--ink); }
+.nav { position: fixed; top: 14px; left: 50%; z-index: 50; transform: translateX(-50%); display: flex; align-items: center; gap: 18px; width: min(100% - 24px, 1180px); padding: 8px 8px 8px 16px; border-radius: 999px; background: rgb(10 10 16 / .55); border: 1px solid var(--line); backdrop-filter: blur(18px) saturate(1.4); -webkit-backdrop-filter: blur(18px) saturate(1.4); transition: background .3s, border-color .3s; }
+.nav.scrolled { background: rgb(12 12 19 / .85); border-color: var(--line-2); }
+.brand { display: inline-flex; align-items: center; gap: 10px; font-weight: 600; letter-spacing: -.01em; text-decoration: none; }
+.brand img { width: 26px; height: 26px; border-radius: 7px; }
+.nav-links { margin-left: auto; display: flex; align-items: center; gap: 24px; font-size: .9rem; }
+.nav-links a:not(.btn) { color: var(--text-2); text-decoration: none; transition: color .2s; } .nav-links a:not(.btn):hover { color: var(--text); }
 
-/* buttons */
-.btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-height: 46px; padding: 0 22px; border-radius: 999px; font: 500 .92rem var(--sans); text-decoration: none; border: 1px solid var(--line-2); background: var(--card); color: var(--ink); transition: transform .2s var(--ease), box-shadow .2s var(--ease); cursor: pointer; }
-.btn:hover { transform: translateY(-2px); box-shadow: 0 12px 24px -14px rgb(34 6 28 / .45); }
-.btn.dark, .nav-links a.btn.dark { background: var(--ink); color: var(--paper); border-color: var(--ink); }
-.btn.sm { min-height: 36px; padding: 0 14px; font-size: .84rem; }
-.ctas { display: flex; flex-wrap: wrap; justify-content: center; gap: 12px; margin-top: 28px; }
-.badge { display: inline-flex; align-items: center; gap: 10px; padding: 6px 14px 6px 6px; border-radius: 999px; background: var(--card); border: 1px solid var(--line); font-size: .84rem; color: var(--ink-2); text-decoration: none; }
-.badge b { padding: 3px 10px; border-radius: 999px; background: var(--ink); color: var(--paper); font: 500 .72rem var(--mono); }
+.btn { display: inline-flex; align-items: center; justify-content: center; gap: 10px; min-height: 48px; padding: 0 24px; border-radius: 999px; font: 550 .95rem var(--sans); text-decoration: none; border: 1px solid var(--line-2); background: rgb(255 255 255 / .04); color: var(--text); cursor: pointer; transition: transform .25s var(--ease), box-shadow .25s var(--ease), border-color .25s, background .25s; }
+.btn:hover { transform: translateY(-2px); border-color: rgb(255 255 255 / .28); background: rgb(255 255 255 / .07); }
+.btn.primary { background: var(--grad); color: #0b0820; border: 0; box-shadow: 0 14px 40px -14px rgb(139 92 246 / .9), inset 0 1px 0 rgb(255 255 255 / .5); }
+.btn.primary:hover { box-shadow: 0 20px 50px -14px rgb(139 92 246 / 1), inset 0 1px 0 rgb(255 255 255 / .5); background: var(--grad); }
+.btn.sm { min-height: 38px; padding: 0 16px; font-size: .88rem; }
+.btn svg { width: 18px; height: 18px; }
+.btn small { font: 500 .72rem var(--mono); opacity: .65; }
 
-/* hero + stats */
-.hero { padding-top: clamp(44px, 7vw, 84px); text-align: center; }
-.stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 14px; margin-top: 40px; text-align: left; }
-.stat { background: var(--card); border: 1px solid var(--line); border-radius: 18px; padding: 20px 22px; }
-.stat strong { display: block; font: 400 clamp(2rem, 3.6vw, 2.8rem)/1 var(--serif); color: var(--ink); }
-.stat span { display: block; margin-top: 6px; font-size: .88rem; color: var(--ink-2); }
+/* type */
+.eyebrow { display: inline-flex; align-items: center; gap: 10px; font: 500 .74rem var(--mono); letter-spacing: .14em; text-transform: uppercase; color: var(--lilac); }
+.eyebrow::before { content: ""; width: 6px; height: 6px; border-radius: 50%; background: var(--violet); box-shadow: 0 0 0 4px rgb(139 92 246 / .22), 0 0 18px var(--violet); }
+h1, h2 { font-family: var(--serif); font-weight: 400; letter-spacing: -.02em; text-wrap: balance; }
+h1 { margin: 20px 0 0; font-size: clamp(3.4rem, 9vw, 7.4rem); line-height: .95; }
+h2 { margin: 16px 0 0; font-size: clamp(2.4rem, 5.4vw, 4.4rem); line-height: 1; }
+h1 em, h2 em { font-style: italic; background: var(--grad); -webkit-background-clip: text; background-clip: text; color: transparent; padding-right: .06em; }
+h3 { margin: 0; font-size: 1.12rem; font-weight: 620; letter-spacing: -.01em; }
+.lead { margin: 22px 0 0; max-width: 40rem; font-size: clamp(1.05rem, 1.6vw, 1.22rem); color: var(--text-2); text-wrap: pretty; }
+.center { text-align: center; } .center .lead { margin-inline: auto; }
+section { position: relative; padding-block: clamp(80px, 11vw, 150px); }
+section[id] { scroll-margin-top: 80px; }
 
-/* interactive gallery */
-.gallery-shell { margin-top: 42px; }
-.tabs { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; margin-bottom: 16px; }
-.tab { padding: 8px 16px; border-radius: 999px; border: 1px solid var(--line); background: var(--card); color: var(--ink-2); font: 500 .84rem var(--sans); cursor: pointer; transition: all .2s; }
-.tab[aria-pressed="true"] { background: var(--ink); color: var(--paper); border-color: var(--ink); }
-.shot-frame { border-radius: 22px; overflow: hidden; border: 1px solid var(--line-2); box-shadow: 0 36px 80px -36px rgb(34 6 28 / .45); background: var(--plum-deep); }
-.shot-frame img { width: 100%; height: auto; }
-.shot-cap { text-align: center; margin-top: 12px; font-size: .88rem; color: var(--ink-3); }
+/* hero */
+.hero { padding-top: 150px; padding-bottom: 40px; text-align: center; isolation: isolate; }
+.hero .icon { width: 84px; height: 84px; margin: 0 auto 10px; border-radius: 20px; box-shadow: 0 20px 60px -10px rgb(139 92 246 / .7); }
+.hero .lead { margin-inline: auto; }
+.hero-cta { display: flex; flex-wrap: wrap; justify-content: center; gap: 12px; margin-top: 34px; }
+.hero-meta { margin-top: 16px; font: .8rem var(--mono); color: var(--text-3); }
+.stage { position: relative; z-index: 1; margin-top: 64px; perspective: 1800px; }
+.window { position: relative; border-radius: 16px; overflow: hidden; border: 1px solid var(--line-2); background: var(--ink-2); box-shadow: 0 60px 140px -40px rgb(0 0 0 / .9), 0 0 0 1px rgb(0 0 0 / .4), 0 0 120px -30px rgb(91 108 255 / .45); transform: rotateX(var(--tilt, 14deg)) scale(var(--sc, .94)); transform-origin: 50% 0; transition: transform .1s linear; }
+.window video, .window img { width: 100%; height: auto; aspect-ratio: 16 / 10; object-fit: cover; }
+.glow { position: absolute; inset: auto 10% -12% 10%; height: 40%; background: radial-gradient(50% 50% at 50% 50%, rgb(139 92 246 / .35), transparent 70%); filter: blur(30px); z-index: -1; }
 
-/* cards, grids, dark band */
-.grid-2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 18px; margin-top: 32px; }
-.grid-3 { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 16px; margin-top: 28px; }
-.card { background: var(--card); border: 1px solid var(--line); border-radius: 20px; padding: 24px 26px; }
-.card p { margin: 8px 0 0; color: var(--ink-2); font-size: .95rem; }
-.band { background: var(--plum-deep); color: #f6efe6; }
-.band .eyebrow, .band .lead, .band p, .band td { color: rgb(246 239 230 / .8); }
-.band h2, .band h3, .band th, .band strong { color: #fff; }
-.band .card { background: rgb(255 255 255 / .05); border-color: rgb(255 255 255 / .12); }
-.band code { background: rgb(255 255 255 / .12); color: #ffd97d; }
+/* film */
+.film { padding-top: 60px; }
+.film-frame { position: relative; margin-top: 44px; border-radius: 20px; overflow: hidden; border: 1px solid var(--line-2); background: #000; box-shadow: 0 50px 120px -40px rgb(0 0 0 / .9); aspect-ratio: 16 / 9; }
+.film-frame video { width: 100%; height: 100%; object-fit: cover; }
+.play { position: absolute; inset: 0; display: grid; place-items: center; border: 0; background: linear-gradient(180deg, transparent 50%, rgb(0 0 0 / .45)); cursor: pointer; color: #fff; }
+.play span { display: inline-flex; align-items: center; gap: 12px; padding: 14px 22px 14px 16px; border-radius: 999px; background: rgb(255 255 255 / .12); border: 1px solid rgb(255 255 255 / .25); backdrop-filter: blur(14px); font: 550 1rem var(--sans); transition: transform .3s var(--ease), background .3s; }
+.play:hover span { transform: scale(1.05); background: rgb(255 255 255 / .2); }
+.play svg { width: 34px; height: 34px; padding: 9px; border-radius: 50%; background: #fff; color: #000; fill: #000; stroke: none; }
+.film-frame.playing .play { display: none; }
 
-/* tables */
-.table-wrap { overflow-x: auto; margin-top: 24px; border-radius: 16px; border: 1px solid var(--line); background: var(--card); }
-.band .table-wrap { background: rgb(255 255 255 / .04); border-color: rgb(255 255 255 / .14); }
-table { width: 100%; border-collapse: collapse; font-size: .9rem; text-align: left; }
-th, td { padding: 13px 16px; border-bottom: 1px solid var(--line); vertical-align: top; }
-.band th, .band td { border-bottom-color: rgb(255 255 255 / .1); }
-th { font: 600 .78rem var(--mono); text-transform: uppercase; letter-spacing: .08em; color: var(--ink-2); }
-tr:last-child td { border-bottom: 0; }
-.pill { display: inline-block; padding: 2px 9px; border-radius: 999px; font: 500 .74rem var(--mono); }
-.pill.ok { background: rgb(47 138 85 / .18); color: #1d6b3e; }
-.band .pill.ok { background: rgb(47 138 85 / .28); color: #8af0b3; }
-.pill.warn { background: rgb(196 59 90 / .16); color: #a12543; }
-.band .pill.warn { background: rgb(196 59 90 / .28); color: #ff9eb3; }
+/* proof strip */
+.proof { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1px; margin-top: 70px; border-radius: 18px; overflow: hidden; border: 1px solid var(--line); background: var(--line); }
+.proof div { padding: 26px 24px; background: var(--ink-2); }
+.proof b { display: block; font: 400 2.6rem/1 var(--serif); letter-spacing: -.02em; }
+.proof span { display: block; margin-top: 8px; font-size: .88rem; color: var(--text-3); line-height: 1.45; }
 
-/* diagram box */
-.diagram { margin-top: 28px; padding: 24px; border-radius: 20px; background: var(--card); border: 1px solid var(--line); overflow-x: auto; }
-.band .diagram { background: rgb(255 255 255 / .04); border-color: rgb(255 255 255 / .14); }
-.flow-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 12px; }
-.flow-step { padding: 16px; border-radius: 14px; border: 1px solid var(--line); background: var(--paper); }
-.flow-step b { display: block; font: 500 .72rem var(--mono); color: var(--amber-deep); text-transform: uppercase; letter-spacing: .08em; margin-bottom: 6px; }
-.flow-step strong { display: block; font-size: .95rem; margin-bottom: 4px; }
-.flow-step span { font-size: .84rem; color: var(--ink-2); }
+/* features */
+.tabs { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; margin-top: 44px; }
+.tab { padding: 10px 18px; border-radius: 999px; border: 1px solid var(--line-2); background: none; color: var(--text-2); font: 500 .92rem var(--sans); cursor: pointer; transition: all .2s; }
+.tab:hover { color: var(--text); border-color: rgb(255 255 255 / .3); }
+.tab[aria-selected="true"] { background: var(--text); color: var(--ink); border-color: var(--text); }
+.panel { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.7fr); gap: 48px; align-items: center; margin-top: 46px; }
+.panel[hidden] { display: none; }
+.panel ul { list-style: none; margin: 22px 0 0; padding: 0; }
+.panel li { position: relative; padding: 10px 0 10px 28px; border-top: 1px solid var(--line); color: var(--text-2); font-size: .97rem; }
+.panel li::before { content: ""; position: absolute; left: 4px; top: 19px; width: 8px; height: 8px; border-radius: 2px; background: var(--violet); transform: rotate(45deg); }
+.panel li b { color: var(--text); font-weight: 600; }
+.panel p { color: var(--text-2); margin: 12px 0 0; }
+.shot { border-radius: 14px; overflow: hidden; border: 1px solid var(--line-2); box-shadow: 0 40px 100px -40px rgb(0 0 0 / .9), 0 0 80px -40px rgb(91 108 255 / .5); background: var(--ink-2); }
+.shot img { width: 100%; height: auto; }
+.fade-in { animation: fade .5s var(--ease); }
+@keyframes fade { from { opacity: 0; transform: translateY(10px); } }
 
-/* prompt copy box */
-.copy-row { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-top: 12px; flex-wrap: wrap; }
-.copied { font: 500 .8rem var(--mono); color: var(--mint); }
-footer { padding: 48px 0 64px; border-top: 1px solid var(--line); font-size: .88rem; color: var(--ink-3); }
-@media (max-width: 720px) { .nav-links a:not(.btn) { display: none; } }
+/* assistant */
+.assistant { background: linear-gradient(180deg, transparent, rgb(91 108 255 / .05) 30%, rgb(139 92 246 / .07) 70%, transparent); }
+.split { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.25fr); gap: 64px; align-items: center; }
+.chat { display: grid; gap: 12px; margin-top: 30px; }
+.bubble { max-width: 92%; padding: 12px 16px; border-radius: 16px; font-size: .95rem; line-height: 1.5; }
+.bubble.me { justify-self: end; background: linear-gradient(135deg, #6d5cf6, #8b5cf6); color: #fff; border-bottom-right-radius: 5px; }
+.bubble.it { background: var(--panel); border: 1px solid var(--line-2); color: var(--text-2); border-bottom-left-radius: 5px; }
+.bubble.it b { color: var(--text); }
+.bubble .undo { display: inline-block; margin-top: 8px; font: 550 .8rem var(--sans); color: var(--lilac); }
+.flow { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; margin-top: 70px; }
+.step { padding: 24px; border-radius: 16px; border: 1px solid var(--line); background: var(--ink-2); }
+.step .n { font: 500 .74rem var(--mono); color: var(--lilac); letter-spacing: .1em; }
+.step h3 { margin-top: 10px; }
+.step p { margin: 8px 0 0; font-size: .92rem; color: var(--text-2); }
+.tools { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 26px; }
+.tools code { padding: 6px 10px; border-radius: 8px; background: var(--panel); border: 1px solid var(--line); font-size: .78rem; color: var(--text-2); }
+
+/* model */
+.bars { margin-top: 40px; display: grid; gap: 26px; }
+.bar-row header { display: flex; justify-content: space-between; align-items: baseline; gap: 16px; }
+.bar-row header span { color: var(--text-2); font-size: .95rem; }
+.bar-row header b { font: 400 2.6rem/1 var(--serif); }
+.bar-row small { display: block; color: var(--text-3); font-size: .82rem; }
+.track { position: relative; height: 10px; margin-top: 12px; border-radius: 999px; background: rgb(255 255 255 / .06); overflow: hidden; }
+.track i { position: absolute; inset: 0 auto 0 0; width: 0; border-radius: inherit; background: rgb(255 255 255 / .28); transition: width 1.6s var(--ease); }
+.track i.hot { background: var(--grad); box-shadow: 0 0 24px rgb(139 92 246 / .7); }
+.in .track i { width: var(--w); }
+.gate { position: absolute; top: -4px; bottom: -4px; left: 85%; width: 2px; background: var(--mint); opacity: .8; }
+.card { padding: 30px; border-radius: 20px; border: 1px solid var(--line-2); background: linear-gradient(180deg, var(--panel), var(--ink-2)); }
+.specs { display: grid; grid-template-columns: 1fr 1fr; gap: 1px; margin-top: 26px; border-radius: 14px; overflow: hidden; background: var(--line); border: 1px solid var(--line); }
+.specs div { padding: 14px 16px; background: var(--ink-2); }
+.specs dt { font: 500 .7rem var(--mono); letter-spacing: .1em; text-transform: uppercase; color: var(--text-3); }
+.specs dd { margin: 4px 0 0; font-size: .95rem; }
+.legend { margin-top: 18px; display: flex; gap: 18px; font-size: .8rem; color: var(--text-3); }
+.legend span::before { content: ""; display: inline-block; width: 10px; height: 2px; margin-right: 8px; vertical-align: middle; background: var(--mint); }
+
+/* architecture */
+.arch { margin-top: 50px; padding: clamp(18px, 3vw, 34px); border-radius: 22px; border: 1px solid var(--line); background: var(--ink-2); overflow-x: auto; }
+.arch svg { width: 100%; min-width: 760px; height: auto; stroke: none; }
+.arch .box { fill: var(--panel); stroke: rgb(255 255 255 / .14); stroke-width: 1; }
+.arch .grp { fill: rgb(255 255 255 / .02); stroke: rgb(255 255 255 / .08); stroke-width: 1; stroke-dasharray: 4 5; }
+.arch .hot { fill: rgb(139 92 246 / .14); stroke: rgb(167 139 250 / .6); stroke-width: 1; }
+.arch text { fill: var(--text); font: 550 14px var(--sans); }
+.arch .sub { fill: var(--text-3); font: 400 12px var(--sans); }
+.arch .lab { fill: var(--lilac); font: 500 11px var(--mono); letter-spacing: .12em; }
+.arch .ln { stroke: rgb(167 139 250 / .55); stroke-width: 1.5; fill: none; }
+.arch .ln.dash { stroke-dasharray: 5 5; }
+.arch .dot { fill: #a78bfa; }
+
+/* privacy */
+.ledger { margin-top: 44px; border-radius: 18px; overflow: hidden; border: 1px solid var(--line); }
+.ledger div { display: grid; grid-template-columns: 1.1fr 1fr 1.4fr; gap: 20px; padding: 16px 22px; border-top: 1px solid var(--line); font-size: .93rem; color: var(--text-2); }
+.ledger div:first-child { border: 0; background: var(--ink-2); font: 500 .72rem var(--mono); letter-spacing: .1em; text-transform: uppercase; color: var(--text-3); }
+.ledger b { color: var(--text); font-weight: 600; }
+.ledger .never { color: var(--mint); }
+
+/* plans */
+.plans { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; margin-top: 50px; }
+.plan { position: relative; padding: 34px; border-radius: 22px; border: 1px solid var(--line-2); background: var(--ink-2); }
+.plan.pro { background: linear-gradient(180deg, rgb(139 92 246 / .12), var(--ink-2) 60%); border-color: rgb(167 139 250 / .4); }
+.plan .price { margin-top: 16px; font: 400 3.2rem/1 var(--serif); }
+.plan .price small { font: 400 1rem var(--sans); color: var(--text-3); }
+.plan ul { list-style: none; margin: 24px 0 0; padding: 0; }
+.plan li { padding: 9px 0 9px 28px; position: relative; color: var(--text-2); font-size: .95rem; border-top: 1px solid var(--line); }
+.plan li::before { content: ""; position: absolute; left: 2px; top: 15px; width: 12px; height: 7px; border-left: 2px solid var(--mint); border-bottom: 2px solid var(--mint); transform: rotate(-45deg); }
+.plan .note { margin-top: 18px; font-size: .84rem; color: var(--text-3); }
+.promise { margin-top: 18px; padding: 18px 22px; border-radius: 16px; border: 1px solid var(--line); color: var(--text-2); font-size: .95rem; text-align: center; }
+.promise b { color: var(--text); }
+
+/* docs */
+.docs-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; margin-top: 46px; }
+.doc { display: block; padding: 24px; border-radius: 16px; border: 1px solid var(--line); background: var(--ink-2); text-decoration: none; transition: border-color .25s, transform .25s var(--ease), background .25s; }
+.doc:hover { border-color: rgb(167 139 250 / .5); transform: translateY(-3px); background: var(--panel); }
+.doc small { font: 500 .7rem var(--mono); letter-spacing: .12em; text-transform: uppercase; color: var(--lilac); }
+.doc h3 { margin-top: 10px; }
+.doc p { margin: 8px 0 0; font-size: .9rem; color: var(--text-2); }
+
+/* final */
+.final { text-align: center; overflow: hidden; isolation: isolate; }
+.final .icon { width: 96px; height: 96px; margin: 0 auto; border-radius: 22px; box-shadow: 0 30px 80px -10px rgb(139 92 246 / .8); }
+.install { display: inline-flex; align-items: center; gap: 12px; margin-top: 26px; padding: 10px 10px 10px 18px; border-radius: 12px; border: 1px solid var(--line-2); background: var(--ink-2); font: .85rem var(--mono); color: var(--text-2); }
+.install button { padding: 6px 12px; border-radius: 8px; border: 1px solid var(--line-2); background: var(--raise); color: var(--text); font: 500 .78rem var(--sans); cursor: pointer; }
+footer.site { padding: 40px 0 60px; border-top: 1px solid var(--line); color: var(--text-3); font-size: .86rem; }
+footer.site .wrap { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 16px; }
+footer.site nav { display: flex; gap: 20px; flex-wrap: wrap; }
+footer.site a { text-decoration: none; } footer.site a:hover { color: var(--text); }
+
+.reveal { opacity: 0; transform: translateY(24px); transition: opacity .9s var(--ease), transform .9s var(--ease); }
+.reveal.in { opacity: 1; transform: none; }
+
+@media (max-width: 960px) {
+  .panel, .split { grid-template-columns: 1fr; gap: 32px; }
+  .proof { grid-template-columns: 1fr 1fr; }
+  .flow, .docs-grid, .plans { grid-template-columns: 1fr; }
+  .ledger div { grid-template-columns: 1fr; gap: 4px; }
+  .ledger div:first-child { display: none; }
+}
+@media (max-width: 640px) {
+  .nav-links a:not(.btn) { display: none; }
+  .hero { padding-top: 120px; }
+  .window { --tilt: 0deg; --sc: 1; }
+  .specs { grid-template-columns: 1fr; }
+}
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation: none !important; transition: none !important; }
+  .reveal { opacity: 1; transform: none; }
+  .track i { width: var(--w); }
+}
 </style>
 </head>
 <body>
-<nav class="nav" aria-label="Hermione navigation">
-  <a class="brand" href="/"><img src="/p/hermione/icon.png" alt="">Hermione <small>by Mohamed Ansar</small></a>
-  <div class="nav-links">
-    <a href="#how-it-works">How it works</a>
-    <a href="#models">Models</a>
-    <a href="#gpus">GPUs &amp; Cost</a>
-    <a href="#technical">Technical</a>
-    <a href="#use-it" class="btn sm dark">Use Hermione</a>
+<a class="skip" href="#main">Skip to content</a>
+
+<header class="nav" id="nav">
+  <a class="brand" href="#top"><img src="/p/hermione/icon.png" alt="" width="26" height="26">Hermione</a>
+  <nav class="nav-links" aria-label="Sections">
+    <a href="#features">Features</a>
+    <a href="#assistant">Assistant</a>
+    <a href="#model">Model</a>
+    <a href="/p/hermione/docs/">Docs</a>
+    <a href="https://github.com/ansarbuilds/Hermione" target="_blank" rel="noopener">GitHub</a>
+    <a class="btn sm primary" href="#download">Download</a>
+  </nav>
+</header>
+
+<main id="main">
+<section class="hero" id="top">
+  <div class="orbs" aria-hidden="true"><i></i><i></i><i></i></div>
+  <div class="wrap" style="position:relative">
+    <img class="icon" src="/p/hermione/icon.png" alt="" width="84" height="84">
+    <span class="eyebrow">Version 0.3.0 · for macOS</span>
+    <h1>Your work, <em>on your Mac.</em></h1>
+    <p class="lead">Hermione is a project tracker and wiki in one app: boards, sprints, roadmaps and pages, kept in a single file you own. Press <kbd>⌘</kbd><kbd>J</kbd> and say what you want; it runs offline.</p>
+    <div class="hero-cta">
+      <a class="btn primary" href="#download"><svg viewBox="0 0 24 24"><path d="M12 4v12m0 0 5-5m-5 5-5-5M5 20h14"/></svg>Download for Mac <small>20 MB</small></a>
+      <a class="btn" href="/p/hermione/docs/">Read the docs</a>
+    </div>
+    <p class="hero-meta">Free · Apache-2.0 · Apple silicon · macOS 11+</p>
+    <div class="stage">
+      <div class="window" id="window">
+        <video autoplay muted loop playsinline preload="metadata" poster="/p/hermione/shots/board.webp" aria-label="Hermione's board, issue view and assistant in use">
+          <source src="/p/hermione/loop.mp4" type="video/mp4">
+        </video>
+      </div>
+      <div class="glow" aria-hidden="true"></div>
+    </div>
   </div>
-  <div class="scroll-meter" id="meter"></div>
-</nav>
+</section>
 
-<main>
-  <section class="hero wrap">
-    <a class="badge" href="https://github.com/ansarbuilds/Hermione/releases"><b>v0.2.0 · Apache-2.0</b> Signed Mac app + 2 live models on Hugging Face</a>
-    <h1>Your workspace, <em>offline</em>.<br>Your AI, <em>on-device</em>.</h1>
-    <p class="lead">Hermione is a local-first Jira + Confluence workspace for Mac — issues, kanban, sprints, roadmap, and a Markdown handbook — driven by custom fine-tuned 2B AI models (<strong>92.6% exact match</strong>) that run privately on your laptop via <code>llama.cpp</code>.</p>
-    <div class="ctas">
-      <a class="btn dark" href="https://github.com/ansarbuilds/Hermione/releases">Download Mac App (.dmg)</a>
-      <a class="btn" href="https://huggingface.co/ansarbuilds/hermione-models">Models on Hugging Face</a>
-      <a class="btn" href="https://github.com/ansarbuilds/Hermione">Source on GitHub</a>
+<section class="film" id="film">
+  <div class="wrap center">
+    <span class="eyebrow">The film · 58 seconds</span>
+    <h2>Meet <em>Hermione.</em></h2>
+    <div class="film-frame reveal" id="film-frame">
+      <video id="film-video" preload="none" playsinline poster="/p/hermione/poster.jpg" controls>
+        <source src="/p/hermione/film.mp4" type="video/mp4">
+      </video>
+      <button class="play" type="button" id="play" aria-label="Play the film with sound"><span><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>Play with sound</span></button>
     </div>
-
-    <div class="stats-grid">
-      <div class="stat"><strong>92.6%</strong><span>exact match on 500 unseen requests for <code>hermione-2b</code> (up from 47.2% base, 97.2% right tools)</span></div>
-      <div class="stat"><strong>91.2%</strong><span>exact match for <code>hermione-2b-web</code> with 21 tools including web research (up from 45.0%)</span></div>
-      <div class="stat"><strong>1.32 GB</strong><span>4-bit <code>Q4_K_M</code> GGUF — fits comfortably on an 8 GB Mac, zero cloud API fees</span></div>
-      <div class="stat"><strong>$288.66</strong><span>total build cost: $271.31 in Claude Code + $17.35 across A40, L40S, and H100 GPUs on Runpod</span></div>
+    <div class="proof reveal">
+      <div><b>1 file</b><span>Every project, issue and page, in a folder on your Mac</span></div>
+      <div><b>0</b><span>Accounts, trackers, or servers needed</span></div>
+      <div><b>21</b><span>Tools the assistant can use, each one undoable</span></div>
+      <div><b>92.6%</b><span>Exact-match accuracy for the 2B on-device model</span></div>
     </div>
+  </div>
+</section>
 
-    <div class="gallery-shell">
-      <div class="tabs" role="tablist" aria-label="Hermione screenshots">
-        <button class="tab" aria-pressed="true" data-src="/p/hermione/board-dark.jpg" data-cap="Sprint board in dark mode — drag cards, swimlanes, WIP limits, keyboard shortcuts, and ⌘J assistant.">Board (Dark)</button>
-        <button class="tab" aria-pressed="false" data-src="/p/hermione/board-light.jpg" data-cap="Sprint board in light mode — first-class light &amp; dark themes with 7 accent colours.">Board (Light)</button>
-        <button class="tab" aria-pressed="false" data-src="/p/hermione/home-light.jpg" data-cap="Home dashboard — your assigned work, active sprint progress, and project overview.">Home</button>
-        <button class="tab" aria-pressed="false" data-src="/p/hermione/issue-dark.jpg" data-cap="Issue detail — inline editing, child issues, links, work log, @mentions, and full history.">Issue</button>
-        <button class="tab" aria-pressed="false" data-src="/p/hermione/sprints-light.jpg" data-cap="Sprint planning — backlog ranking, points budget, burndown chart, and velocity.">Sprints</button>
-        <button class="tab" aria-pressed="false" data-src="/p/hermione/page-dark.jpg" data-cap="Handbook — visual Markdown editor, / menu, native SVG Mermaid diagrams, and version history.">Handbook</button>
-      </div>
-      <div class="shot-frame"><img id="shot-img" src="/p/hermione/board-dark.jpg" alt="Hermione sprint board"></div>
-      <p class="shot-cap" id="shot-cap">Sprint board in dark mode — drag cards, swimlanes, WIP limits, keyboard shortcuts, and ⌘J assistant.</p>
+<section id="features">
+  <div class="wrap center">
+    <span class="eyebrow">Everything in one place</span>
+    <h2>Plan it, write it, <em>ship it.</em></h2>
+    <p class="lead">The shapes you already know (a board, an issue, a page tree) rebuilt from scratch to be fast, keyboard-first and yours.</p>
+    <div class="tabs" role="tablist" aria-label="Features">
+      <button class="tab" role="tab" aria-selected="true" aria-controls="p-plan" id="t-plan">Planning</button>
+      <button class="tab" role="tab" aria-selected="false" aria-controls="p-issues" id="t-issues">Issues</button>
+      <button class="tab" role="tab" aria-selected="false" aria-controls="p-pages" id="t-pages">Pages</button>
+      <button class="tab" role="tab" aria-selected="false" aria-controls="p-reports" id="t-reports">Reports &amp; goals</button>
+      <button class="tab" role="tab" aria-selected="false" aria-controls="p-move" id="t-move">Getting around</button>
     </div>
-  </section>
-
-  <section id="how-it-works" class="wrap">
-    <span class="eyebrow">Plain-English Guide</span>
-    <h2>What CUDA, <code>llama.cpp</code>, and LoRA actually do.</h2>
-    <p class="lead">If you have never trained a local AI model before, here is the exact mental model behind how Hermione's assistant went from a generic 47% base model to a 92.6% specialist running on a MacBook.</p>
-
-    <div class="grid-2">
-      <div class="card">
-        <h3>What is CUDA? Is it on my Mac?</h3>
-        <p><strong>CUDA</strong> is NVIDIA's math engine that lets AI training run thousands of calculations in parallel on an NVIDIA GPU instead of one-by-one on a CPU. <strong>Macs do not have CUDA</strong> — Apple Silicon chips (M1–M4) use Apple's <strong>Metal</strong> instead. So we rent NVIDIA GPUs on Runpod (CUDA) for the heavy training, then export a single file that runs fast on your Mac (Metal).</p>
+  </div>
+  <div class="wrap" style="text-align:left">
+    <div class="panel" role="tabpanel" id="p-plan" aria-labelledby="t-plan">
+      <div>
+        <h3>Board, backlog, sprints, roadmap.</h3>
+        <p>Drag cards across your workflow, plan a sprint from the backlog, and see the quarter on a timeline.</p>
+        <ul>
+          <li><b>Workflow rules</b> decide what an issue needs before it moves.</li>
+          <li><b>Sprints</b> with a burndown, velocity, and a close that asks where unfinished work goes.</li>
+          <li><b>Triage</b> new work with single keys: <kbd>A</kbd> accept, <kbd>D</kbd> decline.</li>
+          <li><b>Releases</b> and a roadmap built from your epics.</li>
+        </ul>
+        <p><a href="/p/hermione/docs/planning/">Planning guide →</a></p>
       </div>
-      <div class="card">
-        <h3>What are <code>llama.cpp</code> and <code>.gguf</code>?</h3>
-        <p><strong><code>llama.cpp</code></strong> is a lightweight C++ runtime that executes AI models directly on a laptop without Python or cloud servers. <strong><code>.gguf</code></strong> is the compressed single-file format it reads — like an MP3 for AI weights. 4-bit quantization (<code>Q4_K_M</code>) shrinks a ~4 GB model to <strong>1.32 GB</strong> so it runs smoothly on an 8 GB Mac.</p>
-      </div>
-      <div class="card">
-        <h3>How does LoRA fine-tuning work?</h3>
-        <p>Instead of retraining all 2.23 billion weights from scratch, <strong>LoRA</strong> attaches a tiny trainable layer (21.8M parameters — under <strong>1%</strong> of the model). We show it 28,800 synthetic Hermione requests paired with exact tool calls, nudge only those weights until validation loss drops from <code>0.228</code> to <code>0.0056</code>, then merge them permanently into the model.</p>
-      </div>
-      <div class="card">
-        <h3>Why not just call ChatGPT or Claude?</h3>
-        <p><strong>Privacy &amp; zero per-message cost.</strong> Your issues, roadmap, and notes stay in one file on your machine and never hit a cloud API. A tiny 2B model specialized for Hermione's exact 21-tool schema responds in milliseconds and costs $0 to run forever.</p>
-      </div>
+      <div class="shot"><img src="/p/hermione/shots/board.webp" alt="The board with columns To do, In progress, In review and Done" loading="lazy" width="1800" height="1125"></div>
     </div>
-
-    <div class="diagram">
-      <div class="flow-row">
-        <div class="flow-step"><b>Step 1 · Data</b><strong>30,000 flashcards</strong><span>28,800 train / 600 val / 600 unseen test examples across 26+ Hermione intents.</span></div>
-        <div class="flow-step"><b>Step 2 · Baseline</b><strong>45–47% exact</strong><span>Untrained base model scored on 500 unseen requests before any training.</span></div>
-        <div class="flow-step"><b>Step 3 · Fine-tune</b><strong>Unsloth QLoRA</strong><span>1 epoch (1,800 steps) on Runpod NVIDIA GPUs, loss masked to assistant turns only.</span></div>
-        <div class="flow-step"><b>Step 4 · Export</b><strong>1.32 GB GGUF</strong><span>Merged to 16-bit and quantized to <code>Q4_K_M</code> with CUDA-built <code>llama.cpp</code>.</span></div>
-        <div class="flow-step"><b>Step 5 · Gate</b><strong>85%+ pass mark</strong><span>Final exam on 500 unseen requests. Below 85% is blocked from publishing.</span></div>
-        <div class="flow-step"><b>Step 6 · Ship</b><strong>Signed manifest</strong><span>Uploaded to Hugging Face, signed offline with Ed25519 on Mac, runs via Metal.</span></div>
+    <div class="panel" role="tabpanel" id="p-issues" aria-labelledby="t-issues" hidden>
+      <div>
+        <h3>Issues that keep their history.</h3>
+        <p>Every change is recorded on the issue, every list is filterable, and nothing is ever more than a keystroke away.</p>
+        <ul>
+          <li><b>Filters</b> like <code>assignee:me status:open priority:high</code>.</li>
+          <li><b>Subtasks, links, a work log</b> with a timer, attachments and comments.</li>
+          <li><b>Select rows</b> to change status, assignee, priority or sprint at once.</li>
+          <li><b>Automations</b> set priority, assign or label for you.</li>
+        </ul>
+        <p><a href="/p/hermione/docs/issues/">Issues guide →</a></p>
       </div>
+      <div class="shot"><img src="/p/hermione/shots/issue.webp" alt="An issue with its description, activity and Details panel" loading="lazy" width="1800" height="1125"></div>
     </div>
-
-    <div class="table-wrap">
-      <table>
-        <thead><tr><th>User says in ⌘J</th><th>Untrained base model (wrong)</th><th>Trained <code>hermione-2b</code> (exact)</th></tr></thead>
-        <tbody>
-          <tr><td><code>"and give it to Lucas"</code></td><td><code>update_issues(keys=["WEB-26"], assignee="@lucas")</code></td><td><code>update_issues(keys=["WEB-26"], assignee="lucas")</code></td></tr>
-          <tr><td><code>"pull ONB-2 into this sprint"</code></td><td><code>plan_sprint(keys=["ONB-2"], sprint="current")</code></td><td><code>update_issues(keys=["ONB-2"], sprint="current")</code></td></tr>
-          <tr><td><code>"her-4 is 5 points"</code></td><td><code>search_issues(text="HER-4")</code></td><td><code>update_issues(keys=["HER-4"], points=5)</code></td></tr>
-          <tr><td><code>"are we on track? please"</code></td><td><code>summarize(scope="project")</code></td><td><code>summarize(scope="sprint")</code></td></tr>
-          <tr><td><code>"hey, create a doc: interview questions"</code></td><td><code>draft(kind="retro")</code></td><td><code>create_page(title="Interview questions")</code></td></tr>
-        </tbody>
-      </table>
-    </div>
-  </section>
-
-  <section id="models" class="band">
-    <div class="wrap">
-      <span class="eyebrow">Models Trained</span>
-      <h2>Three models trained. Two shipped. One held back honestly.</h2>
-      <p class="lead">Every model faced the exact same 500-request held-out exam at <code>temperature=0</code>. Only models clearing the <strong>85% exact-match gate</strong> were uploaded to <a href="https://huggingface.co/ansarbuilds/hermione-models">ansarbuilds/hermione-models</a> and signed into <code>models.json</code>.</p>
-
-      <div class="table-wrap">
-        <table>
-          <thead><tr><th>Model</th><th>Base</th><th>Tools &amp; Target</th><th>Size</th><th>Base → Trained Exact</th><th>Right Tools</th><th>Status</th></tr></thead>
-          <tbody>
-            <tr>
-              <td><strong><code>hermione-2b</code></strong><br><small>Recommended</small></td>
-              <td><code>unsloth/Qwen3.5-2B</code></td>
-              <td>19 offline workspace tools · 8 GB+ Macs</td>
-              <td>1.32 GB</td>
-              <td>47.2% → <strong>92.6%</strong> (+45.4%)</td>
-              <td><strong>97.2%</strong></td>
-              <td><span class="pill ok">LIVE ON HF</span></td>
-            </tr>
-            <tr>
-              <td><strong><code>hermione-2b-web</code></strong></td>
-              <td><code>unsloth/Qwen3.5-2B</code></td>
-              <td>19 workspace + 2 web research tools · 8 GB+ Macs</td>
-              <td>1.32 GB</td>
-              <td>45.0% → <strong>91.2%</strong> (+46.2%)</td>
-              <td><strong>96.2%</strong></td>
-              <td><span class="pill ok">LIVE ON HF</span></td>
-            </tr>
-            <tr>
-              <td><strong><code>hermione-4b</code></strong></td>
-              <td><code>Qwen/Qwen3-4B-Instruct-2507</code></td>
-              <td>19 offline workspace tools · 16 GB+ Macs</td>
-              <td>2.40 GB</td>
-              <td>46.4% → <strong>74.8%</strong> (+28.4%)</td>
-              <td>76.8%</td>
-              <td><span class="pill warn">HELD BACK (&lt;85%)</span></td>
-            </tr>
-          </tbody>
-        </table>
+    <div class="panel" role="tabpanel" id="p-pages" aria-labelledby="t-pages" hidden>
+      <div>
+        <h3>A wiki that lives next to the work.</h3>
+        <p>Write in Markdown or the Visual editor. Pages link to issues and to each other, and diagrams draw themselves.</p>
+        <ul>
+          <li><b>Mermaid</b> flowcharts and sequence diagrams, right in the page.</li>
+          <li><b>Live issue lists</b> that update as work moves.</li>
+          <li><b>Templates</b>: meeting notes, decision records, retros, briefs.</li>
+          <li><b>Backlinks</b> and private pages. Export to Markdown or PDF.</li>
+        </ul>
+        <p><a href="/p/hermione/docs/pages/">Pages guide →</a></p>
       </div>
+      <div class="shot"><img src="/p/hermione/shots/diagrams.webp" alt="A page with a flowchart drawn from a mermaid block" loading="lazy" width="1800" height="1125"></div>
+    </div>
+    <div class="panel" role="tabpanel" id="p-reports" aria-labelledby="t-reports" hidden>
+      <div>
+        <h3>Know where things stand.</h3>
+        <p>Reports that answer real questions, goals that connect the quarter to the work, and one page for every project.</p>
+        <ul>
+          <li><b>Cycle and lead time</b>, cumulative flow, created vs resolved, sprint reports.</li>
+          <li><b>Quarterly goals</b> with linked epics and progress.</li>
+          <li><b>All projects</b> on one page: open and overdue issues, and each sprint's progress.</li>
+        </ul>
+        <p><a href="/p/hermione/docs/reports-and-goals/">Reports guide →</a></p>
+      </div>
+      <div class="shot"><img src="/p/hermione/shots/reports.webp" alt="Reports with cycle time and cumulative flow charts" loading="lazy" width="1800" height="1125"></div>
+    </div>
+    <div class="panel" role="tabpanel" id="p-move" aria-labelledby="t-move" hidden>
+      <div>
+        <h3>Built for the keyboard.</h3>
+        <p>Jump anywhere with <kbd>⌘</kbd><kbd>K</kbd>, capture from any app, and find issues from macOS Spotlight.</p>
+        <ul>
+          <li><b>Quick add</b> understands <code>bug: login fails p1 3pts friday</code>.</li>
+          <li><b>Undo history</b> (<kbd>⇧</kbd><kbd>⌘</kbd><kbd>H</kbd>) goes back several changes at once.</li>
+          <li><b>Import</b> from Jira, Linear, Trello or GitHub; export everything.</li>
+          <li><b>14 daily backups</b> and a 30-day Trash.</li>
+        </ul>
+        <p><a href="/p/hermione/docs/getting-around/">Getting around →</a></p>
+      </div>
+      <div class="shot"><img src="/p/hermione/shots/command-palette.webp" alt="The command palette open over the app" loading="lazy" width="1800" height="1125"></div>
+    </div>
+  </div>
+</section>
 
-      <div class="grid-2">
-        <div class="card">
-          <h3>Why <code>hermione-2b</code> &amp; <code>2b-web</code> excelled</h3>
-          <p><code>hermione-2b</code> hit <strong>100% accuracy</strong> on 14 of 26 categories (navigation, moves, priority, points, assignment, pages, drafts, comments, themes, archiving, and mid-thread corrections). <code>hermione-2b-web</code> hit 100% on 12 categories while citing source hostnames on multi-step web research.</p>
-        </div>
-        <div class="card">
-          <h3>Why <code>hermione-4b</code> was blocked at 74.8%</h3>
-          <p>On 23% of test requests, <code>Qwen3-4B-Instruct-2507</code> emitted literal <code>&lt;/tool_call&gt;\n\n&lt;/tool_call&gt;</code> tags without parsed calls — a Jinja chat-template / stop-token mismatch rather than a data problem (since both 2B models hit &gt;91% on the exact same dataset). The release gate did its job and blocked publication.</p>
-        </div>
+<section class="assistant" id="assistant">
+  <div class="wrap split">
+    <div>
+      <span class="eyebrow">The assistant · ⌘J</span>
+      <h2>Just <em>say it.</em></h2>
+      <p class="lead">Type what you want the way you'd tell a teammate. Hermione makes the change, tells you what it did, and puts <b>Undo</b> under every answer.</p>
+      <div class="chat" aria-label="An example conversation">
+        <div class="bubble me">Move HER-2 to done, make HER-5 urgent and give it to Priya</div>
+        <div class="bubble it"><b>Done.</b> HER-2 is in Done. HER-5 is now urgent and assigned to Priya.<br><span class="undo">↶ Undo this</span></div>
+        <div class="bubble me">What's left in the sprint?</div>
+        <div class="bubble it">Four issues, <b>11 points</b> left, with two days to go. Two are in review.</div>
       </div>
     </div>
-  </section>
-
-  <section id="gpus" class="wrap">
-    <span class="eyebrow">GPUs &amp; Transparent Cost</span>
-    <h2>Three cloud GPUs, 6 production bugs fixed, $288.66 total.</h2>
-    <p class="lead">Every pod was provisioned via <code>runpodctl</code> on Runpod Secure Cloud and terminated immediately after uploading so zero credit burned while idle.</p>
-
-    <div class="table-wrap">
-      <table>
-        <thead><tr><th>Pod / GPU</th><th>Specs</th><th>Rate</th><th>Speed</th><th>Model Trained</th><th>Notes</th></tr></thead>
-        <tbody>
-          <tr><td><strong>NVIDIA A40</strong></td><td>48 GB VRAM · 9 vCPU · 50 GB RAM</td><td>$0.59/hr</td><td>~7.0 s/step</td><td>Smoke test + <code>hermione-2b</code></td><td>Cheapest per hour, ~3h 39m for 1,800 steps. Caught 5 script/PyArrow bugs in smoke test.</td></tr>
-          <tr><td><strong>NVIDIA L40S</strong></td><td>48 GB VRAM · 16 vCPU · 188 GB RAM</td><td>$1.09/hr</td><td>~4.8 s/step</td><td><code>hermione-2b-web</code></td><td>45% faster (~2h 31m). First-try clean setup after repo fixes.</td></tr>
-          <tr><td><strong>NVIDIA H100 SXM</strong></td><td>80 GB HBM3 · 26 vCPU · 251 GB RAM</td><td>$4.39/hr</td><td>~2.6 s/step</td><td><code>hermione-4b</code></td><td>Nearly 3× faster (~1h 23m). Caught post-CUDA <code>datasets.map</code> fork deadlock on 26 vCPUs.</td></tr>
-        </tbody>
-      </table>
+    <div class="shot reveal"><img src="/p/hermione/shots/assistant-plan.webp" alt="The assistant showing a plan of six changes with Apply and Cancel" loading="lazy" width="1800" height="1125"></div>
+  </div>
+  <div class="wrap">
+    <div class="flow">
+      <div class="step reveal"><span class="n">01 · INSTANT</span><h3>A built-in engine</h3><p>Hand-written rules read keys, statuses, people, dates and points. It answers offline, in milliseconds, and needs no download.</p></div>
+      <div class="step reveal"><span class="n">02 · ON YOUR MAC</span><h3>A model, when it's needed</h3><p>Looser requests go to Hermione AI running on <code>127.0.0.1</code>, or to your own llama.cpp, Ollama or LM Studio.</p></div>
+      <div class="step reveal"><span class="n">03 · SAFE</span><h3>A plan for big changes</h3><p>More than five changes shows a plan first. Archiving and closing a sprint always ask. Every answer can be undone.</p></div>
     </div>
+    <div class="tools reveal" aria-label="The assistant's tools">
+      <code>create_issue</code><code>update_issues</code><code>search_issues</code><code>comment</code><code>archive_issues</code><code>create_sprint</code><code>plan_sprint</code><code>start_sprint</code><code>complete_sprint</code><code>create_page</code><code>draft</code><code>summarize</code><code>catch_up</code><code>navigate</code><code>set_theme</code><code>set_accent</code><code>set_density</code><code>set_text_size</code><code>toggle_sidebar</code><code>web_search</code><code>read_web_page</code>
+    </div>
+    <p class="center" style="margin-top:22px"><a href="/p/hermione/docs/assistant/">All 21 tools (19 for the workspace, 2 for the web), and how a request is handled →</a></p>
+  </div>
+</section>
 
-    <div class="grid-3">
-      <div class="card">
-        <h3>App &amp; ML Engineering</h3>
-        <p><strong>$271.31</strong> in Claude Code (Opus 5.5 — 442m API time, 709m wall time, 1,966 local requests) to build the entire Tauri + React + Rust workspace, CoreSpotlight bridge, Mermaid SVG engine, and ML kit.</p>
+<section id="model">
+  <div class="wrap split">
+    <div>
+      <span class="eyebrow">Hermione AI · 2B</span>
+      <h2>A small model, <em>trained for one job.</em></h2>
+      <p class="lead">Qwen3.5-2B, fine-tuned with QLoRA on 30,000 generated conversations about Hermione's own tools, then quantised to run on any Apple-silicon Mac. Scored on 500 requests it never saw.</p>
+      <dl class="specs">
+        <div><dt>Size</dt><dd>1.3 GB · Q4_K_M</dd></div>
+        <div><dt>Runs on</dt><dd>llama.cpp, bundled</dd></div>
+        <div><dt>Right tools</dt><dd>97.2%</dd></div>
+        <div><dt>Delivery</dt><dd>Ed25519-signed, SHA-256 checked</dd></div>
+      </dl>
+      <p style="margin-top:22px"><a href="https://huggingface.co/ansarbuilds/hermione-models" target="_blank" rel="noopener">Weights on Hugging Face</a> · <a href="/p/hermione/docs/models/">Model docs</a> · <a href="/p/hermione/docs/train-your-own/">Train your own</a></p>
+    </div>
+    <div class="card reveal" id="bars">
+      <div class="bars">
+        <div class="bar-row"><header><span>Qwen3.5-2B, as it comes<small>Exact tool calls, 500 held-out requests</small></span><b>47.2%</b></header><div class="track"><i style="--w:47.2%"></i><span class="gate"></span></div></div>
+        <div class="bar-row"><header><span>Hermione AI 2B<small>The same model, fine-tuned</small></span><b>92.6%</b></header><div class="track"><i class="hot" style="--w:92.6%"></i><span class="gate"></span></div></div>
+        <div class="bar-row"><header><span>Hermione AI 2B + Web<small>Also decides when to search</small></span><b>91.2%</b></header><div class="track"><i class="hot" style="--w:91.2%"></i><span class="gate"></span></div></div>
       </div>
-      <div class="card">
-        <h3>Cloud GPU Training</h3>
-        <p><strong>$17.35</strong> total on Runpod across A40, L40S, and H100 SXM for smoke tests and three full 30,000-example training runs ($2.42 credit remaining, $0/hr active).</p>
+      <div class="legend"><span>85% release gate: below it, a model isn't published</span></div>
+    </div>
+  </div>
+</section>
+
+<section id="architecture" style="padding-top:0">
+  <div class="wrap center">
+    <span class="eyebrow">Under the hood</span>
+    <h2>One path for <em>every change.</em></h2>
+    <p class="lead">A drag on the board and a sentence to the assistant go through the same rules in a shared TypeScript core, then a Rust store writes them atomically to your disk.</p>
+    <div class="arch reveal">
+      <svg viewBox="0 0 1000 380" role="img" aria-label="Architecture: the React window and the assistant call the shared core, which writes through the Rust store to your data folder; the assistant falls back to llama-server running Hermione AI on 127.0.0.1.">
+        <rect class="grp" x="10" y="20" width="300" height="340" rx="16"/>
+        <text class="lab" x="30" y="48">THE WINDOW · REACT</text>
+        <rect class="box" x="30" y="66" width="260" height="70" rx="12"/><text x="48" y="96">Board, issues, pages</text><text class="sub" x="48" y="118">Every view, keyboard-first</text>
+        <rect class="hot" x="30" y="156" width="260" height="70" rx="12"/><text x="48" y="186">Assistant · ⌘J</text><text class="sub" x="48" y="208">Says what it did, offers Undo</text>
+        <rect class="box" x="30" y="246" width="260" height="90" rx="12"/><text x="48" y="276">Built-in engine</text><text class="sub" x="48" y="298">Sentence → tool calls,</text><text class="sub" x="48" y="316">offline, in milliseconds</text>
+
+        <rect class="grp" x="350" y="20" width="300" height="340" rx="16"/>
+        <text class="lab" x="370" y="48">PACKAGES/CORE · TYPESCRIPT</text>
+        <rect class="hot" x="370" y="66" width="260" height="110" rx="12"/><text x="388" y="96">Workspace rules</text><text class="sub" x="388" y="118">Validate, apply, record history,</text><text class="sub" x="388" y="136">run automations, build the undo</text><text class="sub" x="388" y="154">patch</text>
+        <rect class="box" x="370" y="196" width="260" height="70" rx="12"/><text x="388" y="226">Tool executor and plans</text><text class="sub" x="388" y="248">21 tools · plan above 5 · max 25</text>
+        <rect class="box" x="370" y="286" width="260" height="50" rx="12"/><text x="388" y="316">Filters, reports, import, export</text>
+
+        <rect class="grp" x="690" y="20" width="300" height="340" rx="16"/>
+        <text class="lab" x="710" y="48">TAURI 2 SHELL · RUST</text>
+        <rect class="box" x="710" y="66" width="260" height="70" rx="12"/><text x="728" y="96">hermione-store</text><text class="sub" x="728" y="118">Atomic writes, 14 daily backups</text>
+        <rect class="hot" x="710" y="156" width="260" height="70" rx="12"/><text x="728" y="186">llama-server · 127.0.0.1</text><text class="sub" x="728" y="208">Hermione AI, signed + verified</text>
+        <rect class="box" x="710" y="246" width="260" height="90" rx="12"/><text x="728" y="276">macOS</text><text class="sub" x="728" y="298">Spotlight, notifications,</text><text class="sub" x="728" y="316">quick capture, menus</text>
+
+        <path class="ln" d="M290 101 H370"/><circle class="dot" cx="370" cy="101" r="3.5"/>
+        <path class="ln" d="M290 208 H330 V231 H370"/><circle class="dot" cx="370" cy="231" r="3.5"/>
+        <path class="ln" d="M500 196 V176"/><circle class="dot" cx="500" cy="176" r="3.5"/>
+        <path class="ln" d="M630 101 H710"/><circle class="dot" cx="710" cy="101" r="3.5"/>
+        <path class="ln dash" d="M160 226 V246"/>
+        <path class="ln dash" d="M290 186 H710"/><circle class="dot" cx="710" cy="186" r="3.5"/>
+        <rect x="532" y="178" width="112" height="16" rx="4" style="fill:#0d0d14"/>
+        <text class="sub" x="588" y="190" text-anchor="middle" style="fill:#c4b5fd">not understood →</text>
+      </svg>
+    </div>
+    <p style="margin-top:22px"><a href="/p/hermione/docs/architecture/">Read the architecture →</a></p>
+  </div>
+</section>
+
+<section id="privacy" style="padding-top:0">
+  <div class="wrap center">
+    <span class="eyebrow">Privacy, written down</span>
+    <h2>Everything that <em>can leave.</em></h2>
+    <p class="lead">No account, no analytics, no tracking. This is the whole list, and the same table is in the app under Settings → Privacy.</p>
+    <div class="ledger reveal" style="text-align:left">
+      <div><span>What</span><span>When</span><span>What's sent</span></div>
+      <div><b>Projects, issues, pages</b><span class="never">Never</span><span>Nothing</span></div>
+      <div><b>The assistant</b><span class="never">Never (built-in or Hermione AI)</span><span>Runs on this Mac</span></div>
+      <div><b>Web answers</b><span>Only if you turn them on</span><span>Search words and page addresses, never project data</span></div>
+      <div><b>Model download</b><span>When you click Download</span><span>A normal file download</span></div>
+      <div><b>Update check</b><span>When you choose Check for Updates</span><span>The app version</span></div>
+      <div><b>Diagnostics</b><span>Only when you paste them</span><span>Versions, counts, errors; no project text</span></div>
+    </div>
+    <p style="margin-top:22px"><a href="/p/hermione/docs/privacy-and-security/">Privacy and security →</a></p>
+  </div>
+</section>
+
+<section id="pricing" style="padding-top:0">
+  <div class="wrap center">
+    <span class="eyebrow">Free, and open source</span>
+    <h2>Every feature, <em>free forever.</em></h2>
+    <div class="plans" style="text-align:left">
+      <div class="plan reveal">
+        <h3>Hermione</h3>
+        <div class="price">Free</div>
+        <ul>
+          <li>The full app: board, backlog, sprints, roadmap, releases, pages, reports, goals</li>
+          <li>The built-in assistant, offline</li>
+          <li>Your own model through llama.cpp, Ollama or LM Studio, including Hermione's open weights</li>
+          <li>Import, export, backups and your data folder</li>
+        </ul>
       </div>
-      <div class="card">
-        <h3>Total Shipped Cost</h3>
-        <p><strong>$288.66</strong> end-to-end for a packaged macOS app, signed release manifest, and two >91%-accurate local AI models hosted publicly on Hugging Face.</p>
+      <div class="plan pro reveal">
+        <h3>Hermione Pro</h3>
+        <div class="price">CA$10 <small>a month · or CA$100 a year</small></div>
+        <ul>
+          <li><b>Hermione AI</b>: the trained model in one click, kept up to date</li>
+          <li><b>Hermione AI + Web</b>: looks things up; only search words leave</li>
+          <li><b>Sync</b> across Mac, iPad and iPhone, end-to-end encrypted (coming)</li>
+          <li>Priority support</li>
+        </ul>
+        <p class="note">Checkout is opening soon. A licence is a signed key checked on your Mac: no account.</p>
       </div>
     </div>
-  </section>
+    <p class="promise reveal"><b>Your data is never held hostage.</b> If Pro ends, every project, page and backup stays and keeps working.</p>
+  </div>
+</section>
 
-  <section id="technical" class="band">
-    <div class="wrap">
-      <span class="eyebrow">Technical Deep Dive</span>
-      <h2>Architecture, 21 tools, and 6 real GPU-run bugs we fixed.</h2>
-      <p class="lead">Built as a TypeScript + Rust monorepo (Tauri v2, React/Vite, Rust atomic store, Automerge CRDT scaffold, macOS CoreSpotlight via <code>objc2</code>, and Ed25519-signed model manifests).</p>
-
-      <div class="grid-2">
-        <div class="card">
-          <h3>The 21-Tool Function Surface</h3>
-          <p><strong>Navigation &amp; UI (6):</strong> <code>navigate</code>, <code>set_theme</code>, <code>set_accent</code>, <code>set_density</code>, <code>set_text_size</code>, <code>toggle_sidebar</code>.<br>
-          <strong>Issues (7):</strong> <code>search_issues</code>, <code>summarize</code>, <code>catch_up</code>, <code>create_issue</code>, <code>update_issues</code>, <code>comment</code>, <code>archive_issues</code>.<br>
-          <strong>Sprints &amp; Pages (6):</strong> <code>create_sprint</code>, <code>plan_sprint</code>, <code>start_sprint</code>, <code>complete_sprint</code>, <code>create_page</code>, <code>draft</code>.<br>
-          <strong>Web Research (+2):</strong> <code>web_search</code>, <code>read_web_page</code> (sanitized queries only, hostname citation enforced).</p>
-        </div>
-        <div class="card">
-          <h3>6 Live-Pod Bugs Caught &amp; Fixed</h3>
-          <p>1. Pre-loop <code>llama-server</code> build order (<code>--setup-only</code>) + missing <code>base.json</code> guard.<br>
-          2. Linux <code>sha256sum</code> fallback + <code>HfApi().upload_file()</code> replacing deprecated CLI.<br>
-          3. Ubuntu 24.04 PEP 668 <code>PIP_BREAK_SYSTEM_PACKAGES=1</code> + zipfile <code>+x</code> bits.<br>
-          4. Stopped <code>llama.cpp</code> reqs from overwriting CUDA PyTorch with <code>torch+cpu</code> &amp; added <code>/usr/local/cuda/bin</code> to <code>PATH</code>.<br>
-          5. Unwrapped <code>Qwen3VLProcessor</code> &amp; rendered templates before <code>Dataset.from_list</code> to stop PyArrow <code>null</code>-key schema bloat past 4,096 tokens.<br>
-          6. Fixed post-CUDA <code>datasets.map(num_proc=8)</code> fork deadlock on 26-vCPU H100 with <code>num_proc=1</code>.</p>
-        </div>
-      </div>
-
-      <div class="grid-2">
-        <div class="card">
-          <h3>Offline Ed25519 Manifest Verification</h3>
-          <p>The signing key (<code>~/.hermione-license/private.pem</code>) never touches a cloud pod. <code>scripts/license.mjs sign-manifest</code> signs <code>models.src.json</code> on the Mac and attaches <code>models.json</code> to GitHub Release <code>v0.2.0</code>. Hermione verifies both the Ed25519 signature and the exact SHA-256 digest before loading any <code>.gguf</code>.</p>
-        </div>
-        <div class="card">
-          <h3>Full Engineering Docs in Repo</h3>
-          <p>Read the complete visual walkthrough (<a href="https://github.com/ansarbuilds/Hermione/blob/main/docs/how-it-works.md"><code>docs/how-it-works.md</code></a>), full technical specification (<a href="https://github.com/ansarbuilds/Hermione/blob/main/docs/technical-deep-dive.md"><code>docs/technical-deep-dive.md</code></a>), and Runpod playbook (<a href="https://github.com/ansarbuilds/Hermione/blob/main/ml/POD.md"><code>ml/POD.md</code></a>).</p>
-        </div>
-      </div>
+<section id="docs" style="padding-top:0">
+  <div class="wrap center">
+    <span class="eyebrow">The docs</span>
+    <h2>Every corner, <em>explained.</em></h2>
+    <p class="lead">Eighteen pages with screenshots of every view, the assistant's tools, the model, and how to train your own.</p>
+    <div class="docs-grid" style="text-align:left">
+      <a class="doc reveal" href="/p/hermione/docs/install/"><small>Start</small><h3>Install</h3><p>Download, open, and your first project in two minutes.</p></a>
+      <a class="doc reveal" href="/p/hermione/docs/planning/"><small>Use</small><h3>Planning</h3><p>Board, backlog, sprints, triage, roadmap and releases.</p></a>
+      <a class="doc reveal" href="/p/hermione/docs/pages/"><small>Use</small><h3>Pages</h3><p>The wiki: Visual editing, diagrams, templates, backlinks.</p></a>
+      <a class="doc reveal" href="/p/hermione/docs/assistant/"><small>AI</small><h3>The assistant</h3><p>All 21 tools, plans, undo, and how a request is handled.</p></a>
+      <a class="doc reveal" href="/p/hermione/docs/train-your-own/"><small>AI</small><h3>Train your own</h3><p>Generate data, fine-tune, evaluate, export to GGUF.</p></a>
+      <a class="doc reveal" href="/p/hermione/docs/architecture/"><small>Build</small><h3>Architecture</h3><p>React, the shared core, Tauri, the store and the runtime.</p></a>
     </div>
-  </section>
+  </div>
+</section>
 
-  <section id="use-it" class="wrap">
-    <span class="eyebrow">Try It Yourself</span>
-    <h2>Download directly, or let your coding agent set it up.</h2>
-    <p class="lead">Hermione is free and Apache-2.0 open source. Run the signed Mac app or clone the repository with Claude Code, Codex, Gemini, or Cursor.</p>
-
-    <div class="grid-2">
-      <div class="card">
-        <h3>Option 1 · Download the Mac app</h3>
-        <p>Grab <code>Hermione_0.2.0_aarch64.dmg</code> from GitHub Releases, drag to Applications, right-click → <strong>Open</strong> once, then open <strong>Settings → Assistant</strong> to download <strong>Hermione AI 2B</strong> directly from Hugging Face.</p>
-        <div style="margin-top:16px"><a class="btn dark sm" href="https://github.com/ansarbuilds/Hermione/releases">Download v0.2.0 (.dmg)</a></div>
-      </div>
-      <div class="card">
-        <h3>Option 2 · Ask Claude / GPT / Gemini to run it</h3>
-        <p>Copy this prompt into your AI coding agent to clone, verify, and launch Hermione locally:</p>
-        <pre><code id="agent-prompt">Clone https://github.com/ansarbuilds/Hermione.git, run `pnpm install`, and launch Hermione locally with `pnpm desktop` (native app) or `pnpm dev` (browser at http://localhost:5173).</code></pre>
-        <div class="copy-row">
-          <button class="btn sm" id="copy-btn" type="button">Copy agent prompt</button>
-          <span class="copied" id="copy-msg" aria-live="polite"></span>
-        </div>
-      </div>
+<section class="final" id="download">
+  <div class="orbs" aria-hidden="true"><i></i><i></i><i></i></div>
+  <div class="wrap" style="position:relative">
+    <img class="icon" src="/p/hermione/icon.png" alt="" width="96" height="96">
+    <h2 style="margin-top:28px">Your work, <em>on your Mac.</em></h2>
+    <p class="lead">Free for macOS 11 and later on Apple silicon. About 20 MB.</p>
+    <div class="hero-cta">
+      <a class="btn primary" href="https://github.com/ansarbuilds/Hermione/releases/latest"><svg viewBox="0 0 24 24"><path d="M12 4v12m0 0 5-5m-5 5-5-5M5 20h14"/></svg>Download Hermione 0.3.0</a>
+      <a class="btn" href="/p/hermione/docs/install/">Install guide</a>
     </div>
-
-    <div class="card" style="margin-top:24px">
-      <h3>What's next</h3>
-      <p><strong>1. 30-day daily dogfooding:</strong> Use <code>hermione-2b</code> and <code>hermione-2b-web</code> on real work and feed missed phrasings back into <code>ml/generate_dataset.py</code>. &nbsp;<strong>2. Ship 4B models:</strong> Fix Qwen3-4B's <code>&lt;tool_call&gt;</code> template alignment for 16 GB+ Macs. &nbsp;<strong>3. Encrypted CRDT sync &amp; mobile:</strong> Turn on <code>hermione-sync</code> (Automerge) and the self-hostable relay for iPhone and iPad.</p>
-    </div>
-  </section>
+    <div class="install"><span>First open: right-click → Open</span><button type="button" id="copy-x" data-cmd="xattr -dr com.apple.quarantine /Applications/Hermione.app">Copy fix for “damaged”</button></div>
+  </div>
+</section>
 </main>
 
-<footer>
-  <div class="wrap" style="display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap">
-    <span>Hermione · Apache-2.0 · Built by <a href="/">Mohamed Ansar</a></span>
-    <span><a href="https://github.com/ansarbuilds/Hermione">GitHub</a> · <a href="https://huggingface.co/ansarbuilds/hermione-models">Hugging Face</a> · <a href="/work/">All projects</a></span>
+<footer class="site">
+  <div class="wrap">
+    <span>Hermione · Apache-2.0 · by <a href="/">Mohamed Ansar</a></span>
+    <nav aria-label="Links">
+      <a href="/p/hermione/docs/">Docs</a>
+      <a href="https://github.com/ansarbuilds/Hermione" target="_blank" rel="noopener">GitHub</a>
+      <a href="https://huggingface.co/ansarbuilds/hermione-models" target="_blank" rel="noopener">Hugging Face</a>
+      <a href="/p/hermione/docs/changelog/">Changelog</a>
+      <a href="/p/hermione/docs/privacy-and-security/">Privacy</a>
+    </nav>
   </div>
 </footer>
 
 <script>
-const meter = document.getElementById('meter');
-addEventListener('scroll', () => {
-  const h = document.documentElement.scrollHeight - innerHeight;
-  meter.style.transform = `scaleX(${h > 0 ? Math.min(1, scrollY / h) : 0})`;
-}, { passive: true });
+(() => {
+  const nav = document.getElementById("nav");
+  const win = document.getElementById("window");
+  const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const onScroll = () => {
+    nav.classList.toggle("scrolled", scrollY > 30);
+    if (!reduce && innerWidth > 640) {
+      const p = Math.min(1, scrollY / 520);
+      win.style.setProperty("--tilt", `${14 * (1 - p)}deg`);
+      win.style.setProperty("--sc", String(.94 + .06 * p));
+    }
+  };
+  addEventListener("scroll", onScroll, { passive: true });
+  onScroll();
 
-const img = document.getElementById('shot-img');
-const cap = document.getElementById('shot-cap');
-document.querySelectorAll('.tab').forEach(btn => {
-  btn.addEventListener('click', () => {
-    document.querySelectorAll('.tab').forEach(b => b.setAttribute('aria-pressed', 'false'));
-    btn.setAttribute('aria-pressed', 'true');
-    img.src = btn.dataset.src;
-    cap.textContent = btn.dataset.cap;
+  const io = new IntersectionObserver((es) => es.forEach((e) => { if (e.isIntersecting) { e.target.classList.add("in"); io.unobserve(e.target); } }), { threshold: .18 });
+  document.querySelectorAll(".reveal, #bars").forEach((el) => io.observe(el));
+
+  const tabs = [...document.querySelectorAll(".tab")];
+  const select = (t, focus) => {
+    tabs.forEach((x) => {
+      const on = x === t;
+      x.setAttribute("aria-selected", String(on));
+      x.tabIndex = on ? 0 : -1;
+      const panel = document.getElementById(x.getAttribute("aria-controls"));
+      panel.hidden = !on;
+      if (on) { panel.classList.remove("fade-in"); void panel.offsetWidth; panel.classList.add("fade-in"); }
+    });
+    if (focus) t.focus();
+  };
+  tabs.forEach((t, i) => {
+    t.tabIndex = i ? -1 : 0;
+    t.addEventListener("click", () => select(t));
+    t.addEventListener("keydown", (e) => {
+      if (e.key !== "ArrowRight" && e.key !== "ArrowLeft") return;
+      select(tabs[(i + (e.key === "ArrowRight" ? 1 : -1) + tabs.length) % tabs.length], true);
+    });
   });
-});
 
-document.getElementById('copy-btn').addEventListener('click', async () => {
-  const text = document.getElementById('agent-prompt').textContent;
-  try {
-    await navigator.clipboard.writeText(text);
-    document.getElementById('copy-msg').textContent = 'Copied!';
-    setTimeout(() => { document.getElementById('copy-msg').textContent = ''; }, 2000);
-  } catch {}
-});
+  const frame = document.getElementById("film-frame");
+  const video = document.getElementById("film-video");
+  document.getElementById("play").addEventListener("click", () => { frame.classList.add("playing"); video.play(); });
+  video.addEventListener("play", () => frame.classList.add("playing"));
+
+  const copy = document.getElementById("copy-x");
+  copy.addEventListener("click", async () => {
+    try { await navigator.clipboard.writeText(copy.dataset.cmd); copy.textContent = "Copied. Paste in Terminal"; }
+    catch { copy.textContent = copy.dataset.cmd; }
+  });
+})();
 </script>
 </body>
 </html>

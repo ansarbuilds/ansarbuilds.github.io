@@ -1,0 +1,135 @@
+<!doctype html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Your data · Hermione docs</title>
+<meta name="description" content="Where everything is saved, backups, undo, Trash, import, export and moving the data folder.">
+<link rel="canonical" href="https://ansarbuilds.dev/p/hermione/docs/your-data/">
+<meta property="og:title" content="Your data · Hermione docs">
+<meta property="og:description" content="Where everything is saved, backups, undo, Trash, import, export and moving the data folder.">
+<meta property="og:image" content="https://ansarbuilds.dev/p/hermione/og.jpg">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="icon" href="../assets/icon.png">
+<script>try{const t=localStorage.getItem("hermione-docs-theme")||(matchMedia("(prefers-color-scheme: light)").matches?"light":"dark");document.documentElement.dataset.theme=t}catch{}</script>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400..700&family=JetBrains+Mono:wght@400;500&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/site.css">
+</head>
+<body>
+<a class="skip" href="#content">Skip to content</a>
+<header class="top">
+  <button class="menu" type="button" aria-label="Open navigation" aria-expanded="false" aria-controls="sidebar"><svg viewBox="0 0 24 24"><path d="M4 7h16M4 12h16M4 17h16"/></svg></button>
+  <a class="brand" href="../introduction/"><img src="../assets/icon.png" alt="" width="26" height="26">Hermione <span>Docs</span></a>
+  <button class="search-open" type="button" aria-label="Search the docs"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg><span>Search</span><kbd>⌘K</kbd></button>
+  <nav class="top-links" aria-label="Elsewhere">
+    <a href="../../">Product</a>
+    <a href="https://huggingface.co/ansarbuilds/hermione-models" target="_blank" rel="noopener">Models</a>
+    <a href="https://github.com/ansarbuilds/Hermione" target="_blank" rel="noopener">GitHub</a>
+    <button class="theme" type="button" aria-label="Switch light or dark"><svg class="sun" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg><svg class="moon" viewBox="0 0 24 24"><path d="M20 14.5A8 8 0 0 1 9.5 4a8 8 0 1 0 10.5 10.5Z"/></svg></button>
+  </nav>
+</header>
+<div class="layout">
+  <aside class="sidebar" id="sidebar" aria-label="Docs"><div class="nav-group"><p>Get started</p><ul><li><a href="../introduction/">Introduction</a></li><li><a href="../install/">Install</a></li></ul></div><div class="nav-group"><p>Using Hermione</p><ul><li><a href="../planning/">Planning</a></li><li><a href="../issues/">Issues</a></li><li><a href="../pages/">Pages</a></li><li><a href="../getting-around/">Getting around</a></li><li><a href="../keyboard/">Keyboard</a></li><li><a href="../reports-and-goals/">Reports and goals</a></li><li><a href="../settings/">Settings</a></li><li><a href="../your-data/" aria-current="page">Your data</a></li></ul></div><div class="nav-group"><p>The assistant</p><ul><li><a href="../assistant/">The assistant</a></li><li><a href="../models/">Hermione AI models</a></li><li><a href="../train-your-own/">Train your own</a></li></ul></div><div class="nav-group"><p>Under the hood</p><ul><li><a href="../architecture/">Architecture</a></li><li><a href="../privacy-and-security/">Privacy and security</a></li></ul></div><div class="nav-group"><p>More</p><ul><li><a href="../pro/">Hermione Pro</a></li><li><a href="../faq/">FAQ and troubleshooting</a></li><li><a href="../changelog/">Changelog</a></li></ul></div>
+    <a class="sidebar-cta" href="../../#download">Download for Mac <span>v0.3.0</span></a>
+  </aside>
+  <main id="content" class="content">
+    <article>
+      <p class="crumb">Using Hermione</p>
+      <h1>Your data</h1>
+<p>Everything you make in Hermione is saved on your Mac, in files you can see, copy
+and back up. Nothing depends on a server or a plan.</p>
+<h2 id="where-it-lives"><a class="anchor" href="#where-it-lives" aria-label="Link to this section">#</a>Where it lives</h2>
+<div class="code"><button class="copy" type="button" aria-label="Copy">Copy</button><pre><code class="lang-text">~/Library/Application Support/com.ansarbuilds.hermione/
+├── workspace.json        every project, issue, page and setting
+├── backups/              one copy a day, the last 14 days
+├── attachments/          files attached to issues and pages
+└── models/               Hermione AI, if you downloaded it</code></pre></div>
+<p>Every change is saved at once, written to a temporary file first and then
+swapped in, so a crash or a full disk never leaves half a file. The browser
+version keeps the same data in the browser&#39;s IndexedDB.</p>
+<p><strong>Settings → Your data → Data folder</strong> moves everything to another folder, a
+synced one or an external drive, and the app follows it.</p>
+<h2 id="backups"><a class="anchor" href="#backups" aria-label="Link to this section">#</a>Backups</h2>
+<p>The first save each day copies the previous day&#39;s file into <code>backups/</code>; the
+newest 14 are kept. <strong>Settings → Your data → Backups</strong> lists them; <strong>Restore</strong>
+replaces the workspace with one (the current state is backed up first, so a
+restore can itself be undone).</p>
+<h2 id="undo"><a class="anchor" href="#undo" aria-label="Link to this section">#</a>Undo</h2>
+<p><strong>⌘Z</strong> and <strong>⇧⌘Z</strong> undo and redo any change, including the assistant&#39;s. <strong>⇧⌘H</strong>
+shows the last 30 changes in words and jumps back to any of them. See <a href="../getting-around/#undo-history">Undo
+history</a>.</p>
+<h2 id="trash"><a class="anchor" href="#trash" aria-label="Link to this section">#</a>Trash</h2>
+<p>Deleted issues and pages wait in <strong>Settings → Trash</strong> for 30 days, then go for
+good. <strong>Restore</strong> puts one back where it was, with its comments and history.
+<strong>Delete for good</strong> skips the wait.</p>
+<p><figure class="shot"><button class="zoom" type="button" aria-label="Enlarge: Trash"><img class="only-light" src="../assets/img/settings-trash-light.webp" alt="Trash" loading="lazy" width="2000" height="1250"><img class="only-dark" src="../assets/img/settings-trash-dark.webp" alt="Trash" loading="lazy" width="2000" height="1250"></button><figcaption>Trash</figcaption></figure></p>
+<h2 id="import"><a class="anchor" href="#import" aria-label="Link to this section">#</a>Import</h2>
+<p><strong>Settings → Your data → Import</strong>:</p>
+<div class="table"><table>
+<thead>
+<tr>
+<th>From</th>
+<th>File</th>
+<th>What comes across</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Jira</td>
+<td>CSV export</td>
+<td>Issues, types, statuses, priorities, assignees, labels, estimates, due dates, parents</td>
+</tr>
+<tr>
+<td>Linear</td>
+<td>CSV export</td>
+<td>The same</td>
+</tr>
+<tr>
+<td>Trello</td>
+<td>Board JSON</td>
+<td>Cards as issues, lists as statuses, labels, members, due dates, checklists</td>
+</tr>
+<tr>
+<td>GitHub</td>
+<td>Issues JSON (<code>gh issue list --json …</code>)</td>
+<td>Issues, labels, assignees, open or closed</td>
+</tr>
+<tr>
+<td>Hermione</td>
+<td>CSV, or a full JSON export</td>
+<td>Everything</td>
+</tr>
+</tbody></table>
+</div><p>Statuses are matched by meaning, so &quot;Closed&quot;, &quot;Done&quot; and &quot;Resolved&quot; all land in
+your <em>Done</em> category.</p>
+<h2 id="export"><a class="anchor" href="#export" aria-label="Link to this section">#</a>Export</h2>
+<p><strong>Settings → Your data → Export</strong>:</p>
+<ul>
+<li><strong>Everything (JSON)</strong>: the complete workspace, re-importable exactly.</li>
+<li><strong>Everything as Markdown (zip)</strong>: pages as nested Markdown files, issues as
+Markdown files with their fields as frontmatter, and links as <code>[[wiki links]]</code>,
+ready for Obsidian or any Markdown folder.</li>
+<li><strong>Issues (CSV)</strong>: for a spreadsheet.</li>
+<li><strong>A page</strong> as Markdown or PDF, from the page itself.</li>
+</ul>
+<h2 id="reset"><a class="anchor" href="#reset" aria-label="Link to this section">#</a>Reset</h2>
+<p><strong>Settings → Your data → Reset the sample</strong> puts the sample project back as it
+was. <strong>Danger zone</strong> removes a project, after asking.</p>
+
+      <footer class="pager">
+        <a class="prev" href="../settings/"><span>Previous</span>Settings</a>
+        <a class="next" href="../assistant/"><span>Next</span>The assistant</a>
+      </footer>
+      <p class="edit"><a href="https://github.com/ansarbuilds/Hermione/blob/main/docs/guide/your-data.md" target="_blank" rel="noopener">Edit this page on GitHub</a></p>
+    </article>
+  </main>
+  <nav class="toc" aria-label="On this page"><p>On this page</p><ul><li><a href="#where-it-lives">Where it lives</a></li><li><a href="#backups">Backups</a></li><li><a href="#undo">Undo</a></li><li><a href="#trash">Trash</a></li><li><a href="#import">Import</a></li><li><a href="#export">Export</a></li><li><a href="#reset">Reset</a></li></ul></nav>
+</div>
+<dialog class="search" aria-label="Search">
+  <div class="search-box"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg><input type="search" placeholder="Search the docs" aria-label="Search the docs" autocomplete="off" spellcheck="false"><kbd>esc</kbd></div>
+  <ul class="results" role="listbox"></ul>
+</dialog>
+<dialog class="lightbox" aria-label="Screenshot"><img alt=""></dialog>
+<script type="module" src="../assets/site.js"></script>
+</body>
+</html>
