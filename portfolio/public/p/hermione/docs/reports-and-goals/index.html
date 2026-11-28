@@ -1,0 +1,113 @@
+<!doctype html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Reports and goals · Hermione docs</title>
+<meta name="description" content="Cycle and lead time, cumulative flow, created vs resolved, sprint reports, quarterly goals and all projects.">
+<link rel="canonical" href="https://ansarbuilds.dev/p/hermione/docs/reports-and-goals/">
+<meta property="og:title" content="Reports and goals · Hermione docs">
+<meta property="og:description" content="Cycle and lead time, cumulative flow, created vs resolved, sprint reports, quarterly goals and all projects.">
+<meta property="og:image" content="https://ansarbuilds.dev/p/hermione/og.jpg">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="icon" href="../assets/icon.png">
+<script>try{const t=localStorage.getItem("hermione-docs-theme")||(matchMedia("(prefers-color-scheme: light)").matches?"light":"dark");document.documentElement.dataset.theme=t}catch{}</script>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400..700&family=JetBrains+Mono:wght@400;500&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/site.css">
+</head>
+<body>
+<a class="skip" href="#content">Skip to content</a>
+<header class="top">
+  <button class="menu" type="button" aria-label="Open navigation" aria-expanded="false" aria-controls="sidebar"><svg viewBox="0 0 24 24"><path d="M4 7h16M4 12h16M4 17h16"/></svg></button>
+  <a class="brand" href="../introduction/"><img src="../assets/icon.png" alt="" width="26" height="26">Hermione <span>Docs</span></a>
+  <button class="search-open" type="button" aria-label="Search the docs"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg><span>Search</span><kbd>⌘K</kbd></button>
+  <nav class="top-links" aria-label="Elsewhere">
+    <a href="../../">Product</a>
+    <a href="https://huggingface.co/ansarbuilds/hermione-models" target="_blank" rel="noopener">Models</a>
+    <a href="https://github.com/ansarbuilds/Hermione" target="_blank" rel="noopener">GitHub</a>
+    <button class="theme" type="button" aria-label="Switch light or dark"><svg class="sun" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg><svg class="moon" viewBox="0 0 24 24"><path d="M20 14.5A8 8 0 0 1 9.5 4a8 8 0 1 0 10.5 10.5Z"/></svg></button>
+  </nav>
+</header>
+<div class="layout">
+  <aside class="sidebar" id="sidebar" aria-label="Docs"><div class="nav-group"><p>Get started</p><ul><li><a href="../introduction/">Introduction</a></li><li><a href="../install/">Install</a></li></ul></div><div class="nav-group"><p>Using Hermione</p><ul><li><a href="../planning/">Planning</a></li><li><a href="../issues/">Issues</a></li><li><a href="../pages/">Pages</a></li><li><a href="../getting-around/">Getting around</a></li><li><a href="../keyboard/">Keyboard</a></li><li><a href="../reports-and-goals/" aria-current="page">Reports and goals</a></li><li><a href="../settings/">Settings</a></li><li><a href="../your-data/">Your data</a></li></ul></div><div class="nav-group"><p>The assistant</p><ul><li><a href="../assistant/">The assistant</a></li><li><a href="../models/">Hermione AI models</a></li><li><a href="../train-your-own/">Train your own</a></li></ul></div><div class="nav-group"><p>Under the hood</p><ul><li><a href="../architecture/">Architecture</a></li><li><a href="../privacy-and-security/">Privacy and security</a></li></ul></div><div class="nav-group"><p>More</p><ul><li><a href="../pro/">Hermione Pro</a></li><li><a href="../faq/">FAQ and troubleshooting</a></li><li><a href="../changelog/">Changelog</a></li></ul></div>
+    <a class="sidebar-cta" href="../../#download">Download for Mac <span>v0.3.0</span></a>
+  </aside>
+  <main id="content" class="content">
+    <article>
+      <p class="crumb">Using Hermione</p>
+      <h1>Reports and goals</h1>
+<h2 id="reports"><a class="anchor" href="#reports" aria-label="Link to this section">#</a>Reports</h2>
+<p><strong>G</strong> then <strong>T</strong>. How long work takes and how it flows, worked out from every
+issue&#39;s history. Pick a window of 14, 30, 90 or 180 days.</p>
+<p><figure class="shot"><button class="zoom" type="button" aria-label="Enlarge: Reports"><img class="only-light" src="../assets/img/reports-light.webp" alt="Reports" loading="lazy" width="2000" height="1250"><img class="only-dark" src="../assets/img/reports-dark.webp" alt="Reports" loading="lazy" width="2000" height="1250"></button><figcaption>Reports</figcaption></figure></p>
+<div class="table"><table>
+<thead>
+<tr>
+<th>Number or chart</th>
+<th>Means</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>Median cycle time</strong></td>
+<td>From an issue starting (first moved into a started status) to finishing</td>
+</tr>
+<tr>
+<td><strong>Median lead time</strong></td>
+<td>From an issue being created to finishing</td>
+</tr>
+<tr>
+<td><strong>Issues finished / opened</strong></td>
+<td>In the window</td>
+</tr>
+<tr>
+<td><strong>Cumulative flow</strong></td>
+<td>Issues in each status category, day by day. A widening middle band means work starts faster than it finishes</td>
+</tr>
+<tr>
+<td><strong>Created vs resolved</strong></td>
+<td>New issues against finished ones, day by day</td>
+</tr>
+</tbody></table>
+</div><p>Every chart has <strong>Show as a table</strong> for the numbers behind it, and the colours
+are checked for colour blindness in both themes.</p>
+<p>A median shows a dash until at least one issue has both started and finished in
+the window.</p>
+<h2 id="sprint-reports"><a class="anchor" href="#sprint-reports" aria-label="Link to this section">#</a>Sprint reports</h2>
+<p>Each completed sprint keeps a report on the <strong>Sprints</strong> page: what was committed,
+what was finished, what was carried over and what was added after the start, with
+its burndown. <strong>Velocity</strong> compares the points finished across your recent
+sprints. The assistant can turn a sprint report into a retro page: &quot;draft a retro
+for the last sprint&quot;.</p>
+<h2 id="goals"><a class="anchor" href="#goals" aria-label="Link to this section">#</a>Goals</h2>
+<p><strong>G</strong> then <strong>O</strong>. Quarterly goals, each linked to the epics that deliver it. A
+goal&#39;s progress is the share of its epics&#39; issues that are done, so it moves as
+the work does, with nothing to update by hand.</p>
+<p><figure class="shot"><button class="zoom" type="button" aria-label="Enlarge: Goals"><img class="only-light" src="../assets/img/goals-light.webp" alt="Goals" loading="lazy" width="2000" height="1250"><img class="only-dark" src="../assets/img/goals-dark.webp" alt="Goals" loading="lazy" width="2000" height="1250"></button><figcaption>Goals</figcaption></figure></p>
+<ol>
+<li><strong>Add goal</strong>, with a title and the quarter.</li>
+<li><strong>Link an epic</strong> from the goal&#39;s card.</li>
+<li>Watch it fill.</li>
+</ol>
+<h2 id="all-projects"><a class="anchor" href="#all-projects" aria-label="Link to this section">#</a>All projects</h2>
+<p>The project menu → <strong>All projects</strong>: every project on one page with its open and
+overdue issues and the running sprint&#39;s progress. Click one to open it.</p>
+<p><figure class="shot"><button class="zoom" type="button" aria-label="Enlarge: All projects"><img class="only-light" src="../assets/img/portfolio-light.webp" alt="All projects" loading="lazy" width="2000" height="1250"><img class="only-dark" src="../assets/img/portfolio-dark.webp" alt="All projects" loading="lazy" width="2000" height="1250"></button><figcaption>All projects</figcaption></figure></p>
+
+      <footer class="pager">
+        <a class="prev" href="../keyboard/"><span>Previous</span>Keyboard</a>
+        <a class="next" href="../settings/"><span>Next</span>Settings</a>
+      </footer>
+      <p class="edit"><a href="https://github.com/ansarbuilds/Hermione/blob/main/docs/guide/reports-and-goals.md" target="_blank" rel="noopener">Edit this page on GitHub</a></p>
+    </article>
+  </main>
+  <nav class="toc" aria-label="On this page"><p>On this page</p><ul><li><a href="#reports">Reports</a></li><li><a href="#sprint-reports">Sprint reports</a></li><li><a href="#goals">Goals</a></li><li><a href="#all-projects">All projects</a></li></ul></nav>
+</div>
+<dialog class="search" aria-label="Search">
+  <div class="search-box"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg><input type="search" placeholder="Search the docs" aria-label="Search the docs" autocomplete="off" spellcheck="false"><kbd>esc</kbd></div>
+  <ul class="results" role="listbox"></ul>
+</dialog>
+<dialog class="lightbox" aria-label="Screenshot"><img alt=""></dialog>
+<script type="module" src="../assets/site.js"></script>
+</body>
+</html>

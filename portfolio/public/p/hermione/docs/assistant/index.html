@@ -1,0 +1,311 @@
+<!doctype html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>The assistant · Hermione docs</title>
+<meta name="description" content="⌘J, what you can ask, every tool it can use, plans and undo, and how it decides between the built-in engine and a model.">
+<link rel="canonical" href="https://ansarbuilds.dev/p/hermione/docs/assistant/">
+<meta property="og:title" content="The assistant · Hermione docs">
+<meta property="og:description" content="⌘J, what you can ask, every tool it can use, plans and undo, and how it decides between the built-in engine and a model.">
+<meta property="og:image" content="https://ansarbuilds.dev/p/hermione/og.jpg">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="icon" href="../assets/icon.png">
+<script>try{const t=localStorage.getItem("hermione-docs-theme")||(matchMedia("(prefers-color-scheme: light)").matches?"light":"dark");document.documentElement.dataset.theme=t}catch{}</script>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400..700&family=JetBrains+Mono:wght@400;500&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/site.css">
+</head>
+<body>
+<a class="skip" href="#content">Skip to content</a>
+<header class="top">
+  <button class="menu" type="button" aria-label="Open navigation" aria-expanded="false" aria-controls="sidebar"><svg viewBox="0 0 24 24"><path d="M4 7h16M4 12h16M4 17h16"/></svg></button>
+  <a class="brand" href="../introduction/"><img src="../assets/icon.png" alt="" width="26" height="26">Hermione <span>Docs</span></a>
+  <button class="search-open" type="button" aria-label="Search the docs"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg><span>Search</span><kbd>⌘K</kbd></button>
+  <nav class="top-links" aria-label="Elsewhere">
+    <a href="../../">Product</a>
+    <a href="https://huggingface.co/ansarbuilds/hermione-models" target="_blank" rel="noopener">Models</a>
+    <a href="https://github.com/ansarbuilds/Hermione" target="_blank" rel="noopener">GitHub</a>
+    <button class="theme" type="button" aria-label="Switch light or dark"><svg class="sun" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg><svg class="moon" viewBox="0 0 24 24"><path d="M20 14.5A8 8 0 0 1 9.5 4a8 8 0 1 0 10.5 10.5Z"/></svg></button>
+  </nav>
+</header>
+<div class="layout">
+  <aside class="sidebar" id="sidebar" aria-label="Docs"><div class="nav-group"><p>Get started</p><ul><li><a href="../introduction/">Introduction</a></li><li><a href="../install/">Install</a></li></ul></div><div class="nav-group"><p>Using Hermione</p><ul><li><a href="../planning/">Planning</a></li><li><a href="../issues/">Issues</a></li><li><a href="../pages/">Pages</a></li><li><a href="../getting-around/">Getting around</a></li><li><a href="../keyboard/">Keyboard</a></li><li><a href="../reports-and-goals/">Reports and goals</a></li><li><a href="../settings/">Settings</a></li><li><a href="../your-data/">Your data</a></li></ul></div><div class="nav-group"><p>The assistant</p><ul><li><a href="../assistant/" aria-current="page">The assistant</a></li><li><a href="../models/">Hermione AI models</a></li><li><a href="../train-your-own/">Train your own</a></li></ul></div><div class="nav-group"><p>Under the hood</p><ul><li><a href="../architecture/">Architecture</a></li><li><a href="../privacy-and-security/">Privacy and security</a></li></ul></div><div class="nav-group"><p>More</p><ul><li><a href="../pro/">Hermione Pro</a></li><li><a href="../faq/">FAQ and troubleshooting</a></li><li><a href="../changelog/">Changelog</a></li></ul></div>
+    <a class="sidebar-cta" href="../../#download">Download for Mac <span>v0.3.0</span></a>
+  </aside>
+  <main id="content" class="content">
+    <article>
+      <p class="crumb">The assistant</p>
+      <h1>The assistant</h1>
+<p>Press <strong>⌘J</strong> (or the sparkle button, bottom right) and type what you want, the
+way you&#39;d tell a teammate. Hermione makes the change and tells you what it did,
+with <strong>Undo</strong> under every answer.</p>
+<p><figure class="shot"><button class="zoom" type="button" aria-label="Enlarge: The assistant creating an issue"><img class="only-light" src="../assets/img/assistant-create-light.webp" alt="The assistant creating an issue" loading="lazy" width="2000" height="1250"><img class="only-dark" src="../assets/img/assistant-create-dark.webp" alt="The assistant creating an issue" loading="lazy" width="2000" height="1250"></button><figcaption>The assistant creating an issue</figcaption></figure></p>
+<p>It works offline, out of the box. Nothing you type is sent anywhere unless you
+turn on web answers, and even then only the search words go.</p>
+<h2 id="what-you-can-ask"><a class="anchor" href="#what-you-can-ask" aria-label="Link to this section">#</a>What you can ask</h2>
+<div class="table"><table>
+<thead>
+<tr>
+<th>Say</th>
+<th>It does</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>create a bug: export button does nothing, high priority, for @noah due friday</code></td>
+<td>One issue with the type, priority, assignee and due date set</td>
+</tr>
+<tr>
+<td><code>move HER-5 to done and assign HER-2 to me</code></td>
+<td>Two changes, one Undo</td>
+</tr>
+<tr>
+<td><code>make it urgent</code> (with an issue open)</td>
+<td>&quot;it&quot; and &quot;this&quot; mean the issue on screen</td>
+</tr>
+<tr>
+<td><code>plan the next sprint with 20 points</code></td>
+<td>Fills the next sprint from the top of the backlog until 20 points</td>
+</tr>
+<tr>
+<td><code>start the next sprint</code> · <code>complete the sprint, move the rest to the backlog</code></td>
+<td>Runs the sprint; completing asks first</td>
+</tr>
+<tr>
+<td><code>what&#39;s assigned to me?</code> · <code>overdue bugs</code></td>
+<td>Lists matching issues</td>
+</tr>
+<tr>
+<td><code>how is the sprint going?</code></td>
+<td>A summary: points done, what&#39;s late, what&#39;s at risk</td>
+</tr>
+<tr>
+<td><code>catch me up on HER-3</code> · <code>what happened this week?</code></td>
+<td>The changes and comments since, in a few lines</td>
+</tr>
+<tr>
+<td><code>draft a retro for the last sprint</code> · <code>draft release notes</code> · <code>write a status update</code></td>
+<td>A new page written from the project&#39;s real data</td>
+</tr>
+<tr>
+<td><code>write a page called Release checklist</code></td>
+<td>A new page</td>
+</tr>
+<tr>
+<td><code>comment on HER-4: shipped in 0.3</code></td>
+<td>A comment</td>
+</tr>
+<tr>
+<td><code>archive HER-7 and HER-8</code></td>
+<td>Archives them, after asking</td>
+</tr>
+<tr>
+<td><code>switch to dark mode</code> · <code>make the text bigger</code> · <code>use violet</code></td>
+<td>Changes the app</td>
+</tr>
+<tr>
+<td><code>go to the roadmap</code> · <code>open HER-12</code></td>
+<td>Takes you there</td>
+</tr>
+</tbody></table>
+</div><p>Corrections work too: after &quot;move HER-2 to review&quot;, &quot;oops, I meant in progress&quot;
+fixes it.</p>
+<h2 id="plans-before-big-changes"><a class="anchor" href="#plans-before-big-changes" aria-label="Link to this section">#</a>Plans before big changes</h2>
+<p>When one request would change more than five things, or a model proposes more
+than one change, Hermione shows the plan first: every step in words, each with a
+tick box. Untick what you don&#39;t want, then <strong>Apply</strong>, or <strong>Cancel</strong>.</p>
+<p><figure class="shot"><button class="zoom" type="button" aria-label="Enlarge: A plan before applying"><img class="only-light" src="../assets/img/assistant-plan-light.webp" alt="A plan before applying" loading="lazy" width="2000" height="1250"><img class="only-dark" src="../assets/img/assistant-plan-dark.webp" alt="A plan before applying" loading="lazy" width="2000" height="1250"></button><figcaption>A plan before applying</figcaption></figure></p>
+<p>Some things always ask first, whatever their size: archiving issues and
+completing a sprint. One request can never change more than 25 things.</p>
+<h2 id="undo"><a class="anchor" href="#undo" aria-label="Link to this section">#</a>Undo</h2>
+<p>Every answer that changed something has <strong>Undo this</strong> (or <strong>Undo these 6
+changes</strong>), and everything the assistant does also goes into the normal undo
+history (<strong>⌘Z</strong>, <strong>⇧⌘H</strong>) and each issue&#39;s <strong>History</strong>. Fields the assistant set
+carry a small mark with the sentence that set them.</p>
+<h2 id="how-it-understands-you"><a class="anchor" href="#how-it-understands-you" aria-label="Link to this section">#</a>How it understands you</h2>
+<p>The assistant has two engines, and uses them in order.</p>
+<figure class="diagram"><pre class="mermaid">flowchart TB
+  A[Your sentence] --&gt; B{Built-in engine understands it?}
+  B --&gt;|yes| C[Tool calls]
+  B --&gt;|no| D{A model is set up?}
+  D --&gt;|yes| E[Model on this Mac] --&gt; C
+  D --&gt;|no| F[Asks you to rephrase, with examples]
+  C --&gt; G{More than 5 changes, or several from a model?}
+  G --&gt;|yes| H[Plan: tick, Apply]
+  G --&gt;|no| I[Runs, with Undo]
+  H --&gt; I</pre></figure>
+<ol>
+<li><strong>The built-in engine</strong> reads common sentences with hand-written rules: issue
+keys, statuses by meaning (&quot;finished&quot;, &quot;shipped&quot;, &quot;wip&quot;), priorities (&quot;p1&quot;,
+&quot;urgent&quot;, &quot;blocker&quot;), people (&quot;me&quot;, &quot;@noah&quot;, &quot;Priya&quot;), dates (&quot;friday&quot;, &quot;end of
+the week&quot;, &quot;in 3 days&quot;, &quot;dec 3&quot;), points, labels and sprints. It answers in
+milliseconds, offline, with no model at all. This is what you get by default.</li>
+<li><strong>A model</strong>, if one is set up, for anything the engine can&#39;t place: vague
+requests, long sentences with several things in them, questions. It sees the
+same tools and a short description of the project, and answers with tool
+calls. Choose one in <strong>Settings → Assistant</strong>:<ul>
+<li><strong>Hermione AI</strong> (Pro): Hermione&#39;s own model, trained for exactly these tools,
+downloaded once and run on your Mac. See <a href="../models/">Hermione AI models</a>.</li>
+<li><strong>Your own model</strong>: any OpenAI-compatible server, such as llama.cpp, Ollama,
+LM Studio or vLLM, usually on your Mac.</li>
+</ul>
+</li>
+</ol>
+<p>Whichever engine answers, the same checks run before anything changes: the
+workflow&#39;s rules, the limits above, and confirmation for archive and complete.</p>
+<h2 id="every-tool"><a class="anchor" href="#every-tool" aria-label="Link to this section">#</a>Every tool</h2>
+<p>The assistant can do exactly these things and nothing else. The list is one file
+in the code (<code>packages/core/src/assistant/tools.ts</code>); the built-in engine, the
+model and the training data all use it.</p>
+<div class="table"><table>
+<thead>
+<tr>
+<th>Tool</th>
+<th>Kind</th>
+<th>Does</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>navigate</code></td>
+<td>view</td>
+<td>Opens a view (home, board, backlog, issues, sprints, roadmap, releases, pages, inbox, settings) or an issue</td>
+</tr>
+<tr>
+<td><code>set_theme</code></td>
+<td>view</td>
+<td>Light, dark, or follow the system</td>
+</tr>
+<tr>
+<td><code>set_accent</code></td>
+<td>view</td>
+<td>The accent colour</td>
+</tr>
+<tr>
+<td><code>set_density</code></td>
+<td>view</td>
+<td>Compact or comfortable</td>
+</tr>
+<tr>
+<td><code>set_text_size</code></td>
+<td>view</td>
+<td>Small, normal, large, larger</td>
+</tr>
+<tr>
+<td><code>toggle_sidebar</code></td>
+<td>view</td>
+<td>Collapses or expands the sidebar</td>
+</tr>
+<tr>
+<td><code>search_issues</code></td>
+<td>read</td>
+<td>Finds issues by text, status, assignee, priority, type, or overdue</td>
+</tr>
+<tr>
+<td><code>summarize</code></td>
+<td>read</td>
+<td>The state of the sprint, your work, or the project</td>
+</tr>
+<tr>
+<td><code>catch_up</code></td>
+<td>read</td>
+<td>What changed lately on one issue or the whole project</td>
+</tr>
+<tr>
+<td><code>create_issue</code></td>
+<td>change</td>
+<td>One issue with any of its fields, parent and description</td>
+</tr>
+<tr>
+<td><code>update_issues</code></td>
+<td>change</td>
+<td>Changes fields on one or more issues by key: status, assignee, priority, points, due date, type, sprint, labels, summary</td>
+</tr>
+<tr>
+<td><code>comment</code></td>
+<td>change</td>
+<td>Adds a comment</td>
+</tr>
+<tr>
+<td><code>create_sprint</code></td>
+<td>change</td>
+<td>Plans a new sprint, with a goal and a length</td>
+</tr>
+<tr>
+<td><code>plan_sprint</code></td>
+<td>change</td>
+<td>Fills a sprint by keys, or by priority up to a points budget</td>
+</tr>
+<tr>
+<td><code>start_sprint</code></td>
+<td>change</td>
+<td>Starts the next planned sprint</td>
+</tr>
+<tr>
+<td><code>complete_sprint</code></td>
+<td>change, asks first</td>
+<td>Completes the active sprint, sending unfinished work to the backlog or the next sprint</td>
+</tr>
+<tr>
+<td><code>create_page</code></td>
+<td>change</td>
+<td>Writes a new page, optionally under another</td>
+</tr>
+<tr>
+<td><code>draft</code></td>
+<td>change</td>
+<td>Writes a retro, release notes or a status update from the project&#39;s real data</td>
+</tr>
+<tr>
+<td><code>archive_issues</code></td>
+<td>change, asks first</td>
+<td>Archives issues (they can be restored)</td>
+</tr>
+<tr>
+<td><code>web_search</code></td>
+<td>web</td>
+<td>Hermione AI + Web only: searches the web</td>
+</tr>
+<tr>
+<td><code>read_web_page</code></td>
+<td>web</td>
+<td>Hermione AI + Web only: reads a page it found</td>
+</tr>
+</tbody></table>
+</div><h2 id="web-answers"><a class="anchor" href="#web-answers" aria-label="Link to this section">#</a>Web answers</h2>
+<p>With <strong>Hermione AI + Web</strong> (Pro) and web answers on, you can ask about things
+outside your project: &quot;what changed in React 19.3?&quot;, &quot;what&#39;s the Postgres
+default for max_connections?&quot;. The model decides what to search for; the app
+runs the search on your own SearXNG server or Brave Search, reads up to a few
+pages, and the model answers on your Mac, naming its sources.</p>
+<p>What leaves your Mac: the search words and the addresses of the pages it reads.
+Never your project. The model is trained never to put project details in a
+search, and only <code>https://</code> pages on the public internet are read; local and
+private network addresses are refused.</p>
+<h2 id="teach-it-your-way-of-working"><a class="anchor" href="#teach-it-your-way-of-working" aria-label="Link to this section">#</a>Teach it your way of working</h2>
+<p>Turn on <strong>Keep examples to improve the model</strong> in <strong>Settings → Assistant</strong> and the
+requests the assistant got right (the ones you kept, where every step worked) are
+saved on your Mac in the same format as the training data. Under <strong>Recent
+actions</strong>, download them as <code>hermione-training.jsonl</code>, ready for <a href="../train-your-own/">training your
+own model</a>.</p>
+<h2 id="when-it-doesn39t-understand"><a class="anchor" href="#when-it-doesn39t-understand" aria-label="Link to this section">#</a>When it doesn&#39;t understand</h2>
+<p>It says so, with examples of what it can do. Rephrase with an issue key and a
+plain verb (&quot;move HER-3 to done&quot;), or set up Hermione AI or your own model for
+looser language.</p>
+
+      <footer class="pager">
+        <a class="prev" href="../your-data/"><span>Previous</span>Your data</a>
+        <a class="next" href="../models/"><span>Next</span>Hermione AI models</a>
+      </footer>
+      <p class="edit"><a href="https://github.com/ansarbuilds/Hermione/blob/main/docs/guide/assistant.md" target="_blank" rel="noopener">Edit this page on GitHub</a></p>
+    </article>
+  </main>
+  <nav class="toc" aria-label="On this page"><p>On this page</p><ul><li><a href="#what-you-can-ask">What you can ask</a></li><li><a href="#plans-before-big-changes">Plans before big changes</a></li><li><a href="#undo">Undo</a></li><li><a href="#how-it-understands-you">How it understands you</a></li><li><a href="#every-tool">Every tool</a></li><li><a href="#web-answers">Web answers</a></li><li><a href="#teach-it-your-way-of-working">Teach it your way of working</a></li><li><a href="#when-it-doesn39t-understand">When it doesn&amp;#39;t understand</a></li></ul></nav>
+</div>
+<dialog class="search" aria-label="Search">
+  <div class="search-box"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg><input type="search" placeholder="Search the docs" aria-label="Search the docs" autocomplete="off" spellcheck="false"><kbd>esc</kbd></div>
+  <ul class="results" role="listbox"></ul>
+</dialog>
+<dialog class="lightbox" aria-label="Screenshot"><img alt=""></dialog>
+<script type="module" src="../assets/site.js"></script>
+</body>
+</html>
